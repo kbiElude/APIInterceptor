@@ -24,19 +24,12 @@ include_directories("${APIInterceptor_BINARY_DIR}"
                     "${APIInterceptor_SOURCE_DIR}/include"
                     "${APIInterceptor_SOURCE_DIR}/include/Khronos")
 
-file(GLOB LauncherIncludes "${APIInterceptor_SOURCE_DIR}/include/Launcher/*.h")
-file(GLOB LauncherSources  "${APIInterceptor_SOURCE_DIR}/src/Launcher/*.cpp")
-
 file(GLOB CommonIncludes "${APIInterceptor_SOURCE_DIR}/include/Common/*.h")
 file(GLOB CommonSources  "${APIInterceptor_SOURCE_DIR}/src/Common/*.cpp")
 
 file(GLOB APIInterceptorIncludes "${APIInterceptor_SOURCE_DIR}/include/APIInterceptor/*.h")
 file(GLOB APIInterceptorSources  "${APIInterceptor_SOURCE_DIR}/src/APIInterceptor/*.cpp"
                                  "${APIInterceptor_SOURCE_DIR}/src/APIInterceptor/*.def")
-
-add_executable(Launcher ${LauncherIncludes}
-                        ${LauncherSources})
-
 
 find_package(OpenGL)
 
@@ -157,7 +150,6 @@ add_library(APIInterceptor SHARED ${CommonSources}
                              ${APIInterceptorIncludes}
                              ${APIInterceptorSources})
 
-target_link_libraries(Launcher  Detours)
 target_link_libraries(APIInterceptor Detours)
 
 add_dependencies     (APIInterceptor GDI32)
@@ -169,17 +161,12 @@ target_link_libraries(APIInterceptor OpenGL ${OPENGL_gl_LIBRARY})
 add_dependencies     (APIInterceptor WGL)
 target_link_libraries(APIInterceptor WGL ${OPENGL_gl_LIBRARY})
 
-add_dependencies(Launcher APIInterceptor)
-
-
 set(LIBRARY_OUTPUT_PATH ${APIInterceptor_BINARY_DIR}/bin)
 
 source_group ("Common include files"     FILES ${CommonIncludes})
 source_group ("GDI32 include files"      FILES ${GDI32Includes})
 source_group ("GDI32 source files"       FILES ${GDI32Sources})
 source_group ("Khronos include files"    FILES ${KhronosIncludes})
-source_group ("Launcher include files"   FILES ${LauncherIncludes})
-source_group ("Launcher source files"    FILES ${LauncherSources})
 source_group ("Entrypoint include files" FILES ${OpenGL32EntrypointsIncludes})
 source_group ("Entrypoint source files"  FILES ${OpenGL32EntrypointsSources})
 source_group ("OpenGL32 include files"   FILES ${OpenGL32Includes})
