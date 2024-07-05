@@ -1,0 +1,33 @@
+/* API Interceptor (c) 2024 Dominik Witczak
+ *
+ * This code is licensed under MIT license (see LICENSE.txt for details)
+ */
+#include "OpenGL/entrypoints/GL3.0/gl_framebuffer_texture_2d.h"
+#include "OpenGL/globals.h"
+#include "OpenGL/utils_enum.h"
+#include "WGL/globals.h"
+
+void AI_APIENTRY OpenGL::aiFramebufferTexture2D(GLenum target,
+                                                GLenum attachment,
+                                                GLenum textarget,
+                                                GLuint texture,
+                                                GLint  level)
+{
+    AI_TRACE("glFramebufferTexture2D(target=[%s] attachment=[%s] textarget=[%s] texture=[%u] level=[%d])",
+             OpenGL::Utils::get_raw_string_for_gl_enum(target),
+             OpenGL::Utils::get_raw_string_for_gl_enum(attachment),
+             OpenGL::Utils::get_raw_string_for_gl_enum(textarget),
+             texture,
+             level);
+
+    if (OpenGL::g_cached_gl_framebuffer_texture_2D == nullptr)
+    {
+        OpenGL::g_cached_gl_framebuffer_texture_2D = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glFramebufferTexture2D");
+    }
+
+    reinterpret_cast<PFNGLFRAMEBUFFERTEXTURE2DPROC>(OpenGL::g_cached_gl_framebuffer_texture_2D)(target,
+                                                                                                attachment,
+                                                                                                textarget,
+                                                                                                texture,
+                                                                                                level);
+}

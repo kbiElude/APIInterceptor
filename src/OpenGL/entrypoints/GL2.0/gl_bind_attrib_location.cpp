@@ -1,0 +1,26 @@
+/* API Interceptor (c) 2024 Dominik Witczak
+ *
+ * This code is licensed under MIT license (see LICENSE.txt for details)
+ */
+#include "OpenGL/entrypoints/GL2.0/gl_bind_attrib_location.h"
+#include "OpenGL/globals.h"
+#include "WGL/globals.h"
+
+void AI_APIENTRY OpenGL::aiBindAttribLocation(GLuint  program,
+                                              GLuint  index,
+                                              GLchar* name)
+{
+    AI_TRACE("glBindAttribLocation(program=[%d] index=[%d] name=[%s])",
+             program,
+             index,
+             name);
+
+    if (OpenGL::g_cached_gl_bind_attrib_location == nullptr)
+    {
+        OpenGL::g_cached_gl_bind_attrib_location = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glBindAttribLocation");
+    }
+
+    reinterpret_cast<PFNGLBINDATTRIBLOCATIONPROC>(OpenGL::g_cached_gl_bind_attrib_location)(program,
+                                                                                            index,
+                                                                                            name);
+}

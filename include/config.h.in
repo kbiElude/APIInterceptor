@@ -1,0 +1,1 @@
+#cmakedefine APIINTERCEPTOR_DUMP_API_CALLS

@@ -1,0 +1,27 @@
+/* API Interceptor (c) 2024 Dominik Witczak
+ *
+ * This code is licensed under MIT license (see LICENSE.txt for details)
+ */
+#include "OpenGL/entrypoints/GL3.2/gl_wait_sync.h"
+#include "OpenGL/globals.h"
+#include "OpenGL/utils_enum.h"
+#include "WGL/globals.h"
+
+void AI_APIENTRY OpenGL::aiWaitSync(GLsync     sync,
+                                    GLbitfield flags,
+                                    GLuint64   timeout)
+{
+    AI_TRACE("glWaitSync(sync=[%p] flags=[%d] timeout=[%lld])",
+             sync,
+             flags,
+             timeout);
+
+    if (OpenGL::g_cached_gl_wait_sync == nullptr)
+    {
+        OpenGL::g_cached_gl_wait_sync = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glWaitSync");
+    }
+
+    reinterpret_cast<PFNGLWAITSYNCPROC>(OpenGL::g_cached_gl_wait_sync)(sync,
+                                                                       flags,
+                                                                       timeout);
+}

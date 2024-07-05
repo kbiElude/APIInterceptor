@@ -1,0 +1,32 @@
+/* API Interceptor (c) 2024 Dominik Witczak
+ *
+ * This code is licensed under MIT license (see LICENSE.txt for details)
+ */
+#include "OpenGL/entrypoints/GL3.0/gl_color_maski.h"
+#include "OpenGL/globals.h"
+#include "WGL/globals.h"
+
+void AI_APIENTRY OpenGL::aiColorMaski(GLuint    index,
+                                      GLboolean r,
+                                      GLboolean g,
+                                      GLboolean b,
+                                      GLboolean a)
+{
+    AI_TRACE("glColorMaski(index=[%d] r=[%d] g=[%d] b=[%d] a=[%d])",
+             index,
+             (r == GL_TRUE) ? 1 : 0,
+             (g == GL_TRUE) ? 1 : 0,
+             (b == GL_TRUE) ? 1 : 0,
+             (a == GL_TRUE) ? 1 : 0);
+
+    if (OpenGL::g_cached_gl_color_maski == nullptr)
+    {
+        OpenGL::g_cached_gl_color_maski = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glColorMaski");
+    }
+
+    reinterpret_cast<PFNGLCOLORMASKIPROC>(OpenGL::g_cached_gl_color_maski)(index,
+                                                                           r,
+                                                                           g,
+                                                                           b,
+                                                                           a);
+}
