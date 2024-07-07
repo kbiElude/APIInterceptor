@@ -13,12 +13,13 @@ namespace APIInterceptor
                                         const APIFunctionArgument* in_args_ptr,
                                         void*                      in_user_arg_ptr);
 
-    bool get_callback_for_function(const APIFunction&                  in_api_func,
-                                   PFNCALLBACKFUNCPROC*                out_callback_func_ptr,
-                                   void**                              out_user_arg_ptr);
-    void register_for_callback    (APIFunction                         in_function,
-                                   APIInterceptor::PFNCALLBACKFUNCPROC in_callback_func_ptr,
-                                   void*                               in_func_user_arg);
+    void disable_callbacks_for_this_thread();
+    bool get_callback_for_function        (const APIFunction&                  in_api_func,
+                                           PFNCALLBACKFUNCPROC*                out_callback_func_ptr,
+                                           void**                              out_user_arg_ptr);
+    void register_for_callback            (APIFunction                         in_function,
+                                           APIInterceptor::PFNCALLBACKFUNCPROC in_callback_func_ptr,
+                                           void*                               in_func_user_arg);
 }
 
 #endif /* COMMON_CALLBACKS_H */

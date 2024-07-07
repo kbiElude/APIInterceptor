@@ -10,19 +10,31 @@
 
 typedef std::pair<APIInterceptor::PFNCALLBACKFUNCPROC, void*> APIFuncCallback;
 
-static auto g_api_func_callback_vec = std::vector<APIFuncCallback>(APIInterceptor::APIFUNCTION_COUNT);
+static auto         g_api_func_callback_vec = std::vector<APIFuncCallback>(APIInterceptor::APIFUNCTION_COUNT);
+AI_THREADLOCAL bool g_callbacks_enabled     = true;
 
+void APIInterceptor::disable_callbacks_for_this_thread()
+{
+    g_callbacks_enabled = false;
+}
 
 bool APIInterceptor::get_callback_for_function(const APIFunction&                   in_api_func,
                                                APIInterceptor::PFNCALLBACKFUNCPROC* out_callback_func_ptr,
                                                void**                               out_user_arg_ptr)
 {
-    auto data_ptr = &g_api_func_callback_vec.at(static_cast<size_t>(in_api_func) );
+    bool result = false;
 
-    *out_callback_func_ptr = data_ptr->first;
-    *out_user_arg_ptr      = data_ptr->second;
+    if (g_callbacks_enabled)
+    {
+        auto data_ptr = &g_api_func_callback_vec.at(static_cast<size_t>(in_api_func) );
 
-    return (data_ptr->first != nullptr);
+        *out_callback_func_ptr = data_ptr->first;
+        *out_user_arg_ptr      = data_ptr->second;
+
+        result = (data_ptr->first != nullptr);
+    }
+
+    return result;
 }
 
 void APIInterceptor::register_for_callback(APIFunction                         in_function,
