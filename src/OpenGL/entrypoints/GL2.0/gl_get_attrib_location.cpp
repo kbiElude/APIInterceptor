@@ -13,9 +13,9 @@ GLint AI_APIENTRY OpenGL::aiGetAttribLocation(GLuint        program,
              program,
              name);
 
-    if (OpenGL::g_cached_gl_end_transform_feedback == nullptr)
+    if (OpenGL::g_cached_gl_get_attrib_location == nullptr)
     {
-        OpenGL::g_cached_gl_end_transform_feedback = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glEndTransformFeedback");
+        OpenGL::g_cached_gl_get_attrib_location = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glGetAttribLocation");
     }
 
     return reinterpret_cast<PFNGLGETATTRIBLOCATIONPROC>(OpenGL::g_cached_gl_get_attrib_location)(program,

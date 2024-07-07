@@ -18,9 +18,9 @@ void AI_APIENTRY OpenGL::aiBufferData(GLenum      target,
              data,
              OpenGL::Utils::get_raw_string_for_gl_enum(usage) );
 
-    if (OpenGL::g_cached_gl_blit_framebuffer == nullptr)
+    if (OpenGL::g_cached_gl_buffer_data == nullptr)
     {
-        OpenGL::g_cached_gl_blit_framebuffer = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glBlitFramebuffer");
+        OpenGL::g_cached_gl_buffer_data = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glBufferData");
     }
 
     reinterpret_cast<PFNGLBUFFERDATAPROC>(OpenGL::g_cached_gl_buffer_data)(target,

@@ -17,6 +17,7 @@
  *       cached trace data is only written at dll detach time!
  */
 APIInterceptor::Logger* APIInterceptor::g_logger_ptr = nullptr;
+AI_THREADLOCAL bool     g_logging_enabled            = true;
 
 
 APIInterceptor::Logger::Logger()
@@ -40,6 +41,8 @@ APIInterceptor::Logger::Logger()
 
 APIInterceptor::Logger::~Logger()
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     ::fclose(m_currentframe_file_ptr);
     ::fclose(m_warning_file_ptr);
 }
@@ -53,6 +56,11 @@ void APIInterceptor::Logger::deinit()
         delete g_logger_ptr;
         g_logger_ptr = nullptr;
     }
+}
+
+void APIInterceptor::Logger::disable_logging_for_this_thread()
+{
+    g_logging_enabled = false;
 }
 
 std::string APIInterceptor::Logger::get_frame_log_filename(const uint32_t& n_frame) const
@@ -82,6 +90,11 @@ void APIInterceptor::Logger::log(const LogLevel& in_log_level,
 {
     va_list args;
     char    temp[MAX_PER_FUNC_LOCAL_HELPER_STORAGE_SIZE];
+
+    if (!g_logging_enabled)
+    {
+        goto end;
+    }
 
     va_start(args,
              in_message_template);
@@ -145,6 +158,11 @@ void APIInterceptor::Logger::on_frame_presented()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
+    if (!g_logging_enabled)
+    {
+        goto end;
+    }
+
     if (g_logger_ptr->m_currentframe_file_ptr != nullptr)
     {
         ::fclose(g_logger_ptr->m_currentframe_file_ptr);
@@ -153,4 +171,7 @@ void APIInterceptor::Logger::on_frame_presented()
     }
 
     m_n_current_frame++;
+
+end:
+    ;
 }

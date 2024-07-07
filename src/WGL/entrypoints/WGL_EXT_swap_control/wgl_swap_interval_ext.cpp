@@ -12,12 +12,5 @@ BOOL WINAPI WGL::swap_interval_ext(int in_interval)
     AI_TRACE("wglSwapIntervalEXT(in_interval=[%d])\n",
                in_interval);
 
-    if (WGL::g_cached_swap_interval_ext_func_ptr == nullptr)
-    {
-        WGL::g_cached_swap_interval_ext_func_ptr = reinterpret_cast<PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("wglSwapIntervalEXT");
-
-        AI_ASSERT(WGL::g_cached_swap_interval_ext_func_ptr != nullptr);
-    }
-
     return reinterpret_cast<PFNWGLSWAPINTERVALEXTPROC>(WGL::g_cached_swap_interval_ext_func_ptr)(in_interval);
 }

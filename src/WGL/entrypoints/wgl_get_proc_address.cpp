@@ -53,10 +53,17 @@ PROC WINAPI WGL::get_proc_address(LPCSTR in_name)
         }
     }
 
+    WGL::g_cached_create_context_attribs_arb_func_ptr = reinterpret_cast<PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("wglCreateContextAttribsARB");
+    WGL::g_cached_get_extensions_string_arb_func_ptr  = reinterpret_cast<PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("wglGetExtensionsStringARB");
+    WGL::g_cached_get_swap_interval_ext_func_ptr      = reinterpret_cast<PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("wglGetSwapIntervalEXT");
+    WGL::g_cached_swap_interval_ext_func_ptr          = reinterpret_cast<PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("wglSwapIntervalEXT");
+
     if (result == nullptr)
     {
         AI_WARN("[!] Application called wglGetProcAddress() for an unsupported entrypoint [%s].",
                 in_name);
+
+        result = reinterpret_cast<PFNWGLGETPROCADDRESSPROC>(g_cached_get_proc_address_func_ptr)(in_name);
     }
 
     return result;
