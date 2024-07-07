@@ -43,8 +43,19 @@ APIInterceptor::Logger::~Logger()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
-    ::fclose(m_currentframe_file_ptr);
-    ::fclose(m_warning_file_ptr);
+    if (m_currentframe_file_ptr != nullptr)
+    {
+        ::fclose(m_currentframe_file_ptr);
+
+        m_currentframe_file_ptr = nullptr;
+    }
+
+    if (m_warning_file_ptr != nullptr)
+    {
+        ::fclose(m_warning_file_ptr);
+
+        m_warning_file_ptr = nullptr;
+    }
 }
 
 void APIInterceptor::Logger::deinit()
