@@ -2,6 +2,7 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
+#include "Common/callbacks.h"
 #include "OpenGL/entrypoints/GL1.0/gl_read_pixels.h"
 #include "OpenGL/globals.h"
 #include "OpenGL/utils_enum.h"
@@ -15,6 +16,9 @@ void AI_APIENTRY OpenGL::aiReadPixels(GLint   x,
                                       GLenum  type,
                                       void*   pixels)
 {
+    void*                               callback_func_arg = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+
     AI_TRACE("glReadPixels(x=[%d] y=[%d] width=[%d] height=[%d] format=[%s] type=[%s] pixels=[%p])",
              x,
              y,
@@ -23,6 +27,26 @@ void AI_APIENTRY OpenGL::aiReadPixels(GLint   x,
              OpenGL::Utils::get_raw_string_for_gl_enum(format),
              OpenGL::Utils::get_raw_string_for_gl_enum(type),
              pixels);
+
+    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLACCUM,
+                                                  &callback_func_ptr,
+                                                  &callback_func_arg) )
+    {
+        const APIInterceptor::APIFunctionArgument args[] =
+        {
+            APIInterceptor::APIFunctionArgument::create_i32     (x),
+            APIInterceptor::APIFunctionArgument::create_i32     (y),
+            APIInterceptor::APIFunctionArgument::create_i32     (width),
+            APIInterceptor::APIFunctionArgument::create_i32     (height),
+            APIInterceptor::APIFunctionArgument::create_u32     (format),
+            APIInterceptor::APIFunctionArgument::create_u32     (type),
+            APIInterceptor::APIFunctionArgument::create_void_ptr(pixels)
+        };
+
+        callback_func_ptr(sizeof(args) / sizeof(args[0]),
+                          args,
+                          callback_func_arg);
+    }
 
     if (OpenGL::g_cached_gl_read_pixels == nullptr)
     {

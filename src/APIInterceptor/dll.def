@@ -1,3 +1,0 @@
-LIBRARY APIInterceptor
-EXPORTS
-     dummy @1

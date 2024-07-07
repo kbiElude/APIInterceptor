@@ -16,4 +16,8 @@
     #error todo
 #endif
 
+/* Two functions below must be implemented by APIInceptor library user projects. */
+extern void on_api_interceptor_removed ();
+extern void on_api_interceptor_injected();
+
 #endif /* COMMON_GLOBALS_H */

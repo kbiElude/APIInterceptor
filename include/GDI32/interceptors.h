@@ -6,6 +6,7 @@
 #define GDI32_INTERCEPTORS_H
 
 #include "Common/globals.h"
+#include "Common/types.h"
 #include <vector>
 
 namespace GDI32

@@ -28,8 +28,7 @@ file(GLOB CommonIncludes "${APIInterceptor_SOURCE_DIR}/include/Common/*.h")
 file(GLOB CommonSources  "${APIInterceptor_SOURCE_DIR}/src/Common/*.cpp")
 
 file(GLOB APIInterceptorIncludes "${APIInterceptor_SOURCE_DIR}/include/APIInterceptor/*.h")
-file(GLOB APIInterceptorSources  "${APIInterceptor_SOURCE_DIR}/src/APIInterceptor/*.cpp"
-                                 "${APIInterceptor_SOURCE_DIR}/src/APIInterceptor/*.def")
+file(GLOB APIInterceptorSources  "${APIInterceptor_SOURCE_DIR}/src/APIInterceptor/*.cpp")
 
 find_package(OpenGL)
 
@@ -146,9 +145,9 @@ add_library(WGL STATIC ${CommonIncludes}
                        ${WGLSources}
                        ${WGLIncludes})
 
-add_library(APIInterceptor SHARED ${CommonSources}
-                             ${APIInterceptorIncludes}
-                             ${APIInterceptorSources})
+add_library(APIInterceptor OBJECT ${CommonSources}
+                                  ${APIInterceptorIncludes}
+                                  ${APIInterceptorSources})
 
 target_link_libraries(APIInterceptor Detours)
 
