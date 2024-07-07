@@ -25,7 +25,8 @@ void AI_APIENTRY OpenGL::aiEnable(GLenum cap)
             APIInterceptor::APIFunctionArgument::create_u32(cap)
         };
 
-        callback_func_ptr(sizeof(args) / sizeof(args[0]),
+        callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLENABLE,
+                          sizeof(args) / sizeof(args[0]),
                           args,
                           callback_func_arg);
     }

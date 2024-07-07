@@ -26,7 +26,8 @@ void AI_APIENTRY OpenGL::aiVertex2fv(const GLfloat* v)
             APIInterceptor::APIFunctionArgument::create_fp32_ptr(v)
         };
 
-        callback_func_ptr(sizeof(args) / sizeof(args[0]),
+        callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLVERTEX2FV,
+                          sizeof(args) / sizeof(args[0]),
                           args,
                           callback_func_arg);
     }

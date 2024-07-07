@@ -7,9 +7,6 @@
 #include "WGL/globals.h"
 #include "WGL/entrypoints/wgl_make_current.h"
 
-
-#include "OpenGL/globals.h"
-
 BOOL WINAPI WGL::make_current(HDC   in_hdc,
                               HGLRC in_hglrc)
 {
@@ -29,7 +26,8 @@ BOOL WINAPI WGL::make_current(HDC   in_hdc,
             APIInterceptor::APIFunctionArgument::create_void_ptr(in_hdc)
         };
 
-        callback_func_ptr(sizeof(args) / sizeof(args[0]),
+        callback_func_ptr(APIInterceptor::APIFUNCTION_WGL_WGLMAKECURRENT,
+                          sizeof(args) / sizeof(args[0]),
                           args,
                           callback_func_arg);
     }

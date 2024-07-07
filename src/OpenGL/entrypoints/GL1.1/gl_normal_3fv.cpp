@@ -25,7 +25,8 @@ void AI_APIENTRY OpenGL::aiNormal3fv(const GLfloat* v)
             APIInterceptor::APIFunctionArgument::create_fp32_ptr(v)
         };
 
-        callback_func_ptr(sizeof(args) / sizeof(args[0]),
+        callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLNORMAL3FV,
+                          sizeof(args) / sizeof(args[0]),
                           args,
                           callback_func_arg);
     }

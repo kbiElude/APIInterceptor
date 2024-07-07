@@ -31,7 +31,8 @@ void AI_APIENTRY OpenGL::aiTexParameterf(GLenum  target,
             APIInterceptor::APIFunctionArgument::create_fp32(param)
         };
 
-        callback_func_ptr(sizeof(args) / sizeof(args[0]),
+        callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLTEXPARAMETERF,
+                          sizeof(args) / sizeof(args[0]),
                           args,
                           callback_func_arg);
     }

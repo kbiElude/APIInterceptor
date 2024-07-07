@@ -34,7 +34,8 @@ void AI_APIENTRY OpenGL::aiVertex4f(GLfloat x,
             APIInterceptor::APIFunctionArgument::create_fp32(w)
         };
 
-        callback_func_ptr(sizeof(args) / sizeof(args[0]),
+        callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLVERTEX4F,
+                          sizeof(args) / sizeof(args[0]),
                           args,
                           callback_func_arg);
     }

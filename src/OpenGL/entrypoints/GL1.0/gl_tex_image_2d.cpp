@@ -49,7 +49,8 @@ void AI_APIENTRY OpenGL::aiTexImage2D(GLenum      target,
             APIInterceptor::APIFunctionArgument::create_void_ptr(pixels)
         };
 
-        callback_func_ptr(sizeof(args) / sizeof(args[0]),
+        callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLTEXIMAGE2D,
+                          sizeof(args) / sizeof(args[0]),
                           args,
                           callback_func_arg);
     }

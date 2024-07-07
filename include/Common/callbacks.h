@@ -9,7 +9,8 @@
 
 namespace APIInterceptor
 {
-    typedef void (*PFNCALLBACKFUNCPROC)(uint32_t                   in_n_args,
+    typedef void (*PFNCALLBACKFUNCPROC)(APIFunction                in_api_func,
+                                        uint32_t                   in_n_args,
                                         const APIFunctionArgument* in_args_ptr,
                                         void*                      in_user_arg_ptr);
 

@@ -28,7 +28,8 @@ void AI_APIENTRY OpenGL::aiAccum(GLenum  op,
             APIInterceptor::APIFunctionArgument::create_fp32(value),
         };
 
-        callback_func_ptr(sizeof(args) / sizeof(args[0]),
+        callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLACCUM,
+                          sizeof(args) / sizeof(args[0]),
                           args,
                           callback_func_arg);
     }

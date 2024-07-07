@@ -25,7 +25,8 @@ void AI_APIENTRY OpenGL::aiCullFace(GLenum mode)
             APIInterceptor::APIFunctionArgument::create_u32(mode)
         };
 
-        callback_func_ptr(sizeof(args) / sizeof(args[0]),
+        callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLCULLFACE,
+                          sizeof(args) / sizeof(args[0]),
                           args,
                           callback_func_arg);
     }

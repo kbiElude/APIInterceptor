@@ -18,7 +18,8 @@ void AI_APIENTRY OpenGL::aiFlush(void)
                                                   &callback_func_ptr,
                                                   &callback_func_arg) )
     {
-        callback_func_ptr(0,
+        callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLFLUSH,
+                          0,
                           nullptr,
                           callback_func_arg);
     }

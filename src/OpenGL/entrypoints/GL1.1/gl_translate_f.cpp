@@ -31,7 +31,8 @@ void AI_APIENTRY OpenGL::aiTranslatef(GLfloat x,
             APIInterceptor::APIFunctionArgument::create_fp32(z),
         };
 
-        callback_func_ptr(sizeof(args) / sizeof(args[0]),
+        callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLTRANSLATEF,
+                          sizeof(args) / sizeof(args[0]),
                           args,
                           callback_func_arg);
     }

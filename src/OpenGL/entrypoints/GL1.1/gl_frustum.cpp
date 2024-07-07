@@ -40,7 +40,8 @@ void AI_APIENTRY OpenGL::aiFrustum(GLdouble left,
             APIInterceptor::APIFunctionArgument::create_fp64(zFar)
         };
 
-        callback_func_ptr(sizeof(args) / sizeof(args[0]),
+        callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLFRUSTUM,
+                          sizeof(args) / sizeof(args[0]),
                           args,
                           callback_func_arg);
     }

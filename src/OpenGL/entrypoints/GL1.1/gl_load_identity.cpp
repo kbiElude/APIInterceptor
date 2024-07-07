@@ -19,7 +19,8 @@ void AI_APIENTRY OpenGL::aiLoadIdentity()
                                                   &callback_func_ptr,
                                                   &callback_func_arg) )
     {
-        callback_func_ptr(0,
+        callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLLOADIDENTITY,
+                          0,
                           nullptr,
                           callback_func_arg);
     }
