@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiStencilOp(GLenum fail,
                                      GLenum zfail,
                                      GLenum zpass)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glStencilOp(fail=[%s] zfail=[%s] zpass=[%s])",
              OpenGL::Utils::get_raw_string_for_gl_enum(fail),
              OpenGL::Utils::get_raw_string_for_gl_enum(zfail),

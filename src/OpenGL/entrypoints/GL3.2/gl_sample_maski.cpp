@@ -9,6 +9,8 @@
 void AI_APIENTRY OpenGL::aiSampleMaski(GLuint     maskNumber,
                                        GLbitfield mask)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glSampleMaski(maskNumber=[%u] mask=[%x])",
              maskNumber,
              mask);

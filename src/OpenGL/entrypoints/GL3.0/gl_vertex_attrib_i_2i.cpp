@@ -10,6 +10,8 @@ void AI_APIENTRY OpenGL::aiVertexAttribI2i(GLuint index,
                                            GLint  x,
                                            GLint  y)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glVertexAttribI2i(index=[%u] x=[%d] y=[%d])",
              index,
              x,

@@ -15,6 +15,8 @@ void AI_APIENTRY OpenGL::aiDrawRangeElementsBaseVertex(GLenum      mode,
                                                        const void* indices,
                                                        GLint       basevertex)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glDrawRangeElementsBaseVertex(mode=[%s] start=%u] end=[%u] count=[%d] type=[%s] indices=[%p] basevertex=[%d])",
              OpenGL::Utils::get_raw_string_for_gl_enum(mode),
              start,

@@ -12,6 +12,8 @@ void AI_APIENTRY OpenGL::aiRenderbufferStorage(GLenum  target,
                                                GLsizei width,
                                                GLsizei height)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glRenderbufferStorage(target=[%s] internalformat=[%s] width=[%d] height=[%d])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              OpenGL::Utils::get_raw_string_for_gl_enum(internalformat),

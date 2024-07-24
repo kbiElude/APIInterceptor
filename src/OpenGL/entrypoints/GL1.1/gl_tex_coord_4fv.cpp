@@ -16,7 +16,7 @@ void AI_APIENTRY OpenGL::aiTexCoord4fv(const GLfloat* v)
     AI_TRACE("glTexCoord4fv(v=[%p])",
              v);
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLACCUM,
+    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTEXCOORD4FV,
                                                   &callback_func_ptr,
                                                   &callback_func_arg) )
     {

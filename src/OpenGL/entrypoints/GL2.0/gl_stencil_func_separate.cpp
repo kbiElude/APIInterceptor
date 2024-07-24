@@ -12,6 +12,8 @@ void AI_APIENTRY OpenGL::aiStencilFuncSeparate(GLenum face,
                                                GLint  ref,
                                                GLuint mask)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glStencilFuncSeparate(face=[%s] func=[%s] ref=[%d] mask=[%u])",
              OpenGL::Utils::get_raw_string_for_gl_enum(face),
              OpenGL::Utils::get_raw_string_for_gl_enum(func),

@@ -8,6 +8,8 @@
 
 void AI_APIENTRY OpenGL::aiEndConditionalRender(void)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glEndConditionalRender()");
 
     if (OpenGL::g_cached_gl_end_conditional_render == nullptr)

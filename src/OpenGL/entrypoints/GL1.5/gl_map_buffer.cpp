@@ -10,6 +10,8 @@
 void *APIENTRY OpenGL::aiMapBuffer(GLenum target,
                                    GLenum access)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glMapBuffer(target=[%s] access=[%s])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              OpenGL::Utils::get_raw_string_for_gl_enum(access) );

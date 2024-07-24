@@ -15,6 +15,8 @@ void AI_APIENTRY OpenGL::aiCompressedTexSubImage1D(GLenum      target,
                                                    GLsizei     imageSize,
                                                    const void* data)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glCompressedTexSubImage1D(target=[%s] level=[%d] xoffset=[%d] width=[%d] format=[%s] imageSize=[%d] data=[%p])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              level,

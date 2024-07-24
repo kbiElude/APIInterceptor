@@ -13,6 +13,8 @@ void AI_APIENTRY OpenGL::aiGetActiveUniformsiv(GLuint        program,
                                                GLenum        pname,
                                                GLint*        params)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetActiveUniformsiv(program=[%u] uniformCount=[%d] uniformIndices=[%p] pname=[%s] params=[%p])",
              program,
              static_cast<int32_t>(uniformCount),

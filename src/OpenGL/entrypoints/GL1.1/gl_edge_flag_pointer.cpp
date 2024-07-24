@@ -10,6 +10,8 @@
 void AI_APIENTRY OpenGL::aiEdgeFlagPointer(GLsizei       stride,
                                            const GLvoid* pointer)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glEdgeFlagPointer(stride=[%d] pointer=[%p])",
              stride,
              pointer);

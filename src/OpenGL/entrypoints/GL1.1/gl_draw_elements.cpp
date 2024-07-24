@@ -12,6 +12,8 @@ void AI_APIENTRY OpenGL::aiDrawElements(GLenum      mode,
                                         GLenum      type,
                                         const void* indices)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glDrawElements(mode=[%s] count=[%d] type=[%s] indices=[%p])",
              OpenGL::Utils::get_raw_string_for_gl_enum(mode),
              static_cast<int32_t>(count),

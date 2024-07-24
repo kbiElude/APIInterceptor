@@ -9,6 +9,8 @@
 
 void AI_APIENTRY OpenGL::aiRasterPos2sv(const GLshort* v)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glRasterPos2sv(v=[%p])",
              v);
 

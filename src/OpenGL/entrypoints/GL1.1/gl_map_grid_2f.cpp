@@ -14,6 +14,8 @@ void AI_APIENTRY OpenGL::aiMapGrid2f(GLint   un,
                                      GLfloat v1,
                                      GLfloat v2)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glMapGrid2f(un=[%d], u1=[%.4f], u2=[%.4f], vn=[%d], v1=[%.4f], v2=[%.4f])",
              un,
              u1,

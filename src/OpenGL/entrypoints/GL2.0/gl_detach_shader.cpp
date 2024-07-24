@@ -10,6 +10,8 @@
 void AI_APIENTRY OpenGL::aiDetachShader(GLuint program,
                                         GLuint shader)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glDetachShader(program=[%d] shader=[%d])",
              program,
              shader);

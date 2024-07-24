@@ -13,6 +13,8 @@ void AI_APIENTRY OpenGL::aiGetActiveUniformName(GLuint   program,
                                                 GLsizei* length,
                                                 GLchar*  uniformName)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetActiveUniformName(program=[%u] uniformIndex=[%u] bufSize=[%d] length=[%p] uniformName=[%p])",
              program,
              uniformIndex,

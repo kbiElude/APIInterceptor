@@ -8,6 +8,8 @@
 
 GLuint AI_APIENTRY OpenGL::aiCreateProgram()
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glCreateProgram()");
 
     if (OpenGL::g_cached_gl_create_program == nullptr)

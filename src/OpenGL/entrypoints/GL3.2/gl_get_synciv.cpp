@@ -13,6 +13,8 @@ void AI_APIENTRY OpenGL::aiGetSynciv(GLsync   sync,
                                      GLsizei* length,
                                      GLint*   values)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetSynciv(sync=[%p] pname=[%s] bufSize=[%d] length=[%p] values=[%p])",
              sync,
              OpenGL::Utils::get_raw_string_for_gl_enum(pname),

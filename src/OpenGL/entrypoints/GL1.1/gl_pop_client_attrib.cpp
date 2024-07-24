@@ -9,6 +9,8 @@
 
 void AI_APIENTRY OpenGL::aiPopClientAttrib()
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glPopClientAttrib()");
 
     reinterpret_cast<PFNGLPOPCLIENTATTRIBPROC>(OpenGL::g_cached_gl_pop_client_attrib)();

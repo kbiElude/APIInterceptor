@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiUniform3i(GLint location,
                                      GLint v1,
                                      GLint v2)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glUniform3i(location=[%d] v0=[%d] v1=[%d] v2=[%d])",
              location,
              v0,

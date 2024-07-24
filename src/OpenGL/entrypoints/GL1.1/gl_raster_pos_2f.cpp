@@ -10,6 +10,8 @@
 void AI_APIENTRY OpenGL::aiRasterPos2f(GLfloat x,
                                        GLfloat y)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glRasterPos2f(x=[%.4f] y=[%.4f])",
              x,
              y);

@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiVertexAttrib3s(GLuint  index,
                                           GLshort y,
                                           GLshort z)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glVertexAttrib3s(index=[%u] x=[%d] y=[%d] z=[%d])",
              index,
              static_cast<int32_t>(x),

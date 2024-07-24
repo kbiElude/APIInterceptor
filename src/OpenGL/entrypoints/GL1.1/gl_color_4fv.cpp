@@ -16,7 +16,7 @@ void AI_APIENTRY OpenGL::aiColor4fv(const GLfloat* v)
     AI_TRACE("glColor4fv(v=[%p])",
              v);
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLACCUM,
+    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCOLOR4FV,
                                                   &callback_func_ptr,
                                                   &callback_func_arg) )
     {

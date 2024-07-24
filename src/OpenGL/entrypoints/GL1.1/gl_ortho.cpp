@@ -26,7 +26,7 @@ void AI_APIENTRY OpenGL::aiOrtho(GLdouble left,
              zNear,
              zFar);
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLACCUM,
+    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLORTHO,
                                                   &callback_func_ptr,
                                                   &callback_func_arg) )
     {

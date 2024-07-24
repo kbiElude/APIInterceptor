@@ -10,6 +10,8 @@
 void AI_APIENTRY OpenGL::aiStencilMaskSeparate(GLenum face,
                                                GLuint mask)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glStencilMaskSeparate(face=[%s] mask=[%u])",
              OpenGL::Utils::get_raw_string_for_gl_enum(face),
              mask);

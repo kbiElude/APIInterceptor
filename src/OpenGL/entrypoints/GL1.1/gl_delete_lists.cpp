@@ -10,6 +10,8 @@
 void AI_APIENTRY OpenGL::aiDeleteLists(GLuint  list,
                                        GLsizei range)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glDeleteLists(list=[%d] range=[%d])",
              list,
              range);

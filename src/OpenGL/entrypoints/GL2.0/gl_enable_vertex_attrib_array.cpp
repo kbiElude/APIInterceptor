@@ -8,6 +8,8 @@
 
 void AI_APIENTRY OpenGL::aiEnableVertexAttribArray(GLuint index)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glEnableVertexAttribArray(index=[%u])",
              index);
 

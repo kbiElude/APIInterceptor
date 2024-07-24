@@ -16,7 +16,7 @@ void AI_APIENTRY OpenGL::aiClearDepth(GLdouble depth)
     AI_TRACE("glClearDepth(depth=[%.4f])",
              static_cast<float>(depth) );
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLACCUM,
+    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCLEARDEPTH,
                                                   &callback_func_ptr,
                                                   &callback_func_arg) )
     {

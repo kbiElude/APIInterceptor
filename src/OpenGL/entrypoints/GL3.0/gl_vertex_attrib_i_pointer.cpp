@@ -13,6 +13,8 @@ void AI_APIENTRY OpenGL::aiVertexAttribIPointer(GLuint      index,
                                                 GLsizei     stride,
                                                 const void* pointer)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glVertexAttribIPointer(index=[%u] size=[%d] type=[%s] stride=[%d] pointer=[%p])",
              index,
              size,

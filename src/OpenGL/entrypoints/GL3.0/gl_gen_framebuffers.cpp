@@ -9,6 +9,8 @@
 void AI_APIENTRY OpenGL::aiGenFramebuffers(GLsizei n,
                                            GLuint* framebuffers)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGenFramebuffers(n=[%d] framebuffers=[%p])",
              static_cast<int32_t>(n),
              framebuffers);

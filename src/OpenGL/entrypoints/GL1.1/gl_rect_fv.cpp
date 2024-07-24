@@ -10,6 +10,8 @@
 void AI_APIENTRY OpenGL::aiRectfv(const GLfloat* v1,
                                   const GLfloat* v2)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glRectfv(v1=[%p], v2=[%p])",
              v1,
              v2);

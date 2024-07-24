@@ -10,6 +10,8 @@
 void AI_APIENTRY OpenGL::aiPixelZoom(GLfloat xfactor,
                                      GLfloat yfactor)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glPixelZoom(xfactor=[%.4f], yfactor=[%.4f])",
              xfactor,
              yfactor);

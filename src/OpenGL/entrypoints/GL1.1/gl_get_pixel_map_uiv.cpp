@@ -10,6 +10,8 @@
 void AI_APIENTRY OpenGL::aiGetPixelMapuiv(GLenum  map,
                                           GLuint* values)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetPixelMapuiv(map=[%s], values=[%p])",
              OpenGL::Utils::get_raw_string_for_gl_enum(map),
              values);

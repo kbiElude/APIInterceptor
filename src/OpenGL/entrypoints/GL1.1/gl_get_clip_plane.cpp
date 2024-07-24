@@ -10,6 +10,8 @@
 void AI_APIENTRY OpenGL::aiGetClipPlane(GLenum    plane,
                                         GLdouble* equation)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("gGetClipPlane(plane=[%s], equation=[%p])",
              OpenGL::Utils::get_raw_string_for_gl_enum(plane),
              equation);

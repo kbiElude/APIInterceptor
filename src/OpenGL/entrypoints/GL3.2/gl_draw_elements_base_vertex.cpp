@@ -13,6 +13,8 @@ void AI_APIENTRY OpenGL::aiDrawElementsBaseVertex(GLenum      mode,
                                                   const void* indices,
                                                   GLint       basevertex)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glDrawElementsBaseVertex(mode=[%s] count=[%d] type=[%s] indices=[%p] basevertex=[%d])",
              OpenGL::Utils::get_raw_string_for_gl_enum(mode),
              static_cast<int32_t>(count),

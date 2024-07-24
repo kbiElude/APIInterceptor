@@ -10,6 +10,8 @@
 void AI_APIENTRY OpenGL::aiEvalPoint2(GLint i,
                                       GLint j)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glEvalPoint2(i=[%d], j=[%d])",
              i,
              j);

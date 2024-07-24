@@ -9,6 +9,8 @@
 
 void AI_APIENTRY OpenGL::aiLoadMatrixd(const GLdouble* m)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glLoadMatrixd(m=[%p])",
              m);
 

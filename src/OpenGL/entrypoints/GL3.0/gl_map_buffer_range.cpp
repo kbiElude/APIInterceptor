@@ -12,6 +12,8 @@ void* APIENTRY OpenGL::aiMapBufferRange(GLenum     target,
                                         GLsizeiptr length,
                                         GLbitfield access)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glMapBufferRange(target=[%s] offset=[%d] length=[%d] access=[%s])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              static_cast<int32_t>(offset),

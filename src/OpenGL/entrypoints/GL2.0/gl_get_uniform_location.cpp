@@ -9,6 +9,8 @@
 GLint AI_APIENTRY OpenGL::aiGetUniformLocation(GLuint        program,
                                                const GLchar* name)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetUniformLocation(program=[%u] name=[%s])",
              program,
              name);

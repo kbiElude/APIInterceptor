@@ -12,6 +12,8 @@ void AI_APIENTRY OpenGL::aiGetBufferSubData(GLenum     target,
                                             GLsizeiptr size,
                                             void*      data)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetBufferSubData(target=[%s] offset=[%d] size=[%d] data=[%p])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              static_cast<int32_t>(offset),

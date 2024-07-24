@@ -17,7 +17,7 @@ void AI_APIENTRY OpenGL::aiDeleteTextures(GLsizei       n,
              static_cast<int32_t>(n),
              textures);
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLACCUM,
+    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDELETETEXTURES,
                                                   &callback_func_ptr,
                                                   &callback_func_arg) )
     {

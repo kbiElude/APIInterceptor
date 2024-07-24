@@ -8,7 +8,7 @@
 
 void AI_APIENTRY OpenGL::aiPointSize(GLfloat size)
 {
-    const auto dispatch_table_ptr = OpenGL::g_dispatch_table_ptr;
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
 
     AI_TRACE("glPointSize(size=[%.4f])",
              size);

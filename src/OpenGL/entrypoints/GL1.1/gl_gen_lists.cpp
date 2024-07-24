@@ -9,6 +9,8 @@
 
 GLuint AI_APIENTRY OpenGL::aiGenLists(GLsizei range)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGenLists(range=[%d])",
              range);
 

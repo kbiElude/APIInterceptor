@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiStencilFunc(GLenum func,
                                        GLint  ref,
                                        GLuint mask)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glStencilFunc(func=[%s] ref=[%d] mask=[%u])",
              OpenGL::Utils::get_raw_string_for_gl_enum(func),
              ref,

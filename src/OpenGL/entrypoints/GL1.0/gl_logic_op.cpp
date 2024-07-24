@@ -9,6 +9,8 @@
 
 void AI_APIENTRY OpenGL::aiLogicOp(GLenum opcode)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glLogicOp(opcode=[%s])",
              OpenGL::Utils::get_raw_string_for_gl_enum(opcode) );
 

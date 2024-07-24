@@ -10,6 +10,8 @@ void AI_APIENTRY OpenGL::aiPrioritizeTextures(GLsizei n,
                                               const GLuint* textures,
                                               const GLclampf* priorities)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glPrioritizeTexturesEXT(n=[%d] textures=[%p] priorities=[%p])",
              n,
              textures,

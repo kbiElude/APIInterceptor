@@ -18,6 +18,8 @@ void AI_APIENTRY OpenGL::aiBlitFramebuffer(GLint      srcX0,
                                            GLbitfield mask,
                                            GLenum     filter)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glBlitFramebuffer(srcX0=[%d] srcY0=[%d] srcX1=[%d] srcY1=[%d] dstX0=[%d] dstY0=[%d] dstX1=[%d] dstY1=[%d] mask=[%s] filter=[%s]",
              srcX0,
              srcY0,

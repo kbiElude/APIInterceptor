@@ -13,6 +13,8 @@ void AI_APIENTRY OpenGL::aiFramebufferTextureLayer(GLenum target,
                                                    GLint  level,
                                                    GLint  layer)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glFramebufferTextureLayer(target=[%s] attachment=[%s] texture=[%u] level=[%d] layer=[%d])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              OpenGL::Utils::get_raw_string_for_gl_enum(attachment),

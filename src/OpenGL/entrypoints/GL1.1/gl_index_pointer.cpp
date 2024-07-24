@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiIndexPointer(GLenum        type,
                                         GLsizei       stride,
                                         const GLvoid* pointer)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glIndexPointer(type=[%s], stride=[%d], pointer=[%p])",
              OpenGL::Utils::get_raw_string_for_gl_enum(type),
              stride,

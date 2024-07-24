@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiTexBuffer(GLenum target,
                                      GLenum internalformat,
                                      GLuint buffer)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glTexBuffer(target=[%s] internalformat=[%s] buffer=[%u])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              OpenGL::Utils::get_raw_string_for_gl_enum(internalformat),

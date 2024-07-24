@@ -18,6 +18,8 @@ void AI_APIENTRY OpenGL::aiMap2f(GLenum         target,
                                  GLint          vorder,
                                  const GLfloat* points)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glMap2f(target=[%s], u1=[%f], u2=[%f], ustride=[%d], uorder=[%d], v1=[%f], v2=[%f], vstride=[%d], vorder=[%d], points=[%p])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              u1,

@@ -12,6 +12,8 @@ void AI_APIENTRY OpenGL::aiRectf(GLfloat x1,
                                  GLfloat x2,
                                  GLfloat y2)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glRectf(x1=[%.4f], y1=[%.4f], x2=[%.4f], y2=[%.4f])",
              x1,
              y1,

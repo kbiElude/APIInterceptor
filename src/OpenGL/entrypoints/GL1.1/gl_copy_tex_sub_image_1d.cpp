@@ -14,6 +14,8 @@ void AI_APIENTRY OpenGL::aiCopyTexSubImage1D(GLenum  target,
                                              GLint   y,
                                              GLsizei width)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glCopyTexSubImage1D(target=[%s] level=[%d] xoffset=[%d] x=[%d] y=[%d] width=[%d])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              level,

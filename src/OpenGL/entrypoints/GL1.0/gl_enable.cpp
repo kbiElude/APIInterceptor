@@ -16,7 +16,7 @@ void AI_APIENTRY OpenGL::aiEnable(GLenum cap)
     AI_TRACE("glEnable(cap=[%s])",
              OpenGL::Utils::get_raw_string_for_gl_enum(cap) );
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLACCUM,
+    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLENABLE,
                                                   &callback_func_ptr,
                                                   &callback_func_arg) )
     {

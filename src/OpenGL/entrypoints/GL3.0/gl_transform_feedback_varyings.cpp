@@ -12,6 +12,8 @@ void AI_APIENTRY OpenGL::aiTransformFeedbackVaryings(GLuint               progra
                                                      const GLchar* const* varyings,
                                                      GLenum               bufferMode)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     /* TODO: Make me more useful */
     AI_TRACE("glTransformFeedbackVaryings(program=[%u] count=[%d] varyings=[%p] bufferMode=[%s])",
              program,

@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiGetShaderInfoLog(GLuint   shader,
                                             GLsizei* length,
                                             GLchar*  infoLog)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetShaderInfoLog(shader=[%u] bufSize=[%d] length=[%p] infoLog=[%p])",
              shader,
              static_cast<int32_t>(bufSize),

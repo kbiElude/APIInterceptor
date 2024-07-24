@@ -10,6 +10,8 @@
 void AI_APIENTRY OpenGL::aiSampleCoverage(GLfloat   value,
                                           GLboolean invert)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glSampleCoverage(value=[%.4f] invert=[%d])",
              value,
              (invert == GL_TRUE) ? 1 : 0);

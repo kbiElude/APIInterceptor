@@ -10,6 +10,8 @@
 void AI_APIENTRY OpenGL::aiGetBooleanv(GLenum     pname,
                                        GLboolean* data)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetBooleanv(pname=[%s] data=[%p])",
              OpenGL::Utils::get_raw_string_for_gl_enum(pname),
              data);

@@ -18,7 +18,7 @@ void AI_APIENTRY OpenGL::aiVertex2f(GLfloat x,
              x,
              y);
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLACCUM,
+    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLVERTEX2F,
                                                   &callback_func_ptr,
                                                   &callback_func_arg) )
     {

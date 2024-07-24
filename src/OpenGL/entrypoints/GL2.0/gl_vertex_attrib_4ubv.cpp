@@ -9,6 +9,8 @@
 void AI_APIENTRY OpenGL::aiVertexAttrib4ubv(GLuint         index,
                                             const GLubyte* v)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     /* TODO: Make me more useful */
     AI_TRACE("glVertexAttrib4ubv(index=[%u] v=[%p])",
              index,

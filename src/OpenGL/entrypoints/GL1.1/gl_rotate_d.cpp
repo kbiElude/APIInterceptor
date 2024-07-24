@@ -12,6 +12,8 @@ void AI_APIENTRY OpenGL::aiRotated(GLdouble angle,
                                    GLdouble y,
                                    GLdouble z)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glRotated(angle=[%.4lf], x=[%.4lf], y=[%.4lf], z=[%.4lf])",
              angle,
              x,

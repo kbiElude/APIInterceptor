@@ -8,6 +8,8 @@
 
 void AI_APIENTRY OpenGL::aiUseProgram(GLuint program)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glUseProgram(program=[%u])",
              program);
 

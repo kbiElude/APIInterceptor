@@ -12,6 +12,8 @@ void AI_APIENTRY OpenGL::aiBlendFuncSeparate(GLenum sfactorRGB,
                                              GLenum sfactorAlpha,
                                              GLenum dfactorAlpha)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glBlendFuncSeparate(sfactorRGB=[%s] dfactorRGB=[%s] sfactorAlpha=[%s] dfactorAlpha=[%s])",
              OpenGL::Utils::get_raw_string_for_gl_enum(sfactorRGB),
              OpenGL::Utils::get_raw_string_for_gl_enum(dfactorRGB),

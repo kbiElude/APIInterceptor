@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiGetMultisamplefv(GLenum   pname,
                                             GLuint   index,
                                             GLfloat* val)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetMultisamplefv(pname=[%s] index=[%u] val=[%p])",
              OpenGL::Utils::get_raw_string_for_gl_enum(pname),
              index,

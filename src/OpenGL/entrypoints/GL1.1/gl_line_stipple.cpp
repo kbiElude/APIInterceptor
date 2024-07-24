@@ -10,6 +10,8 @@
 void AI_APIENTRY OpenGL::aiLineStipple(GLint    factor,
                                        GLushort pattern)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glLineStipple(factor=[%d], pattern=[%d])",
              factor,
              static_cast<uint32_t>(pattern) );

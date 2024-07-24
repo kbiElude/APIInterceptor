@@ -9,7 +9,7 @@
 void AI_APIENTRY OpenGL::aiPolygonOffset(GLfloat factor,
                                          GLfloat units)
 {
-    const auto dispatch_table_ptr = OpenGL::g_dispatch_table_ptr;
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
 
     AI_TRACE("glPolygonOffset(factor=[%.4f] units=[%.4f])",
              factor,

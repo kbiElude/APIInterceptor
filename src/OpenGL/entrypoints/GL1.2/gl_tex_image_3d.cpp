@@ -18,6 +18,8 @@ void AI_APIENTRY OpenGL::aiTexImage3D(GLenum      target,
                                       GLenum      type,
                                       const void* pixels)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glTexImage3D(target=[%s] level={%d] internalformat=[%s] width=[%d] height=[%d] depth=[%d] border=[%d] format=[%s] type=[%s] pixels=[%p])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              level,

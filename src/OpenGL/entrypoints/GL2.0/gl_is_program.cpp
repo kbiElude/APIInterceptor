@@ -8,6 +8,8 @@
 
 GLboolean AI_APIENTRY OpenGL::aiIsProgram(GLuint program)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glIsProgram(program=[%u])",
              program);
 

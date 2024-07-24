@@ -10,6 +10,8 @@
 void AI_APIENTRY OpenGL::aiGetPointerv(GLenum   pname,
                                        GLvoid** params)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetPointerv(pname=[%s], params=[%p])",
              OpenGL::Utils::get_raw_string_for_gl_enum(pname),
              params);

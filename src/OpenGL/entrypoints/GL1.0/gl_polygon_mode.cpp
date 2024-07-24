@@ -18,7 +18,7 @@ void AI_APIENTRY OpenGL::aiPolygonMode(GLenum face,
              OpenGL::Utils::get_raw_string_for_gl_enum(face),
              OpenGL::Utils::get_raw_string_for_gl_enum(mode) );
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLACCUM,
+    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLPOLYGONMODE,
                                                   &callback_func_ptr,
                                                   &callback_func_arg) )
     {

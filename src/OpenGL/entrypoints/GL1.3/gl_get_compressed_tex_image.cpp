@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiGetCompressedTexImage(GLenum target,
                                                  GLint  level,
                                                  void*  img)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetCompressedTexImage(target=[%s] level=[%d] img=[%p])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              level,

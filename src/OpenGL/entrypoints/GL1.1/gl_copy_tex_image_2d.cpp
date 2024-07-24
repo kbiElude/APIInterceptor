@@ -16,6 +16,8 @@ void AI_APIENTRY OpenGL::aiCopyTexImage2D(GLenum  target,
                                           GLsizei height,
                                           GLint   border)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glCopyTexImage2D(target=[%s] level=[%d] internalformat=[%s] x=[%d] y=[%d] width=[%d] height={%d] border=[%d])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              level,

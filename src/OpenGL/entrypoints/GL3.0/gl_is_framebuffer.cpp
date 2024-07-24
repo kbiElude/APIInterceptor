@@ -8,6 +8,8 @@
 
 GLboolean AI_APIENTRY OpenGL::aiIsFramebuffer(GLuint framebuffer)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glIsFramebuffer(framebuffer=[%u])",
              framebuffer);
 

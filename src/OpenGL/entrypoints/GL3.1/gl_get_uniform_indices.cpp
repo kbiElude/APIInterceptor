@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiGetUniformIndices(GLuint               program,
                                              const GLchar* const* uniformNames,
                                              GLuint*              uniformIndices)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     /* TODO: Make me more useful */
     AI_TRACE("glGetUniformIndices(program=[%u] uniformCount=[%d] uniformNames=[%p] uniformIndices=[%p])",
              program,

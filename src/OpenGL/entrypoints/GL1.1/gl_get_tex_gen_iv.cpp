@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiGetTexGeniv(GLenum coord,
                                        GLenum pname,
                                        GLint* params)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetTexGeniv(coord=[%s], pname=[%s], params=[%p])",
              OpenGL::Utils::get_raw_string_for_gl_enum(coord),
              OpenGL::Utils::get_raw_string_for_gl_enum(pname),

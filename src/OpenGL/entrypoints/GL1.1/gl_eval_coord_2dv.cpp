@@ -9,6 +9,8 @@
 
 void AI_APIENTRY OpenGL::aiEvalCoord2dv(const GLdouble* u)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glEvalCoord2dv(u=[%p])",
              u);
 

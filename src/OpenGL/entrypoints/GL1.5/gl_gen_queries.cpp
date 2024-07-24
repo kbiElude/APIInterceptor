@@ -9,6 +9,8 @@
 void AI_APIENTRY OpenGL::aiGenQueries(GLsizei n,
                                       GLuint* ids)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGenQueries(n=[%d] id=[%p])",
              static_cast<int32_t>(n),
              ids);

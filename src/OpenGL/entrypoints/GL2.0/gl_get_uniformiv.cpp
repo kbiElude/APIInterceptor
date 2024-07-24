@@ -10,6 +10,8 @@ void AI_APIENTRY OpenGL::aiGetUniformiv(GLuint program,
                                         GLint  location,
                                         GLint* params)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetUniformiv(program=[%u] location=[%d] params=[%p])",
              program,
              location,

@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiBindFragDataLocation(GLuint        program,
                                                 GLuint        color,
                                                 const GLchar* name)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glBindFragDataLocation(program=[%d] color=[%d] name=[%s])",
              program,
              color,

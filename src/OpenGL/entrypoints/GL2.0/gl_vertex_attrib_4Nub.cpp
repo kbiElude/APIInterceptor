@@ -12,6 +12,8 @@ void AI_APIENTRY OpenGL::aiVertexAttrib4Nub(GLuint  index,
                                             GLubyte z,
                                             GLubyte w)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glVertexAttrib4Nub(index=[%u] x=[%u] y=[%u] z=[%u] w=[%u])",
              index,
              static_cast<uint32_t>(x),

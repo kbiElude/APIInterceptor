@@ -9,7 +9,7 @@
 void AI_APIENTRY OpenGL::aiVertexAttrib1d(GLuint   index,
                                           GLdouble x)
 {
-    const auto& dispatch_table_ptr = OpenGL::g_dispatch_table_ptr;
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
 
     AI_TRACE("glVertexAttrib1d(index=[%u] x=[%.4f])",
              index,

@@ -9,6 +9,8 @@
 GLuint AI_APIENTRY OpenGL::aiGetUniformBlockIndex(GLuint        program,
                                                   const GLchar* uniformBlockName)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetUniformBlockIndex(program=[%u] uniformBlockName=[%s])",
              program,
              uniformBlockName);

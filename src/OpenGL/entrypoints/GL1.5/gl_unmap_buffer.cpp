@@ -9,6 +9,8 @@
 
 GLboolean AI_APIENTRY OpenGL::aiUnmapBuffer(GLenum target)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glUnmapBuffer(target=[%s])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target) );
 

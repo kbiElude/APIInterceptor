@@ -9,6 +9,8 @@
 
 void AI_APIENTRY OpenGL::aiIndexiv(const GLint* c)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glIndexiv(c=[%p])",
              c);
 

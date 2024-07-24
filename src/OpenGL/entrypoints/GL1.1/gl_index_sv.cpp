@@ -9,6 +9,8 @@
 
 void AI_APIENTRY OpenGL::aiIndexsv(const GLshort* c)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glIndexsv(c=[%p])",
              c);
 

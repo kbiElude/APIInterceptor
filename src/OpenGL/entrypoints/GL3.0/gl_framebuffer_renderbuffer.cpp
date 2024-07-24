@@ -12,6 +12,8 @@ void AI_APIENTRY OpenGL::aiFramebufferRenderbuffer(GLenum target,
                                                    GLenum renderbuffertarget,
                                                    GLuint renderbuffer)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glFramebufferRenderbuffer(target=[%s] attachment=[%s] renderbuffertarget=[%s] renderbuffer=[%d])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              OpenGL::Utils::get_raw_string_for_gl_enum(attachment),

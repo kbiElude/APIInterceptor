@@ -10,6 +10,8 @@
 void AI_APIENTRY OpenGL::aiDeleteQueries(GLsizei       n,
                                          const GLuint* ids)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glDeleteQueries(n=[%d] ids=[%p])",
              static_cast<int32_t>(n),
              ids);

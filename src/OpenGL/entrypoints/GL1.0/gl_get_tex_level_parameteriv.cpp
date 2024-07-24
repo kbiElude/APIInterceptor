@@ -12,6 +12,8 @@ void AI_APIENTRY OpenGL::aiGetTexLevelParameteriv(GLenum target,
                                                   GLenum pname,
                                                   GLint* params)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetTexLevelParameteriv(target=[%s] level=[%d] pname=[%s] params=[%p])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              level,

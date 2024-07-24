@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiGetProgramiv(GLuint program,
                                         GLenum pname,
                                         GLint* params)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetProgramiv(program=[%u] pname=[%s] params=[%p])",
              program,
              OpenGL::Utils::get_raw_string_for_gl_enum(pname),

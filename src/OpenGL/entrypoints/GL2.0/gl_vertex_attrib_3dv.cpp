@@ -9,6 +9,8 @@
 void AI_APIENTRY OpenGL::aiVertexAttrib3dv(GLuint          index,
                                            const GLdouble* v)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     /* TODO: Make me more useful */
     AI_TRACE("glVertexAttrib3dv(index=[%u] v=[%p])",
              index,

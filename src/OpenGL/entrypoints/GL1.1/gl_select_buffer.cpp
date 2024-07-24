@@ -10,6 +10,8 @@
 void AI_APIENTRY OpenGL::aiSelectBuffer(GLsizei size,
                                         GLuint* buffer)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glSelectBuffer(size=[%d], buffer=[%p])",
              size,
              buffer);

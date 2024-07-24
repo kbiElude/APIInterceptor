@@ -9,6 +9,8 @@
 
 void AI_APIENTRY OpenGL::aiEdgeFlagv(const GLboolean *flag)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glEdgeFlagv(flag=[%p])",
              flag);
 

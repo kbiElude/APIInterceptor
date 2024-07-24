@@ -9,6 +9,8 @@
 void AI_APIENTRY OpenGL::aiDeleteRenderbuffers(GLsizei       n,
                                                const GLuint* renderbuffers)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glDeleteRenderbuffers(n=[%d] renderbuffers=[%p])",
              static_cast<int32_t>(n),
              renderbuffers);

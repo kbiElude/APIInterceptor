@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiLightiv(GLenum       light,
                                    GLenum       pname,
                                    const GLint* params)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glLightiv(light=[%s], pname=[%s], params=[%p])",
              OpenGL::Utils::get_raw_string_for_gl_enum(light),
              OpenGL::Utils::get_raw_string_for_gl_enum(pname),

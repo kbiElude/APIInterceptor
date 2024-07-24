@@ -8,6 +8,8 @@
 
 void AI_APIENTRY OpenGL::aiDeleteShader(GLuint shader)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glDeleteShader(shader=[%d])",
              shader);
 

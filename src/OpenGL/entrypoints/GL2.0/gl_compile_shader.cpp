@@ -8,6 +8,8 @@
 
 void AI_APIENTRY OpenGL::aiCompileShader(GLuint shader)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glCompileShader(shader=[%d])",
              shader);
 

@@ -9,6 +9,8 @@
 
 void AI_APIENTRY OpenGL::aiIndexf(GLfloat c)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glIndexf(c=[%.4f])",
              c);
 

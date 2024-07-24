@@ -12,6 +12,8 @@ void AI_APIENTRY OpenGL::aiMultiDrawArrays(GLenum         mode,
                                            const GLsizei* count,
                                            GLsizei        drawcount)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glMultiDrawArrays(mode=[%s] first=[%p] count=[%p] drawcount=[%d])",
              OpenGL::Utils::get_raw_string_for_gl_enum(mode),
              first,

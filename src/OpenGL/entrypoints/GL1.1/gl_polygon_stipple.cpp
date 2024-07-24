@@ -9,6 +9,8 @@
 
 void AI_APIENTRY OpenGL::aiPolygonStipple(const GLubyte *mask)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glPolygonStipple(mask=[%p])",
              mask);
 

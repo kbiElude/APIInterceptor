@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiGetAttachedShaders(GLuint   program,
                                               GLsizei* count,
                                               GLuint*  shaders)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetAttachedShaders(program=[%u] maxCount=[%d] count=[%p] shaders=[%p])",
              program,
              static_cast<int32_t>(maxCount),

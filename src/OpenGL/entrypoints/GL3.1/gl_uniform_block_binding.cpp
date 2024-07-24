@@ -10,6 +10,8 @@ void AI_APIENTRY OpenGL::aiUniformBlockBinding(GLuint program,
                                                GLuint uniformBlockIndex,
                                                GLuint uniformBlockBinding)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glUniformBlockBinding(program=[%u] uniformBlockIndex=[%u] uniformBlockBinding=[%u])",
              program,
              uniformBlockIndex,

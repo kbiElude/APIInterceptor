@@ -9,6 +9,8 @@
 void AI_APIENTRY OpenGL::aiGenVertexArrays(GLsizei n,
                                            GLuint* arrays)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGenVertexArrays(n=[%d] arrays=[%p])",
              static_cast<int32_t>(n),
              arrays);

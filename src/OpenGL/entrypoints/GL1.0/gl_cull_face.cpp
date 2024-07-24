@@ -16,7 +16,7 @@ void AI_APIENTRY OpenGL::aiCullFace(GLenum mode)
     AI_TRACE("glCullFace(mode=[%s])",
              OpenGL::Utils::get_raw_string_for_gl_enum(mode) );
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLACCUM,
+    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCULLFACE,
                                                   &callback_func_ptr,
                                                   &callback_func_arg) )
     {

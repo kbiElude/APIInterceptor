@@ -10,6 +10,8 @@ void AI_APIENTRY OpenGL::aiBindAttribLocation(GLuint  program,
                                               GLuint  index,
                                               GLchar* name)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glBindAttribLocation(program=[%d] index=[%d] name=[%s])",
              program,
              index,

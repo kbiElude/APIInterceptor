@@ -13,6 +13,8 @@ void AI_APIENTRY OpenGL::aiCopyBufferSubData(GLenum     readTarget,
                                              GLintptr   writeOffset,
                                              GLsizeiptr size)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glCopyBufferSubData(readTarget=[%s] writeTarget=[%s] readOffset=[%d] writeOffset=[%d] size=[%d])",
              OpenGL::Utils::get_raw_string_for_gl_enum(readTarget),
              OpenGL::Utils::get_raw_string_for_gl_enum(writeTarget),

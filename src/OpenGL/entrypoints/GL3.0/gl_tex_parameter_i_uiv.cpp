@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiTexParameterIuiv(GLenum        target,
                                             GLenum        pname,
                                             const GLuint* params)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glTexParameterIuiv(target=[%s] pname=[%s] params=[%p])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              OpenGL::Utils::get_raw_string_for_gl_enum(pname),

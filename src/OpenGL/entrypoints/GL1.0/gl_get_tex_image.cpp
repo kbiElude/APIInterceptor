@@ -13,6 +13,8 @@ void AI_APIENTRY OpenGL::aiGetTexImage(GLenum target,
                                        GLenum type,
                                        void*  pixels)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetTexImage(target=[%s] level=[%d] format=[%s] type=[%s] pixels=[%p])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              level,

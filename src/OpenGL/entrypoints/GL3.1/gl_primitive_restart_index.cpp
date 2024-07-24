@@ -8,6 +8,8 @@
 
 void AI_APIENTRY OpenGL::aiPrimitiveRestartIndex(GLuint index)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glPrimitiveRestartIndex(index=[%u])",
              index);
 

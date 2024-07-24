@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiTexGend(GLenum   coord,
                                    GLenum   pname,
                                    GLdouble param)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glTexGend(coord=[%s], pname=[%s], param=[%.4lf])",
              OpenGL::Utils::get_raw_string_for_gl_enum(coord),
              OpenGL::Utils::get_raw_string_for_gl_enum(pname),

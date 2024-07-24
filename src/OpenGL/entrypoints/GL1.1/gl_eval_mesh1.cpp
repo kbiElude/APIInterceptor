@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiEvalMesh1(GLenum mode,
                                      GLint  i1,
                                      GLint  i2)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glEvalMesh1(mode=[%s], i1=[%d], i2=[%d])",
              OpenGL::Utils::get_raw_string_for_gl_enum(mode),
              i1,

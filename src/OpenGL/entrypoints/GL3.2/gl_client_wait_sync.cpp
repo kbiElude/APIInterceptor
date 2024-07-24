@@ -11,6 +11,8 @@ GLenum AI_APIENTRY OpenGL::aiClientWaitSync(GLsync     sync,
                                             GLbitfield flags,
                                             GLuint64   timeout)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glClientWaitSync(sync=[%p] flags=[%s] timeout=[%d])",
              sync,
              OpenGL::Utils::get_raw_string_for_gl_bitfield(OpenGL::BitfieldType::Wait_Sync_Mask, flags),

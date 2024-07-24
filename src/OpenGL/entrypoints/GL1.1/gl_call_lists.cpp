@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiCallLists(GLsizei       n,
                                      GLenum        type,
                                      const GLvoid* lists)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glCallLists(n=[%d], type=[%s], lists=[%p])",
              n,
              OpenGL::Utils::get_raw_string_for_gl_enum(type),

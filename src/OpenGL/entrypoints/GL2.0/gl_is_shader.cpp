@@ -8,6 +8,8 @@
 
 GLboolean AI_APIENTRY OpenGL::aiIsShader(GLuint shader)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glIsShader(shader=[%u])",
              shader);
 

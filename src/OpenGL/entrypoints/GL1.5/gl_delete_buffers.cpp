@@ -10,6 +10,8 @@
 void AI_APIENTRY OpenGL::aiDeleteBuffers(GLsizei       n,
                                          const GLuint* buffers)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glDeleteBuffers(n=[%d] buffers=[%p])",
              static_cast<int32_t>(n),
              buffers);

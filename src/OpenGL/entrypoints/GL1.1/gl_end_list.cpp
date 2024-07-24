@@ -9,6 +9,8 @@
 
 void AI_APIENTRY OpenGL::aiEndList()
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glEndList()");
 
     reinterpret_cast<PFNGLENDLISTPROC>(OpenGL::g_cached_gl_end_list)();

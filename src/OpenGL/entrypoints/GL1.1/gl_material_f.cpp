@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiMaterialf(GLenum  face,
                                      GLenum  pname,
                                      GLfloat param)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glMaterialf(face=[%s], pname=[%s], param=[%.4f])",
              OpenGL::Utils::get_raw_string_for_gl_enum(face),
              OpenGL::Utils::get_raw_string_for_gl_enum(pname),

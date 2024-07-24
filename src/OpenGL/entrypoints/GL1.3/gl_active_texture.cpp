@@ -16,7 +16,7 @@ void AI_APIENTRY OpenGL::aiActiveTexture(GLenum texture)
     AI_TRACE("glActiveTexture(texture=[%s])",
              OpenGL::Utils::get_raw_string_for_gl_enum(texture) );
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLACCUM,
+    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLACTIVETEXTURE,
                                                   &callback_func_ptr,
                                                   &callback_func_arg) )
     {

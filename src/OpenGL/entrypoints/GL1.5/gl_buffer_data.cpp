@@ -12,6 +12,8 @@ void AI_APIENTRY OpenGL::aiBufferData(GLenum      target,
                                       const void* data,
                                       GLenum      usage)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glBufferData(target=[%s] size=[%d] data=[%p] usage=[%s])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              static_cast<uint32_t>(size),

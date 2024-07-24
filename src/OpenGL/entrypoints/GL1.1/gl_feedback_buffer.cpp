@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiFeedbackBuffer(GLsizei  size,
                                           GLenum   type,
                                           GLfloat* buffer)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glFeedbackBuffer(size={%d], type=[%s], buffer=[%p])",
              size,
              OpenGL::Utils::get_raw_string_for_gl_enum(type),

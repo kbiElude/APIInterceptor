@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiGetShaderSource(GLuint   shader,
                                            GLsizei* length,
                                            GLchar*  source)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetShaderSource(shader=[%u] bufSize=[%d] length=[%p] source=[%p])",
              shader,
              static_cast<int32_t>(bufSize),

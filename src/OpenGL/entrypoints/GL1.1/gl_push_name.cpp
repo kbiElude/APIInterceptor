@@ -9,6 +9,8 @@
 
 void AI_APIENTRY OpenGL::aiPushName(GLuint name)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glPushName(name=[%d])",
              name);
 

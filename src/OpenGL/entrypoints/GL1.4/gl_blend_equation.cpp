@@ -9,6 +9,8 @@
 
 void AI_APIENTRY OpenGL::aiBlendEquation(GLenum mode)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glBlendEquation(mode=[%s])",
              OpenGL::Utils::get_raw_string_for_gl_enum(mode) );
 

@@ -20,7 +20,7 @@ void AI_APIENTRY OpenGL::aiTranslatef(GLfloat x,
              y,
              z);
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLACCUM,
+    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTRANSLATEF,
                                                   &callback_func_ptr,
                                                   &callback_func_arg) )
     {

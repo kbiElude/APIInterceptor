@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiGetShaderiv(GLuint shader,
                                        GLenum pname,
                                        GLint* params)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetShaderiv(shader=[%u] pname=[%s] params=[%p])",
              shader,
              OpenGL::Utils::get_raw_string_for_gl_enum(pname),

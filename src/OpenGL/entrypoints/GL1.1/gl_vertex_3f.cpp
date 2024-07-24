@@ -20,7 +20,7 @@ void AI_APIENTRY OpenGL::aiVertex3f(GLfloat x,
              y,
              z);
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLACCUM,
+    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLVERTEX3F,
                                                   &callback_func_ptr,
                                                   &callback_func_arg) )
     {

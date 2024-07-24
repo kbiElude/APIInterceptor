@@ -8,7 +8,7 @@
 
 void AI_APIENTRY OpenGL::aiLineWidth(GLfloat width)
 {
-    const auto dispatch_table_ptr = OpenGL::g_dispatch_table_ptr;
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
 
     AI_TRACE("glLineWidth(width=[%.4f])",
              width);

@@ -10,6 +10,8 @@
 void AI_APIENTRY OpenGL::aiLightModelf(GLenum  pname,
                                        GLfloat param)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glLightModelf(pname=[%s], param=[%.4f])",
              OpenGL::Utils::get_raw_string_for_gl_enum(pname),
              param);

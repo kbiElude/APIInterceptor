@@ -15,7 +15,7 @@ void AI_APIENTRY OpenGL::aiEnd()
 
     AI_TRACE("glEnd()");
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLACCUM,
+    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLEND,
                                                   &callback_func_ptr,
                                                   &callback_func_arg) )
     {

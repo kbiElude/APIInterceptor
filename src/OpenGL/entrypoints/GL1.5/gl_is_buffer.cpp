@@ -8,6 +8,8 @@
 
 GLboolean AI_APIENTRY OpenGL::aiIsBuffer(GLuint buffer)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glIsBuffer(buffer=[%u])",
              buffer);
 

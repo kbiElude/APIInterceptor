@@ -9,6 +9,8 @@
 
 void AI_APIENTRY OpenGL::aiCallList(GLuint list)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glCallList(list=[%d])",
              list);
 

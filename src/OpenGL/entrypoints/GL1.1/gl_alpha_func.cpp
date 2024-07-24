@@ -18,7 +18,7 @@ void AI_APIENTRY OpenGL::aiAlphaFunc(GLenum   func,
              OpenGL::Utils::get_raw_string_for_gl_enum(func),
              ref);
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLACCUM,
+    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLALPHAFUNC,
                                                   &callback_func_ptr,
                                                   &callback_func_arg) )
     {

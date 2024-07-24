@@ -15,7 +15,7 @@ void AI_APIENTRY OpenGL::aiClearStencil(GLint s)
     AI_TRACE("glClearStencil(s=[%d])",
              s);
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLACCUM,
+    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCLEARSTENCIL,
                                                   &callback_func_ptr,
                                                   &callback_func_arg) )
     {

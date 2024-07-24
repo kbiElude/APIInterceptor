@@ -12,6 +12,8 @@ void AI_APIENTRY OpenGL::aiColorMaski(GLuint    index,
                                       GLboolean b,
                                       GLboolean a)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glColorMaski(index=[%d] r=[%d] g=[%d] b=[%d] a=[%d])",
              index,
              (r == GL_TRUE) ? 1 : 0,

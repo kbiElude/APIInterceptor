@@ -12,6 +12,8 @@ void AI_APIENTRY OpenGL::aiStencilOpSeparate(GLenum face,
                                              GLenum dpfail,
                                              GLenum dppass)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glStencilOpSeparate(face=[%s] sfail={%s] dpfail=[%s] dppass=[%s])",
              OpenGL::Utils::get_raw_string_for_gl_enum(face),
              OpenGL::Utils::get_raw_string_for_gl_enum(sfail),

@@ -20,7 +20,7 @@ void AI_APIENTRY OpenGL::aiTexParameterf(GLenum  target,
              OpenGL::Utils::get_raw_string_for_gl_enum(pname),
              param);
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLACCUM,
+    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTEXPARAMETERF,
                                                   &callback_func_ptr,
                                                   &callback_func_arg) )
     {

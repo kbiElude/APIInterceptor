@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiGetInteger64i_v(GLenum   target,
                                            GLuint   index,
                                            GLint64* data)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetInteger64i_v(target=[%s] index=[%u] data=[%p])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              index,

@@ -8,6 +8,8 @@
 
 void AI_APIENTRY OpenGL::aiEndTransformFeedback(void)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glEndTransformFeedback()");
 
     if (OpenGL::g_cached_gl_end_transform_feedback == nullptr)

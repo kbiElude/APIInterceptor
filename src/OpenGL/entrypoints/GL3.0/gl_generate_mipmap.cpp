@@ -9,6 +9,8 @@
 
 void AI_APIENTRY OpenGL::aiGenerateMipmap(GLenum target)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGenerateMipmap(target=[%s])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target) );
 

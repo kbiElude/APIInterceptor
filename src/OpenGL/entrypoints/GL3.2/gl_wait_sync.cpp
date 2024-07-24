@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiWaitSync(GLsync     sync,
                                     GLbitfield flags,
                                     GLuint64   timeout)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glWaitSync(sync=[%p] flags=[%d] timeout=[%lld])",
              sync,
              flags,

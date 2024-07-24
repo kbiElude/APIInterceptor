@@ -12,6 +12,8 @@ void AI_APIENTRY OpenGL::aiClearBufferfi(GLenum  buffer,
                                          GLfloat depth,
                                          GLint   stencil)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glClearBufferfi(buffer=[%s] drawbuffer=[%d] depth=[%.4f] stencil=[%d])",
              OpenGL::Utils::get_raw_string_for_gl_enum(buffer),
              drawbuffer,

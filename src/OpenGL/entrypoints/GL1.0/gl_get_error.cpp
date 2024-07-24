@@ -9,6 +9,8 @@
 
 GLenum AI_APIENTRY OpenGL::aiGetError(void)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetError()");
 
     if (OpenGL::g_cached_gl_end_transform_feedback == nullptr)

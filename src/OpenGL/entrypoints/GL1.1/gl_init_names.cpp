@@ -9,6 +9,8 @@
 
 void AI_APIENTRY OpenGL::aiInitNames()
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glInitNames()");
 
     reinterpret_cast<PFNGLINITNAMESPROC>(OpenGL::g_cached_gl_init_names)();

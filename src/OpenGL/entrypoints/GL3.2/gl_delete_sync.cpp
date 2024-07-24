@@ -8,6 +8,8 @@
 
 void AI_APIENTRY OpenGL::aiDeleteSync(GLsync sync)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glDeleteSync(sync=[%p])",
              sync);
 

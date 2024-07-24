@@ -12,6 +12,8 @@ void AI_APIENTRY OpenGL::aiRecti(GLint x1,
                                  GLint x2,
                                  GLint y2)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glRecti(x1=[%d], y1=[%d], x2=[%d], y2=[%d])",
              x1,
              y1,

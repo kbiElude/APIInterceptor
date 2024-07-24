@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiUniformMatrix4x3fv(GLint          location,
                                               GLboolean      transpose,
                                               const GLfloat* value)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     /* TODO: Make me more useful */
     AI_TRACE("glUniformMatrix4x3fv(location=[%d] count=[%d] transpose=[%d] value=[%p])",
              location,

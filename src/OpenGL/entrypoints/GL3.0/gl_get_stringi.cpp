@@ -10,6 +10,8 @@
 const GLubyte *APIENTRY OpenGL::aiGetStringi(GLenum name,
                                              GLuint index)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetStringi(name=[%s] index=[%u])",
              OpenGL::Utils::get_raw_string_for_gl_enum(name),
              index);

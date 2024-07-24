@@ -15,7 +15,7 @@ void AI_APIENTRY OpenGL::aiLoadIdentity()
 
     AI_TRACE("glLoadIdentity()");
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLACCUM,
+    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLLOADIDENTITY,
                                                   &callback_func_ptr,
                                                   &callback_func_arg) )
     {

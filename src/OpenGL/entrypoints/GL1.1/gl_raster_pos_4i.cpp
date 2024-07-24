@@ -12,6 +12,8 @@ void AI_APIENTRY OpenGL::aiRasterPos4i(GLint x,
                                        GLint z,
                                        GLint w)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glRasterPos4i(x=[%d], y=[%d], z=[%d], w=[%d])",
              x,
              y,

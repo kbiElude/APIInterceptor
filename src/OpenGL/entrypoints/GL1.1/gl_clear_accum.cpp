@@ -12,6 +12,8 @@ void AI_APIENTRY OpenGL::aiClearAccum(GLfloat red,
                                       GLfloat blue,
                                       GLfloat alpha)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glClearAccum(red=[%.4f] green=[%.4f] blue=[%.4f] alpha=[%.4f])",
              red,
              green,

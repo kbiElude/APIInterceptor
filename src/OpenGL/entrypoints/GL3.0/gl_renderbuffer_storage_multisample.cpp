@@ -13,6 +13,8 @@ void AI_APIENTRY OpenGL::aiRenderbufferStorageMultisample(GLenum  target,
                                                           GLsizei width,
                                                           GLsizei height)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glRenderbufferStorageMultisample(target=[%s] samples=[%d] internalformat=[%s] width=[%d] height=[%d])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              static_cast<int32_t>(samples),

@@ -10,6 +10,8 @@
 void AI_APIENTRY OpenGL::aiBeginQuery(GLenum target,
                                       GLuint id)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glBeginQuery(target=[%s] id=[%d])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              id);

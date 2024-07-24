@@ -12,6 +12,8 @@ void AI_APIENTRY OpenGL::aiGetActiveUniformBlockiv(GLuint program,
                                                    GLenum pname,
                                                    GLint* params)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetActiveUniformBlockiv(program=[%u] uniformBlockIndex=[%u] pname=[%s] params=[%p])",
              program,
              uniformBlockIndex,

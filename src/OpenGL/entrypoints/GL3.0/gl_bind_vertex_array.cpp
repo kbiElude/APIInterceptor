@@ -8,6 +8,8 @@
 
 void AI_APIENTRY OpenGL::aiBindVertexArray(GLuint array)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glBindVertexArray(array=[%d])",
              array);
 

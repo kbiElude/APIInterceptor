@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiBindBufferBase(GLenum target,
                                           GLuint index,
                                           GLuint buffer)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glBindBufferBase(target=[%s] index=[%d] buffer=[%d])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              index,

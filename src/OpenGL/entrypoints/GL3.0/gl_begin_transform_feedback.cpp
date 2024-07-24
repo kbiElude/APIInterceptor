@@ -9,6 +9,8 @@
 
 void AI_APIENTRY OpenGL::aiBeginTransformFeedback(GLenum primitiveMode)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glBeginTransformFeedback(primitiveMode=[%s])",
              OpenGL::Utils::get_raw_string_for_gl_enum(primitiveMode) );
 

@@ -16,7 +16,7 @@ void AI_APIENTRY OpenGL::aiLoadMatrixf(const GLfloat* m)
     AI_TRACE("glLoadMatrixf(m=[%p])",
              m);
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLACCUM,
+    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLLOADMATRIXF,
                                                   &callback_func_ptr,
                                                   &callback_func_arg) )
     {

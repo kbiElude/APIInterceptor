@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiGetProgramInfoLog(GLuint   program,
                                              GLsizei* length,
                                              GLchar*  infoLog)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetProgramInfoLog(program=[%u] bufSize=[%d] length=[%p] infoLog=[%p])",
              program,
              static_cast<int32_t>(bufSize),

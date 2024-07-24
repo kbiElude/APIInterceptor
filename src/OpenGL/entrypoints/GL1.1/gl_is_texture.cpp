@@ -8,6 +8,8 @@
 
 GLboolean AI_APIENTRY OpenGL::aiIsTexture(GLuint texture)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glIsTexture(texture=[%u])",
                texture);
 

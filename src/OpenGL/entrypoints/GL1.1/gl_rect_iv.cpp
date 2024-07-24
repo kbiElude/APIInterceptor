@@ -10,6 +10,8 @@
 void AI_APIENTRY OpenGL::aiRectiv(const GLint* v1,
                                   const GLint* v2)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glRectiv(v1=[%p], v2=[%p])",
              v1,
              v2);

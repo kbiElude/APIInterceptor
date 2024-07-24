@@ -14,6 +14,8 @@ void AI_APIENTRY OpenGL::aiTexImage2DMultisample(GLenum    target,
                                                  GLsizei   height,
                                                  GLboolean fixedsamplelocations)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glTexImage2DMultisample(target=[%s] samples=[%d] internalformat=[%s] width=[%d] height=[%d] fixedsamplelocations=[%d])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              static_cast<int32_t>(samples),

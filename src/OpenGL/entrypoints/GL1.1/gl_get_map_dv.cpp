@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiGetMapdv(GLenum    target,
                                     GLenum    query,
                                     GLdouble* v)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetMapdv(target=[%s], query=[%s], v=[%p])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              OpenGL::Utils::get_raw_string_for_gl_enum(query),

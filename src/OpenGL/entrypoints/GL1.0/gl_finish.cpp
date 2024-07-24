@@ -14,7 +14,7 @@ void AI_APIENTRY OpenGL::aiFinish(void)
 
     AI_TRACE("glFinish()");
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLACCUM,
+    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLFINISH,
                                                   &callback_func_ptr,
                                                   &callback_func_arg) )
     {

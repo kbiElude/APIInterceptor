@@ -15,6 +15,8 @@ void AI_APIENTRY OpenGL::aiBitmap(GLsizei        width,
                                   GLfloat        ymove,
                                   const GLubyte* bitmapef)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glBitmap(width=[%d] width=[%d] xorig=[%.4f] yorig=[%.4f] xmove=[%.4f] ymove=[%.4f] bitmapef=[%p])",
              width,
              height,

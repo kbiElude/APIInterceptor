@@ -9,6 +9,8 @@
 void AI_APIENTRY OpenGL::aiDeleteFramebuffers(GLsizei       n,
                                               const GLuint* framebuffers)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glDeleteFramebuffers(n=[%d] framebuffers=[%p])",
              static_cast<int32_t>(n),
              framebuffers);

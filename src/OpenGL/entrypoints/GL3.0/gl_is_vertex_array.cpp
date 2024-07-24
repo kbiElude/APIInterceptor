@@ -8,6 +8,8 @@
 
 GLboolean AI_APIENTRY OpenGL::aiIsVertexArray(GLuint array)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glIsVertexArray(array=[%u])",
              array);
 

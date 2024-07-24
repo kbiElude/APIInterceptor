@@ -13,6 +13,8 @@ void AI_APIENTRY OpenGL::aiDrawPixels(GLsizei       width,
                                       GLenum        type,
                                       const GLvoid* pixels)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glDrawPixels(width=[%d] height=[%d] format=[%s] type=[%s] pixels=[%p])",
              width,
              height,

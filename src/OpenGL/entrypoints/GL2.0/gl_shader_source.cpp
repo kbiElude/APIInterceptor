@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiShaderSource(GLuint               shader,
                                         const GLchar* const* string,
                                         const GLint*         length)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     /* TODO: Make me more useful */
     AI_TRACE("glShaderSource(shader=[%u] count=[%d] string=[%p] length=[%p])",
              shader,

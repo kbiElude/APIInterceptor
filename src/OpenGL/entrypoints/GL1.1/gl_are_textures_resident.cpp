@@ -12,6 +12,8 @@ GLboolean AI_APIENTRY OpenGL::aiAreTexturesResident(GLsizei       n,
                                                     const GLuint* textures,
                                                     GLboolean*    residences)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glAreTexturesResident(n=[%d] textures=[%p] residences=[%p])",
              n,
              textures,

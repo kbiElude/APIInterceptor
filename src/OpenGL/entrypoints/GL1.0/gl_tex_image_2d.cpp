@@ -32,7 +32,7 @@ void AI_APIENTRY OpenGL::aiTexImage2D(GLenum      target,
              OpenGL::Utils::get_raw_string_for_gl_enum(type),
              pixels);
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLACCUM,
+    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTEXIMAGE2D,
                                                   &callback_func_ptr,
                                                   &callback_func_arg) )
     {

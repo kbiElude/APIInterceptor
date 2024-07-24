@@ -8,6 +8,8 @@
 
 GLboolean AI_APIENTRY OpenGL::aiIsSync(GLsync sync)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glIsSync(sync=[%p])",
              sync);
 

@@ -15,6 +15,8 @@ void AI_APIENTRY OpenGL::aiGetActiveAttrib(GLuint   program,
                                            GLenum*  type,
                                            GLchar*  name)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetActiveAttrib(program=[%u] index=[%u] bufSize=[%d] length=[%p] size=[%p] type=[%p] name=[%p])",
              program,
              index,

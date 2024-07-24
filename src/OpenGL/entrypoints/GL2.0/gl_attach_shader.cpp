@@ -10,6 +10,8 @@
 void AI_APIENTRY OpenGL::aiAttachShader(GLuint program,
                                         GLuint shader)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glAttachShader(program=[%d] shader=[%d])",
              program,
              shader);

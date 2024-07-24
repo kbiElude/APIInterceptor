@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiGetBufferParameteri64v(GLenum   target,
                                                   GLenum   pname,
                                                   GLint64* params)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetBufferParameteri64v(target=[%s] pname=[%s] params=[%p])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              OpenGL::Utils::get_raw_string_for_gl_enum(pname),

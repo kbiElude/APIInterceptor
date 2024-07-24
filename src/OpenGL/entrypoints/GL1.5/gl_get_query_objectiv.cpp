@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiGetQueryObjectiv(GLuint id,
                                             GLenum pname,
                                             GLint* params)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetQueryObjectiv(id=[%u] pname=[%s] params=[%p])",
              id,
              OpenGL::Utils::get_raw_string_for_gl_enum(pname),

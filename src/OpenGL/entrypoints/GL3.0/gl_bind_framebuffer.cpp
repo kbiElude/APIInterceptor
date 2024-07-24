@@ -10,6 +10,8 @@
 void AI_APIENTRY OpenGL::aiBindFramebuffer(GLenum target,
                                            GLuint framebuffer)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glBindFramebuffer(target=[%s] framebuffer=[%d])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              framebuffer);

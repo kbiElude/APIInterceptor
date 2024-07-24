@@ -12,6 +12,8 @@ void AI_APIENTRY OpenGL::aiRects(GLshort x1,
                                  GLshort x2,
                                  GLshort y2)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glRects(x1=[%d], y1=[%d], x2=[%d], y2=[%d])",
              static_cast<int32_t>(x1),
              static_cast<int32_t>(y1),

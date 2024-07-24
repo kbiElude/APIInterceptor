@@ -10,6 +10,8 @@
 void AI_APIENTRY OpenGL::aiEnablei(GLenum target,
                                    GLuint index)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glEnablei(target=[%s] index=[%u])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              index);

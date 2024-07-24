@@ -13,6 +13,8 @@ void AI_APIENTRY OpenGL::aiBindBufferRange(GLenum     target,
                                            GLintptr   offset,
                                            GLsizeiptr size)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glBindBufferRange(target=[%s] index=[%d] buffer=[%d] offset=[%d] size=[%d])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              index,

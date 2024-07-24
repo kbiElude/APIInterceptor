@@ -9,6 +9,8 @@
 
 void AI_APIENTRY OpenGL::aiPopName()
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glPopName()");
 
     reinterpret_cast<PFNGLPOPNAMEPROC>(OpenGL::g_cached_gl_pop_name)();

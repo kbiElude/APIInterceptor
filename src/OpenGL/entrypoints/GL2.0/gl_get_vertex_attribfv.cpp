@@ -11,6 +11,8 @@ void AI_APIENTRY OpenGL::aiGetVertexAttribfv(GLuint   index,
                                              GLenum   pname,
                                              GLfloat* params)
 {
+    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+
     AI_TRACE("glGetVertexAttribfv(index=[%u] pname=[%s] params=[%p])",
              index,
              OpenGL::Utils::get_raw_string_for_gl_enum(pname),
