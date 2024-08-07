@@ -8,6 +8,7 @@
 #include "globals.h"
 #include "Common/macros.h"
 #include <cstdint>
+#include <vector>
 
 namespace APIInterceptor
 {
@@ -418,6 +419,18 @@ namespace APIInterceptor
         } value;
 
     } APIFunctionArgument;
+
+    struct APICommand
+    {
+        APIFunction                      api_func;
+        std::vector<APIFunctionArgument> api_arg_vec;
+
+        APICommand()
+            :api_func(APIInterceptor::APIFUNCTION_UNKNOWN)
+        {
+            /* Stub */
+        }
+    };
 
     struct FunctionInterceptor
     {
