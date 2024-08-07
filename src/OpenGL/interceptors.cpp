@@ -1411,15 +1411,15 @@ std::vector<APIInterceptor::FunctionInterceptor> OpenGL::get_function_intercepto
         APIInterceptor::FunctionInterceptor(&(PVOID&) OpenGL::g_cached_gl_stencil_func,              OpenGL::aiStencilFunc),
         APIInterceptor::FunctionInterceptor(&(PVOID&) OpenGL::g_cached_gl_stencil_mask,              OpenGL::aiStencilMask),
         APIInterceptor::FunctionInterceptor(&(PVOID&) OpenGL::g_cached_gl_stencil_op,                OpenGL::aiStencilOp),
-        APIInterceptor::FunctionInterceptor(&(PVOID&) OpenGL::g_cached_gl_tex_image_1d,              OpenGL::aiTexImage1D),
-        APIInterceptor::FunctionInterceptor(&(PVOID&) OpenGL::g_cached_gl_tex_image_2d,              OpenGL::aiTexImage2D),
+        APIInterceptor::FunctionInterceptor(&(PVOID&) OpenGL::g_cached_gl_tex_image_1D,              OpenGL::aiTexImage1D),
+        APIInterceptor::FunctionInterceptor(&(PVOID&) OpenGL::g_cached_gl_tex_image_2D,              OpenGL::aiTexImage2D),
         APIInterceptor::FunctionInterceptor(&(PVOID&) OpenGL::g_cached_gl_tex_parameterf,            OpenGL::aiTexParameterf),
         APIInterceptor::FunctionInterceptor(&(PVOID&) OpenGL::g_cached_gl_tex_parameterfv,           OpenGL::aiTexParameterfv),
         APIInterceptor::FunctionInterceptor(&(PVOID&) OpenGL::g_cached_gl_tex_parameteri,            OpenGL::aiTexParameteri),
         APIInterceptor::FunctionInterceptor(&(PVOID&) OpenGL::g_cached_gl_tex_parameteriv,           OpenGL::aiTexParameteriv),
         APIInterceptor::FunctionInterceptor(&(PVOID&) OpenGL::g_cached_gl_tex_sub_image_1d,          OpenGL::aiTexSubImage1D),
         APIInterceptor::FunctionInterceptor(&(PVOID&) OpenGL::g_cached_gl_tex_sub_image_2d,          OpenGL::aiTexSubImage2D),
-        APIInterceptor::FunctionInterceptor(&(PVOID&) OpenGL::g_cached_gl_viewport_func_ptr,         OpenGL::aiViewport),
+        APIInterceptor::FunctionInterceptor(&(PVOID&) OpenGL::g_cached_gl_viewport,                  OpenGL::aiViewport),
 
         /* Compat profile */
         APIInterceptor::FunctionInterceptor(&(PVOID&) OpenGL::g_cached_gl_accum,                  OpenGL::aiAccum),

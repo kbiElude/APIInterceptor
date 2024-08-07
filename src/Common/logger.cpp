@@ -121,7 +121,10 @@ void APIInterceptor::Logger::log(const LogLevel& in_log_level,
         FILE*                       log_file_ptr   (nullptr);
         const bool                  use_warning_log(in_log_level == LogLevel::Warning);
 
-        m_log_data_sstream << temp
+        m_log_data_sstream << "[tid: "
+                           << std::this_thread::get_id()
+                           << "] "
+                           << temp
                            << "\n";
 
         if (use_warning_log)

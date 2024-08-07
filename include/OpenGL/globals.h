@@ -68,15 +68,12 @@ namespace OpenGL
     extern void* g_cached_gl_stencil_func;
     extern void* g_cached_gl_stencil_mask;
     extern void* g_cached_gl_stencil_op;
-    extern void* g_cached_gl_tex_image_1d;
-    extern void* g_cached_gl_tex_image_2d;
     extern void* g_cached_gl_tex_parameterf;
     extern void* g_cached_gl_tex_parameterfv;
     extern void* g_cached_gl_tex_parameteri;
     extern void* g_cached_gl_tex_parameteriv;
     extern void* g_cached_gl_tex_sub_image_1d;
     extern void* g_cached_gl_tex_sub_image_2d;
-    extern void* g_cached_gl_viewport_func_ptr;
 
     /* Compat profile follows */
     extern void* g_cached_gl_accum;
