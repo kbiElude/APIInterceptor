@@ -21,7 +21,7 @@
                                              __LINE__,                        \
                                              "Unexpected condition detected");
 #else
-    #define AI_ASSERT    (assertion)
+    #define AI_ASSERT(assertion)
     #define AI_ASSERT_FAIL()
 #endif
 
