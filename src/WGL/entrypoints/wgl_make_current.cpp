@@ -23,7 +23,8 @@ BOOL WINAPI WGL::make_current(HDC   in_hdc,
     {
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_void_ptr(in_hdc)
+            APIInterceptor::APIFunctionArgument::create_void_ptr(in_hdc),
+            APIInterceptor::APIFunctionArgument::create_void_ptr(in_hglrc),
         };
 
         callback_func_ptr(APIInterceptor::APIFUNCTION_WGL_WGLMAKECURRENT,

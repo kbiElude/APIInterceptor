@@ -15,10 +15,23 @@ void AI_APIENTRY OpenGL::aiTexParameterf(GLenum  target,
     void*                               callback_func_arg = nullptr;
     APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
 
-    AI_TRACE("glTexParameterf(target=[%s] pname=[%s] param=[%.4f])",
-             OpenGL::Utils::get_raw_string_for_gl_enum(target),
-             OpenGL::Utils::get_raw_string_for_gl_enum(pname),
-             param);
+    if ( (pname == GL_TEXTURE_MIN_LOD)    ||
+         (pname == GL_TEXTURE_MAX_LOD)    ||
+         (pname == GL_TEXTURE_BASE_LEVEL) ||
+         (pname == GL_TEXTURE_MAX_LEVEL)  )
+    {
+        AI_TRACE("glTexParameterf(target=[%s] pname=[%s] param=[%.4f])",
+                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 param);
+    }
+    else
+    {
+        AI_TRACE("glTexParameterf(target=[%s] pname=[%s] param=[%s])",
+                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 OpenGL::Utils::get_raw_string_for_gl_enum(static_cast<GLenum>(param) ));
+    }
 
     if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTEXPARAMETERF,
                                                   &callback_func_ptr,

@@ -199,27 +199,6 @@ namespace APIInterceptor
     {
         APIFunctionArgumentType type;
 
-        union
-        {
-            float                 value_fp32;
-            const float*          value_fp32_ptr;
-            double                value_fp64;
-            const double*         value_fp64_ptr;
-            char                  value_i8;
-            const char*           value_i8_ptr;
-            short                 value_i16;
-            const short*          value_i16_ptr;
-            int                   value_i32;
-            const int*            value_i32_ptr;
-            unsigned char         value_u8;
-            const unsigned char*  value_u8_ptr;
-            unsigned short        value_u16;
-            const unsigned short* value_u16_ptr;
-            unsigned int          value_u32;
-            const unsigned int*   value_u32_ptr;
-            const void*           value_ptr;
-        } value;
-
         static APIFunctionArgument create_fp32(const float& in_value)
         {
             APIFunctionArgument result;
@@ -390,6 +369,24 @@ namespace APIInterceptor
             return result;
         }
 
+        const float&          get_fp32    () const;
+        const float*          get_fp32_ptr() const;
+        const double&         get_fp64    () const;
+        const double*         get_fp64_ptr() const;
+        const char&           get_i8      () const;
+        const char*           get_i8_ptr  () const;
+        const short&          get_i16     () const;
+        const short*          get_i16_ptr () const;
+        const int&            get_i32     () const;
+        const int*            get_i32_ptr () const;
+        const unsigned char&  get_u8      () const;
+        const unsigned char*  get_u8_ptr  () const;
+        const unsigned short& get_u16     () const;
+        const unsigned short* get_u16_ptr () const;
+        const unsigned int&   get_u32     () const;
+        const unsigned int*   get_u32_ptr () const;
+        const void*           get_ptr     () const;
+
         APIFunctionArgument(const APIFunctionArgument& in_arg) = default;
 
     private:
@@ -398,6 +395,28 @@ namespace APIInterceptor
         {
             /* Stub */
         }
+
+        union
+        {
+            float                 value_fp32;
+            const float*          value_fp32_ptr;
+            double                value_fp64;
+            const double*         value_fp64_ptr;
+            char                  value_i8;
+            const char*           value_i8_ptr;
+            short                 value_i16;
+            const short*          value_i16_ptr;
+            int                   value_i32;
+            const int*            value_i32_ptr;
+            unsigned char         value_u8;
+            const unsigned char*  value_u8_ptr;
+            unsigned short        value_u16;
+            const unsigned short* value_u16_ptr;
+            unsigned int          value_u32;
+            const unsigned int*   value_u32_ptr;
+            const void*           value_ptr;
+        } value;
+
     } APIFunctionArgument;
 
     struct FunctionInterceptor
