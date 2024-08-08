@@ -431,7 +431,7 @@ void APIInterceptor::convert_api_command_to_string(const APICommand& in_api_comm
                     << ", "
                     << OpenGL::Utils::get_raw_string_for_gl_enum(arg_pname)
                     << ", "
-                    << arg_param
+                    << OpenGL::Utils::get_raw_string_for_gl_enum(static_cast<uint32_t>(arg_param) )
                     << ")\n";
 
             break;
