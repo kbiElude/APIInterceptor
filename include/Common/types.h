@@ -388,14 +388,15 @@ namespace APIInterceptor
         const unsigned int*   get_u32_ptr () const;
         const void*           get_ptr     () const;
 
-        APIFunctionArgument(const APIFunctionArgument& in_arg) = default;
-
-    private:
         APIFunctionArgument()
             :type(UNKNOWN)
         {
             /* Stub */
         }
+
+        APIFunctionArgument(const APIFunctionArgument& in_arg) = default;
+
+    private:
 
         union
         {
