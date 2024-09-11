@@ -10,8 +10,9 @@
 
 void AI_APIENTRY OpenGL::aiClearDepth(GLdouble depth)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glClearDepth(depth=[%.4f])",
              static_cast<float>(depth) );
@@ -28,7 +29,8 @@ void AI_APIENTRY OpenGL::aiClearDepth(GLdouble depth)
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLCLEARDEPTH,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
     if (OpenGL::g_cached_gl_clear_depth == nullptr)
@@ -36,5 +38,8 @@ void AI_APIENTRY OpenGL::aiClearDepth(GLdouble depth)
         OpenGL::g_cached_gl_clear_depth = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glClearDepth");
     }
 
-    reinterpret_cast<PFNGLCLEARDEPTHPROC>(OpenGL::g_cached_gl_clear_depth)(depth);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLCLEARDEPTHPROC>(OpenGL::g_cached_gl_clear_depth)(depth);
+    }
 }

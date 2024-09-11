@@ -13,8 +13,9 @@ void AI_APIENTRY OpenGL::aiRotatef(GLfloat angle,
                                    GLfloat y,
                                    GLfloat z)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glRotatef(angle=[%.4f], x=[%.4f], y=[%.4f], z=[%.4f])",
              angle,
@@ -37,11 +38,15 @@ void AI_APIENTRY OpenGL::aiRotatef(GLfloat angle,
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLROTATEF,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
-    reinterpret_cast<PFNGLROTATEFPROC>(OpenGL::g_cached_gl_rotate_f)(angle,
-                                                                     x,
-                                                                     y,
-                                                                     z);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLROTATEFPROC>(OpenGL::g_cached_gl_rotate_f)(angle,
+                                                                         x,
+                                                                         y,
+                                                                         z);
+    }
 }

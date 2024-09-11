@@ -10,8 +10,9 @@
 
 void AI_APIENTRY OpenGL::aiDepthFunc(GLenum func)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glDepthFunc(func=[%s])",
              OpenGL::Utils::get_raw_string_for_gl_enum(func) );
@@ -28,7 +29,8 @@ void AI_APIENTRY OpenGL::aiDepthFunc(GLenum func)
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLDEPTHFUNC,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
     if (OpenGL::g_cached_gl_depth_func == nullptr)
@@ -36,5 +38,8 @@ void AI_APIENTRY OpenGL::aiDepthFunc(GLenum func)
         OpenGL::g_cached_gl_depth_func = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glDepthFunc");
     }
 
-    reinterpret_cast<PFNGLDEPTHFUNCPROC>(OpenGL::g_cached_gl_depth_func)(func);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLDEPTHFUNCPROC>(OpenGL::g_cached_gl_depth_func)(func);
+    }
 }

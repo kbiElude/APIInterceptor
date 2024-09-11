@@ -13,8 +13,9 @@ void AI_APIENTRY OpenGL::aiVertex4d(GLdouble x,
                                     GLdouble z,
                                     GLdouble w)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glVertex4d(x=[%.4lf], y=[%.4lf], z=[%.4lf], w=[%.4lf])",
              x,
@@ -37,11 +38,15 @@ void AI_APIENTRY OpenGL::aiVertex4d(GLdouble x,
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLVERTEX4D,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
-    reinterpret_cast<PFNGLVERTEX4DPROC>(OpenGL::g_cached_gl_vertex_4d)(x,
-                                                                       y,
-                                                                       z,
-                                                                       w);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLVERTEX4DPROC>(OpenGL::g_cached_gl_vertex_4d)(x,
+                                                                           y,
+                                                                           z,
+                                                                           w);
+    }
 }

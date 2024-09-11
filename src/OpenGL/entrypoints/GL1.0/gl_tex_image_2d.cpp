@@ -18,8 +18,9 @@ void AI_APIENTRY OpenGL::aiTexImage2D(GLenum      target,
                                       GLenum      type,
                                       const void* pixels)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glTexImage2D(target=[%s] level={%d] internalformat=[%s] width=[%d] height=[%d] border=[%d] format=[%s] type=[%s] pixels=[%p])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
@@ -52,7 +53,8 @@ void AI_APIENTRY OpenGL::aiTexImage2D(GLenum      target,
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLTEXIMAGE2D,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
     if (OpenGL::g_cached_gl_tex_image_2D == nullptr)
@@ -60,13 +62,16 @@ void AI_APIENTRY OpenGL::aiTexImage2D(GLenum      target,
         OpenGL::g_cached_gl_tex_image_2D = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glTexImage2D");
     }
 
-    reinterpret_cast<PFNGLTEXIMAGE2DPROC>(OpenGL::g_cached_gl_tex_image_2D)(target,
-                                                                            level,
-                                                                            internalformat,
-                                                                            width,
-                                                                            height,
-                                                                            border,
-                                                                            format,
-                                                                            type,
-                                                                            pixels);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLTEXIMAGE2DPROC>(OpenGL::g_cached_gl_tex_image_2D)(target,
+                                                                                level,
+                                                                                internalformat,
+                                                                                width,
+                                                                                height,
+                                                                                border,
+                                                                                format,
+                                                                                type,
+                                                                                pixels);
+    }
 }

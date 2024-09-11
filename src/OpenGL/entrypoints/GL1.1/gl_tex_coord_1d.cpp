@@ -10,8 +10,9 @@
 
 void AI_APIENTRY OpenGL::aiTexCoord1d(GLdouble s)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glTexCoord1d(s=[%.4lf])",
              s);
@@ -28,8 +29,12 @@ void AI_APIENTRY OpenGL::aiTexCoord1d(GLdouble s)
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLTEXCOORD1D,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
-    reinterpret_cast<PFNGLTEXCOORD1DPROC>(OpenGL::g_cached_gl_tex_coord_1d)(s);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLTEXCOORD1DPROC>(OpenGL::g_cached_gl_tex_coord_1d)(s);
+    }
 }

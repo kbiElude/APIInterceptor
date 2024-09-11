@@ -10,8 +10,9 @@
 
 void AI_APIENTRY OpenGL::aiEnable(GLenum cap)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glEnable(cap=[%s])",
              OpenGL::Utils::get_raw_string_for_gl_enum(cap) );
@@ -28,7 +29,8 @@ void AI_APIENTRY OpenGL::aiEnable(GLenum cap)
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLENABLE,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
     if (OpenGL::g_cached_gl_enable == nullptr)
@@ -36,5 +38,8 @@ void AI_APIENTRY OpenGL::aiEnable(GLenum cap)
         OpenGL::g_cached_gl_enable = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glEnable");
     }
 
-    reinterpret_cast<PFNGLENABLEPROC>(OpenGL::g_cached_gl_enable)(cap);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLENABLEPROC>(OpenGL::g_cached_gl_enable)(cap);
+    }
 }

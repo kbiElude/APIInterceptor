@@ -10,8 +10,9 @@
 
 void AI_APIENTRY OpenGL::aiBegin(GLenum mode)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glBegin(mode=[%s])",
              OpenGL::Utils::get_raw_string_for_gl_enum(mode) );
@@ -28,8 +29,12 @@ void AI_APIENTRY OpenGL::aiBegin(GLenum mode)
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLBEGIN,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
-    reinterpret_cast<PFNGLBEGINPROC>(OpenGL::g_cached_gl_begin)(mode);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLBEGINPROC>(OpenGL::g_cached_gl_begin)(mode);
+    }
 }

@@ -9,10 +9,12 @@
 
 namespace APIInterceptor
 {
+    /* Return true if the captured API call should actually be made. False to drop it. */
     typedef void (*PFNCALLBACKFUNCPROC)(APIFunction                in_api_func,
                                         uint32_t                   in_n_args,
                                         const APIFunctionArgument* in_args_ptr,
-                                        void*                      in_user_arg_ptr);
+                                        void*                      in_user_arg_ptr,
+                                        bool*                      out_should_pass_through_ptr);
 
     void disable_callbacks_for_this_thread();
     bool get_callback_for_function        (const APIFunction&                  in_api_func,

@@ -10,8 +10,9 @@
 
 void AI_APIENTRY OpenGL::aiMatrixMode(GLenum mode)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glMatrixMode(mode=[%s])",
              OpenGL::Utils::get_raw_string_for_gl_enum(mode) );
@@ -28,8 +29,12 @@ void AI_APIENTRY OpenGL::aiMatrixMode(GLenum mode)
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLMATRIXMODE,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
-    reinterpret_cast<PFNGLMATRIXMODEPROC>(OpenGL::g_cached_gl_matrix_mode)(mode);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLMATRIXMODEPROC>(OpenGL::g_cached_gl_matrix_mode)(mode);
+    }
 }

@@ -12,8 +12,9 @@ void AI_APIENTRY OpenGL::aiTexEnviv(GLenum       target,
                                     GLenum       pname,
                                     const GLint* params)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glTexEnviv(target=[%s], pname=[%s], params=[%p])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
@@ -34,10 +35,14 @@ void AI_APIENTRY OpenGL::aiTexEnviv(GLenum       target,
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLTEXENVIV,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
-    reinterpret_cast<PFNGLTEXENVIVPROC>(OpenGL::g_cached_gl_tex_env_iv)(target,
-                                                                        pname,
-                                                                        params);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLTEXENVIVPROC>(OpenGL::g_cached_gl_tex_env_iv)(target,
+                                                                            pname,
+                                                                            params);
+    }
 }

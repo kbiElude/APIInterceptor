@@ -10,8 +10,9 @@
 void AI_APIENTRY OpenGL::aiGenTextures(GLsizei n,
                                        GLuint* textures)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glGenTextures(n=[%d] textures=[%p])",
              static_cast<int32_t>(n),
@@ -30,7 +31,8 @@ void AI_APIENTRY OpenGL::aiGenTextures(GLsizei n,
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGENTEXTURES,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
     if (OpenGL::g_cached_gl_gen_textures == nullptr)
@@ -38,6 +40,12 @@ void AI_APIENTRY OpenGL::aiGenTextures(GLsizei n,
         OpenGL::g_cached_gl_gen_textures = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glGenTextures");
     }
 
-    reinterpret_cast<PFNGLGENTEXTURESPROC>(OpenGL::g_cached_gl_gen_textures)(n,
-                                                                             textures);
+    // NOTE: This API call should always be passed through.
+    AI_ASSERT(should_pass_through);
+
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLGENTEXTURESPROC>(OpenGL::g_cached_gl_gen_textures)(n,
+                                                                                 textures);
+    }
 }

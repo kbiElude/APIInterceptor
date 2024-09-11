@@ -14,8 +14,9 @@ void AI_APIENTRY OpenGL::aiCopyPixels(GLint   x,
                                       GLsizei height,
                                       GLenum  type)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glCopyPixels(x=[%d] y=[%d] width=[%d] height=[%d] type=[%s])",
              x,
@@ -40,12 +41,16 @@ void AI_APIENTRY OpenGL::aiCopyPixels(GLint   x,
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLCOPYPIXELS,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
-    reinterpret_cast<PFNGLCOPYPIXELSPROC>(OpenGL::g_cached_gl_copy_pixels)(x,
-                                                                           y,
-                                                                           width,
-                                                                           height,
-                                                                           type);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLCOPYPIXELSPROC>(OpenGL::g_cached_gl_copy_pixels)(x,
+                                                                               y,
+                                                                               width,
+                                                                               height,
+                                                                               type);
+    }
 }

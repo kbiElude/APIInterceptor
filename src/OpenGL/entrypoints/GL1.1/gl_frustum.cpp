@@ -15,8 +15,9 @@ void AI_APIENTRY OpenGL::aiFrustum(GLdouble left,
                                    GLdouble zNear,
                                    GLdouble zFar)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glFrustum(left=[%.4lf], right=[%.4lf] bottom=[%.4lf] top=[%.4lf] zNear=[%.4lf] zFar=[%.4lf])",
              left,
@@ -43,13 +44,17 @@ void AI_APIENTRY OpenGL::aiFrustum(GLdouble left,
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLFRUSTUM,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
-    reinterpret_cast<PFNGLFRUSTUMPROC>(OpenGL::g_cached_gl_frustum)(left,
-                                                                    right,
-                                                                    bottom,
-                                                                    top,
-                                                                    zNear,
-                                                                    zFar);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLFRUSTUMPROC>(OpenGL::g_cached_gl_frustum)(left,
+                                                                        right,
+                                                                        bottom,
+                                                                        top,
+                                                                        zNear,
+                                                                        zFar);
+    }
 }

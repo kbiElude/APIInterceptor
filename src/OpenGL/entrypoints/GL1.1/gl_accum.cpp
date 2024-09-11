@@ -11,8 +11,9 @@
 void AI_APIENTRY OpenGL::aiAccum(GLenum  op,
                                  GLfloat value)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glAccum(op=[%s], value=[%.4f])",
              OpenGL::Utils::get_raw_string_for_gl_enum(op),
@@ -31,9 +32,13 @@ void AI_APIENTRY OpenGL::aiAccum(GLenum  op,
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLACCUM,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
-    reinterpret_cast<PFNGLACCUMPROC>(OpenGL::g_cached_gl_accum)(op,
-                                                                value);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLACCUMPROC>(OpenGL::g_cached_gl_accum)(op,
+                                                                    value);
+    }
 }

@@ -12,8 +12,9 @@ void AI_APIENTRY OpenGL::aiColorMask(GLboolean red,
                                      GLboolean blue,
                                      GLboolean alpha)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glColorMask(red=[%d] green=[%d] blue={%d] alpha=[%d])",
              (red   == GL_TRUE) ? 1 : 0,
@@ -36,7 +37,8 @@ void AI_APIENTRY OpenGL::aiColorMask(GLboolean red,
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLCOLORMASK,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
     if (OpenGL::g_cached_gl_color_mask == nullptr)
@@ -44,8 +46,11 @@ void AI_APIENTRY OpenGL::aiColorMask(GLboolean red,
         OpenGL::g_cached_gl_color_mask = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glColorMask");
     }
 
-    reinterpret_cast<PFNGLCOLORMASKPROC>(OpenGL::g_cached_gl_color_mask)(red,
-                                                                         green,
-                                                                         blue,
-                                                                         alpha);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLCOLORMASKPROC>(OpenGL::g_cached_gl_color_mask)(red,
+                                                                             green,
+                                                                             blue,
+                                                                             alpha);
+    }
 }

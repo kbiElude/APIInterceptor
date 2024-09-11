@@ -11,8 +11,9 @@
 void AI_APIENTRY OpenGL::aiBlendFunc(GLenum sfactor,
                                      GLenum dfactor)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glBlendFunc(sfactor=[%s] dfactor=[%s])",
              OpenGL::Utils::get_raw_string_for_gl_enum(sfactor),
@@ -31,7 +32,8 @@ void AI_APIENTRY OpenGL::aiBlendFunc(GLenum sfactor,
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLBLENDFUNC,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
     if (OpenGL::g_cached_gl_blend_func == nullptr)
@@ -39,6 +41,9 @@ void AI_APIENTRY OpenGL::aiBlendFunc(GLenum sfactor,
         OpenGL::g_cached_gl_blend_func = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glBlendFunc");
     }
 
-    reinterpret_cast<PFNGLBLENDFUNCPROC>(OpenGL::g_cached_gl_blend_func)(sfactor,
-                                                                         dfactor);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLBLENDFUNCPROC>(OpenGL::g_cached_gl_blend_func)(sfactor,
+                                                                             dfactor);
+    }
 }

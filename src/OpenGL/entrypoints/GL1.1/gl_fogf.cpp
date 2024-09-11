@@ -11,8 +11,9 @@
 void AI_APIENTRY OpenGL::aiFogf(GLenum  pname,
                                 GLfloat param)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glFogf(pname=[%s], param=[%.4f])",
              OpenGL::Utils::get_raw_string_for_gl_enum(pname),
@@ -31,9 +32,13 @@ void AI_APIENTRY OpenGL::aiFogf(GLenum  pname,
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLFOGF,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
-    reinterpret_cast<PFNGLFOGFPROC>(OpenGL::g_cached_gl_fogf)(pname,
-                                                              param);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLFOGFPROC>(OpenGL::g_cached_gl_fogf)(pname,
+                                                                  param);
+    }
 }

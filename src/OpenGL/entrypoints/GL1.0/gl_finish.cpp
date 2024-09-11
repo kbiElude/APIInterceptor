@@ -9,8 +9,9 @@
 
 void AI_APIENTRY OpenGL::aiFinish(void)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glFinish()");
 
@@ -21,7 +22,8 @@ void AI_APIENTRY OpenGL::aiFinish(void)
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLFINISH,
                           0,
                           nullptr,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
     if (OpenGL::g_cached_gl_finish == nullptr)
@@ -29,5 +31,8 @@ void AI_APIENTRY OpenGL::aiFinish(void)
         OpenGL::g_cached_gl_finish = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glFinish");
     }
 
-    reinterpret_cast<PFNGLFINISHPROC>(OpenGL::g_cached_gl_finish)();
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLFINISHPROC>(OpenGL::g_cached_gl_finish)();
+    }
 }

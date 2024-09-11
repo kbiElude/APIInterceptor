@@ -10,8 +10,9 @@
 
 void AI_APIENTRY OpenGL::aiClear(GLbitfield mask)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glClear(mask=[%s])",
              OpenGL::Utils::get_raw_string_for_gl_bitfield(OpenGL::BitfieldType::Clear_Buffer_Mask, mask) );
@@ -28,7 +29,8 @@ void AI_APIENTRY OpenGL::aiClear(GLbitfield mask)
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLCLEAR,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
     if (OpenGL::g_cached_gl_clear == nullptr)
@@ -36,5 +38,8 @@ void AI_APIENTRY OpenGL::aiClear(GLbitfield mask)
         OpenGL::g_cached_gl_clear = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glClear");
     }
 
-    reinterpret_cast<PFNGLCLEARPROC>(OpenGL::g_cached_gl_clear)(mask);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLCLEARPROC>(OpenGL::g_cached_gl_clear)(mask);
+    }
 }

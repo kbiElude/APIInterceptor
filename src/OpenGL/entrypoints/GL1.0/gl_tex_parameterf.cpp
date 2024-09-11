@@ -12,8 +12,9 @@ void AI_APIENTRY OpenGL::aiTexParameterf(GLenum  target,
                                          GLenum  pname,
                                          GLfloat param)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     if ( (pname == GL_TEXTURE_MIN_LOD)    ||
          (pname == GL_TEXTURE_MAX_LOD)    ||
@@ -47,7 +48,8 @@ void AI_APIENTRY OpenGL::aiTexParameterf(GLenum  target,
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLTEXPARAMETERF,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
     if (OpenGL::g_cached_gl_tex_parameterf == nullptr)
@@ -55,7 +57,10 @@ void AI_APIENTRY OpenGL::aiTexParameterf(GLenum  target,
         OpenGL::g_cached_gl_tex_parameterf = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glTexParameterf");
     }
 
-    reinterpret_cast<PFNGLTEXPARAMETERFPROC>(OpenGL::g_cached_gl_tex_parameterf)(target,
-                                                                                 pname,
-                                                                                 param);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLTEXPARAMETERFPROC>(OpenGL::g_cached_gl_tex_parameterf)(target,
+                                                                                     pname,
+                                                                                     param);
+    }
 }

@@ -11,8 +11,9 @@
 void AI_APIENTRY OpenGL::aiPolygonMode(GLenum face,
                                        GLenum mode)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glPolygonMode(face=[%s] mode=[%s])",
              OpenGL::Utils::get_raw_string_for_gl_enum(face),
@@ -31,7 +32,8 @@ void AI_APIENTRY OpenGL::aiPolygonMode(GLenum face,
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLPOLYGONMODE,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
     if (OpenGL::g_cached_gl_polygon_mode == nullptr)
@@ -39,6 +41,9 @@ void AI_APIENTRY OpenGL::aiPolygonMode(GLenum face,
         OpenGL::g_cached_gl_polygon_mode = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glPolygonMode");
     }
 
-    reinterpret_cast<PFNGLPOLYGONMODEPROC>(g_cached_gl_polygon_mode)(face,
-                                                                     mode);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLPOLYGONMODEPROC>(g_cached_gl_polygon_mode)(face,
+                                                                         mode);
+    }
 }

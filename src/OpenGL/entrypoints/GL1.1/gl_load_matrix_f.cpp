@@ -10,8 +10,9 @@
 
 void AI_APIENTRY OpenGL::aiLoadMatrixf(const GLfloat* m)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glLoadMatrixf(m=[%p])",
              m);
@@ -28,8 +29,12 @@ void AI_APIENTRY OpenGL::aiLoadMatrixf(const GLfloat* m)
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLLOADMATRIXF,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
-    reinterpret_cast<PFNGLLOADMATRIXFPROC>(OpenGL::g_cached_gl_load_matrix_f)(m);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLLOADMATRIXFPROC>(OpenGL::g_cached_gl_load_matrix_f)(m);
+    }
 }

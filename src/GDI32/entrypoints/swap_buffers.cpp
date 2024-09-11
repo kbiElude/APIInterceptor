@@ -10,8 +10,9 @@
 
 BOOL WINAPI GDI32::swap_buffers(HDC in_hdc)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("SwapBuffers(in_hdc=[%p])",
              in_hdc);
@@ -28,10 +29,18 @@ BOOL WINAPI GDI32::swap_buffers(HDC in_hdc)
         callback_func_ptr(APIInterceptor::APIFUNCTION_GDI32_SWAPBUFFERS,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
     APIInterceptor::g_logger_ptr->on_frame_presented();
 
-    return reinterpret_cast<GDI32::PFNSWAPBUFFERSPROC>(GDI32::g_cached_swap_buffers_func_ptr)(in_hdc);
+    if (should_pass_through)
+    {
+        return reinterpret_cast<GDI32::PFNSWAPBUFFERSPROC>(GDI32::g_cached_swap_buffers_func_ptr)(in_hdc);
+    }
+    else
+    {
+        return TRUE;
+    }
 }

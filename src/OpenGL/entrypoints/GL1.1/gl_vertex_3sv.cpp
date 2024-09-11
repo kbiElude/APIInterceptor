@@ -10,8 +10,9 @@
 
 void AI_APIENTRY OpenGL::aiVertex3sv(const GLshort* v)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glVertex3sv(v=[%p])",
              v);
@@ -28,8 +29,12 @@ void AI_APIENTRY OpenGL::aiVertex3sv(const GLshort* v)
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLVERTEX3SV,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
-    reinterpret_cast<PFNGLVERTEX3SVPROC>(OpenGL::g_cached_gl_vertex_3sv)(v);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLVERTEX3SVPROC>(OpenGL::g_cached_gl_vertex_3sv)(v);
+    }
 }

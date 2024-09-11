@@ -10,8 +10,9 @@
 
 void AI_APIENTRY OpenGL::aiFrontFace(GLenum mode)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glFrontFace(mode=[%s])",
              OpenGL::Utils::get_raw_string_for_gl_enum(mode) );
@@ -28,7 +29,8 @@ void AI_APIENTRY OpenGL::aiFrontFace(GLenum mode)
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLFRONTFACE,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
     if (OpenGL::g_cached_gl_front_face == nullptr)
@@ -36,5 +38,8 @@ void AI_APIENTRY OpenGL::aiFrontFace(GLenum mode)
         OpenGL::g_cached_gl_front_face = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glFrontFace");
     }
 
-    reinterpret_cast<PFNGLFRONTFACEPROC>(OpenGL::g_cached_gl_front_face)(mode);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLFRONTFACEPROC>(OpenGL::g_cached_gl_front_face)(mode);
+    }
 }

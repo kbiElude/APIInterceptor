@@ -9,8 +9,9 @@
 
 void AI_APIENTRY OpenGL::aiFlush(void)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glFlush()");
 
@@ -21,7 +22,8 @@ void AI_APIENTRY OpenGL::aiFlush(void)
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLFLUSH,
                           0,
                           nullptr,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
     if (OpenGL::g_cached_gl_flush == nullptr)
@@ -29,5 +31,8 @@ void AI_APIENTRY OpenGL::aiFlush(void)
         OpenGL::g_cached_gl_flush = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glFlush");
     }
 
-    reinterpret_cast<PFNGLFLUSHPROC>(OpenGL::g_cached_gl_flush)();
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLFLUSHPROC>(OpenGL::g_cached_gl_flush)();
+    }
 }

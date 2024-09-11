@@ -12,8 +12,9 @@ void AI_APIENTRY OpenGL::aiColor3d(GLdouble red,
                                    GLdouble green,
                                    GLdouble blue)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glColor3d(red=[%.4lf] green=[%.4lf] blue=[%.4lf])",
              red,
@@ -34,10 +35,14 @@ void AI_APIENTRY OpenGL::aiColor3d(GLdouble red,
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLCOLOR3D,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
-    reinterpret_cast<PFNGLCOLOR3DPROC>(OpenGL::g_cached_gl_color_3d)(red,
-                                                                     green,
-                                                                     blue);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLCOLOR3DPROC>(OpenGL::g_cached_gl_color_3d)(red,
+                                                                         green,
+                                                                         blue);
+    }
 }

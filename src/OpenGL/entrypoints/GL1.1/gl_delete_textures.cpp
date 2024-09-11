@@ -10,8 +10,9 @@
 void AI_APIENTRY OpenGL::aiDeleteTextures(GLsizei       n,
                                           const GLuint* textures)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glDeleteTextures(n=[%d] texture=[%p])",
              static_cast<int32_t>(n),
@@ -30,7 +31,8 @@ void AI_APIENTRY OpenGL::aiDeleteTextures(GLsizei       n,
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLDELETETEXTURES,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
     if (OpenGL::g_cached_gl_delete_textures == nullptr)
@@ -38,6 +40,9 @@ void AI_APIENTRY OpenGL::aiDeleteTextures(GLsizei       n,
         OpenGL::g_cached_gl_delete_textures = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glDeleteTextures");
     }
 
-    reinterpret_cast<PFNGLDELETETEXTURESPROC>(OpenGL::g_cached_gl_delete_textures)(n,
-                                                                                   textures);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLDELETETEXTURESPROC>(OpenGL::g_cached_gl_delete_textures)(n,
+                                                                                       textures);
+    }
 }

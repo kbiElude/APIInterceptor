@@ -10,8 +10,9 @@
 
 void AI_APIENTRY OpenGL::aiLoadIdentity()
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glLoadIdentity()");
 
@@ -22,8 +23,12 @@ void AI_APIENTRY OpenGL::aiLoadIdentity()
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLLOADIDENTITY,
                           0,
                           nullptr,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
-    reinterpret_cast<PFNGLLOADIDENTITYPROC>(OpenGL::g_cached_gl_load_identity)();
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLLOADIDENTITYPROC>(OpenGL::g_cached_gl_load_identity)();
+    }
 }

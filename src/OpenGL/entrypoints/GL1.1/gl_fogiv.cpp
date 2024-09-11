@@ -11,8 +11,9 @@
 void AI_APIENTRY OpenGL::aiFogiv(GLenum       pname,
                                  const GLint* params)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glFogiv(pname=[%s], params=[%p])",
              OpenGL::Utils::get_raw_string_for_gl_enum(pname),
@@ -31,9 +32,13 @@ void AI_APIENTRY OpenGL::aiFogiv(GLenum       pname,
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLFOGIV,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
-    reinterpret_cast<PFNGLFOGIVPROC>(OpenGL::g_cached_gl_fogiv)(pname,
-                                                                params);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLFOGIVPROC>(OpenGL::g_cached_gl_fogiv)(pname,
+                                                                    params);
+    }
 }

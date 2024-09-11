@@ -11,8 +11,9 @@
 void AI_APIENTRY OpenGL::aiClipPlane(GLenum          plane,
                                      const GLdouble* equation)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glClipPlane(plane=[%s], equation=[%p])",
              OpenGL::Utils::get_raw_string_for_gl_enum(plane),
@@ -31,9 +32,13 @@ void AI_APIENTRY OpenGL::aiClipPlane(GLenum          plane,
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLCLIPPLANE,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
-    reinterpret_cast<PFNGLCLIPPLANEPROC>(OpenGL::g_cached_gl_clip_plane)(plane,
-                                                                         equation);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLCLIPPLANEPROC>(OpenGL::g_cached_gl_clip_plane)(plane,
+                                                                             equation);
+    }
 }

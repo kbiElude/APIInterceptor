@@ -10,8 +10,9 @@
 
 void AI_APIENTRY OpenGL::aiVertex4iv(const GLint* v)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glVertex4iv(v=[%p])",
              v);
@@ -28,8 +29,12 @@ void AI_APIENTRY OpenGL::aiVertex4iv(const GLint* v)
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLVERTEX4IV,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
-    reinterpret_cast<PFNGLVERTEX4IVPROC>(OpenGL::g_cached_gl_vertex_4iv)(v);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLVERTEX4IVPROC>(OpenGL::g_cached_gl_vertex_4iv)(v);
+    }
 }

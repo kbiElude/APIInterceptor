@@ -11,8 +11,9 @@
 void AI_APIENTRY OpenGL::aiVertex2s(GLshort x,
                                     GLshort y)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glVertex2s(x=[%d], y=[%d])",
              static_cast<int32_t>(x),
@@ -31,9 +32,13 @@ void AI_APIENTRY OpenGL::aiVertex2s(GLshort x,
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLVERTEX2S,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
-    reinterpret_cast<PFNGLVERTEX2SPROC>(OpenGL::g_cached_gl_vertex_2s)(x,
-                                                                       y);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLVERTEX2SPROC>(OpenGL::g_cached_gl_vertex_2s)(x,
+                                                                           y);
+    }
 }

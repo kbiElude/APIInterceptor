@@ -10,8 +10,9 @@
 
 void AI_APIENTRY OpenGL::aiPushMatrix()
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glPushMatrix()");
 
@@ -22,8 +23,12 @@ void AI_APIENTRY OpenGL::aiPushMatrix()
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLPUSHMATRIX,
                           0,       /* in_n_args   */
                           nullptr, /* in_args_ptr */
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
-    reinterpret_cast<PFNGLPUSHMATRIXPROC>(OpenGL::g_cached_gl_push_matrix)();
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLPUSHMATRIXPROC>(OpenGL::g_cached_gl_push_matrix)();
+    }
 }

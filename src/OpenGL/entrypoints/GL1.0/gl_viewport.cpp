@@ -12,8 +12,9 @@ void AI_APIENTRY OpenGL::aiViewport(GLint   x,
                                     GLsizei width,
                                     GLsizei height)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glViewport(x=[%d] y=[%d] width=[%d] height=[%d])",
              x,
@@ -36,7 +37,8 @@ void AI_APIENTRY OpenGL::aiViewport(GLint   x,
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLVIEWPORT,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
     if (OpenGL::g_cached_gl_viewport == nullptr)
@@ -44,8 +46,11 @@ void AI_APIENTRY OpenGL::aiViewport(GLint   x,
         OpenGL::g_cached_gl_viewport = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glViewport");
     }
 
-    reinterpret_cast<PFNGLVIEWPORTPROC>(OpenGL::g_cached_gl_viewport)(x,
-                                                                      y,
-                                                                      width,
-                                                                      height);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLVIEWPORTPROC>(OpenGL::g_cached_gl_viewport)(x,
+                                                                          y,
+                                                                          width,
+                                                                          height);
+    }
 }

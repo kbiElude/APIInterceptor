@@ -10,8 +10,9 @@
 
 void AI_APIENTRY OpenGL::aiActiveTexture(GLenum texture)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glActiveTexture(texture=[%s])",
              OpenGL::Utils::get_raw_string_for_gl_enum(texture) );
@@ -28,7 +29,8 @@ void AI_APIENTRY OpenGL::aiActiveTexture(GLenum texture)
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLACTIVETEXTURE,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
     if (OpenGL::g_cached_gl_active_texture == nullptr)
@@ -36,5 +38,8 @@ void AI_APIENTRY OpenGL::aiActiveTexture(GLenum texture)
         OpenGL::g_cached_gl_active_texture = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glActiveTexture");
     }
 
-    reinterpret_cast<PFNGLACTIVETEXTUREPROC>(OpenGL::g_cached_gl_active_texture)(texture);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLACTIVETEXTUREPROC>(OpenGL::g_cached_gl_active_texture)(texture);
+    }
 }

@@ -9,8 +9,9 @@
 
 void AI_APIENTRY OpenGL::aiDepthMask(GLboolean flag)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glDepthMask(flag=[%d])",
              (flag == GL_TRUE) ? 1 : 0);
@@ -27,7 +28,8 @@ void AI_APIENTRY OpenGL::aiDepthMask(GLboolean flag)
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLDEPTHMASK,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
     if (OpenGL::g_cached_gl_depth_mask == nullptr)
@@ -35,5 +37,8 @@ void AI_APIENTRY OpenGL::aiDepthMask(GLboolean flag)
         OpenGL::g_cached_gl_depth_mask = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glDepthMask");
     }
 
-    reinterpret_cast<PFNGLDEPTHMASKPROC>(OpenGL::g_cached_gl_depth_mask)(flag);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLDEPTHMASKPROC>(OpenGL::g_cached_gl_depth_mask)(flag);
+    }
 }

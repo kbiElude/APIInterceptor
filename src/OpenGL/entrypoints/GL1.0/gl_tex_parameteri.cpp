@@ -12,8 +12,9 @@ void AI_APIENTRY OpenGL::aiTexParameteri(GLenum target,
                                          GLenum pname,
                                          GLint  param)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glTexParameteri(target=[%s] pname=[%s] param=[%d])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
@@ -34,7 +35,8 @@ void AI_APIENTRY OpenGL::aiTexParameteri(GLenum target,
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLTEXPARAMETERI,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
     if (OpenGL::g_cached_gl_tex_parameteri == nullptr)
@@ -42,7 +44,10 @@ void AI_APIENTRY OpenGL::aiTexParameteri(GLenum target,
         OpenGL::g_cached_gl_tex_parameteri = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glTexParameteri");
     }
 
-    reinterpret_cast<PFNGLTEXPARAMETERIPROC>(OpenGL::g_cached_gl_tex_parameteri)(target,
-                                                                                 pname,
-                                                                                 param);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLTEXPARAMETERIPROC>(OpenGL::g_cached_gl_tex_parameteri)(target,
+                                                                                     pname,
+                                                                                     param);
+    }
 }

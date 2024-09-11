@@ -10,8 +10,9 @@
 
 void AI_APIENTRY OpenGL::aiColor3fv(const GLfloat* v)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glColor3fv(v=[%p])",
              v);
@@ -28,8 +29,12 @@ void AI_APIENTRY OpenGL::aiColor3fv(const GLfloat* v)
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLCOLOR3FV,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
-    reinterpret_cast<PFNGLCOLOR3FVPROC>(OpenGL::g_cached_gl_color_3fv)(v);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLCOLOR3FVPROC>(OpenGL::g_cached_gl_color_3fv)(v);
+    }
 }

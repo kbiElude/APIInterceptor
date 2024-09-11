@@ -11,8 +11,9 @@
 void AI_APIENTRY OpenGL::aiAlphaFunc(GLenum   func,
                                      GLclampf ref)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glAlphaFunc(func=[%s], ref=[%.4f])",
              OpenGL::Utils::get_raw_string_for_gl_enum(func),
@@ -31,9 +32,13 @@ void AI_APIENTRY OpenGL::aiAlphaFunc(GLenum   func,
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLALPHAFUNC,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
-    reinterpret_cast<PFNGLACCUMPROC>(OpenGL::g_cached_gl_alpha_func)(func,
-                                                                     ref);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLACCUMPROC>(OpenGL::g_cached_gl_alpha_func)(func,
+                                                                         ref);
+    }
 }

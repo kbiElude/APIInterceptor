@@ -12,8 +12,9 @@ void AI_APIENTRY OpenGL::aiVertex3s(GLshort x,
                                     GLshort y,
                                     GLshort z)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glVertex3s(x=[%d], y=[%d], z=[%d])",
              static_cast<int32_t>(x),
@@ -34,10 +35,14 @@ void AI_APIENTRY OpenGL::aiVertex3s(GLshort x,
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLVERTEX3S,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
-    reinterpret_cast<PFNGLVERTEX3SPROC>(OpenGL::g_cached_gl_vertex_3s)(x,
-                                                                       y,
-                                                                       z);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLVERTEX3SPROC>(OpenGL::g_cached_gl_vertex_3s)(x,
+                                                                           y,
+                                                                           z);
+    }
 }

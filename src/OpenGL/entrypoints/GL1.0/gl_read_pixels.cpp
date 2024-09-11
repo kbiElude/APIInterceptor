@@ -16,8 +16,9 @@ void AI_APIENTRY OpenGL::aiReadPixels(GLint   x,
                                       GLenum  type,
                                       void*   pixels)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glReadPixels(x=[%d] y=[%d] width=[%d] height=[%d] format=[%s] type=[%s] pixels=[%p])",
              x,
@@ -46,7 +47,8 @@ void AI_APIENTRY OpenGL::aiReadPixels(GLint   x,
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLREADPIXELS,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
     if (OpenGL::g_cached_gl_read_pixels == nullptr)
@@ -54,11 +56,14 @@ void AI_APIENTRY OpenGL::aiReadPixels(GLint   x,
         OpenGL::g_cached_gl_read_pixels = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glReadPixels");
     }
 
-    reinterpret_cast<PFNGLREADPIXELSPROC>(g_cached_gl_read_pixels)(x,
-                                                                   y,
-                                                                   width,
-                                                                   height,
-                                                                   format,
-                                                                   type,
-                                                                   pixels);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLREADPIXELSPROC>(g_cached_gl_read_pixels)(x,
+                                                                       y,
+                                                                       width,
+                                                                       height,
+                                                                       format,
+                                                                       type,
+                                                                       pixels);
+    }
 }

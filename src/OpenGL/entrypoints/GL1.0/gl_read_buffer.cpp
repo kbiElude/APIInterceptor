@@ -10,8 +10,9 @@
 
 void AI_APIENTRY OpenGL::aiReadBuffer(GLenum src)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glReadBuffer(src=[%s])",
              OpenGL::Utils::get_raw_string_for_gl_enum(src) );
@@ -28,7 +29,8 @@ void AI_APIENTRY OpenGL::aiReadBuffer(GLenum src)
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLREADBUFFER,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
     if (OpenGL::g_cached_gl_read_buffer == nullptr)
@@ -36,5 +38,8 @@ void AI_APIENTRY OpenGL::aiReadBuffer(GLenum src)
         OpenGL::g_cached_gl_read_buffer = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glReadBuffer");
     }
 
-    reinterpret_cast<PFNGLREADBUFFERPROC>(g_cached_gl_read_buffer)(src);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLREADBUFFERPROC>(g_cached_gl_read_buffer)(src);
+    }
 }

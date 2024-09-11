@@ -10,8 +10,9 @@
 void AI_APIENTRY OpenGL::aiDepthRange(GLdouble n,
                                       GLdouble f)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glDepthRange(n=[%.4f] f=[%.4f])",
              n,
@@ -30,7 +31,8 @@ void AI_APIENTRY OpenGL::aiDepthRange(GLdouble n,
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLDEPTHRANGE,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
     if (OpenGL::g_cached_gl_depth_range == nullptr)
@@ -38,6 +40,9 @@ void AI_APIENTRY OpenGL::aiDepthRange(GLdouble n,
         OpenGL::g_cached_gl_depth_range = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glDepthRange");
     }
 
-    reinterpret_cast<PFNGLDEPTHRANGEPROC>(OpenGL::g_cached_gl_depth_range)(n,
-                                                                           f);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLDEPTHRANGEPROC>(OpenGL::g_cached_gl_depth_range)(n,
+                                                                               f);
+    }
 }

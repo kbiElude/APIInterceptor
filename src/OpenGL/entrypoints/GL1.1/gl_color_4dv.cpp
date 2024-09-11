@@ -10,8 +10,9 @@
 
 void AI_APIENTRY OpenGL::aiColor4dv(const GLdouble* v)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glColor4dv(v=[%p])",
              v);
@@ -28,8 +29,12 @@ void AI_APIENTRY OpenGL::aiColor4dv(const GLdouble* v)
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLBLENDFUNC,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
-    reinterpret_cast<PFNGLCOLOR4DVPROC>(OpenGL::g_cached_gl_color_4dv)(v);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLCOLOR4DVPROC>(OpenGL::g_cached_gl_color_4dv)(v);
+    }
 }

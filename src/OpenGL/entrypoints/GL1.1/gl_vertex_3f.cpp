@@ -12,8 +12,9 @@ void AI_APIENTRY OpenGL::aiVertex3f(GLfloat x,
                                     GLfloat y,
                                     GLfloat z)
 {
-    void*                               callback_func_arg = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr = nullptr;
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glVertex3f(x=[%.4f], y=[%.4f], z=[%.4f])",
              x,
@@ -34,10 +35,14 @@ void AI_APIENTRY OpenGL::aiVertex3f(GLfloat x,
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLVERTEX3F,
                           sizeof(args) / sizeof(args[0]),
                           args,
-                          callback_func_arg);
+                          callback_func_arg,
+                         &should_pass_through);
     }
 
-    reinterpret_cast<PFNGLVERTEX3FPROC>(OpenGL::g_cached_gl_vertex_3f)(x,
-                                                                       y,
-                                                                       z);
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLVERTEX3FPROC>(OpenGL::g_cached_gl_vertex_3f)(x,
+                                                                           y,
+                                                                           z);
+    }
 }
