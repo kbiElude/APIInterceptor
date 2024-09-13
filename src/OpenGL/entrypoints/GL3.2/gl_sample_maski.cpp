@@ -15,11 +15,6 @@ void AI_APIENTRY OpenGL::aiSampleMaski(GLuint     maskNumber,
              maskNumber,
              mask);
 
-    if (OpenGL::g_cached_gl_sample_maski == nullptr)
-    {
-        OpenGL::g_cached_gl_sample_maski = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glSampleMaski");
-    }
-
     reinterpret_cast<PFNGLSAMPLEMASKIPROC>(g_cached_gl_sample_maski)(maskNumber,
                                                                      mask);
 }

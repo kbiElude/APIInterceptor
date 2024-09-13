@@ -22,11 +22,6 @@ void AI_APIENTRY OpenGL::aiGetTexImage(GLenum target,
              OpenGL::Utils::get_raw_string_for_gl_enum(type),
              pixels);
 
-    if (OpenGL::g_cached_gl_get_tex_image == nullptr)
-    {
-        OpenGL::g_cached_gl_get_tex_image = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glGetTexImage");
-    }
-
     reinterpret_cast<PFNGLGETTEXIMAGEPROC>(OpenGL::g_cached_gl_get_tex_image)(target,
                                                                               level,
                                                                               format,

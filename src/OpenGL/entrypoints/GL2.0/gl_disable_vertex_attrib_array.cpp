@@ -13,10 +13,5 @@ void AI_APIENTRY OpenGL::aiDisableVertexAttribArray(GLuint index)
     AI_TRACE("glDisableVertexAttribArray(index=[%d])",
              index);
 
-    if (OpenGL::g_cached_gl_disable_vertex_attrib_array == nullptr)
-    {
-        OpenGL::g_cached_gl_disable_vertex_attrib_array = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glDisableVertexAttribArray");
-    }
-
     reinterpret_cast<PFNGLDISABLEVERTEXATTRIBARRAYPROC>(OpenGL::g_cached_gl_disable_vertex_attrib_array)(index);
 }

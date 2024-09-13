@@ -16,11 +16,6 @@ void AI_APIENTRY OpenGL::aiAttachShader(GLuint program,
              program,
              shader);
 
-    if (OpenGL::g_cached_gl_attach_shader == nullptr)
-    {
-        OpenGL::g_cached_gl_attach_shader = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glAttachShader");
-    }
-
     reinterpret_cast<PFNGLATTACHSHADERPROC>(OpenGL::g_cached_gl_attach_shader)(program,
                                                                                shader);
 }

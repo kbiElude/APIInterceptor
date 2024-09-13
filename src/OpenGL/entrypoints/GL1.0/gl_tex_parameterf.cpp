@@ -52,11 +52,6 @@ void AI_APIENTRY OpenGL::aiTexParameterf(GLenum  target,
                          &should_pass_through);
     }
 
-    if (OpenGL::g_cached_gl_tex_parameterf == nullptr)
-    {
-        OpenGL::g_cached_gl_tex_parameterf = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glTexParameterf");
-    }
-
     if (should_pass_through)
     {
         reinterpret_cast<PFNGLTEXPARAMETERFPROC>(OpenGL::g_cached_gl_tex_parameterf)(target,

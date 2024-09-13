@@ -16,11 +16,6 @@ void AI_APIENTRY OpenGL::aiDeleteBuffers(GLsizei       n,
              static_cast<int32_t>(n),
              buffers);
 
-    if (OpenGL::g_cached_gl_delete_buffers == nullptr)
-    {
-        OpenGL::g_cached_gl_delete_buffers = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glDeleteBuffers");
-    }
-
     reinterpret_cast<PFNGLDELETEBUFFERSPROC>(OpenGL::g_cached_gl_delete_buffers)(n,
                                                                                  buffers);
 }

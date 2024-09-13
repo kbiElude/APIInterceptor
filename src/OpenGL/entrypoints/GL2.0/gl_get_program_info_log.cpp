@@ -19,11 +19,6 @@ void AI_APIENTRY OpenGL::aiGetProgramInfoLog(GLuint   program,
              length,
              infoLog);
 
-    if (OpenGL::g_cached_gl_get_program_info_log == nullptr)
-    {
-        OpenGL::g_cached_gl_get_program_info_log = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glGetProgramInfoLog");
-    }
-
     reinterpret_cast<PFNGLGETPROGRAMINFOLOGPROC>(OpenGL::g_cached_gl_get_program_info_log)(program,
                                                                                            bufSize,
                                                                                            length,

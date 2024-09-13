@@ -17,11 +17,6 @@ void AI_APIENTRY OpenGL::aiUniform2i(GLint location,
              v0,
              v1);
 
-    if (OpenGL::g_cached_gl_uniform_2i == nullptr)
-    {
-        OpenGL::g_cached_gl_uniform_2i = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glUniform2i");
-    }
-
     reinterpret_cast<PFNGLUNIFORM2IPROC>(OpenGL::g_cached_gl_uniform_2i)(location,
                                                                          v0,
                                                                          v1);

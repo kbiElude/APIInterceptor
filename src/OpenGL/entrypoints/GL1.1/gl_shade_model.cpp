@@ -33,11 +33,6 @@ void AI_APIENTRY OpenGL::aiShadeModel(GLenum mode)
                          &should_pass_through);
     }
 
-    if (OpenGL::g_cached_gl_shade_model == nullptr)
-    {
-        OpenGL::g_cached_gl_shade_model = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glShadeModel");
-    }
-
     if (should_pass_through)
     {
         reinterpret_cast<PFNGLSHADEMODELPROC>(OpenGL::g_cached_gl_shade_model)(mode);

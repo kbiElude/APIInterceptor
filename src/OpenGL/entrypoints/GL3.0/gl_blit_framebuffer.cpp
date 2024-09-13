@@ -32,11 +32,6 @@ void AI_APIENTRY OpenGL::aiBlitFramebuffer(GLint      srcX0,
              OpenGL::Utils::get_raw_string_for_gl_bitfield(BitfieldType::Blit_Mask, mask),
              OpenGL::Utils::get_raw_string_for_gl_enum    (filter) );
 
-    if (OpenGL::g_cached_gl_blit_framebuffer == nullptr)
-    {
-        OpenGL::g_cached_gl_blit_framebuffer = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glBlitFramebuffer");
-    }
-
     reinterpret_cast<PFNGLBLITFRAMEBUFFERPROC>(OpenGL::g_cached_gl_blit_framebuffer)(srcX0,
                                                                                      srcY0,
                                                                                      srcX1,

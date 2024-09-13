@@ -19,11 +19,6 @@ GLboolean AI_APIENTRY OpenGL::aiAreTexturesResident(GLsizei       n,
              textures,
              residences);
 
-    if (OpenGL::g_cached_are_textures_resident_ext == nullptr)
-    {
-        OpenGL::g_cached_are_textures_resident_ext = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glAreTexturesResidentEXT");
-    }
-
     return reinterpret_cast<PFNGLARETEXTURESRESIDENTEXTPROC>(OpenGL::g_cached_are_textures_resident_ext)(n,
                                                                                                          textures,
                                                                                                          residences);

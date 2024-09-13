@@ -20,11 +20,6 @@ void AI_APIENTRY OpenGL::aiShaderSource(GLuint               shader,
              string,
              length);
 
-    if (OpenGL::g_cached_gl_shader_source == nullptr)
-    {
-        OpenGL::g_cached_gl_shader_source = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glShaderSource");
-    }
-
     reinterpret_cast<PFNGLSHADERSOURCEPROC>(g_cached_gl_shader_source)(shader,
                                                                        count,
                                                                        string,

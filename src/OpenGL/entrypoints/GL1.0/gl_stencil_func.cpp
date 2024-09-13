@@ -18,11 +18,6 @@ void AI_APIENTRY OpenGL::aiStencilFunc(GLenum func,
              ref,
              mask);
 
-    if (OpenGL::g_cached_gl_stencil_func == nullptr)
-    {
-        OpenGL::g_cached_gl_stencil_func = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glStencilFunc");
-    }
-
     reinterpret_cast<PFNGLSTENCILFUNCPROC>(g_cached_gl_stencil_func)(func,
                                                                      ref,
                                                                      mask);

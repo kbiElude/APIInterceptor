@@ -16,11 +16,6 @@ void AI_APIENTRY OpenGL::aiDetachShader(GLuint program,
              program,
              shader);
 
-    if (OpenGL::g_cached_gl_detach_shader == nullptr)
-    {
-        OpenGL::g_cached_gl_detach_shader = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glDetachShader");
-    }
-
     reinterpret_cast<PFNGLDETACHSHADERPROC>(OpenGL::g_cached_gl_detach_shader)(program,
                                                                                shader);
 }

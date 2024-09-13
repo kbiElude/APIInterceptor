@@ -20,11 +20,6 @@ void AI_APIENTRY OpenGL::aiBlendFuncSeparate(GLenum sfactorRGB,
              OpenGL::Utils::get_raw_string_for_gl_enum(sfactorAlpha),
              OpenGL::Utils::get_raw_string_for_gl_enum(dfactorAlpha) );
 
-    if (OpenGL::g_cached_gl_blend_func_separate == nullptr)
-    {
-        OpenGL::g_cached_gl_blend_func_separate = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glBlendFuncSeparate");
-    }
-
     reinterpret_cast<PFNGLBLENDFUNCSEPARATEPROC>(OpenGL::g_cached_gl_blend_func_separate)(sfactorRGB,
                                                                                           dfactorRGB,
                                                                                           sfactorAlpha,

@@ -13,10 +13,5 @@ void AI_APIENTRY OpenGL::aiBindVertexArray(GLuint array)
     AI_TRACE("glBindVertexArray(array=[%d])",
              array);
 
-    if (OpenGL::g_cached_gl_bind_vertex_array == nullptr)
-    {
-        OpenGL::g_cached_gl_bind_vertex_array = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glBindVertexArray");
-    }
-
     reinterpret_cast<PFNGLBINDVERTEXARRAYPROC>(OpenGL::g_cached_gl_bind_vertex_array)(array);
 }

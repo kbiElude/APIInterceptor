@@ -20,11 +20,6 @@ void AI_APIENTRY OpenGL::aiRenderbufferStorage(GLenum  target,
              static_cast<int32_t>(width),
              static_cast<int32_t>(height) );
 
-    if (OpenGL::g_cached_gl_renderbuffer_storage == nullptr)
-    {
-        OpenGL::g_cached_gl_renderbuffer_storage = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glRenderbufferStorage");
-    }
-
     reinterpret_cast<PFNGLRENDERBUFFERSTORAGEPROC>(g_cached_gl_renderbuffer_storage)(target,
                                                                                      internalformat,
                                                                                      width,

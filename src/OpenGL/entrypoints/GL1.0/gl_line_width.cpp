@@ -13,10 +13,5 @@ void AI_APIENTRY OpenGL::aiLineWidth(GLfloat width)
     AI_TRACE("glLineWidth(width=[%.4f])",
              width);
 
-    if (OpenGL::g_cached_gl_line_width == nullptr)
-    {
-        OpenGL::g_cached_gl_line_width = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glLineWidth");
-    }
-
     reinterpret_cast<PFNGLLINEWIDTHPROC>(OpenGL::g_cached_gl_line_width)(width);
 }

@@ -16,11 +16,6 @@ void AI_APIENTRY OpenGL::aiDrawBuffers(GLsizei       n,
              static_cast<int32_t>(n),
              bufs); /* todo: expand to a list of buf enums */
 
-    if (OpenGL::g_cached_gl_draw_buffers == nullptr)
-    {
-        OpenGL::g_cached_gl_draw_buffers = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glDrawBuffers");
-    }
-
     reinterpret_cast<PFNGLDRAWBUFFERSPROC>(OpenGL::g_cached_gl_draw_buffers)(n,
                                                                              bufs);
 }

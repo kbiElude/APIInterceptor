@@ -16,11 +16,6 @@ void AI_APIENTRY OpenGL::aiPolygonOffset(GLfloat factor,
              units);
 
 
-    if (OpenGL::g_cached_gl_polygon_offset == nullptr)
-    {
-        OpenGL::g_cached_gl_polygon_offset = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glPolygonOffset");
-    }
-
     reinterpret_cast<PFNGLPOLYGONOFFSETPROC>(g_cached_gl_polygon_offset)(factor,
                                                                          units);
 }

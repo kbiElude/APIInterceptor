@@ -18,11 +18,6 @@ void AI_APIENTRY OpenGL::aiBindFragDataLocation(GLuint        program,
              color,
              name);
 
-    if (OpenGL::g_cached_gl_bind_frag_data_location == nullptr)
-    {
-        OpenGL::g_cached_gl_bind_frag_data_location = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glBindFragDataLocation");
-    }
-
     reinterpret_cast<PFNGLBINDFRAGDATALOCATIONPROC>(OpenGL::g_cached_gl_bind_frag_data_location)(program,
                                                                                                  color,
                                                                                                  name);

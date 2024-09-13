@@ -35,11 +35,6 @@ void AI_APIENTRY OpenGL::aiGenTextures(GLsizei n,
                          &should_pass_through);
     }
 
-    if (OpenGL::g_cached_gl_gen_textures == nullptr)
-    {
-        OpenGL::g_cached_gl_gen_textures = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glGenTextures");
-    }
-
     // NOTE: This API call should always be passed through.
     AI_ASSERT(should_pass_through);
 

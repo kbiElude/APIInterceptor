@@ -22,11 +22,6 @@ void AI_APIENTRY OpenGL::aiRenderbufferStorageMultisample(GLenum  target,
              static_cast<int32_t>(width),
              static_cast<int32_t>(height) );
 
-    if (OpenGL::g_cached_gl_renderbuffer_storage_multisample == nullptr)
-    {
-        OpenGL::g_cached_gl_renderbuffer_storage_multisample = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glRenderbufferStorageMultisample");
-    }
-
     reinterpret_cast<PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC>(g_cached_gl_renderbuffer_storage_multisample)(target,
                                                                                                             samples,
                                                                                                             internalformat,

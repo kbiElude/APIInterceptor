@@ -17,11 +17,6 @@ void AI_APIENTRY OpenGL::aiBindAttribLocation(GLuint  program,
              index,
              name);
 
-    if (OpenGL::g_cached_gl_bind_attrib_location == nullptr)
-    {
-        OpenGL::g_cached_gl_bind_attrib_location = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glBindAttribLocation");
-    }
-
     reinterpret_cast<PFNGLBINDATTRIBLOCATIONPROC>(OpenGL::g_cached_gl_bind_attrib_location)(program,
                                                                                             index,
                                                                                             name);

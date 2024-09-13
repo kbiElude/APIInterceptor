@@ -13,10 +13,5 @@ void AI_APIENTRY OpenGL::aiLinkProgram(GLuint program)
     AI_TRACE("glLinkProgram(program=[%u])",
              program);
 
-    if (OpenGL::g_cached_gl_link_program == nullptr)
-    {
-        OpenGL::g_cached_gl_link_program = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glLinkProgram");
-    }
-
     return reinterpret_cast<PFNGLLINKPROGRAMPROC>(OpenGL::g_cached_gl_link_program)(program);
 }

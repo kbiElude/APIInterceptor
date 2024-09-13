@@ -20,11 +20,6 @@ void AI_APIENTRY OpenGL::aiUniformMatrix4x2fv(GLint          location,
              (transpose == GL_TRUE) ? 1 : 0,
              value);
 
-    if (OpenGL::g_cached_gl_uniform_matrix_4x2_fv == nullptr)
-    {
-        OpenGL::g_cached_gl_uniform_matrix_4x2_fv = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glUniformMatrix4x2fv");
-    }
-
     reinterpret_cast<PFNGLUNIFORMMATRIX4X2FVPROC>(OpenGL::g_cached_gl_uniform_matrix_4x2_fv)(location,
                                                                                              count,
                                                                                              transpose,

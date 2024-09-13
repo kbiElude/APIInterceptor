@@ -18,11 +18,6 @@ void AI_APIENTRY OpenGL::aiGetIntegeri_v(GLenum target,
              index,
              data);
 
-    if (OpenGL::g_cached_gl_get_integeri_v == nullptr)
-    {
-        OpenGL::g_cached_gl_get_integeri_v = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glGetIntegeri_v");
-    }
-
     reinterpret_cast<PFNGLGETINTEGERI_VPROC>(OpenGL::g_cached_gl_get_integeri_v)(target,
                                                                                  index,
                                                                                  data);

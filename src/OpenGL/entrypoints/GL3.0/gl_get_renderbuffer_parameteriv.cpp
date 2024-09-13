@@ -18,11 +18,6 @@ void AI_APIENTRY OpenGL::aiGetRenderbufferParameteriv(GLenum target,
              OpenGL::Utils::get_raw_string_for_gl_enum(pname),
              params);
 
-    if (OpenGL::g_cached_gl_get_renderbuffer_parameteriv == nullptr)
-    {
-        OpenGL::g_cached_gl_get_renderbuffer_parameteriv = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glGetRenderbufferParameteriv");
-    }
-
     reinterpret_cast<PFNGLGETRENDERBUFFERPARAMETERIVPROC>(OpenGL::g_cached_gl_get_renderbuffer_parameteriv)(target,
                                                                                                             pname,
                                                                                                             params);

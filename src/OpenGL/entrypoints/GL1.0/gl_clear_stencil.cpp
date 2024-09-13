@@ -32,11 +32,6 @@ void AI_APIENTRY OpenGL::aiClearStencil(GLint s)
                          &should_pass_through);
     }
 
-    if (OpenGL::g_cached_gl_clear_stencil == nullptr)
-    {
-        OpenGL::g_cached_gl_clear_stencil = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glClearStencil");
-    }
-
     if (should_pass_through)
     {
         reinterpret_cast<PFNGLCLEARSTENCILPROC>(OpenGL::g_cached_gl_clear_stencil)(s);

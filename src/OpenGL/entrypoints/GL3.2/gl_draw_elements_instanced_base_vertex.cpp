@@ -24,11 +24,6 @@ void AI_APIENTRY OpenGL::aiDrawElementsInstancedBaseVertex(GLenum      mode,
              static_cast<int32_t>(instancecount),
              basevertex);
 
-    if (OpenGL::g_cached_gl_draw_elements_instanced_base_vertex == nullptr)
-    {
-        OpenGL::g_cached_gl_draw_elements_instanced_base_vertex = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glDrawElementsInstancedBaseVertex");
-    }
-
     reinterpret_cast<PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXPROC>(OpenGL::g_cached_gl_draw_elements_instanced_base_vertex)(mode,
                                                                                                                         count,
                                                                                                                         type,

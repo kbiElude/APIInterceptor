@@ -22,11 +22,6 @@ void AI_APIENTRY OpenGL::aiFramebufferTextureLayer(GLenum target,
              level,
              layer);
 
-    if (OpenGL::g_cached_gl_framebuffer_texture_layer == nullptr)
-    {
-        OpenGL::g_cached_gl_framebuffer_texture_layer = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glFramebufferTextureLayer");
-    }
-
     reinterpret_cast<PFNGLFRAMEBUFFERTEXTURELAYERPROC>(OpenGL::g_cached_gl_framebuffer_texture_layer)(target,
                                                                                                       attachment,
                                                                                                       texture,

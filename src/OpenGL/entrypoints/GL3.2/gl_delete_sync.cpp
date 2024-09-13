@@ -13,10 +13,5 @@ void AI_APIENTRY OpenGL::aiDeleteSync(GLsync sync)
     AI_TRACE("glDeleteSync(sync=[%p])",
              sync);
 
-    if (OpenGL::g_cached_gl_delete_sync == nullptr)
-    {
-        OpenGL::g_cached_gl_delete_sync = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glDeleteSync");
-    }
-
     reinterpret_cast<PFNGLDELETESYNCPROC>(OpenGL::g_cached_gl_delete_sync)(sync);
 }

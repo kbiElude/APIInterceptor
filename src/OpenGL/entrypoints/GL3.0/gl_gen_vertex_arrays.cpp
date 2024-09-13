@@ -15,11 +15,6 @@ void AI_APIENTRY OpenGL::aiGenVertexArrays(GLsizei n,
              static_cast<int32_t>(n),
              arrays);
 
-    if (OpenGL::g_cached_gl_gen_vertex_arrays == nullptr)
-    {
-        OpenGL::g_cached_gl_gen_vertex_arrays = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glGenVertexArrays");
-    }
-
     reinterpret_cast<PFNGLGENVERTEXARRAYSPROC>(OpenGL::g_cached_gl_gen_vertex_arrays)(n,
                                                                                       arrays);
 }

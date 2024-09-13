@@ -16,11 +16,6 @@ void AI_APIENTRY OpenGL::aiBeginQuery(GLenum target,
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              id);
 
-    if (OpenGL::g_cached_gl_begin_query == nullptr)
-    {
-        OpenGL::g_cached_gl_begin_query = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glBeginQuery");
-    }
-
     reinterpret_cast<PFNGLBEGINQUERYPROC>(OpenGL::g_cached_gl_begin_query)(target,
                                                                            id);
 }

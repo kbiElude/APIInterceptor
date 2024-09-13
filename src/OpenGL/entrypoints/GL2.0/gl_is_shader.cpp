@@ -13,10 +13,5 @@ GLboolean AI_APIENTRY OpenGL::aiIsShader(GLuint shader)
     AI_TRACE("glIsShader(shader=[%u])",
              shader);
 
-    if (OpenGL::g_cached_gl_is_shader == nullptr)
-    {
-        OpenGL::g_cached_gl_is_shader = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glIsShader");
-    }
-
     return reinterpret_cast<PFNGLISSHADERPROC>(OpenGL::g_cached_gl_is_shader)(shader);
 }

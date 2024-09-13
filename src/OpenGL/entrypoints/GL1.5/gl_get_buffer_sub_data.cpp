@@ -20,11 +20,6 @@ void AI_APIENTRY OpenGL::aiGetBufferSubData(GLenum     target,
              static_cast<int32_t>(size),
              data);
 
-    if (OpenGL::g_cached_gl_get_buffer_sub_data == nullptr)
-    {
-        OpenGL::g_cached_gl_get_buffer_sub_data = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glGetBufferSubData");
-    }
-
     reinterpret_cast<PFNGLGETBUFFERSUBDATAPROC>(OpenGL::g_cached_gl_get_buffer_sub_data)(target,
                                                                                          offset,
                                                                                          size,

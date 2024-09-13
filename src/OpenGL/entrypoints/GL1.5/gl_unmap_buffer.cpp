@@ -14,10 +14,5 @@ GLboolean AI_APIENTRY OpenGL::aiUnmapBuffer(GLenum target)
     AI_TRACE("glUnmapBuffer(target=[%s])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target) );
 
-    if (OpenGL::g_cached_gl_unmap_buffer == nullptr)
-    {
-        OpenGL::g_cached_gl_unmap_buffer = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glUnmapBuffer");
-    }
-
     return reinterpret_cast<PFNGLUNMAPBUFFERPROC>(OpenGL::g_cached_gl_unmap_buffer)(target);
 }

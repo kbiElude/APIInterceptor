@@ -12,10 +12,5 @@ GLuint AI_APIENTRY OpenGL::aiCreateProgram()
 
     AI_TRACE("glCreateProgram()");
 
-    if (OpenGL::g_cached_gl_create_program == nullptr)
-    {
-        OpenGL::g_cached_gl_create_program = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glCreateProgram");
-    }
-
     return reinterpret_cast<PFNGLCREATEPROGRAMPROC>(OpenGL::g_cached_gl_create_program)();
 }

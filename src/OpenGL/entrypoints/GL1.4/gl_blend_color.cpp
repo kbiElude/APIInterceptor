@@ -41,11 +41,6 @@ void AI_APIENTRY OpenGL::aiBlendColor(GLfloat red,
                          &should_pass_through);
     }
 
-    if (OpenGL::g_cached_gl_blend_color == nullptr)
-    {
-        OpenGL::g_cached_gl_blend_color = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glBlendColor");
-    }
-
     if (should_pass_through)
     {
         reinterpret_cast<PFNGLBLENDCOLORPROC>(OpenGL::g_cached_gl_blend_color)(red,

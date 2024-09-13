@@ -22,11 +22,6 @@ void AI_APIENTRY OpenGL::aiCopyBufferSubData(GLenum     readTarget,
              static_cast<int32_t>(writeOffset),
              static_cast<int32_t>(size) );
 
-    if (OpenGL::g_cached_gl_copy_buffer_sub_data == nullptr)
-    {
-        OpenGL::g_cached_gl_copy_buffer_sub_data = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glCopyBufferSubData");
-    }
-
     reinterpret_cast<PFNGLCOPYBUFFERSUBDATAPROC>(OpenGL::g_cached_gl_copy_buffer_sub_data)(readTarget,
                                                                                            writeTarget,
                                                                                            readOffset,

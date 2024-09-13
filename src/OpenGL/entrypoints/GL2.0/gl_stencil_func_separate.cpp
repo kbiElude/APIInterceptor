@@ -20,11 +20,6 @@ void AI_APIENTRY OpenGL::aiStencilFuncSeparate(GLenum face,
              ref,
              mask);
 
-    if (OpenGL::g_cached_gl_stencil_func_separate == nullptr)
-    {
-        OpenGL::g_cached_gl_stencil_func_separate = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glStencilFuncSeparate");
-    }
-
     reinterpret_cast<PFNGLSTENCILFUNCSEPARATEPROC>(g_cached_gl_stencil_func_separate)(face,
                                                                                       func,
                                                                                       ref,

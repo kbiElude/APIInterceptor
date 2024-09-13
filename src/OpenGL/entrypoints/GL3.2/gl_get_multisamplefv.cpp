@@ -18,11 +18,6 @@ void AI_APIENTRY OpenGL::aiGetMultisamplefv(GLenum   pname,
              index,
              val);
 
-    if (OpenGL::g_cached_gl_get_multisamplefv == nullptr)
-    {
-        OpenGL::g_cached_gl_get_multisamplefv = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glGetMultisamplefv");
-    }
-
     reinterpret_cast<PFNGLGETMULTISAMPLEFVPROC>(OpenGL::g_cached_gl_get_multisamplefv)(pname,
                                                                                        index,
                                                                                        val);

@@ -22,11 +22,6 @@ void AI_APIENTRY OpenGL::aiMultiDrawElements(GLenum             mode,
              indices,
              static_cast<int32_t>(drawcount) );
 
-    if (OpenGL::g_cached_gl_multi_draw_elements == nullptr)
-    {
-        OpenGL::g_cached_gl_multi_draw_elements = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glMultiDrawElements");
-    }
-
     reinterpret_cast<PFNGLMULTIDRAWELEMENTSPROC>(g_cached_gl_multi_draw_elements)(mode,
                                                                                   count,
                                                                                   type,

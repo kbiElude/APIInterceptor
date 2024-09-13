@@ -33,11 +33,6 @@ void AI_APIENTRY OpenGL::aiCullFace(GLenum mode)
                          &should_pass_through);
     }
 
-    if (OpenGL::g_cached_gl_cull_face == nullptr)
-    {
-        OpenGL::g_cached_gl_cull_face = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glCullFace");
-    }
-
     if (should_pass_through)
     {
         reinterpret_cast<PFNGLCULLFACEPROC>(OpenGL::g_cached_gl_cull_face)(mode);

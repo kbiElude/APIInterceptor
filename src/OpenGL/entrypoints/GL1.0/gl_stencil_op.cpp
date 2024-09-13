@@ -18,11 +18,6 @@ void AI_APIENTRY OpenGL::aiStencilOp(GLenum fail,
              OpenGL::Utils::get_raw_string_for_gl_enum(zfail),
              OpenGL::Utils::get_raw_string_for_gl_enum(zpass) );
 
-    if (OpenGL::g_cached_gl_stencil_op == nullptr)
-    {
-        OpenGL::g_cached_gl_stencil_op = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glStencilOp");
-    }
-
     reinterpret_cast<PFNGLSTENCILOPPROC>(g_cached_gl_stencil_op)(fail,
                                                                  zfail,
                                                                  zpass);

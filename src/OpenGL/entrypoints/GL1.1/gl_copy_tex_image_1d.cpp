@@ -26,11 +26,6 @@ void AI_APIENTRY OpenGL::aiCopyTexImage1D(GLenum  target,
              static_cast<int32_t>(width),
              border);
 
-    if (OpenGL::g_cached_gl_copy_tex_image_1D == nullptr)
-    {
-        OpenGL::g_cached_gl_copy_tex_image_1D = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glCopyTexImage1D");
-    }
-
     reinterpret_cast<PFNGLCOPYTEXIMAGE1DPROC>(OpenGL::g_cached_gl_copy_tex_image_1D)(target,
                                                                                      level,
                                                                                      internalformat,

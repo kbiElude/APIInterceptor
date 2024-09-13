@@ -30,11 +30,6 @@ void AI_APIENTRY OpenGL::aiCopyTexSubImage3D(GLenum  target,
              static_cast<int32_t>(width),
              static_cast<int32_t>(height) );
 
-    if (OpenGL::g_cached_gl_copy_tex_sub_image_3D == nullptr)
-    {
-        OpenGL::g_cached_gl_copy_tex_sub_image_3D = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glCopyTexSubImage3D");
-    }
-
     reinterpret_cast<PFNGLCOPYTEXSUBIMAGE3DPROC>(OpenGL::g_cached_gl_copy_tex_sub_image_3D)(target,
                                                                                             level,
                                                                                             xoffset,

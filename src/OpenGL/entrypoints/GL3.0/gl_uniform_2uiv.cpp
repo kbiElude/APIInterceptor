@@ -18,11 +18,6 @@ void AI_APIENTRY OpenGL::aiUniform2uiv(GLint         location,
              static_cast<int32_t>(count),
              value);
 
-    if (OpenGL::g_cached_gl_uniform_2uiv == nullptr)
-    {
-        OpenGL::g_cached_gl_uniform_2uiv = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glUniform2uiv");
-    }
-
     reinterpret_cast<PFNGLUNIFORM2UIVPROC>(OpenGL::g_cached_gl_uniform_2uiv)(location,
                                                                              count,
                                                                              value);

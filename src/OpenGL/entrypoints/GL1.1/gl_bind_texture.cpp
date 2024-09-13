@@ -36,11 +36,6 @@ void AI_APIENTRY OpenGL::aiBindTexture(GLenum target,
                          &should_pass_through);
     }
 
-    if (OpenGL::g_cached_gl_bind_texture == nullptr)
-    {
-        OpenGL::g_cached_gl_bind_texture = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glBindTexture");
-    }
-
     if (should_pass_through)
     {
         reinterpret_cast<PFNGLBINDTEXTUREPROC>(OpenGL::g_cached_gl_bind_texture)(target,

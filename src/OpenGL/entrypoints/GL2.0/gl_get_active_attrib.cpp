@@ -26,11 +26,6 @@ void AI_APIENTRY OpenGL::aiGetActiveAttrib(GLuint   program,
              type,
              name);
 
-    if (OpenGL::g_cached_gl_get_active_attrib == nullptr)
-    {
-        OpenGL::g_cached_gl_get_active_attrib = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glGetActiveAttrib");
-    }
-
     reinterpret_cast<PFNGLGETACTIVEATTRIBPROC>(OpenGL::g_cached_gl_get_active_attrib)(program,
                                                                                       index,
                                                                                       bufSize,

@@ -35,7 +35,6 @@ void AI_APIENTRY OpenGL::aiEnable(GLenum cap)
 
     if (OpenGL::g_cached_gl_enable == nullptr)
     {
-        OpenGL::g_cached_gl_enable = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glEnable");
     }
 
     if (should_pass_through)

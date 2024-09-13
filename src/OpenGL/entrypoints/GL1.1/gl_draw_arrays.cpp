@@ -18,11 +18,6 @@ void AI_APIENTRY OpenGL::aiDrawArrays(GLenum  mode,
              first,
              static_cast<int32_t>(count) );
 
-    if (OpenGL::g_cached_gl_delete_framebuffers == nullptr)
-    {
-        OpenGL::g_cached_gl_delete_framebuffers = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glDeleteFramebuffers");
-    }
-
     reinterpret_cast<PFNGLDRAWARRAYSPROC>(OpenGL::g_cached_gl_draw_arrays)(mode,
                                                                            first,
                                                                            count);

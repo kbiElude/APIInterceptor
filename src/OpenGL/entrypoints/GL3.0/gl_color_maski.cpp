@@ -21,11 +21,6 @@ void AI_APIENTRY OpenGL::aiColorMaski(GLuint    index,
              (b == GL_TRUE) ? 1 : 0,
              (a == GL_TRUE) ? 1 : 0);
 
-    if (OpenGL::g_cached_gl_color_maski == nullptr)
-    {
-        OpenGL::g_cached_gl_color_maski = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glColorMaski");
-    }
-
     reinterpret_cast<PFNGLCOLORMASKIPROC>(OpenGL::g_cached_gl_color_maski)(index,
                                                                            r,
                                                                            g,

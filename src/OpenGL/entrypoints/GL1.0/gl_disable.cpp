@@ -35,7 +35,6 @@ void AI_APIENTRY OpenGL::aiDisable(GLenum cap)
 
     if (OpenGL::g_cached_gl_disable == nullptr)
     {
-        OpenGL::g_cached_gl_disable = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glDisable");
     }
 
     if (should_pass_through)

@@ -13,10 +13,5 @@ void AI_APIENTRY OpenGL::aiCompileShader(GLuint shader)
     AI_TRACE("glCompileShader(shader=[%d])",
              shader);
 
-    if (OpenGL::g_cached_gl_compile_shader == nullptr)
-    {
-        OpenGL::g_cached_gl_compile_shader = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glCompileShader");
-    }
-
     reinterpret_cast<PFNGLCOMPILESHADERPROC>(OpenGL::g_cached_gl_compile_shader)(shader);
 }

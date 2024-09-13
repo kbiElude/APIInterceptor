@@ -18,11 +18,6 @@ GLenum AI_APIENTRY OpenGL::aiClientWaitSync(GLsync     sync,
              OpenGL::Utils::get_raw_string_for_gl_bitfield(OpenGL::BitfieldType::Wait_Sync_Mask, flags),
              static_cast<uint32_t>(timeout) );
 
-    if (OpenGL::g_cached_gl_client_wait_sync == nullptr)
-    {
-        OpenGL::g_cached_gl_client_wait_sync = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glClientWaitSync");
-    }
-
     return reinterpret_cast<PFNGLCLIENTWAITSYNCPROC>(OpenGL::g_cached_gl_client_wait_sync)(sync,
                                                                                            flags,
                                                                                            timeout);

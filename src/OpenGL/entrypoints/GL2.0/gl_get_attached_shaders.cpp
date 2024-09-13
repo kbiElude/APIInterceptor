@@ -19,11 +19,6 @@ void AI_APIENTRY OpenGL::aiGetAttachedShaders(GLuint   program,
              count,
              shaders);
 
-    if (OpenGL::g_cached_gl_get_attached_shaders == nullptr)
-    {
-        OpenGL::g_cached_gl_get_attached_shaders = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glGetAttachedShaders");
-    }
-
     reinterpret_cast<PFNGLGETATTACHEDSHADERSPROC>(OpenGL::g_cached_gl_get_attached_shaders)(program,
                                                                                             maxCount,
                                                                                             count,

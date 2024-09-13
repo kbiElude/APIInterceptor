@@ -22,11 +22,6 @@ void AI_APIENTRY OpenGL::aiVertexAttribIPointer(GLuint      index,
              static_cast<int32_t>(stride),
              pointer);
 
-    if (OpenGL::g_cached_gl_vertex_attrib_i_pointer == nullptr)
-    {
-        OpenGL::g_cached_gl_vertex_attrib_i_pointer = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glVertexAttribIPointer");
-    }
-
     reinterpret_cast<PFNGLVERTEXATTRIBIPOINTERPROC>(OpenGL::g_cached_gl_vertex_attrib_i_pointer)(index,
                                                                                                  size,
                                                                                                  type,

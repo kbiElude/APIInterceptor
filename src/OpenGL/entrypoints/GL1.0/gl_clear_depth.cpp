@@ -33,11 +33,6 @@ void AI_APIENTRY OpenGL::aiClearDepth(GLdouble depth)
                          &should_pass_through);
     }
 
-    if (OpenGL::g_cached_gl_clear_depth == nullptr)
-    {
-        OpenGL::g_cached_gl_clear_depth = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glClearDepth");
-    }
-
     if (should_pass_through)
     {
         reinterpret_cast<PFNGLCLEARDEPTHPROC>(OpenGL::g_cached_gl_clear_depth)(depth);

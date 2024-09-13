@@ -22,11 +22,6 @@ void AI_APIENTRY OpenGL::aiFramebufferTexture2D(GLenum target,
              texture,
              level);
 
-    if (OpenGL::g_cached_gl_framebuffer_texture_2D == nullptr)
-    {
-        OpenGL::g_cached_gl_framebuffer_texture_2D = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glFramebufferTexture2D");
-    }
-
     reinterpret_cast<PFNGLFRAMEBUFFERTEXTURE2DPROC>(OpenGL::g_cached_gl_framebuffer_texture_2D)(target,
                                                                                                 attachment,
                                                                                                 textarget,

@@ -22,11 +22,6 @@ void AI_APIENTRY OpenGL::aiBindBufferRange(GLenum     target,
              static_cast<uint32_t>(offset),
              static_cast<uint32_t>(size) );
 
-    if (OpenGL::g_cached_gl_bind_buffer_range == nullptr)
-    {
-        OpenGL::g_cached_gl_bind_buffer_range = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glBindBufferRange");
-    }
-
     reinterpret_cast<PFNGLBINDBUFFERRANGEPROC>(OpenGL::g_cached_gl_bind_buffer_range)(target,
                                                                                       index,
                                                                                       buffer,

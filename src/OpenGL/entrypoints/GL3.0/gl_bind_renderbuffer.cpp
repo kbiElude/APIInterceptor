@@ -16,11 +16,6 @@ void AI_APIENTRY OpenGL::aiBindRenderbuffer(GLenum target,
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              renderbuffer);
 
-    if (OpenGL::g_cached_gl_bind_renderbuffer == nullptr)
-    {
-        OpenGL::g_cached_gl_bind_renderbuffer = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glBindRenderbuffer");
-    }
-
     reinterpret_cast<PFNGLBINDRENDERBUFFERPROC>(OpenGL::g_cached_gl_bind_renderbuffer)(target,
                                                                                        renderbuffer);
 }

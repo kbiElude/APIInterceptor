@@ -15,11 +15,6 @@ void AI_APIENTRY OpenGL::aiGenQueries(GLsizei n,
              static_cast<int32_t>(n),
              ids);
 
-    if (OpenGL::g_cached_gl_gen_queries == nullptr)
-    {
-        OpenGL::g_cached_gl_gen_queries = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glGenQueries");
-    }
-
     reinterpret_cast<PFNGLGENQUERIESPROC>(OpenGL::g_cached_gl_gen_queries)(n,
                                                                            ids);
 }

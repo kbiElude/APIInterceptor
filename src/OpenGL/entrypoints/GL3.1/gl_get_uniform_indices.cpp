@@ -20,11 +20,6 @@ void AI_APIENTRY OpenGL::aiGetUniformIndices(GLuint               program,
              uniformNames,
              uniformIndices);
 
-    if (OpenGL::g_cached_gl_get_uniform_indices == nullptr)
-    {
-        OpenGL::g_cached_gl_get_uniform_indices = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glGetUniformIndices");
-    }
-
     reinterpret_cast<PFNGLGETUNIFORMINDICESPROC>(OpenGL::g_cached_gl_get_uniform_indices)(program,
                                                                                           uniformCount,
                                                                                           uniformNames,

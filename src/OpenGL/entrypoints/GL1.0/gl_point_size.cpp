@@ -13,10 +13,5 @@ void AI_APIENTRY OpenGL::aiPointSize(GLfloat size)
     AI_TRACE("glPointSize(size=[%.4f])",
              size);
 
-    if (OpenGL::g_cached_gl_point_size == nullptr)
-    {
-        OpenGL::g_cached_gl_point_size = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glPointSize");
-    }
-
     reinterpret_cast<PFNGLPOINTSIZEPROC>(g_cached_gl_point_size)(size);
 }

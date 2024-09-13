@@ -15,7 +15,7 @@ namespace OpenGL
 {
     extern AI_THREADLOCAL const OpenGL::DispatchTable* g_dispatch_table_ptr;
 
-    /* NOTE: opengl32.dll only exposes <=GL1.1 entrypoints. Core profile go first. */
+    /* NOTE: opengl32.dll only exposes <=GL1.1 entrypoints. Core profile goes first. */
     extern void* g_cached_gl_bind_texture;
     extern void* g_cached_gl_blend_func;
     extern void* g_cached_gl_clear;

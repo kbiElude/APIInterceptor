@@ -15,11 +15,6 @@ GLint AI_APIENTRY OpenGL::aiGetUniformLocation(GLuint        program,
              program,
              name);
 
-    if (OpenGL::g_cached_gl_get_uniform_location == nullptr)
-    {
-        OpenGL::g_cached_gl_get_uniform_location = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glGetUniformLocation");
-    }
-
     return reinterpret_cast<PFNGLGETUNIFORMLOCATIONPROC>(OpenGL::g_cached_gl_get_uniform_location)(program,
                                                                                                    name);
 }

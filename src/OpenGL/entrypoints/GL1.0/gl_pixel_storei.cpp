@@ -16,11 +16,6 @@ void AI_APIENTRY OpenGL::aiPixelStorei(GLenum pname,
              OpenGL::Utils::get_raw_string_for_gl_enum(pname),
              param);
 
-    if (OpenGL::g_cached_gl_pixel_storei == nullptr)
-    {
-        OpenGL::g_cached_gl_pixel_storei = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glPixelStorei");
-    }
-
     reinterpret_cast<PFNGLPIXELSTOREIPROC>(g_cached_gl_pixel_storei)(pname,
                                                                      param);
 }

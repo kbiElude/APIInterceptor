@@ -33,11 +33,6 @@ void AI_APIENTRY OpenGL::aiActiveTexture(GLenum texture)
                          &should_pass_through);
     }
 
-    if (OpenGL::g_cached_gl_active_texture == nullptr)
-    {
-        OpenGL::g_cached_gl_active_texture = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glActiveTexture");
-    }
-
     if (should_pass_through)
     {
         reinterpret_cast<PFNGLACTIVETEXTUREPROC>(OpenGL::g_cached_gl_active_texture)(texture);

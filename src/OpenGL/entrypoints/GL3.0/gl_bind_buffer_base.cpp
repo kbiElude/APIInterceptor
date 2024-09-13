@@ -18,11 +18,6 @@ void AI_APIENTRY OpenGL::aiBindBufferBase(GLenum target,
              index,
              buffer);
 
-    if (OpenGL::g_cached_gl_bind_buffer_base == nullptr)
-    {
-        OpenGL::g_cached_gl_bind_buffer_base = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glBindBufferBase");
-    }
-
     reinterpret_cast<PFNGLBINDBUFFERBASEPROC>(OpenGL::g_cached_gl_bind_buffer_base)(target,
                                                                                     index,
                                                                                     buffer);

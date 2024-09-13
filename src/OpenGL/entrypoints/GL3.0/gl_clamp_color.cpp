@@ -16,11 +16,6 @@ void AI_APIENTRY OpenGL::aiClampColor(GLenum target,
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              OpenGL::Utils::get_raw_string_for_gl_enum(clamp) );
 
-    if (OpenGL::g_cached_gl_clamp_color == nullptr)
-    {
-        OpenGL::g_cached_gl_clamp_color = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glClampColor");
-    }
-
     reinterpret_cast<PFNGLCLAMPCOLORPROC>(OpenGL::g_cached_gl_clamp_color)(target,
                                                                            clamp);
 }

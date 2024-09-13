@@ -18,11 +18,6 @@ void AI_APIENTRY OpenGL::aiGetProgramiv(GLuint program,
              OpenGL::Utils::get_raw_string_for_gl_enum(pname),
              params);
 
-    if (OpenGL::g_cached_gl_get_programiv == nullptr)
-    {
-        OpenGL::g_cached_gl_get_programiv = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glGetProgramiv");
-    }
-
     reinterpret_cast<PFNGLGETPROGRAMIVPROC>(OpenGL::g_cached_gl_get_programiv)(program,
                                                                                pname,
                                                                                params);

@@ -13,10 +13,5 @@ void AI_APIENTRY OpenGL::aiEnableVertexAttribArray(GLuint index)
     AI_TRACE("glEnableVertexAttribArray(index=[%u])",
              index);
 
-    if (OpenGL::g_cached_gl_enable_vertex_attrib_array == nullptr)
-    {
-        OpenGL::g_cached_gl_enable_vertex_attrib_array = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glEnableVertexAttribArray");
-    }
-
     reinterpret_cast<PFNGLENABLEVERTEXATTRIBARRAYPROC>(OpenGL::g_cached_gl_enable_vertex_attrib_array)(index);
 }

@@ -18,11 +18,6 @@ void AI_APIENTRY OpenGL::aiGetBufferParameteri64v(GLenum   target,
              OpenGL::Utils::get_raw_string_for_gl_enum(pname),
              params);
 
-    if (OpenGL::g_cached_gl_get_buffer_parameteri64v == nullptr)
-    {
-        OpenGL::g_cached_gl_get_buffer_parameteri64v = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glGetBufferParameteri64v");
-    }
-
     reinterpret_cast<PFNGLGETBUFFERPARAMETERI64VPROC>(OpenGL::g_cached_gl_get_buffer_parameteri64v)(target,
                                                                                                     pname,
                                                                                                     params);

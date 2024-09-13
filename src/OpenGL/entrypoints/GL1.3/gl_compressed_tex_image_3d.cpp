@@ -30,11 +30,6 @@ void AI_APIENTRY OpenGL::aiCompressedTexImage3D(GLenum      target,
              static_cast<int32_t>(imageSize),
              data);
 
-    if (OpenGL::g_cached_gl_compressed_tex_image_3D == nullptr)
-    {
-        OpenGL::g_cached_gl_compressed_tex_image_3D = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glCompressedTexImage3D");
-    }
-
     reinterpret_cast<PFNGLCOMPRESSEDTEXIMAGE3DPROC>(OpenGL::g_cached_gl_compressed_tex_image_3D)(target,
                                                                                                  level,
                                                                                                  internalformat,

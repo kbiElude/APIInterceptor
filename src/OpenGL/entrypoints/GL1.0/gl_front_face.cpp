@@ -35,7 +35,6 @@ void AI_APIENTRY OpenGL::aiFrontFace(GLenum mode)
 
     if (OpenGL::g_cached_gl_front_face == nullptr)
     {
-        OpenGL::g_cached_gl_front_face = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glFrontFace");
     }
 
     if (should_pass_through)

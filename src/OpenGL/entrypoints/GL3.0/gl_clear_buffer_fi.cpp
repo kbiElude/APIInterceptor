@@ -20,11 +20,6 @@ void AI_APIENTRY OpenGL::aiClearBufferfi(GLenum  buffer,
              depth,
              stencil);
 
-    if (OpenGL::g_cached_gl_clear_buffer_fi == nullptr)
-    {
-        OpenGL::g_cached_gl_clear_buffer_fi = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glClearBufferfi");
-    }
-
     reinterpret_cast<PFNGLCLEARBUFFERFIPROC>(OpenGL::g_cached_gl_clear_buffer_fi)(buffer,
                                                                                   drawbuffer,
                                                                                   depth,

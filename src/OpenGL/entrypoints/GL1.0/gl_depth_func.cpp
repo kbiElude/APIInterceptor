@@ -33,11 +33,6 @@ void AI_APIENTRY OpenGL::aiDepthFunc(GLenum func)
                          &should_pass_through);
     }
 
-    if (OpenGL::g_cached_gl_depth_func == nullptr)
-    {
-        OpenGL::g_cached_gl_depth_func = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glDepthFunc");
-    }
-
     if (should_pass_through)
     {
         reinterpret_cast<PFNGLDEPTHFUNCPROC>(OpenGL::g_cached_gl_depth_func)(func);

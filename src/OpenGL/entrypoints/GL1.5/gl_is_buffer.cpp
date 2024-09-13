@@ -13,10 +13,5 @@ GLboolean AI_APIENTRY OpenGL::aiIsBuffer(GLuint buffer)
     AI_TRACE("glIsBuffer(buffer=[%u])",
              buffer);
 
-    if (OpenGL::g_cached_gl_is_buffer == nullptr)
-    {
-        OpenGL::g_cached_gl_is_buffer = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glIsBuffer");
-    }
-
     return reinterpret_cast<PFNGLISBUFFERPROC>(OpenGL::g_cached_gl_is_buffer)(buffer);
 }

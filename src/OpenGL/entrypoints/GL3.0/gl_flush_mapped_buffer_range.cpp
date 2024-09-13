@@ -18,11 +18,6 @@ void AI_APIENTRY OpenGL::aiFlushMappedBufferRange(GLenum     target,
              static_cast<int32_t>(offset),
              static_cast<int32_t>(length) );
 
-    if (OpenGL::g_cached_gl_flush_mapped_buffer_range == nullptr)
-    {
-        OpenGL::g_cached_gl_flush_mapped_buffer_range = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glFlushMappedBufferRange");
-    }
-
     reinterpret_cast<PFNGLFLUSHMAPPEDBUFFERRANGEPROC>(OpenGL::g_cached_gl_flush_mapped_buffer_range)(target,
                                                                                                      offset,
                                                                                                      length);

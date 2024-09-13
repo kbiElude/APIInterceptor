@@ -15,11 +15,6 @@ void AI_APIENTRY OpenGL::aiGenFramebuffers(GLsizei n,
              static_cast<int32_t>(n),
              framebuffers);
 
-    if (OpenGL::g_cached_gl_gen_framebuffers == nullptr)
-    {
-        OpenGL::g_cached_gl_gen_framebuffers = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glGenFramebuffers");
-    }
-
     reinterpret_cast<PFNGLGENFRAMEBUFFERSPROC>(OpenGL::g_cached_gl_gen_framebuffers)(n,
                                                                                      framebuffers);
 }

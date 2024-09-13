@@ -30,11 +30,6 @@ void AI_APIENTRY OpenGL::aiCompressedTexSubImage2D(GLenum      target,
              static_cast<int32_t>(imageSize),
              data);
 
-    if (OpenGL::g_cached_gl_compressed_tex_sub_image_2D == nullptr)
-    {
-        OpenGL::g_cached_gl_compressed_tex_sub_image_2D = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glCompressedTexSubImage2D");
-    }
-
     reinterpret_cast<PFNGLCOMPRESSEDTEXSUBIMAGE2DPROC>(OpenGL::g_cached_gl_compressed_tex_sub_image_2D)(target,
                                                                                                         level,
                                                                                                         xoffset,

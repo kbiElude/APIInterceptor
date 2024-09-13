@@ -15,11 +15,6 @@ GLint AI_APIENTRY OpenGL::aiGetFragDataLocation(GLuint        program,
              program,
              name);
 
-    if (OpenGL::g_cached_gl_get_frag_data_location == nullptr)
-    {
-        OpenGL::g_cached_gl_get_frag_data_location = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glGetFragDataLocation");
-    }
-
     return reinterpret_cast<PFNGLGETFRAGDATALOCATIONPROC>(OpenGL::g_cached_gl_get_frag_data_location)(program,
                                                                                                       name);
 }

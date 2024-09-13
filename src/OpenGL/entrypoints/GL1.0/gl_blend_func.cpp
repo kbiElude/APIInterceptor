@@ -36,11 +36,6 @@ void AI_APIENTRY OpenGL::aiBlendFunc(GLenum sfactor,
                          &should_pass_through);
     }
 
-    if (OpenGL::g_cached_gl_blend_func == nullptr)
-    {
-        OpenGL::g_cached_gl_blend_func = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glBlendFunc");
-    }
-
     if (should_pass_through)
     {
         reinterpret_cast<PFNGLBLENDFUNCPROC>(OpenGL::g_cached_gl_blend_func)(sfactor,

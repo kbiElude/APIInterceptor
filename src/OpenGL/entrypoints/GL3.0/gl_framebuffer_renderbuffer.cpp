@@ -20,11 +20,6 @@ void AI_APIENTRY OpenGL::aiFramebufferRenderbuffer(GLenum target,
              OpenGL::Utils::get_raw_string_for_gl_enum(renderbuffertarget),
              renderbuffer);
 
-    if (OpenGL::g_cached_gl_framebuffer_renderbuffer == nullptr)
-    {
-        OpenGL::g_cached_gl_framebuffer_renderbuffer = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glFramebufferRenderbuffer");
-    }
-
     reinterpret_cast<PFNGLFRAMEBUFFERRENDERBUFFERPROC>(OpenGL::g_cached_gl_framebuffer_renderbuffer)(target,
                                                                                                      attachment,
                                                                                                      renderbuffertarget,

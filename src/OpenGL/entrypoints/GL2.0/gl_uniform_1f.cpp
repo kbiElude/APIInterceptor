@@ -15,11 +15,6 @@ void AI_APIENTRY OpenGL::aiUniform1f(GLint   location,
              location,
              v0);
 
-    if (OpenGL::g_cached_gl_uniform_1f == nullptr)
-    {
-        OpenGL::g_cached_gl_uniform_1f = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glUniform1f");
-    }
-
     reinterpret_cast<PFNGLUNIFORM1FPROC>(OpenGL::g_cached_gl_uniform_1f)(location,
                                                                          v0);
 }

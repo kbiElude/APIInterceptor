@@ -34,7 +34,6 @@ void AI_APIENTRY OpenGL::aiDepthMask(GLboolean flag)
 
     if (OpenGL::g_cached_gl_depth_mask == nullptr)
     {
-        OpenGL::g_cached_gl_depth_mask = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glDepthMask");
     }
 
     if (should_pass_through)

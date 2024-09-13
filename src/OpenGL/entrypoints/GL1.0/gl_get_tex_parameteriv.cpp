@@ -18,11 +18,6 @@ void AI_APIENTRY OpenGL::aiGetTexParameteriv(GLenum target,
              OpenGL::Utils::get_raw_string_for_gl_enum(pname),
              params);
 
-    if (OpenGL::g_cached_gl_get_tex_parameteriv == nullptr)
-    {
-        OpenGL::g_cached_gl_get_tex_parameteriv = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glGetTexParameteriv");
-    }
-
     reinterpret_cast<PFNGLGETTEXPARAMETERIVPROC>(OpenGL::g_cached_gl_get_tex_parameteriv)(target,
                                                                                           pname,
                                                                                           params);

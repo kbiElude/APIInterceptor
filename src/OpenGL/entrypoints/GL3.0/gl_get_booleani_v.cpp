@@ -18,11 +18,6 @@ void AI_APIENTRY OpenGL::aiGetBooleani_v(GLenum     target,
              index,
              data);
 
-    if (OpenGL::g_cached_gl_get_booleani_v == nullptr)
-    {
-        OpenGL::g_cached_gl_get_booleani_v = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glGetBooleani_v");
-    }
-
     reinterpret_cast<PFNGLGETBOOLEANI_VPROC>(OpenGL::g_cached_gl_get_booleani_v)(target,
                                                                                  index,
                                                                                  data);

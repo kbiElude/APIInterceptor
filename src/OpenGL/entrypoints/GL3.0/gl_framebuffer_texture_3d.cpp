@@ -24,10 +24,6 @@ void AI_APIENTRY OpenGL::aiFramebufferTexture3D(GLenum target,
              level,
              zoffset);
 
-    if (OpenGL::g_cached_gl_framebuffer_texture_3D == nullptr)
-    {
-        OpenGL::g_cached_gl_framebuffer_texture_3D = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glFramebufferTexture3D");
-    }
 
     reinterpret_cast<PFNGLFRAMEBUFFERTEXTURE3DPROC>(OpenGL::g_cached_gl_framebuffer_texture_3D)(target,
                                                                                                 attachment,

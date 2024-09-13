@@ -21,11 +21,6 @@ void AI_APIENTRY OpenGL::aiVertexAttrib4Nub(GLuint  index,
              static_cast<uint32_t>(z),
              static_cast<uint32_t>(w) );
 
-    if (OpenGL::g_cached_gl_vertex_attrib_4Nub == nullptr)
-    {
-        OpenGL::g_cached_gl_vertex_attrib_4Nub = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glVertexAttrib4Nub");
-    }
-
     reinterpret_cast<PFNGLVERTEXATTRIB4NUBPROC>(OpenGL::g_cached_gl_vertex_attrib_4Nub)(index,
                                                                                         x,
                                                                                         y,

@@ -16,11 +16,6 @@ const GLubyte *APIENTRY OpenGL::aiGetStringi(GLenum name,
              OpenGL::Utils::get_raw_string_for_gl_enum(name),
              index);
 
-    if (OpenGL::g_cached_gl_get_stringi == nullptr)
-    {
-        OpenGL::g_cached_gl_get_stringi = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glGetStringi");
-    }
-
     return reinterpret_cast<PFNGLGETSTRINGIPROC>(OpenGL::g_cached_gl_get_stringi)(name,
                                                                                   index);
 }

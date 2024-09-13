@@ -36,11 +36,6 @@ void AI_APIENTRY OpenGL::aiPolygonMode(GLenum face,
                          &should_pass_through);
     }
 
-    if (OpenGL::g_cached_gl_polygon_mode == nullptr)
-    {
-        OpenGL::g_cached_gl_polygon_mode = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glPolygonMode");
-    }
-
     if (should_pass_through)
     {
         reinterpret_cast<PFNGLPOLYGONMODEPROC>(g_cached_gl_polygon_mode)(face,

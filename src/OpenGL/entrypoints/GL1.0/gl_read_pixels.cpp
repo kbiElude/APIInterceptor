@@ -51,11 +51,6 @@ void AI_APIENTRY OpenGL::aiReadPixels(GLint   x,
                          &should_pass_through);
     }
 
-    if (OpenGL::g_cached_gl_read_pixels == nullptr)
-    {
-        OpenGL::g_cached_gl_read_pixels = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glReadPixels");
-    }
-
     if (should_pass_through)
     {
         reinterpret_cast<PFNGLREADPIXELSPROC>(g_cached_gl_read_pixels)(x,

@@ -33,11 +33,6 @@ void AI_APIENTRY OpenGL::aiClear(GLbitfield mask)
                          &should_pass_through);
     }
 
-    if (OpenGL::g_cached_gl_clear == nullptr)
-    {
-        OpenGL::g_cached_gl_clear = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glClear");
-    }
-
     if (should_pass_through)
     {
         reinterpret_cast<PFNGLCLEARPROC>(OpenGL::g_cached_gl_clear)(mask);

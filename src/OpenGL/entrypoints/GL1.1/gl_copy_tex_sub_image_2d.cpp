@@ -28,11 +28,6 @@ void AI_APIENTRY OpenGL::aiCopyTexSubImage2D(GLenum  target,
              static_cast<int32_t>(width),
              static_cast<int32_t>(height) );
 
-    if (OpenGL::g_cached_gl_copy_tex_sub_image_2D == nullptr)
-    {
-        OpenGL::g_cached_gl_copy_tex_sub_image_2D = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glCopyTexSubImage2D");
-    }
-
     reinterpret_cast<PFNGLCOPYTEXSUBIMAGE2DPROC>(OpenGL::g_cached_gl_copy_tex_sub_image_2D)(target,
                                                                                             level,
                                                                                             xoffset,

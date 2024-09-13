@@ -16,11 +16,6 @@ void AI_APIENTRY OpenGL::aiVertexAttribI2uiv(GLuint        index,
              index,
              v);
 
-    if (OpenGL::g_cached_gl_vertex_attrib_i_2uiv == nullptr)
-    {
-        OpenGL::g_cached_gl_vertex_attrib_i_2uiv = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glVertexAttribI2uiv");
-    }
-
     reinterpret_cast<PFNGLVERTEXATTRIBI2UIVPROC>(OpenGL::g_cached_gl_vertex_attrib_i_2uiv)(index,
                                                                                            v);
 }

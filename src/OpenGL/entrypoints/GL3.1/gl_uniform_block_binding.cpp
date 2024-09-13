@@ -17,11 +17,6 @@ void AI_APIENTRY OpenGL::aiUniformBlockBinding(GLuint program,
              uniformBlockIndex,
              uniformBlockBinding);
 
-    if (OpenGL::g_cached_gl_uniform_block_binding == nullptr)
-    {
-        OpenGL::g_cached_gl_uniform_block_binding = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glUniformBlockBinding");
-    }
-
     reinterpret_cast<PFNGLUNIFORMBLOCKBINDINGPROC>(OpenGL::g_cached_gl_uniform_block_binding)(program,
                                                                                               uniformBlockIndex,
                                                                                               uniformBlockBinding);

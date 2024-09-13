@@ -22,11 +22,6 @@ void AI_APIENTRY OpenGL::aiDrawElementsInstanced(GLenum      mode,
              indices,
              static_cast<int32_t>(instancecount) );
 
-    if (OpenGL::g_cached_gl_draw_elements_instanced == nullptr)
-    {
-        OpenGL::g_cached_gl_draw_elements_instanced = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glDrawElementsInstanced");
-    }
-
     reinterpret_cast<PFNGLDRAWELEMENTSINSTANCEDPROC>(OpenGL::g_cached_gl_draw_elements_instanced)(mode,
                                                                                                   count,
                                                                                                   type,

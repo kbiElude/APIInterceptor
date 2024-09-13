@@ -19,11 +19,6 @@ void AI_APIENTRY OpenGL::aiGetShaderInfoLog(GLuint   shader,
              length,
              infoLog);
 
-    if (OpenGL::g_cached_gl_get_shader_info_log == nullptr)
-    {
-        OpenGL::g_cached_gl_get_shader_info_log = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glGetShaderInfoLog");
-    }
-
     reinterpret_cast<PFNGLGETSHADERINFOLOGPROC>(OpenGL::g_cached_gl_get_shader_info_log)(shader,
                                                                                          bufSize,
                                                                                          length,

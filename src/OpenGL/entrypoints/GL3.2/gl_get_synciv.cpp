@@ -22,11 +22,6 @@ void AI_APIENTRY OpenGL::aiGetSynciv(GLsync   sync,
              length,
              values);
 
-    if (OpenGL::g_cached_gl_end_transform_feedback == nullptr)
-    {
-        OpenGL::g_cached_gl_end_transform_feedback = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glEndTransformFeedback");
-    }
-
     reinterpret_cast<PFNGLGETSYNCIVPROC>(OpenGL::g_cached_gl_get_synciv)(sync,
                                                                          pname,
                                                                          bufSize,

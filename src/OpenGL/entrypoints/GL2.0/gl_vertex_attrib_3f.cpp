@@ -19,11 +19,6 @@ void AI_APIENTRY OpenGL::aiVertexAttrib3f(GLuint  index,
              y,
              z);
 
-    if (OpenGL::g_cached_gl_vertex_attrib_3f == nullptr)
-    {
-        OpenGL::g_cached_gl_vertex_attrib_3f = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glVertexAttrib3f");
-    }
-
     reinterpret_cast<PFNGLVERTEXATTRIB3FPROC>(OpenGL::g_cached_gl_vertex_attrib_3f)(index,
                                                                                     x,
                                                                                     y,

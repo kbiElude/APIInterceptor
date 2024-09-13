@@ -16,11 +16,6 @@ void AI_APIENTRY OpenGL::aiEnablei(GLenum target,
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              index);
 
-    if (OpenGL::g_cached_gl_delete_framebuffers == nullptr)
-    {
-        OpenGL::g_cached_gl_delete_framebuffers = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glDeleteFramebuffers");
-    }
-
     reinterpret_cast<PFNGLENABLEIPROC>(OpenGL::g_cached_gl_enablei)(target,
                                                                     index);
 }

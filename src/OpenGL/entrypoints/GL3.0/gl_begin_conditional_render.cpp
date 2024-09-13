@@ -16,11 +16,6 @@ void AI_APIENTRY OpenGL::aiBeginConditionalRender(GLuint id,
              id,
              OpenGL::Utils::get_raw_string_for_gl_enum(mode) );
 
-    if (OpenGL::g_cached_gl_begin_conditional_render == nullptr)
-    {
-        OpenGL::g_cached_gl_begin_conditional_render = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glBeginConditionalRender");
-    }
-
     reinterpret_cast<PFNGLBEGINCONDITIONALRENDERPROC>(OpenGL::g_cached_gl_begin_conditional_render)(id,
                                                                                                     mode);
 }

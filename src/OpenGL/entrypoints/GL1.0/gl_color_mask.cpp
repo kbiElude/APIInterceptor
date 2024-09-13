@@ -43,7 +43,6 @@ void AI_APIENTRY OpenGL::aiColorMask(GLboolean red,
 
     if (OpenGL::g_cached_gl_color_mask == nullptr)
     {
-        OpenGL::g_cached_gl_color_mask = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glColorMask");
     }
 
     if (should_pass_through)

@@ -13,10 +13,5 @@ GLboolean AI_APIENTRY OpenGL::aiIsVertexArray(GLuint array)
     AI_TRACE("glIsVertexArray(array=[%u])",
              array);
 
-    if (OpenGL::g_cached_gl_is_vertex_array == nullptr)
-    {
-        OpenGL::g_cached_gl_is_vertex_array = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glIsVertexArray");
-    }
-
     return reinterpret_cast<PFNGLISVERTEXARRAYPROC>(OpenGL::g_cached_gl_is_vertex_array)(array);
 }

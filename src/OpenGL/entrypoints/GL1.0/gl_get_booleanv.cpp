@@ -18,7 +18,6 @@ void AI_APIENTRY OpenGL::aiGetBooleanv(GLenum     pname,
 
     if (OpenGL::g_cached_gl_get_booleanv == nullptr)
     {
-        OpenGL::g_cached_gl_get_booleanv = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glGetBooleanv");
     }
 
     reinterpret_cast<PFNGLGETBOOLEANVPROC>(OpenGL::g_cached_gl_get_booleanv)(pname,

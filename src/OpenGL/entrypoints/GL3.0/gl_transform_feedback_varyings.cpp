@@ -21,11 +21,6 @@ void AI_APIENTRY OpenGL::aiTransformFeedbackVaryings(GLuint               progra
              varyings,
              OpenGL::Utils::get_raw_string_for_gl_enum(bufferMode) );
 
-    if (OpenGL::g_cached_gl_transform_feedback_varyings == nullptr)
-    {
-        OpenGL::g_cached_gl_transform_feedback_varyings = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glTransformFeedbackVaryings");
-    }
-
     reinterpret_cast<PFNGLTRANSFORMFEEDBACKVARYINGSPROC>(OpenGL::g_cached_gl_transform_feedback_varyings)(program,
                                                                                                           count,
                                                                                                           varyings,

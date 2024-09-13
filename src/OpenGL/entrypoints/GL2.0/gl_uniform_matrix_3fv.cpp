@@ -20,11 +20,6 @@ void AI_APIENTRY OpenGL::aiUniformMatrix3fv(GLint          location,
              (transpose == GL_TRUE) ? 1 : 0,
              value);
 
-    if (OpenGL::g_cached_gl_uniform_matrix_3fv == nullptr)
-    {
-        OpenGL::g_cached_gl_uniform_matrix_3fv = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glUniformMatrix3fv");
-    }
-
     reinterpret_cast<PFNGLUNIFORMMATRIX3FVPROC>(OpenGL::g_cached_gl_uniform_matrix_3fv)(location,
                                                                                         count,
                                                                                         transpose,

@@ -15,11 +15,6 @@ GLuint AI_APIENTRY OpenGL::aiGetUniformBlockIndex(GLuint        program,
              program,
              uniformBlockName);
 
-    if (OpenGL::g_cached_gl_end_transform_feedback == nullptr)
-    {
-        OpenGL::g_cached_gl_end_transform_feedback = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glEndTransformFeedback");
-    }
-
     return reinterpret_cast<PFNGLGETUNIFORMBLOCKINDEXPROC>(OpenGL::g_cached_gl_get_uniform_block_index)(program,
                                                                                                         uniformBlockName);
 }

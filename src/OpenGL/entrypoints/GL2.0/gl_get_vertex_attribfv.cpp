@@ -18,11 +18,6 @@ void AI_APIENTRY OpenGL::aiGetVertexAttribfv(GLuint   index,
              OpenGL::Utils::get_raw_string_for_gl_enum(pname),
              params);
 
-    if (OpenGL::g_cached_gl_get_vertex_attribfv == nullptr)
-    {
-        OpenGL::g_cached_gl_get_vertex_attribfv = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glGetVertexAttribfv");
-    }
-
     reinterpret_cast<PFNGLGETVERTEXATTRIBFVPROC>(OpenGL::g_cached_gl_get_vertex_attribfv)(index,
                                                                                           pname,
                                                                                           params);

@@ -17,11 +17,6 @@ void AI_APIENTRY OpenGL::aiGetUniformuiv(GLuint  program,
              location,
              params);
 
-    if (OpenGL::g_cached_gl_end_transform_feedback == nullptr)
-    {
-        OpenGL::g_cached_gl_end_transform_feedback = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glEndTransformFeedback");
-    }
-
     reinterpret_cast<PFNGLGETUNIFORMUIVPROC>(OpenGL::g_cached_gl_get_uniformuiv)(program,
                                                                                  location,
                                                                                  params);

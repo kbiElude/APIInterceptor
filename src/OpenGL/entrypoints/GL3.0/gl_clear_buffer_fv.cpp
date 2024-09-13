@@ -18,11 +18,6 @@ void AI_APIENTRY OpenGL::aiClearBufferfv(GLenum         buffer,
              drawbuffer,
             *value);
 
-    if (OpenGL::g_cached_gl_clear_buffer_fv == nullptr)
-    {
-        OpenGL::g_cached_gl_clear_buffer_fv = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glClearBufferfv");
-    }
-
     reinterpret_cast<PFNGLCLEARBUFFERFVPROC>(OpenGL::g_cached_gl_clear_buffer_fv)(buffer,
                                                                                   drawbuffer,
                                                                                   value);

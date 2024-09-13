@@ -16,11 +16,6 @@ void AI_APIENTRY OpenGL::aiStencilMaskSeparate(GLenum face,
              OpenGL::Utils::get_raw_string_for_gl_enum(face),
              mask);
 
-    if (OpenGL::g_cached_gl_stencil_mask_separate == nullptr)
-    {
-        OpenGL::g_cached_gl_stencil_mask_separate = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glStencilMaskSeparate");
-    }
-
     reinterpret_cast<PFNGLSTENCILMASKSEPARATEPROC>(g_cached_gl_stencil_mask_separate)(face,
                                                                                       mask);
 }

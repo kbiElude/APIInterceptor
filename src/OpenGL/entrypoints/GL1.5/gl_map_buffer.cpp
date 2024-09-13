@@ -16,10 +16,6 @@ void *APIENTRY OpenGL::aiMapBuffer(GLenum target,
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              OpenGL::Utils::get_raw_string_for_gl_enum(access) );
 
-    if (OpenGL::g_cached_gl_map_buffer == nullptr)
-    {
-        OpenGL::g_cached_gl_map_buffer = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glMapBuffer");
-    }
 
     return reinterpret_cast<PFNGLMAPBUFFERPROC>(OpenGL::g_cached_gl_map_buffer)(target,
                                                                                 access);

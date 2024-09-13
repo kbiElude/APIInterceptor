@@ -26,11 +26,6 @@ void AI_APIENTRY OpenGL::aiDrawRangeElementsBaseVertex(GLenum      mode,
              indices,
              basevertex);
 
-    if (OpenGL::g_cached_gl_draw_range_elements_base_vertex == nullptr)
-    {
-        OpenGL::g_cached_gl_draw_range_elements_base_vertex = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glDrawRangeElementsBaseVertex");
-    }
-
     reinterpret_cast<PFNGLDRAWRANGEELEMENTSBASEVERTEXPROC>(OpenGL::g_cached_gl_draw_range_elements_base_vertex)(mode,
                                                                                                                 start,
                                                                                                                 end,

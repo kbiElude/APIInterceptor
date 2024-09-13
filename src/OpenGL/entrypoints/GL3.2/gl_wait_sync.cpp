@@ -18,11 +18,6 @@ void AI_APIENTRY OpenGL::aiWaitSync(GLsync     sync,
              flags,
              timeout);
 
-    if (OpenGL::g_cached_gl_wait_sync == nullptr)
-    {
-        OpenGL::g_cached_gl_wait_sync = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glWaitSync");
-    }
-
     reinterpret_cast<PFNGLWAITSYNCPROC>(OpenGL::g_cached_gl_wait_sync)(sync,
                                                                        flags,
                                                                        timeout);

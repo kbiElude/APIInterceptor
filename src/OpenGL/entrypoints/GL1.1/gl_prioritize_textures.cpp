@@ -17,11 +17,6 @@ void AI_APIENTRY OpenGL::aiPrioritizeTextures(GLsizei n,
              textures,
              priorities);
 
-    if (OpenGL::g_cached_prioritize_textures_ext == nullptr)
-    {
-        OpenGL::g_cached_prioritize_textures_ext = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glPrioritizeTexturesEXT");
-    }
-
     reinterpret_cast<PFNGLPRIORITIZETEXTURESEXTPROC>(OpenGL::g_cached_prioritize_textures_ext)(n,
                                                                                                textures,
                                                                                                priorities);

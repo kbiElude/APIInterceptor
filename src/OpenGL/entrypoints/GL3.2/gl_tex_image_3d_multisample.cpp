@@ -26,11 +26,6 @@ void AI_APIENTRY OpenGL::aiTexImage3DMultisample(GLenum    target,
              static_cast<int32_t>(depth),
              (fixedsamplelocations == GL_TRUE) ? 1 : 0);
 
-    if (OpenGL::g_cached_gl_tex_image_3DMultisample == nullptr)
-    {
-        OpenGL::g_cached_gl_tex_image_3DMultisample = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glTexImage3DMultisample");
-    }
-
     reinterpret_cast<PFNGLTEXIMAGE3DMULTISAMPLEPROC>(OpenGL::g_cached_gl_tex_image_3DMultisample)(target,
                                                                                                   samples,
                                                                                                   internalformat,

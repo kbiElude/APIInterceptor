@@ -35,11 +35,6 @@ void AI_APIENTRY OpenGL::aiDepthRange(GLdouble n,
                          &should_pass_through);
     }
 
-    if (OpenGL::g_cached_gl_depth_range == nullptr)
-    {
-        OpenGL::g_cached_gl_depth_range = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glDepthRange");
-    }
-
     if (should_pass_through)
     {
         reinterpret_cast<PFNGLDEPTHRANGEPROC>(OpenGL::g_cached_gl_depth_range)(n,

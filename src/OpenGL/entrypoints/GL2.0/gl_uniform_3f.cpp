@@ -19,11 +19,6 @@ void AI_APIENTRY OpenGL::aiUniform3f(GLint   location,
              v1,
              v2);
 
-    if (OpenGL::g_cached_gl_uniform_3f == nullptr)
-    {
-        OpenGL::g_cached_gl_uniform_3f = reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glUniform3f");
-    }
-
     reinterpret_cast<PFNGLUNIFORM3FPROC>(OpenGL::g_cached_gl_uniform_3f)(location,
                                                                          v0,
                                                                          v1,
