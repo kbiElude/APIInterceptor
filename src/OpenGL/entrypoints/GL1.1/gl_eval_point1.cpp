@@ -2,6 +2,7 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
+#include "Common/callbacks.h"
 #include "OpenGL/entrypoints/GL1.1/gl_eval_point1.h"
 #include "OpenGL/globals.h"
 #include "OpenGL/utils_enum.h"
@@ -9,10 +10,31 @@
 
 void AI_APIENTRY OpenGL::aiEvalPoint1(GLint i)
 {
-    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glEvalPoint1(i=[%d])",
              i);
 
-    reinterpret_cast<PFNGLEVALPOINT1PROC>(OpenGL::g_cached_gl_eval_point1)(i);
+    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLEVALPOINT1,
+                                                  &callback_func_ptr,
+                                                  &callback_func_arg) )
+    {
+        const APIInterceptor::APIFunctionArgument args[] =
+        {
+            APIInterceptor::APIFunctionArgument::create_i32(i),
+        };
+
+        callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLEVALPOINT1,
+                          sizeof(args) / sizeof(args[0]),
+                          args,
+                          callback_func_arg,
+                         &should_pass_through);
+    }
+
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLEVALPOINT1PROC>(OpenGL::g_cached_gl_eval_point1)(i);
+    }
 }

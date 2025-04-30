@@ -2,6 +2,7 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
+#include "Common/callbacks.h"
 #include "OpenGL/entrypoints/GL1.0/gl_stencil_op.h"
 #include "OpenGL/globals.h"
 #include "OpenGL/utils_enum.h"
@@ -11,14 +12,37 @@ void AI_APIENTRY OpenGL::aiStencilOp(GLenum fail,
                                      GLenum zfail,
                                      GLenum zpass)
 {
-    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glStencilOp(fail=[%s] zfail=[%s] zpass=[%s])",
              OpenGL::Utils::get_raw_string_for_gl_enum(fail),
              OpenGL::Utils::get_raw_string_for_gl_enum(zfail),
              OpenGL::Utils::get_raw_string_for_gl_enum(zpass) );
 
-    reinterpret_cast<PFNGLSTENCILOPPROC>(g_cached_gl_stencil_op)(fail,
-                                                                 zfail,
-                                                                 zpass);
+    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLSTENCILOP,
+                                                  &callback_func_ptr,
+                                                  &callback_func_arg) )
+    {
+        const APIInterceptor::APIFunctionArgument args[] =
+        {
+            APIInterceptor::APIFunctionArgument::create_u32(fail),
+            APIInterceptor::APIFunctionArgument::create_u32(zfail),
+            APIInterceptor::APIFunctionArgument::create_u32(zpass),
+        };
+
+        callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLSTENCILOP,
+                          sizeof(args) / sizeof(args[0]),
+                          args,
+                          callback_func_arg,
+                         &should_pass_through);
+    }
+
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLSTENCILOPPROC>(g_cached_gl_stencil_op)(fail,
+                                                                     zfail,
+                                                                     zpass);
+    }
 }

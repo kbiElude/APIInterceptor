@@ -2,6 +2,7 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
+#include "Common/callbacks.h"
 #include "OpenGL/entrypoints/GL1.1/gl_polygon_stipple.h"
 #include "OpenGL/globals.h"
 #include "OpenGL/utils_enum.h"
@@ -9,10 +10,31 @@
 
 void AI_APIENTRY OpenGL::aiPolygonStipple(const GLubyte *mask)
 {
-    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glPolygonStipple(mask=[%p])",
              mask);
 
-    reinterpret_cast<PFNGLPOLYGONSTIPPLEPROC>(OpenGL::g_cached_gl_polygon_stipple)(mask);
+    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLPOLYGONSTIPPLE,
+                                                  &callback_func_ptr,
+                                                  &callback_func_arg) )
+    {
+        const APIInterceptor::APIFunctionArgument args[] =
+        {
+            APIInterceptor::APIFunctionArgument::create_u8_ptr(mask),
+        };
+
+        callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLPOLYGONSTIPPLE,
+                          sizeof(args) / sizeof(args[0]),
+                          args,
+                          callback_func_arg,
+                         &should_pass_through);
+    }
+
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLPOLYGONSTIPPLEPROC>(OpenGL::g_cached_gl_polygon_stipple)(mask);
+    }
 }

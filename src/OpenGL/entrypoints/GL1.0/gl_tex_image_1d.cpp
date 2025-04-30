@@ -2,6 +2,7 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
+#include "Common/callbacks.h"
 #include "OpenGL/entrypoints/GL1.0/gl_tex_image_1d.h"
 #include "OpenGL/globals.h"
 #include "OpenGL/utils_enum.h"
@@ -16,7 +17,9 @@ void AI_APIENTRY OpenGL::aiTexImage1D(GLenum      target,
                                       GLenum      type,
                                       const void* pixels)
 {
-    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glTexImage1D(target=[%s] level=[%d] internalformat=[%s] width=[%d] border=[%d] format=[%s] type=[%s] pixels=[%p])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
@@ -28,12 +31,38 @@ void AI_APIENTRY OpenGL::aiTexImage1D(GLenum      target,
              OpenGL::Utils::get_raw_string_for_gl_enum(type),
              pixels);
 
-    reinterpret_cast<PFNGLTEXIMAGE1DPROC>(OpenGL::g_cached_gl_tex_image_1D)(target,
-                                                                            level,
-                                                                            internalformat,
-                                                                            width,
-                                                                            border,
-                                                                            format,
-                                                                            type,
-                                                                            pixels);
+    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTEXIMAGE1D,
+                                                  &callback_func_ptr,
+                                                  &callback_func_arg) )
+    {
+        const APIInterceptor::APIFunctionArgument args[] =
+        {
+            APIInterceptor::APIFunctionArgument::create_u32     (target),
+            APIInterceptor::APIFunctionArgument::create_i32     (level),
+            APIInterceptor::APIFunctionArgument::create_i32     (internalformat),
+            APIInterceptor::APIFunctionArgument::create_i32     (width),
+            APIInterceptor::APIFunctionArgument::create_i32     (border),
+            APIInterceptor::APIFunctionArgument::create_u32     (format),
+            APIInterceptor::APIFunctionArgument::create_u32     (type),
+            APIInterceptor::APIFunctionArgument::create_void_ptr(pixels),
+        };
+
+        callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLTEXIMAGE1D,
+                          sizeof(args) / sizeof(args[0]),
+                          args,
+                          callback_func_arg,
+                         &should_pass_through);
+    }
+
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLTEXIMAGE1DPROC>(OpenGL::g_cached_gl_tex_image_1D)(target,
+                                                                                level,
+                                                                                internalformat,
+                                                                                width,
+                                                                                border,
+                                                                                format,
+                                                                                type,
+                                                                                pixels);
+    }
 }

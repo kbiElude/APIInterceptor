@@ -2,6 +2,7 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
+#include "Common/callbacks.h"
 #include "OpenGL/entrypoints/GL1.1/gl_light_f.h"
 #include "OpenGL/globals.h"
 #include "OpenGL/utils_enum.h"
@@ -11,14 +12,37 @@ void AI_APIENTRY OpenGL::aiLightf(GLenum  light,
                                   GLenum  pname,
                                   GLfloat param)
 {
-    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glLightf(light=[%s], pname=[%s], param=[%.4f])",
              OpenGL::Utils::get_raw_string_for_gl_enum(light),
              OpenGL::Utils::get_raw_string_for_gl_enum(pname),
              param);
 
-    reinterpret_cast<PFNGLLIGHTFPROC>(OpenGL::g_cached_gl_light_f)(light,
-                                                                   pname,
-                                                                   param);
+    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLLIGHTF,
+                                                  &callback_func_ptr,
+                                                  &callback_func_arg) )
+    {
+        const APIInterceptor::APIFunctionArgument args[] =
+        {
+            APIInterceptor::APIFunctionArgument::create_u32 (light),
+            APIInterceptor::APIFunctionArgument::create_u32 (pname),
+            APIInterceptor::APIFunctionArgument::create_fp32(param),
+        };
+
+        callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLLIGHTF,
+                          sizeof(args) / sizeof(args[0]),
+                          args,
+                          callback_func_arg,
+                         &should_pass_through);
+    }
+
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLLIGHTFPROC>(OpenGL::g_cached_gl_light_f)(light,
+                                                                       pname,
+                                                                       param);
+    }
 }

@@ -2,6 +2,7 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
+#include "Common/callbacks.h"
 #include "OpenGL/entrypoints/GL1.1/gl_load_name.h"
 #include "OpenGL/globals.h"
 #include "OpenGL/utils_enum.h"
@@ -9,10 +10,31 @@
 
 void AI_APIENTRY OpenGL::aiLoadName(GLuint name)
 {
-    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+    void*                               callback_func_arg   = nullptr;
+    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                should_pass_through = true;
 
     AI_TRACE("glLoadName(name=[%d])",
              name);
 
-    reinterpret_cast<PFNGLLOADNAMEPROC>(OpenGL::g_cached_gl_load_name)(name);
+    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLLOADNAME,
+                                                  &callback_func_ptr,
+                                                  &callback_func_arg) )
+    {
+        const APIInterceptor::APIFunctionArgument args[] =
+        {
+            APIInterceptor::APIFunctionArgument::create_u32(name),
+        };
+
+        callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLLOADNAME,
+                          sizeof(args) / sizeof(args[0]),
+                          args,
+                          callback_func_arg,
+                         &should_pass_through);
+    }
+
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLLOADNAMEPROC>(OpenGL::g_cached_gl_load_name)(name);
+    }
 }
