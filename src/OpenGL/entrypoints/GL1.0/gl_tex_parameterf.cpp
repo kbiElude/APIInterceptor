@@ -12,9 +12,9 @@ void AI_APIENTRY OpenGL::aiTexParameterf(GLenum  target,
                                          GLenum  pname,
                                          GLfloat param)
 {
-    void*                               callback_func_arg   = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
-    bool                                should_pass_through = true;
+    void*                                  callback_func_arg   = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                   should_pass_through = true;
 
     if ( (pname == GL_TEXTURE_MIN_LOD)    ||
          (pname == GL_TEXTURE_MAX_LOD)    ||
@@ -34,9 +34,9 @@ void AI_APIENTRY OpenGL::aiTexParameterf(GLenum  target,
                  OpenGL::Utils::get_raw_string_for_gl_enum(static_cast<GLenum>(param) ));
     }
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTEXPARAMETERF,
-                                                  &callback_func_ptr,
-                                                  &callback_func_arg) )
+    if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTEXPARAMETERF,
+                                                     &callback_func_ptr,
+                                                     &callback_func_arg) )
     {
         const APIInterceptor::APIFunctionArgument args[] =
         {

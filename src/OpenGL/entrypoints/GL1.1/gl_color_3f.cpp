@@ -12,18 +12,18 @@ void AI_APIENTRY OpenGL::aiColor3f(GLfloat red,
                                    GLfloat green,
                                    GLfloat blue)
 {
-    void*                               callback_func_arg   = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
-    bool                                should_pass_through = true;
+    void*                                  callback_func_arg   = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                   should_pass_through = true;
 
     AI_TRACE("glColor3f(red=[%.4f] green=[%.4f] blue=[%.4f])",
              red,
              green,
              blue);
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCOLOR3F,
-                                                  &callback_func_ptr,
-                                                  &callback_func_arg) )
+    if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCOLOR3F,
+                                                     &callback_func_ptr,
+                                                     &callback_func_arg) )
     {
         const APIInterceptor::APIFunctionArgument args[] =
         {

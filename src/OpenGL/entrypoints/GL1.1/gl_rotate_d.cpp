@@ -13,9 +13,9 @@ void AI_APIENTRY OpenGL::aiRotated(GLdouble angle,
                                    GLdouble y,
                                    GLdouble z)
 {
-    void*                               callback_func_arg   = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
-    bool                                should_pass_through = true;
+    void*                                  callback_func_arg   = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                   should_pass_through = true;
 
     AI_TRACE("glRotated(angle=[%.4lf], x=[%.4lf], y=[%.4lf], z=[%.4lf])",
              angle,
@@ -23,9 +23,9 @@ void AI_APIENTRY OpenGL::aiRotated(GLdouble angle,
              y,
              z);
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLROTATED,
-                                                  &callback_func_ptr,
-                                                  &callback_func_arg) )
+    if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLROTATED,
+                                                     &callback_func_ptr,
+                                                     &callback_func_arg) )
     {
         const APIInterceptor::APIFunctionArgument args[] =
         {

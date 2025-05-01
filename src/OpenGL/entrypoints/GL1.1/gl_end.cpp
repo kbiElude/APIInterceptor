@@ -10,15 +10,15 @@
 
 void AI_APIENTRY OpenGL::aiEnd()
 {
-    void*                               callback_func_arg   = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
-    bool                                should_pass_through = true;
+    void*                                  callback_func_arg   = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                   should_pass_through = true;
 
     AI_TRACE("glEnd()");
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLEND,
-                                                  &callback_func_ptr,
-                                                  &callback_func_arg) )
+    if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLEND,
+                                                     &callback_func_ptr,
+                                                     &callback_func_arg) )
     {
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLEND,
                           0,

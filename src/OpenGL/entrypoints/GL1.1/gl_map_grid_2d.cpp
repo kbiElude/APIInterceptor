@@ -15,9 +15,9 @@ void AI_APIENTRY OpenGL::aiMapGrid2d(GLint    un,
                                      GLdouble v1,
                                      GLdouble v2)
 {
-    void*                               callback_func_arg   = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
-    bool                                should_pass_through = true;
+    void*                                  callback_func_arg   = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                   should_pass_through = true;
 
     AI_TRACE("glMapGrid2d(un=[%d], u1=[%.4lf], u2=[%.4lf], vn=[%d], v1=[%.4lf], v2=[%.4lf])",
              un,
@@ -27,9 +27,9 @@ void AI_APIENTRY OpenGL::aiMapGrid2d(GLint    un,
              v1,
              v2);
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMAPGRID2D,
-                                                  &callback_func_ptr,
-                                                  &callback_func_arg) )
+    if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMAPGRID2D,
+                                                     &callback_func_ptr,
+                                                     &callback_func_arg) )
     {
         const APIInterceptor::APIFunctionArgument args[] =
         {

@@ -12,18 +12,18 @@ void AI_APIENTRY OpenGL::aiGetMapiv(GLenum target,
                                     GLenum query,
                                     GLint* v)
 {
-    void*                               callback_func_arg   = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
-    bool                                should_pass_through = true;
+    void*                                  callback_func_arg   = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                   should_pass_through = true;
 
     AI_TRACE("glGetMapiv(target=[%s], query=[%s], v=[%p])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
              OpenGL::Utils::get_raw_string_for_gl_enum(query),
              v);
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETMAPIV,
-                                                  &callback_func_ptr,
-                                                  &callback_func_arg) )
+    if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETMAPIV,
+                                                     &callback_func_ptr,
+                                                     &callback_func_arg) )
     {
         const APIInterceptor::APIFunctionArgument args[] =
         {

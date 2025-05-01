@@ -19,9 +19,9 @@ void AI_APIENTRY OpenGL::aiMap2f(GLenum         target,
                                  GLint          vorder,
                                  const GLfloat* points)
 {
-    void*                               callback_func_arg   = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
-    bool                                should_pass_through = true;
+    void*                                  callback_func_arg   = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                   should_pass_through = true;
 
     AI_TRACE("glMap2f(target=[%s], u1=[%f], u2=[%f], ustride=[%d], uorder=[%d], v1=[%f], v2=[%f], vstride=[%d], vorder=[%d], points=[%p])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
@@ -35,9 +35,9 @@ void AI_APIENTRY OpenGL::aiMap2f(GLenum         target,
              vorder,
              points);
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMAP2F,
-                                                  &callback_func_ptr,
-                                                  &callback_func_arg) )
+    if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMAP2F,
+                                                     &callback_func_ptr,
+                                                     &callback_func_arg) )
     {
         const APIInterceptor::APIFunctionArgument args[] =
         {

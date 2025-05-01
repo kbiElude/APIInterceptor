@@ -13,9 +13,9 @@ void AI_APIENTRY OpenGL::aiClearAccum(GLfloat red,
                                       GLfloat blue,
                                       GLfloat alpha)
 {
-    void*                               callback_func_arg   = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
-    bool                                should_pass_through = true;
+    void*                                  callback_func_arg   = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                   should_pass_through = true;
 
     AI_TRACE("glClearAccum(red=[%.4f] green=[%.4f] blue=[%.4f] alpha=[%.4f])",
              red,
@@ -23,9 +23,9 @@ void AI_APIENTRY OpenGL::aiClearAccum(GLfloat red,
              blue,
              alpha);
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCLEARACCUM,
-                                                  &callback_func_ptr,
-                                                  &callback_func_arg) )
+    if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCLEARACCUM,
+                                                     &callback_func_ptr,
+                                                     &callback_func_arg) )
     {
         const APIInterceptor::APIFunctionArgument args[] =
         {

@@ -359,18 +359,20 @@ BOOL WINAPI WGL::make_current(HDC   in_hdc,
 {
     static bool has_successfully_updated_non10_entrypoints = false;
 
-    void*                               callback_func_arg   = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
-    BOOL                                result              = TRUE;
-    bool                                should_pass_through = true;
+    void*                                   post_callback_func_arg = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
+    void*                                   pre_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
+    BOOL                                    result                 = TRUE;
+    bool                                    should_pass_through    = true;
 
     AI_TRACE("wglMakeCurrent(in_hdc=[%p] in_hglrc=[%p])",
                in_hdc,
                in_hglrc);
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_WGL_WGLMAKECURRENT,
-                                                 &callback_func_ptr,
-                                                 &callback_func_arg) )
+    if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_WGL_WGLMAKECURRENT,
+                                                     &pre_callback_func_ptr,
+                                                     &pre_callback_func_arg) )
     {
         const APIInterceptor::APIFunctionArgument args[] =
         {
@@ -378,11 +380,11 @@ BOOL WINAPI WGL::make_current(HDC   in_hdc,
             APIInterceptor::APIFunctionArgument::create_void_ptr(in_hglrc),
         };
 
-        callback_func_ptr(APIInterceptor::APIFUNCTION_WGL_WGLMAKECURRENT,
-                          sizeof(args) / sizeof(args[0]),
-                          args,
-                          callback_func_arg,
-                         &should_pass_through);
+        pre_callback_func_ptr(APIInterceptor::APIFUNCTION_WGL_WGLMAKECURRENT,
+                              sizeof(args) / sizeof(args[0]),
+                              args,
+                              pre_callback_func_arg,
+                             &should_pass_through);
     }
 
     // This function should always patch through down the driver stack!
@@ -390,6 +392,17 @@ BOOL WINAPI WGL::make_current(HDC   in_hdc,
 
     result = reinterpret_cast<PFNWGLMAKECURRENTPROC>(WGL::g_cached_make_current_func_ptr)(in_hdc,
                                                                                           in_hglrc);
+
+    if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_WGL_WGLMAKECURRENT,
+                                                      &post_callback_func_ptr,
+                                                      &post_callback_func_arg) )
+    {
+        const auto result_arg = APIInterceptor::APIFunctionArgument::create_i32(result);
+
+        post_callback_func_ptr(APIInterceptor::APIFUNCTION_WGL_WGLMAKECURRENT,
+                               post_callback_func_arg,
+                              &result_arg);
+    }
 
     if (in_hglrc                                   != nullptr &&
         has_successfully_updated_non10_entrypoints == false)

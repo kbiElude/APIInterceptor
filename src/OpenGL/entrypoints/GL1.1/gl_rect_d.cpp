@@ -13,9 +13,9 @@ void AI_APIENTRY OpenGL::aiRectd(GLdouble x1,
                                  GLdouble x2,
                                  GLdouble y2)
 {
-    void*                               callback_func_arg   = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
-    bool                                should_pass_through = true;
+    void*                                  callback_func_arg   = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                   should_pass_through = true;
 
     AI_TRACE("glRectd(x1=[%.4lf], y1=[%.4lf], x2=[%.4lf], y2=[%.4lf])",
              x1,
@@ -23,9 +23,9 @@ void AI_APIENTRY OpenGL::aiRectd(GLdouble x1,
              x2,
              y2);
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLRECTD,
-                                                  &callback_func_ptr,
-                                                  &callback_func_arg) )
+    if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLRECTD,
+                                                     &callback_func_ptr,
+                                                     &callback_func_arg) )
     {
         const APIInterceptor::APIFunctionArgument args[] =
         {

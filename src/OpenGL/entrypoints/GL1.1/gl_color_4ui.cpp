@@ -13,9 +13,9 @@ void AI_APIENTRY OpenGL::aiColor4ui(GLuint red,
                                     GLuint blue,
                                     GLuint alpha)
 {
-    void*                               callback_func_arg   = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
-    bool                                should_pass_through = true;
+    void*                                  callback_func_arg   = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                   should_pass_through = true;
 
     AI_TRACE("glColor4ui(red=[%d] green=[%d] blue=[%d] alpha=[%d])",
              red,
@@ -23,9 +23,9 @@ void AI_APIENTRY OpenGL::aiColor4ui(GLuint red,
              blue,
              alpha);
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCOLOR4UI,
-                                                  &callback_func_ptr,
-                                                  &callback_func_arg) )
+    if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCOLOR4UI,
+                                                     &callback_func_ptr,
+                                                     &callback_func_arg) )
     {
         const APIInterceptor::APIFunctionArgument args[] =
         {

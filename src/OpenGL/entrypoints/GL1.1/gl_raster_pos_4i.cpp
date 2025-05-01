@@ -13,9 +13,9 @@ void AI_APIENTRY OpenGL::aiRasterPos4i(GLint x,
                                        GLint z,
                                        GLint w)
 {
-    void*                               callback_func_arg   = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
-    bool                                should_pass_through = true;
+    void*                                  callback_func_arg   = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                   should_pass_through = true;
 
     AI_TRACE("glRasterPos4i(x=[%d], y=[%d], z=[%d], w=[%d])",
              x,
@@ -23,9 +23,9 @@ void AI_APIENTRY OpenGL::aiRasterPos4i(GLint x,
              z,
              w);
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLRASTERPOS4I,
-                                                  &callback_func_ptr,
-                                                  &callback_func_arg) )
+    if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLRASTERPOS4I,
+                                                     &callback_func_ptr,
+                                                     &callback_func_arg) )
     {
         const APIInterceptor::APIFunctionArgument args[] =
         {

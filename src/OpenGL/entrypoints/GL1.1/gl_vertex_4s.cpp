@@ -13,9 +13,9 @@ void AI_APIENTRY OpenGL::aiVertex4s(GLshort x,
                                     GLshort z,
                                     GLshort w)
 {
-    void*                               callback_func_arg   = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
-    bool                                should_pass_through = true;
+    void*                                  callback_func_arg   = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                   should_pass_through = true;
 
     AI_TRACE("glVertex4s(x=[%d], y=[%d], z=[%d], w=[%d])",
              static_cast<int32_t>(x),
@@ -23,9 +23,9 @@ void AI_APIENTRY OpenGL::aiVertex4s(GLshort x,
              static_cast<int32_t>(z),
              static_cast<int32_t>(w) );
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLVERTEX4S,
-                                                  &callback_func_ptr,
-                                                  &callback_func_arg) )
+    if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLVERTEX4S,
+                                                     &callback_func_ptr,
+                                                     &callback_func_arg) )
     {
         const APIInterceptor::APIFunctionArgument args[] =
         {

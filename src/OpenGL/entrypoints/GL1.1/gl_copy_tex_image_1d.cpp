@@ -16,9 +16,9 @@ void AI_APIENTRY OpenGL::aiCopyTexImage1D(GLenum  target,
                                           GLsizei width,
                                           GLint   border)
 {
-    void*                               callback_func_arg   = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
-    bool                                should_pass_through = true;
+    void*                                  callback_func_arg   = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                   should_pass_through = true;
 
     AI_TRACE("glCopyTexImage1D(target=[%s] level=[%d] internalformat=[%s] x=[%d] y=[%d] width=[%d] border=[%d])",
              OpenGL::Utils::get_raw_string_for_gl_enum(target),
@@ -29,9 +29,9 @@ void AI_APIENTRY OpenGL::aiCopyTexImage1D(GLenum  target,
              static_cast<int32_t>(width),
              border);
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCOPYTEXIMAGE1D,
-                                                  &callback_func_ptr,
-                                                  &callback_func_arg) )
+    if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCOPYTEXIMAGE1D,
+                                                     &callback_func_ptr,
+                                                     &callback_func_arg) )
     {
         const APIInterceptor::APIFunctionArgument args[] =
         {

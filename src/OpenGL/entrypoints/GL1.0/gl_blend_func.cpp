@@ -11,17 +11,17 @@
 void AI_APIENTRY OpenGL::aiBlendFunc(GLenum sfactor,
                                      GLenum dfactor)
 {
-    void*                               callback_func_arg   = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
-    bool                                should_pass_through = true;
+    void*                                  callback_func_arg   = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                   should_pass_through = true;
 
     AI_TRACE("glBlendFunc(sfactor=[%s] dfactor=[%s])",
              OpenGL::Utils::get_raw_string_for_gl_enum(sfactor),
              OpenGL::Utils::get_raw_string_for_gl_enum(dfactor) );
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBLENDFUNC,
-                                                  &callback_func_ptr,
-                                                  &callback_func_arg) )
+    if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBLENDFUNC,
+                                                     &callback_func_ptr,
+                                                     &callback_func_arg) )
     {
         const APIInterceptor::APIFunctionArgument args[] =
         {

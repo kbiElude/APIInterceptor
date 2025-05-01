@@ -12,10 +12,12 @@
 int WINAPI GDI32::choose_pixel_format(HDC                          in_hdc,
                                       CONST PIXELFORMATDESCRIPTOR* in_pixel_format_descriptor_ptr)
 {
-    void*                               callback_func_arg   = nullptr;
-    APIInterceptor::PFNCALLBACKFUNCPROC callback_func_ptr   = nullptr;
-    int                                 result              = 0;
-    bool                                should_pass_through = true;
+    void*                                   post_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr  = nullptr;
+    void*                                   pre_callback_func_arg   = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr   = nullptr;
+    int                                     result                  = 0;
+    bool                                    should_pass_through     = true;
 
     AI_TRACE("ChoosePixelFormat(\n"
              " in_hdc                         = [%p]\n"
@@ -23,9 +25,9 @@ int WINAPI GDI32::choose_pixel_format(HDC                          in_hdc,
              in_hdc,
              GDI32::convert_pixel_format_descriptor_to_raw_string(in_pixel_format_descriptor_ptr) );
 
-    if (APIInterceptor::get_callback_for_function(APIInterceptor::APIFUNCTION_GDI32_CHOOSEPIXELFORMAT,
-                                                  &callback_func_ptr,
-                                                  &callback_func_arg) )
+    if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GDI32_CHOOSEPIXELFORMAT,
+                                                     &pre_callback_func_ptr,
+                                                     &pre_callback_func_arg) )
     {
         const APIInterceptor::APIFunctionArgument args[] =
         {
@@ -33,17 +35,28 @@ int WINAPI GDI32::choose_pixel_format(HDC                          in_hdc,
             APIInterceptor::APIFunctionArgument::create_void_ptr(in_pixel_format_descriptor_ptr),
         };
 
-        callback_func_ptr(APIInterceptor::APIFUNCTION_GDI32_CHOOSEPIXELFORMAT,
-                          sizeof(args) / sizeof(args[0]),
-                          args,
-                          callback_func_arg,
-                         &should_pass_through);
+        pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GDI32_CHOOSEPIXELFORMAT,
+                              sizeof(args) / sizeof(args[0]),
+                              args,
+                              pre_callback_func_arg,
+                             &should_pass_through);
     }
 
     if (should_pass_through)
     {
         result = reinterpret_cast<GDI32::PFNCHOOSEPIXELFORMATPROC>(GDI32::g_cached_choose_pixel_format_func_ptr)(in_hdc,
                                                                                                                  in_pixel_format_descriptor_ptr);
+    }
+
+    if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GDI32_CHOOSEPIXELFORMAT,
+                                                      &post_callback_func_ptr,
+                                                      &post_callback_func_arg) )
+    {
+        const auto result_arg = APIInterceptor::APIFunctionArgument::create_i32(result);
+
+        post_callback_func_ptr(APIInterceptor::APIFUNCTION_GDI32_CHOOSEPIXELFORMAT,
+                               post_callback_func_arg,
+                              &result_arg);
     }
 
     return result;
