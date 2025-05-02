@@ -45,6 +45,8 @@ private:
 
     /* Private vars */
     std::vector<DumpedAPICall> m_dumped_api_call_vec;
+    uint32_t                   m_n_frames_dumped;
+    uint32_t                   m_n_frames_to_dump;
 };
 
 #endif /* APIDUMPER_H */

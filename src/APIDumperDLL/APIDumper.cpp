@@ -10,6 +10,8 @@ static std::mutex g_mutex;
 
 
 APIDumper::APIDumper()
+    :m_n_frames_dumped (0),
+     m_n_frames_to_dump(UINT32_MAX)
 {
     /* Stub */
 }
@@ -87,6 +89,33 @@ APIDumperUniquePtr APIDumper::create()
 
 bool APIDumper::init()
 {
+    bool result = false;
+
+    /* Load settings */
+    {
+        FILE* settings_file_handle = ::fopen("apidumper_settings.bin",
+                                             "rb");
+
+        if (settings_file_handle == nullptr)
+        {
+            assert(settings_file_handle != nullptr);
+
+            goto end;
+        }
+
+        if (::fread(&m_n_frames_to_dump,
+                     sizeof(m_n_frames_to_dump),
+                     1,
+                     settings_file_handle) != 1)
+        {
+            assert(false);
+
+            goto end;
+        }
+
+        ::fclose(settings_file_handle);
+    }
+
     /* Register for callbacks */
     for (uint32_t n_api_func = 0;
                   n_api_func < APIInterceptor::APIFUNCTION_COUNT;
@@ -100,7 +129,9 @@ bool APIDumper::init()
                                                    this);
     }
 
-    return true;
+    result = true;
+end:
+    return result;
 }
 
 void APIDumper::on_post_callback(APIInterceptor::APIFunction                in_api_func,
@@ -112,41 +143,54 @@ void APIDumper::on_post_callback(APIInterceptor::APIFunction                in_a
     DumpedAPICall* api_call_item_ptr = nullptr;
     APIDumper*     this_ptr          = reinterpret_cast<APIDumper*>(in_user_arg_ptr);
 
-    /* Update the last cached API call's returned value.
-     *
-     * In cases where OS DLL implementing the API function calls intercepted API functions, the relevant vec item
-     * may be a few items back.
-     *
-     * NOTE: This will totally break for multi-context apps!
-     */
-    assert(this_ptr->m_dumped_api_call_vec.size() > 0);
-
-    api_call_item_ptr = &this_ptr->m_dumped_api_call_vec.back();
-
-    if (this_ptr->m_dumped_api_call_vec.back().api_func != in_api_func)
+    /* Ignore this callback if we've already dumped sufficient number of frames! */
+    if (this_ptr->m_n_frames_dumped < this_ptr->m_n_frames_to_dump)
     {
-        auto vec_iterator = std::find_if(this_ptr->m_dumped_api_call_vec.rbegin(),
-                                         this_ptr->m_dumped_api_call_vec.rend  (),
-                                         [&](const DumpedAPICall& in_api_call)
-                                         {
-                                            return in_api_call.api_func == in_api_func;
-                                         });
+        /* Update the last cached API call's returned value.
+         *
+         * In cases where OS DLL implementing the API function calls intercepted API functions, the relevant vec item
+         * may be a few items back.
+         *
+         * NOTE: This will totally break for multi-context apps!
+         */
+        assert(this_ptr->m_dumped_api_call_vec.size() > 0);
 
-        assert(vec_iterator != this_ptr->m_dumped_api_call_vec.rend() );
-        if (vec_iterator != this_ptr->m_dumped_api_call_vec.rend() )
+        api_call_item_ptr = &this_ptr->m_dumped_api_call_vec.back();
+
+        if (this_ptr->m_dumped_api_call_vec.back().api_func != in_api_func)
         {
-            api_call_item_ptr = &(*vec_iterator);
+            auto vec_iterator = std::find_if(this_ptr->m_dumped_api_call_vec.rbegin(),
+                                             this_ptr->m_dumped_api_call_vec.rend  (),
+                                             [&](const DumpedAPICall& in_api_call)
+                                             {
+                                                return in_api_call.api_func == in_api_func;
+                                             });
+
+            assert(vec_iterator != this_ptr->m_dumped_api_call_vec.rend() );
+            if (vec_iterator != this_ptr->m_dumped_api_call_vec.rend() )
+            {
+                api_call_item_ptr = &(*vec_iterator);
+            }
+            else
+            {
+                api_call_item_ptr = nullptr;
+            }
         }
-        else
+
+        assert(api_call_item_ptr != nullptr);
+        if (api_call_item_ptr != nullptr)
         {
-            api_call_item_ptr = nullptr;
+            api_call_item_ptr->returned_value = *in_returned_value_ptr;
         }
     }
 
-    assert(api_call_item_ptr != nullptr);
-    if (api_call_item_ptr != nullptr)
+    /* If this is a frame present call, increment internal counter.
+     *
+     * TODO: This will break down badly for apps that do NOT use back buffer..
+     */
+    if (in_api_func == APIInterceptor::APIFUNCTION_GDI32_SWAPBUFFERS)
     {
-        api_call_item_ptr->returned_value = *in_returned_value_ptr;
+        this_ptr->m_n_frames_dumped++;
     }
 }
 
@@ -161,26 +205,30 @@ void APIDumper::on_pre_callback(APIInterceptor::APIFunction                in_ap
 
     assert(sizeof(DumpedAPICall::args) / sizeof(DumpedAPICall::args[0]) >= in_n_args);
 
-    /* Cache API call's properties.
-     *
-     * TODO: This code totally ignores the fact that pointers passed to API calls may go out of scope
-     *       as soon as the API call is handled. This works fine for Q1 but will fail massively for
-     *       any more complex workload!
-     */
+    /* Do NOT dump the API call if we've already dumped sufficient number of frames! */
+    if (this_ptr->m_n_frames_dumped < this_ptr->m_n_frames_to_dump)
     {
-        DumpedAPICall new_item;
-
-        new_item.api_func = in_api_func;
-        new_item.n_args   = in_n_args;
-
-        for (uint32_t n_arg = 0;
-                      n_arg < in_n_args;
-                    ++n_arg)
+        /* Cache API call's properties.
+         *
+         * TODO: This code totally ignores the fact that pointers passed to API calls may go out of scope
+         *       as soon as the API call is handled. This works fine for Q1 but will fail massively for
+         *       any more complex workload!
+         */
         {
-            new_item.args[n_arg] = in_args_ptr[n_arg];
-        }
+            DumpedAPICall new_item;
 
-        this_ptr->m_dumped_api_call_vec.emplace_back(new_item);
+            new_item.api_func = in_api_func;
+            new_item.n_args   = in_n_args;
+
+            for (uint32_t n_arg = 0;
+                          n_arg < in_n_args;
+                        ++n_arg)
+            {
+                new_item.args[n_arg] = in_args_ptr[n_arg];
+            }
+
+            this_ptr->m_dumped_api_call_vec.emplace_back(new_item);
+        }
     }
 
     /* Always pass through any of the intercepted calls */
