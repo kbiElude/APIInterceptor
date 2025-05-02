@@ -1,7 +1,8 @@
 cmake_minimum_required (VERSION 2.8)    
 project (APIInterceptor)
 
-option(APIINTERCEPTOR_DUMP_API_CALLS "Dump API calls to text files (debugging)" ON)
+option(APIINTERCEPTOR_BUILD_TOOLS    "Build tools (API Dumper)"                 ON)
+option(APIINTERCEPTOR_DUMP_API_CALLS "Dump API calls to text files (debugging)" OFF)
 
 # DO NOT MODIFY BELOW THIS LINE
 configure_file("${APIInterceptor_SOURCE_DIR}/include/config.h.in" "${APIInterceptor_BINARY_DIR}/apitracer_config.h")
@@ -172,3 +173,22 @@ source_group ("OpenGL32 include files"   FILES ${OpenGL32Includes})
 source_group ("OpenGL32 source files"    FILES ${OpenGL32Sources})
 source_group ("WGL include files"        FILES ${WGLIncludes})
 source_group ("WGL source files"         FILES ${WGLSources})
+
+if (APIINTERCEPTOR_BUILD_TOOLS)
+    file(GLOB APIDumperDLLIncludes "${APIInterceptor_SOURCE_DIR}/include/APIDumperDLL/*.h")
+    file(GLOB APIDumperDLLSources  "${APIInterceptor_SOURCE_DIR}/src/APIDumperDLL/*.cpp")
+
+    add_executable(APIDumper           "${APIInterceptor_SOURCE_DIR}/src/APIDumper/main.cpp")
+    add_library   (APIDumperDLL SHARED ${APIDumperDLLIncludes} ${APIDumperDLLSources})
+
+    target_link_libraries(APIDumper    Detours)
+    target_link_libraries(APIDumperDLL APIInterceptor)
+
+    add_dependencies(APIDumper APIDumperDLL)
+
+    source_group ("APIDumperDLL include files"  FILES ${APIDumperDLLIncludes})
+    source_group ("APIDumperDLL source files"   FILES ${APIDumperDLLSources})
+
+    include_directories("${APIInterceptor_SOURCE_DIR}/include/APIDumperDLL")
+
+endif()

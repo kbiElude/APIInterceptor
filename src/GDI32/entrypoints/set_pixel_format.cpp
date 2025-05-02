@@ -39,7 +39,7 @@ BOOL WINAPI GDI32::set_pixel_format(HDC                          in_hdc,
             APIInterceptor::APIFunctionArgument::create_void_ptr(in_pixel_format_descriptor_ptr),
         };
 
-        pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLATTACHSHADER,
+        pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GDI32_SETPIXELFORMAT,
                               sizeof(args) / sizeof(args[0]),
                               args,
                               pre_callback_func_arg,

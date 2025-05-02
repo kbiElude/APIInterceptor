@@ -844,6 +844,8 @@ namespace APIInterceptor
         const unsigned int*   get_u32_ptr () const;
         const void*           get_ptr     () const;
 
+        void serialize_to_u8_vec(std::vector<uint8_t>* inout_u8_vec_ptr) const;
+
         APIFunctionArgument()
             :type(UNKNOWN)
         {
@@ -875,6 +877,7 @@ namespace APIInterceptor
             const void*           value_ptr;
         } value;
 
+        uint32_t get_n_arg_value_bytes() const;
     } APIFunctionArgument;
 
     struct APICommand

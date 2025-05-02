@@ -1,0 +1,188 @@
+/* API Dumper (c) 2025 Dominik Witczak
+ *
+ * This code is licensed under MIT license (see LICENSE.txt for details)
+ */
+#include "Common/callbacks.h"
+#include "APIDumper.h"
+#include <cassert>
+
+static std::mutex g_mutex;
+
+
+APIDumper::APIDumper()
+{
+    /* Stub */
+}
+
+APIDumper::~APIDumper()
+{
+    /* Dump the stream.
+     *
+     * TODO: We should be dumping contents asynchronously every specified interval.. But this will have to do for now.
+     */
+    auto file_handle = ::fopen("result_dump.workload",
+                               "w+");
+
+    if (file_handle != nullptr)
+    {
+        const uint32_t       n_api_calls   = static_cast<uint32_t>(m_dumped_api_call_vec.size() );
+        std::vector<uint8_t> helper_u8_vec;
+
+        {
+            helper_u8_vec.resize(sizeof(uint32_t) );
+
+            *reinterpret_cast<uint32_t*>(helper_u8_vec.data() ) = n_api_calls;
+        }
+
+        for (uint32_t n_api_call = 0;
+                      n_api_call < n_api_calls;
+                    ++n_api_call)
+        {
+            auto       current_api_call_ptr   = &m_dumped_api_call_vec.at(n_api_call);
+            uint8_t*   helper_u8_ptr          =  nullptr;
+            const auto helper_u8_vec_pre_size =  helper_u8_vec.size      ();
+
+            helper_u8_vec.resize(helper_u8_vec_pre_size + sizeof(APIInterceptor::APIFunction) + sizeof(uint32_t) );
+
+            helper_u8_ptr = &helper_u8_vec.at(helper_u8_vec_pre_size);
+
+            *reinterpret_cast<APIInterceptor::APIFunction*>(helper_u8_ptr)  = current_api_call_ptr->api_func;
+             helper_u8_ptr                                                 += sizeof(APIInterceptor::APIFunction);
+
+            *reinterpret_cast<uint32_t*>(helper_u8_ptr)  = current_api_call_ptr->n_args;
+             helper_u8_ptr                              += sizeof(uint32_t);
+
+            for (uint32_t n_api_call_arg = 0;
+                          n_api_call_arg < current_api_call_ptr->n_args;
+                        ++n_api_call_arg)
+            {
+                current_api_call_ptr->args[n_api_call_arg].serialize_to_u8_vec(&helper_u8_vec);
+            }
+
+            current_api_call_ptr->returned_value.serialize_to_u8_vec(&helper_u8_vec);
+        }
+
+        ::fwrite(helper_u8_vec.data(),
+                 helper_u8_vec.size(),
+                 1,
+                 file_handle);
+        ::fclose(file_handle);
+    }
+}
+
+APIDumperUniquePtr APIDumper::create()
+{
+    APIDumperUniquePtr result_ptr(new APIDumper() );
+
+    if (result_ptr != nullptr)
+    {
+        if (!result_ptr->init() )
+        {
+            result_ptr.reset();
+        }
+    }
+
+    return result_ptr;
+}
+
+bool APIDumper::init()
+{
+    /* Register for callbacks */
+    for (uint32_t n_api_func = 0;
+                  n_api_func < APIInterceptor::APIFUNCTION_COUNT;
+                ++n_api_func)
+    {
+        APIInterceptor::register_for_post_callback(static_cast<APIInterceptor::APIFunction>(n_api_func),
+                                                  &on_post_callback,
+                                                   this);
+        APIInterceptor::register_for_pre_callback (static_cast<APIInterceptor::APIFunction>(n_api_func),
+                                                  &on_pre_callback,
+                                                   this);
+    }
+
+    return true;
+}
+
+void APIDumper::on_post_callback(APIInterceptor::APIFunction                in_api_func,
+                                 void*                                      in_user_arg_ptr,
+                                 const APIInterceptor::APIFunctionArgument* in_returned_value_ptr)
+{
+    std::lock_guard<std::mutex> guard(g_mutex);
+
+    DumpedAPICall* api_call_item_ptr = nullptr;
+    APIDumper*     this_ptr          = reinterpret_cast<APIDumper*>(in_user_arg_ptr);
+
+    /* Update the last cached API call's returned value.
+     *
+     * In cases where OS DLL implementing the API function calls intercepted API functions, the relevant vec item
+     * may be a few items back.
+     *
+     * NOTE: This will totally break for multi-context apps!
+     */
+    assert(this_ptr->m_dumped_api_call_vec.size() > 0);
+
+    api_call_item_ptr = &this_ptr->m_dumped_api_call_vec.back();
+
+    if (this_ptr->m_dumped_api_call_vec.back().api_func != in_api_func)
+    {
+        auto vec_iterator = std::find_if(this_ptr->m_dumped_api_call_vec.rbegin(),
+                                         this_ptr->m_dumped_api_call_vec.rend  (),
+                                         [&](const DumpedAPICall& in_api_call)
+                                         {
+                                            return in_api_call.api_func == in_api_func;
+                                         });
+
+        assert(vec_iterator != this_ptr->m_dumped_api_call_vec.rend() );
+        if (vec_iterator != this_ptr->m_dumped_api_call_vec.rend() )
+        {
+            api_call_item_ptr = &(*vec_iterator);
+        }
+        else
+        {
+            api_call_item_ptr = nullptr;
+        }
+    }
+
+    assert(api_call_item_ptr != nullptr);
+    if (api_call_item_ptr != nullptr)
+    {
+        api_call_item_ptr->returned_value = *in_returned_value_ptr;
+    }
+}
+
+void APIDumper::on_pre_callback(APIInterceptor::APIFunction                in_api_func,
+                                uint32_t                                   in_n_args,
+                                const APIInterceptor::APIFunctionArgument* in_args_ptr,
+                                void*                                      in_user_arg_ptr,
+                                bool*                                      out_should_pass_through_ptr)
+{
+    std::lock_guard<std::mutex> guard   (g_mutex);
+    APIDumper*                  this_ptr(reinterpret_cast<APIDumper*>(in_user_arg_ptr) );
+
+    assert(sizeof(DumpedAPICall::args) / sizeof(DumpedAPICall::args[0]) >= in_n_args);
+
+    /* Cache API call's properties.
+     *
+     * TODO: This code totally ignores the fact that pointers passed to API calls may go out of scope
+     *       as soon as the API call is handled. This works fine for Q1 but will fail massively for
+     *       any more complex workload!
+     */
+    {
+        DumpedAPICall new_item;
+
+        new_item.api_func = in_api_func;
+        new_item.n_args   = in_n_args;
+
+        for (uint32_t n_arg = 0;
+                      n_arg < in_n_args;
+                    ++n_arg)
+        {
+            new_item.args[n_arg] = in_args_ptr[n_arg];
+        }
+
+        this_ptr->m_dumped_api_call_vec.emplace_back(new_item);
+    }
+
+    /* Always pass through any of the intercepted calls */
+    *out_should_pass_through_ptr = true;
+}
