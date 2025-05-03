@@ -607,7 +607,7 @@ namespace APIInterceptor
         APIFUNCTION_GL_GLVERTEXPOINTER,
         APIFUNCTION_GL_GLVIEWPORT,
         APIFUNCTION_GL_GLWAITSYNC,
-        APIFUNCTION_GL_LAST             = APIFUNCTION_GL_GLVIEWPORT,
+        APIFUNCTION_GL_LAST             = APIFUNCTION_GL_GLWAITSYNC,
 
         /* WGL */
         APIFUNCTION_WGL_FIRST,
@@ -844,7 +844,8 @@ namespace APIInterceptor
         const unsigned int*   get_u32_ptr () const;
         const void*           get_ptr     () const;
 
-        void serialize_to_u8_vec(std::vector<uint8_t>* inout_u8_vec_ptr) const;
+        uint32_t deserialize_from_u8_ptr(const uint8_t*        in_u8_ptr);
+        void     serialize_to_u8_vec    (std::vector<uint8_t>* inout_u8_vec_ptr) const;
 
         APIFunctionArgument()
             :type(UNKNOWN)

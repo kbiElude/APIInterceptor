@@ -5,6 +5,30 @@
 #include "Common/types.h"
 #include <assert.h>
 
+uint32_t APIInterceptor::APIFunctionArgument::deserialize_from_u8_ptr(const uint8_t* in_u8_ptr)
+{
+    uint32_t n_arg_value_bytes = 0;
+    uint32_t result            = 0;
+
+    type       = *reinterpret_cast<const APIFunctionArgumentType*>(in_u8_ptr);
+    in_u8_ptr += sizeof(APIFunctionArgumentType);
+    result    += sizeof(APIFunctionArgumentType);
+
+    n_arg_value_bytes = get_n_arg_value_bytes();
+
+    if (n_arg_value_bytes != 0)
+    {
+        memcpy(&value,
+                in_u8_ptr,
+                n_arg_value_bytes);
+
+        in_u8_ptr += n_arg_value_bytes;
+        result    += n_arg_value_bytes;
+    }
+
+    return result;
+}
+
 const float& APIInterceptor::APIFunctionArgument::get_fp32() const
 {
     assert(type == APIFunctionArgumentType::ARGTYPE_F32);

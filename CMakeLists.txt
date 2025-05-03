@@ -1,6 +1,7 @@
 cmake_minimum_required (VERSION 2.8)    
 project (APIInterceptor)
 
+option(APIINTERCEPTOR_BUILD_LIBS     "Build static libs (API Dump Loader)"      ON)
 option(APIINTERCEPTOR_BUILD_TOOLS    "Build tools (API Dumper)"                 ON)
 option(APIINTERCEPTOR_DUMP_API_CALLS "Dump API calls to text files (debugging)" OFF)
 
@@ -190,5 +191,15 @@ if (APIINTERCEPTOR_BUILD_TOOLS)
     source_group ("APIDumperDLL source files"   FILES ${APIDumperDLLSources})
 
     include_directories("${APIInterceptor_SOURCE_DIR}/include/APIDumperDLL")
+endif()
 
+if (APIINTERCEPTOR_BUILD_LIBS)
+    file(GLOB APIDumpLoaderIncludes "${APIInterceptor_SOURCE_DIR}/include/APIDumpLoader/*.h")
+    file(GLOB APIDumpLoaderSources  "${APIInterceptor_SOURCE_DIR}/src/APIDumpLoader/*.cpp"
+                                    "${APIInterceptor_SOURCE_DIR}/src/Common/types.cpp")
+
+    add_library(APIDumpLoader STATIC ${APIDumpLoaderIncludes} ${APIDumpLoaderSources})
+
+    source_group ("APIDump Loader include files"  FILES ${APIDumpLoaderIncludes})
+    source_group ("APIDump Loader source files"   FILES ${APIDumpLoaderSources})
 endif()
