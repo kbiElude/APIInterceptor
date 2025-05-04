@@ -3,6 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "Common/callbacks.h"
+#include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL1.1/gl_line_stipple.h"
 #include "OpenGL/globals.h"
 #include "OpenGL/utils_enum.h"
@@ -14,26 +15,30 @@ void AI_APIENTRY OpenGL::aiLineStipple(GLint    factor,
     void*                                  callback_func_arg   = nullptr;
     APIInterceptor::PFNPRECALLBACKFUNCPROC callback_func_ptr   = nullptr;
     bool                                   should_pass_through = true;
+    APIInterceptor::Tracker                tracker;
 
-    AI_TRACE("glLineStipple(factor=[%d], pattern=[%d])",
-             factor,
-             static_cast<uint32_t>(pattern) );
-
-    if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLLINESTIPPLE,
-                                                     &callback_func_ptr,
-                                                     &callback_func_arg) )
+    if (tracker.is_top_level_api_call() )
     {
-        const APIInterceptor::APIFunctionArgument args[] =
-        {
-            APIInterceptor::APIFunctionArgument::create_i32(factor),
-            APIInterceptor::APIFunctionArgument::create_u16(pattern),
-        };
+        AI_TRACE("glLineStipple(factor=[%d], pattern=[%d])",
+                 factor,
+                 static_cast<uint32_t>(pattern) );
 
-        callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLLINESTIPPLE,
-                          sizeof(args) / sizeof(args[0]),
-                          args,
-                          callback_func_arg,
-                         &should_pass_through);
+        if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLLINESTIPPLE,
+                                                         &callback_func_ptr,
+                                                         &callback_func_arg) )
+        {
+            const APIInterceptor::APIFunctionArgument args[] =
+            {
+                APIInterceptor::APIFunctionArgument::create_i32(factor),
+                APIInterceptor::APIFunctionArgument::create_u16(pattern),
+            };
+
+            callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLLINESTIPPLE,
+                              sizeof(args) / sizeof(args[0]),
+                              args,
+                              callback_func_arg,
+                             &should_pass_through);
+        }
     }
 
     if (should_pass_through)
