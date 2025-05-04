@@ -684,9 +684,9 @@ namespace APIInterceptor
         {
             APIFunctionArgument result;
 
-            result.type                 = ARGTYPE_F32_PTR;
-            result.value.value_fp32_ptr = in_value_ptr;
+            result.type = ARGTYPE_F32_PTR;
 
+            result.set_ptr_internal(in_value_ptr);
             return result;
         }
 
@@ -704,9 +704,9 @@ namespace APIInterceptor
         {
             APIFunctionArgument result;
 
-            result.type                 = ARGTYPE_F64_PTR;
-            result.value.value_fp64_ptr = in_value_ptr;
+            result.type = ARGTYPE_F64_PTR;
 
+            result.set_ptr_internal(in_value_ptr);
             return result;
         }
 
@@ -724,9 +724,9 @@ namespace APIInterceptor
         {
             APIFunctionArgument result;
 
-            result.type               = ARGTYPE_I8_PTR;
-            result.value.value_i8_ptr = in_value_ptr;
+            result.type = ARGTYPE_I8_PTR;
 
+            result.set_ptr_internal(in_value_ptr);
             return result;
         }
 
@@ -744,9 +744,9 @@ namespace APIInterceptor
         {
             APIFunctionArgument result;
 
-            result.type                = ARGTYPE_I16_PTR;
-            result.value.value_i16_ptr = in_value_ptr;
+            result.type = ARGTYPE_I16_PTR;
 
+            result.set_ptr_internal(in_value_ptr);
             return result;
         }
 
@@ -764,9 +764,9 @@ namespace APIInterceptor
         {
             APIFunctionArgument result;
 
-            result.type                = ARGTYPE_I32_PTR;
-            result.value.value_i32_ptr = in_value_ptr;
+            result.type = ARGTYPE_I32_PTR;
 
+            result.set_ptr_internal(in_value_ptr);
             return result;
         }
 
@@ -784,9 +784,9 @@ namespace APIInterceptor
         {
             APIFunctionArgument result;
 
-            result.type                = ARGTYPE_U16_PTR;
-            result.value.value_u16_ptr = in_value_ptr;
+            result.type = ARGTYPE_U16_PTR;
 
+            result.set_ptr_internal(in_value_ptr);
             return result;
         }
 
@@ -804,9 +804,9 @@ namespace APIInterceptor
         {
             APIFunctionArgument result;
 
-            result.type                = ARGTYPE_U32_PTR;
-            result.value.value_u32_ptr = in_value_ptr;
+            result.type = ARGTYPE_U32_PTR;
 
+            result.set_ptr_internal(in_value_ptr);
             return result;
         }
 
@@ -824,9 +824,9 @@ namespace APIInterceptor
         {
             APIFunctionArgument result;
 
-            result.type               = ARGTYPE_U8_PTR;
-            result.value.value_u8_ptr = in_value_ptr;
+            result.type = ARGTYPE_U8_PTR;
 
+            result.set_ptr_internal(in_value_ptr);
             return result;
         }
 
@@ -834,9 +834,9 @@ namespace APIInterceptor
         {
             APIFunctionArgument result;
 
-            result.type            = ARGTYPE_VOID_PTR;
-            result.value.value_ptr = in_value_ptr;
+            result.type = ARGTYPE_VOID_PTR;
 
+            result.set_ptr_internal(in_value_ptr);
             return result;
         }
 
@@ -874,27 +874,22 @@ namespace APIInterceptor
 
         union
         {
-            float                 value_fp32;
-            const float*          value_fp32_ptr;
-            double                value_fp64;
-            const double*         value_fp64_ptr;
-            char                  value_i8;
-            const char*           value_i8_ptr;
-            short                 value_i16;
-            const short*          value_i16_ptr;
-            int                   value_i32;
-            const int*            value_i32_ptr;
-            DataChunkID           value_id;
-            unsigned char         value_u8;
-            const unsigned char*  value_u8_ptr;
-            unsigned short        value_u16;
-            const unsigned short* value_u16_ptr;
-            unsigned int          value_u32;
-            const unsigned int*   value_u32_ptr;
-            const void*           value_ptr;
+            float          value_fp32;
+            double         value_fp64;
+            char           value_i8;
+            short          value_i16;
+            int            value_i32;
+            DataChunkID    value_id;
+            unsigned char  value_u8;
+            unsigned short value_u16;
+            unsigned int   value_u32;
+            uint64_t       value_ptr_as_u64;
         } value;
 
-        uint32_t get_n_arg_value_bytes() const;
+        uint32_t    get_n_arg_value_bytes()                   const;
+        const void* get_ptr_internal     ()                   const;
+        void        set_ptr_internal     (const void* in_ptr);
+
     } APIFunctionArgument;
 
     struct APICommand
