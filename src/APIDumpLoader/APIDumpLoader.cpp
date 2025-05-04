@@ -62,11 +62,15 @@ APIDumpLoader::DumpedAPICallVectorUniquePtr APIDumpLoader::create_dumped_api_cal
     result_ptr.reset(new DumpedAPICallVector() );
 
     {
-        uint8_t* data_u8_ptr = file_data_u8_vec.data();
-        uint32_t n_api_calls = 0;
+        uint8_t* data_u8_ptr   = file_data_u8_vec.data();
+        uint32_t n_api_calls   = 0;
+        uint32_t n_data_chunks = 0;
 
         n_api_calls  = *reinterpret_cast<uint32_t*>(data_u8_ptr);
         data_u8_ptr += sizeof(uint32_t);
+
+        n_data_chunks  = *reinterpret_cast<uint32_t*>(data_u8_ptr);
+        data_u8_ptr   += sizeof(uint32_t);
 
         result_ptr->resize(n_api_calls);
 

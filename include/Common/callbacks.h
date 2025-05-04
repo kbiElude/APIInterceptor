@@ -34,6 +34,13 @@ namespace APIInterceptor
     void register_for_post_callback       (APIFunction                             in_function,
                                            APIInterceptor::PFNPOSTCALLBACKFUNCPROC in_callback_func_ptr,
                                            void*                                   in_func_user_arg);
+
+    bool        get_data_chunk     (const DataChunkID& in_data_chunk_id,
+                                    const void**       out_data_ptr_ptr,
+                                    uint32_t*          out_n_bytes_ptr);
+    uint32_t    get_n_data_chunks  ();
+    DataChunkID register_data_chunk(const void*     in_data_ptr,
+                                    const uint32_t& in_n_bytes);
 }
 
 #endif /* COMMON_CALLBACKS_H */

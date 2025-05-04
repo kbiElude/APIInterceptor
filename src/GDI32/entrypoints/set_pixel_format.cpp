@@ -32,11 +32,14 @@ BOOL WINAPI GDI32::set_pixel_format(HDC                          in_hdc,
                                                      &pre_callback_func_ptr,
                                                      &pre_callback_func_arg) )
     {
+        const auto pfd_data_chunk_id = APIInterceptor::register_data_chunk(in_pixel_format_descriptor_ptr,
+                                                                           sizeof(*in_pixel_format_descriptor_ptr) );
+
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_void_ptr(in_hdc),
-            APIInterceptor::APIFunctionArgument::create_i32     (in_format),
-            APIInterceptor::APIFunctionArgument::create_void_ptr(in_pixel_format_descriptor_ptr),
+            APIInterceptor::APIFunctionArgument::create_void_ptr     (in_hdc),
+            APIInterceptor::APIFunctionArgument::create_i32          (in_format),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(pfd_data_chunk_id),
         };
 
         pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GDI32_SETPIXELFORMAT,

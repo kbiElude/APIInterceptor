@@ -29,6 +29,13 @@ uint32_t APIInterceptor::APIFunctionArgument::deserialize_from_u8_ptr(const uint
     return result;
 }
 
+const APIInterceptor::DataChunkID& APIInterceptor::APIFunctionArgument::get_data_chunk_id() const
+{
+    assert(type == APIFunctionArgumentType::ARGTYPE_DATA_CHUNK_ID);
+
+    return value.value_id;
+}
+
 const float& APIInterceptor::APIFunctionArgument::get_fp32() const
 {
     assert(type == APIFunctionArgumentType::ARGTYPE_F32);
@@ -105,6 +112,8 @@ uint32_t APIInterceptor::APIFunctionArgument::get_n_arg_value_bytes() const
 
     switch (type)
     {
+        case ARGTYPE_DATA_CHUNK_ID: result = static_cast<uint32_t>(sizeof(DataChunkID) ); break;
+
         case ARGTYPE_F32:      result = static_cast<uint32_t>(sizeof(float)    ); break;
         case ARGTYPE_F64:      result = static_cast<uint32_t>(sizeof(double)   ); break;
         case ARGTYPE_I8:       result = static_cast<uint32_t>(sizeof(int8_t)   ); break;

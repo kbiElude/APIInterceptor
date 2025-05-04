@@ -649,12 +649,26 @@ namespace APIInterceptor
         ARGTYPE_U32_PTR,
         ARGTYPE_VOID_PTR,
 
+        ARGTYPE_DATA_CHUNK_ID,
+
         UNKNOWN
     };
+
+    typedef uint32_t DataChunkID;
 
     typedef struct APIFunctionArgument
     {
         APIFunctionArgumentType type;
+
+        static APIFunctionArgument create_data_chunk_id(const DataChunkID& in_id)
+        {
+            APIFunctionArgument result;
+
+            result.type                      = ARGTYPE_DATA_CHUNK_ID;
+            result.value.value_id = in_id;
+
+            return result;
+        }
 
         static APIFunctionArgument create_fp32(const float& in_value)
         {
@@ -826,23 +840,24 @@ namespace APIInterceptor
             return result;
         }
 
-        const float&          get_fp32    () const;
-        const float*          get_fp32_ptr() const;
-        const double&         get_fp64    () const;
-        const double*         get_fp64_ptr() const;
-        const char&           get_i8      () const;
-        const char*           get_i8_ptr  () const;
-        const short&          get_i16     () const;
-        const short*          get_i16_ptr () const;
-        const int&            get_i32     () const;
-        const int*            get_i32_ptr () const;
-        const unsigned char&  get_u8      () const;
-        const unsigned char*  get_u8_ptr  () const;
-        const unsigned short& get_u16     () const;
-        const unsigned short* get_u16_ptr () const;
-        const unsigned int&   get_u32     () const;
-        const unsigned int*   get_u32_ptr () const;
-        const void*           get_ptr     () const;
+        const DataChunkID&    get_data_chunk_id() const;
+        const float&          get_fp32         () const;
+        const float*          get_fp32_ptr     () const;
+        const double&         get_fp64         () const;
+        const double*         get_fp64_ptr     () const;
+        const char&           get_i8           () const;
+        const char*           get_i8_ptr       () const;
+        const short&          get_i16          () const;
+        const short*          get_i16_ptr      () const;
+        const int&            get_i32          () const;
+        const int*            get_i32_ptr      () const;
+        const unsigned char&  get_u8           () const;
+        const unsigned char*  get_u8_ptr       () const;
+        const unsigned short& get_u16          () const;
+        const unsigned short* get_u16_ptr      () const;
+        const unsigned int&   get_u32          () const;
+        const unsigned int*   get_u32_ptr      () const;
+        const void*           get_ptr          () const;
 
         uint32_t deserialize_from_u8_ptr(const uint8_t*        in_u8_ptr);
         void     serialize_to_u8_vec    (std::vector<uint8_t>* inout_u8_vec_ptr) const;
@@ -869,6 +884,7 @@ namespace APIInterceptor
             const short*          value_i16_ptr;
             int                   value_i32;
             const int*            value_i32_ptr;
+            DataChunkID           value_id;
             unsigned char         value_u8;
             const unsigned char*  value_u8_ptr;
             unsigned short        value_u16;

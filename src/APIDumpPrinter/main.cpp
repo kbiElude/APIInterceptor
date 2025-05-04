@@ -645,47 +645,76 @@ void main()
                 get_string(current_api_call.func) );
 
         for (uint32_t n_arg = 0;
-                      n_arg < n_args;
+                      n_arg < n_args + 1;
                     ++n_arg)
         {
-            const auto current_arg_ptr = &current_api_call.arg_vec.at(n_arg);
+            bool       arg_valid       = true;
+            const auto current_arg_ptr = (n_arg != n_args) ? &current_api_call.arg_vec.at        (n_arg)
+                                                           :  current_api_call.returned_value.get();
 
-            switch (current_arg_ptr->type)
+            if (n_arg == n_args)
             {
-                case APIInterceptor::APIFunctionArgumentType::ARGTYPE_F32: fprintf(stdout, "%f",                        current_arg_ptr->get_fp32() );  break;
-                case APIInterceptor::APIFunctionArgumentType::ARGTYPE_F64: fprintf(stdout, "%lf",                       current_arg_ptr->get_fp64() );  break;
-                case APIInterceptor::APIFunctionArgumentType::ARGTYPE_I8:  fprintf(stdout, "%d",  static_cast<int32_t> (current_arg_ptr->get_i8  () )); break;
-                case APIInterceptor::APIFunctionArgumentType::ARGTYPE_I16: fprintf(stdout, "%d",  static_cast<int32_t> (current_arg_ptr->get_i16 () )); break;
-                case APIInterceptor::APIFunctionArgumentType::ARGTYPE_I32: fprintf(stdout, "%d",                        current_arg_ptr->get_i32 () );  break;
-                case APIInterceptor::APIFunctionArgumentType::ARGTYPE_U8:  fprintf(stdout, "%u",  static_cast<uint32_t>(current_arg_ptr->get_u8  () )); break;
-                case APIInterceptor::APIFunctionArgumentType::ARGTYPE_U16: fprintf(stdout, "%u",  static_cast<uint32_t>(current_arg_ptr->get_u16 () )); break;
-                case APIInterceptor::APIFunctionArgumentType::ARGTYPE_U32: fprintf(stdout, "%u",                        current_arg_ptr->get_u32 () );  break;
-
-                case APIInterceptor::APIFunctionArgumentType::ARGTYPE_F32_PTR:  fprintf(stdout, "0x%p", current_arg_ptr->get_fp32_ptr() ); break;
-                case APIInterceptor::APIFunctionArgumentType::ARGTYPE_F64_PTR:  fprintf(stdout, "0x%p", current_arg_ptr->get_fp64_ptr() ); break;
-                case APIInterceptor::APIFunctionArgumentType::ARGTYPE_I8_PTR:   fprintf(stdout, "0x%p", current_arg_ptr->get_i8_ptr  () ); break;
-                case APIInterceptor::APIFunctionArgumentType::ARGTYPE_I16_PTR:  fprintf(stdout, "0x%p", current_arg_ptr->get_i16_ptr () ); break;
-                case APIInterceptor::APIFunctionArgumentType::ARGTYPE_I32_PTR:  fprintf(stdout, "0x%p", current_arg_ptr->get_i32_ptr () ); break;
-                case APIInterceptor::APIFunctionArgumentType::ARGTYPE_U8_PTR:   fprintf(stdout, "0x%p", current_arg_ptr->get_u8_ptr  () ); break;
-                case APIInterceptor::APIFunctionArgumentType::ARGTYPE_U16_PTR:  fprintf(stdout, "0x%p", current_arg_ptr->get_u16_ptr () ); break;
-                case APIInterceptor::APIFunctionArgumentType::ARGTYPE_U32_PTR:  fprintf(stdout, "0x%p", current_arg_ptr->get_u32_ptr () ); break;
-                case APIInterceptor::APIFunctionArgumentType::ARGTYPE_VOID_PTR: fprintf(stdout, "0x%p", current_arg_ptr->get_ptr     () ); break;
-
-                default:
+                /* Returned value is optional */
+                if (current_arg_ptr       == nullptr                                          ||
+                    current_arg_ptr->type == APIInterceptor::APIFunctionArgumentType::UNKNOWN)
                 {
-                    assert(false);
+                    arg_valid = false;
+                }
+                else
+                {
+                    fprintf(stdout, " returned ");
                 }
             }
 
-            if (n_arg != (n_args - 1) )
+            if (arg_valid)
+            {
+                switch (current_arg_ptr->type)
+                {
+                    case APIInterceptor::APIFunctionArgumentType::ARGTYPE_F32: fprintf(stdout, "%f",                        current_arg_ptr->get_fp32() );  break;
+                    case APIInterceptor::APIFunctionArgumentType::ARGTYPE_F64: fprintf(stdout, "%lf",                       current_arg_ptr->get_fp64() );  break;
+                    case APIInterceptor::APIFunctionArgumentType::ARGTYPE_I8:  fprintf(stdout, "%d",  static_cast<int32_t> (current_arg_ptr->get_i8  () )); break;
+                    case APIInterceptor::APIFunctionArgumentType::ARGTYPE_I16: fprintf(stdout, "%d",  static_cast<int32_t> (current_arg_ptr->get_i16 () )); break;
+                    case APIInterceptor::APIFunctionArgumentType::ARGTYPE_I32: fprintf(stdout, "%d",                        current_arg_ptr->get_i32 () );  break;
+                    case APIInterceptor::APIFunctionArgumentType::ARGTYPE_U8:  fprintf(stdout, "%u",  static_cast<uint32_t>(current_arg_ptr->get_u8  () )); break;
+                    case APIInterceptor::APIFunctionArgumentType::ARGTYPE_U16: fprintf(stdout, "%u",  static_cast<uint32_t>(current_arg_ptr->get_u16 () )); break;
+                    case APIInterceptor::APIFunctionArgumentType::ARGTYPE_U32: fprintf(stdout, "%u",                        current_arg_ptr->get_u32 () );  break;
+
+                    case APIInterceptor::APIFunctionArgumentType::ARGTYPE_F32_PTR:  fprintf(stdout, "[!] 0x%p", current_arg_ptr->get_fp32_ptr() ); break;
+                    case APIInterceptor::APIFunctionArgumentType::ARGTYPE_F64_PTR:  fprintf(stdout, "[!] 0x%p", current_arg_ptr->get_fp64_ptr() ); break;
+                    case APIInterceptor::APIFunctionArgumentType::ARGTYPE_I8_PTR:   fprintf(stdout, "[!] 0x%p", current_arg_ptr->get_i8_ptr  () ); break;
+                    case APIInterceptor::APIFunctionArgumentType::ARGTYPE_I16_PTR:  fprintf(stdout, "[!] 0x%p", current_arg_ptr->get_i16_ptr () ); break;
+                    case APIInterceptor::APIFunctionArgumentType::ARGTYPE_I32_PTR:  fprintf(stdout, "[!] 0x%p", current_arg_ptr->get_i32_ptr () ); break;
+                    case APIInterceptor::APIFunctionArgumentType::ARGTYPE_U8_PTR:   fprintf(stdout, "[!] 0x%p", current_arg_ptr->get_u8_ptr  () ); break;
+                    case APIInterceptor::APIFunctionArgumentType::ARGTYPE_U16_PTR:  fprintf(stdout, "[!] 0x%p", current_arg_ptr->get_u16_ptr () ); break;
+                    case APIInterceptor::APIFunctionArgumentType::ARGTYPE_U32_PTR:  fprintf(stdout, "[!] 0x%p", current_arg_ptr->get_u32_ptr () ); break;
+                    case APIInterceptor::APIFunctionArgumentType::ARGTYPE_VOID_PTR: fprintf(stdout, "[!] 0x%p", current_arg_ptr->get_ptr     () ); break;
+
+                    case APIInterceptor::APIFunctionArgumentType::ARGTYPE_DATA_CHUNK_ID:  fprintf(stdout, "[data chunk %d]", current_arg_ptr->get_data_chunk_id() ); break;
+
+                    default:
+                    {
+                        assert(false);
+                    }
+                }
+            }
+
+            if (n_args != 0           &&
+                n_arg  < (n_args - 1) )
             {
                 fprintf(stdout,
                         ", ");
             }
+            else
+            if (n_args == 0           ||
+                n_arg  == n_args - 1)
+            {
+                fprintf(stdout,
+                        ")");
+            }
         }
 
         fprintf(stdout,
-                ")\n");
+                "\n");
     }
 end:
     ;

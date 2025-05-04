@@ -27,15 +27,19 @@ APIDumper::~APIDumper()
 
     if (file_handle != nullptr)
     {
-        const uint32_t       n_api_calls   = static_cast<uint32_t>(m_dumped_api_call_vec.size() );
+        const uint32_t       n_api_calls   = static_cast<uint32_t>            (m_dumped_api_call_vec.size() );
+        const uint32_t       n_data_chunks = APIInterceptor::get_n_data_chunks();
         std::vector<uint8_t> helper_u8_vec;
 
+        /* Workload props come first.  */
         {
-            helper_u8_vec.resize(sizeof(uint32_t) );
+            helper_u8_vec.resize(sizeof(uint32_t) * 2 );
 
-            *reinterpret_cast<uint32_t*>(helper_u8_vec.data() ) = n_api_calls;
+            *(reinterpret_cast<uint32_t*>(helper_u8_vec.data() ) + 0) = n_api_calls;
+            *(reinterpret_cast<uint32_t*>(helper_u8_vec.data() ) + 1) = n_data_chunks;
         }
 
+        /* Follow with API calls ..*/
         for (uint32_t n_api_call = 0;
                       n_api_call < n_api_calls;
                     ++n_api_call)
@@ -62,6 +66,37 @@ APIDumper::~APIDumper()
             }
 
             current_api_call_ptr->returned_value.serialize_to_u8_vec(&helper_u8_vec);
+        }
+
+        /* ..and finish with data chunks */
+        for (uint32_t n_data_chunk = 0;
+                      n_data_chunk < n_data_chunks;
+                    ++n_data_chunk)
+        {
+            const void* data_chunk_ptr         = nullptr;
+            uint32_t    data_chunk_size        = 0;
+            uint8_t*    helper_u8_ptr          = nullptr;
+            const auto  helper_u8_vec_pre_size = static_cast<uint32_t>(helper_u8_vec.size() );
+
+            if (!APIInterceptor::get_data_chunk(n_data_chunk,
+                                               &data_chunk_ptr,
+                                               &data_chunk_size) )
+            {
+                assert(false);
+
+                continue;
+            }
+
+            helper_u8_vec.resize(helper_u8_vec_pre_size + sizeof(uint32_t) + data_chunk_size);
+
+            helper_u8_ptr = helper_u8_vec.data() + helper_u8_vec_pre_size;
+
+            *reinterpret_cast<uint32_t*>(helper_u8_ptr)  = data_chunk_size;
+            helper_u8_ptr                               += sizeof(uint32_t);
+
+            memcpy(helper_u8_ptr,
+                   data_chunk_ptr,
+                   data_chunk_size);
         }
 
         ::fwrite(helper_u8_vec.data(),

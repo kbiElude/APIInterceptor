@@ -21,9 +21,11 @@ void AI_APIENTRY OpenGL::aiMultMatrixd(const GLdouble* m)
                                                      &callback_func_ptr,
                                                      &callback_func_arg) )
     {
-        const APIInterceptor::APIFunctionArgument args[] =
+        const auto                                data_chunk_id   = APIInterceptor::register_data_chunk(m,
+                                                                                                        static_cast<uint32_t>(sizeof(double) * 16));
+        const APIInterceptor::APIFunctionArgument args         [] =
         {
-            APIInterceptor::APIFunctionArgument::create_fp64_ptr(m),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(data_chunk_id),
         };
 
         callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLMULTMATRIXD,

@@ -7,17 +7,44 @@
 #include "Common/types.h"
 #include <vector>
 
+typedef std::vector<uint8_t>   U8Vec;
+typedef std::unique_ptr<U8Vec> U8VecUniquePtr;
 
 typedef std::pair<APIInterceptor::PFNPOSTCALLBACKFUNCPROC, void*> PostAPIFuncCallback;
 typedef std::pair<APIInterceptor::PFNPRECALLBACKFUNCPROC,  void*> PreAPIFuncCallback;
 
-static auto         g_post_api_func_callback_vec = std::vector<PostAPIFuncCallback>(APIInterceptor::APIFUNCTION_COUNT);
-static auto         g_pre_api_func_callback_vec  = std::vector<PreAPIFuncCallback> (APIInterceptor::APIFUNCTION_COUNT);
-AI_THREADLOCAL bool g_callbacks_enabled          = true;
+static         auto                        g_post_api_func_callback_vec = std::vector<PostAPIFuncCallback>(APIInterceptor::APIFUNCTION_COUNT);
+static         auto                        g_pre_api_func_callback_vec  = std::vector<PreAPIFuncCallback> (APIInterceptor::APIFUNCTION_COUNT);
+AI_THREADLOCAL bool                        g_callbacks_enabled          = true;
+static         std::vector<U8VecUniquePtr> g_data_chunk_vec;
 
 void APIInterceptor::disable_callbacks_for_this_thread()
 {
     g_callbacks_enabled = false;
+}
+
+bool APIInterceptor::get_data_chunk(const DataChunkID& in_data_chunk_id,
+                                    const void**       out_data_ptr_ptr,
+                                    uint32_t*          out_n_bytes_ptr)
+{
+    bool result = false;
+
+    if (g_data_chunk_vec.size() > in_data_chunk_id)
+    {
+        auto data_chunk_ptr = g_data_chunk_vec.at(in_data_chunk_id).get();
+
+        *out_data_ptr_ptr = data_chunk_ptr->data ();
+        *out_n_bytes_ptr  = static_cast<uint32_t>(data_chunk_ptr->size() );
+
+        result = true;
+    }
+
+    return result;
+}
+
+uint32_t APIInterceptor::get_n_data_chunks()
+{
+    return static_cast<uint32_t>(g_data_chunk_vec.size() );
 }
 
 bool APIInterceptor::get_post_callback_for_function(const APIFunction&       in_api_func,
@@ -54,6 +81,27 @@ bool APIInterceptor::get_pre_callback_for_function(const APIFunction&           
 
         result = (data_ptr->first != nullptr);
     }
+
+    return result;
+}
+
+APIInterceptor::DataChunkID APIInterceptor::register_data_chunk(const void*     in_data_ptr,
+                                                                const uint32_t& in_n_bytes)
+{
+    U8VecUniquePtr new_data_chunk_ptr;
+    const auto     result             = static_cast<uint32_t>(g_data_chunk_vec.size() );
+
+    new_data_chunk_ptr.reset(
+        new U8Vec(in_n_bytes)
+    );
+
+    memcpy(new_data_chunk_ptr->data(),
+           in_data_ptr,
+           in_n_bytes);
+
+    g_data_chunk_vec.emplace_back(
+        std::move(new_data_chunk_ptr)
+    );
 
     return result;
 }
