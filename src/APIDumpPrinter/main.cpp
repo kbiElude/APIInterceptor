@@ -621,11 +621,30 @@ const char* get_string(const APIInterceptor::APIFunction& in_func)
     return result_ptr;
 }
 
-void main()
+void main(int   in_argc,
+          char* in_argv[])
 {
-    auto api_dump_ptr = APIDumpLoader::create_dumped_api_call_vec_from_file("e:/vr/q1/nehe_lesson5.workload");
+    APIDumpLoader::DumpedAPICallVectorUniquePtr api_dump_ptr;
+    const char*                                 dump_filename_ptr = nullptr;
+
+    if (in_argc > 1)
+    {
+        dump_filename_ptr = in_argv[1];
+    }
+
+    if (dump_filename_ptr == nullptr)
+    {
+        fprintf(stdout,
+                "In order to use the tool, workload file must be specified via cmd line arg. Example:\n"
+                "\n"
+                "APIDumpPrinter drive:\\path\\to\\file.workload\n");
+
+        goto end;
+    }
 
     /* Load the workload */
+    api_dump_ptr = APIDumpLoader::create_dumped_api_call_vec_from_file(dump_filename_ptr);
+
     if (api_dump_ptr == nullptr)
     {
         fprintf(stderr,
