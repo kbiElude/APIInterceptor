@@ -17,38 +17,41 @@ int main(int   in_argc,
     std::string working_dir;
 
     /* Parse arguments if specified */
-    if (std::string(in_argv[n_file_path_cmd_line_arg]) == "--dump-n-frames")
+    if (in_argc > n_file_path_cmd_line_arg)
     {
-        if (static_cast<uint32_t>(in_argc) <= (n_file_path_cmd_line_arg + 1))
+        if (std::string(in_argv[n_file_path_cmd_line_arg]) == "--dump-n-frames")
         {
-            fprintf(stderr,
-                    "[!] If --dump-n-frames argument is specified, it must be followed by an integer value.\n");
+            if (static_cast<uint32_t>(in_argc) <= (n_file_path_cmd_line_arg + 1))
+            {
+                fprintf(stderr,
+                        "[!] If --dump-n-frames argument is specified, it must be followed by an integer value.\n");
 
-            goto end;
+                goto end;
+            }
+
+            if (sscanf(in_argv[n_file_path_cmd_line_arg + 1],
+                       "%d",
+                       &n_frames_to_dump) != 1)
+            {
+                fprintf(stderr,
+                        "[!] --dump-n-frames argument must be followed by an integer value.\n");
+
+                goto end;
+            }
+
+            if (n_frames_to_dump == 0)
+            {
+                fprintf(stderr,
+                        "[!] User requested zero frames to dump - exiting.\n");
+
+                goto end;
+            }
+
+            n_file_path_cmd_line_arg += 2;
         }
-
-        if (sscanf(in_argv[n_file_path_cmd_line_arg + 1],
-                   "%d",
-                   &n_frames_to_dump) != 1)
-        {
-            fprintf(stderr,
-                    "[!] --dump-n-frames argument must be followed by an integer value.\n");
-
-            goto end;
-        }
-
-        if (n_frames_to_dump == 0)
-        {
-            fprintf(stderr,
-                    "[!] User requested zero frames to dump - exiting.\n");
-
-            goto end;
-        }
-
-        n_file_path_cmd_line_arg += 2;
     }
 
-    if (static_cast<uint32_t>(in_argc) < n_file_path_cmd_line_arg)
+    if (static_cast<uint32_t>(in_argc) <= n_file_path_cmd_line_arg)
     {
         fprintf(stderr,
                 "To dump API calls used by an app, launch it with the following cmd line args:\n"
