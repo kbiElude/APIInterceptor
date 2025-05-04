@@ -1,16 +1,20 @@
 cmake_minimum_required (VERSION 2.8)    
 project (APIInterceptor)
 
-option(APIINTERCEPTOR_BUILD_INTERCEPTOR "Build API interceptor projects"           ON)
-option(APIINTERCEPTOR_BUILD_LIBS        "Build static libs (API Dump Loader)"      ON)
-option(APIINTERCEPTOR_BUILD_TOOLS       "Build tools (API Dumper)"                 ON)
-option(APIINTERCEPTOR_DUMP_API_CALLS    "Dump API calls to text files (debugging)" OFF)
+option(APIINTERCEPTOR_BUILD_INTERCEPTOR "Build API interceptor projects"             ON)
+option(APIINTERCEPTOR_BUILD_LIBS        "Build static libs (API Dump Loader)"        ON)
+option(APIINTERCEPTOR_BUILD_TOOLS       "Build tools (API Dumper, API Dump Printer)" ON)
+option(APIINTERCEPTOR_DUMP_API_CALLS    "Dump API calls to text files (debugging)"   OFF)
 
 # DO NOT MODIFY BELOW THIS LINE
 configure_file("${APIInterceptor_SOURCE_DIR}/include/config.h.in" "${APIInterceptor_BINARY_DIR}/apitracer_config.h")
 
 if (NOT APIINTERCEPTOR_BUILD_INTERCEPTOR AND APIINTERCEPTOR_BUILD_TOOLS)
     message(FATAL_ERROR "APIINTERCEPTOR_BUILD_TOOLS option requires APIINTERCEPTOR_BUILD_INTERCEPTOR option to be enabled.")
+endif()
+
+if (NOT APIINTERCEPTOR_BUILD_LIBS AND APIINTERCEPTOR_BUILD_TOOLS)
+    message(FATAL_ERROR "APIINTERCEPTOR_BUILD_TOOLS option requires APIINTERCEPTOR_BUILD_LIBS option to be enabled.")
 endif()
 
 unset(CMAKE_DEBUG_POSTFIX CACHE)
@@ -176,24 +180,6 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
     source_group ("OpenGL32 source files"    FILES ${OpenGL32Sources})
     source_group ("WGL include files"        FILES ${WGLIncludes})
     source_group ("WGL source files"         FILES ${WGLSources})
-
-    if (APIINTERCEPTOR_BUILD_TOOLS)
-        file(GLOB APIDumperDLLIncludes "${APIInterceptor_SOURCE_DIR}/include/APIDumperDLL/*.h")
-        file(GLOB APIDumperDLLSources  "${APIInterceptor_SOURCE_DIR}/src/APIDumperDLL/*.cpp")
-
-        add_executable(APIDumper           "${APIInterceptor_SOURCE_DIR}/src/APIDumper/main.cpp")
-        add_library   (APIDumperDLL SHARED ${APIDumperDLLIncludes} ${APIDumperDLLSources})
-
-        target_link_libraries(APIDumper    Detours)
-        target_link_libraries(APIDumperDLL APIInterceptor)
-
-        add_dependencies(APIDumper APIDumperDLL)
-
-        source_group ("APIDumperDLL include files"  FILES ${APIDumperDLLIncludes})
-        source_group ("APIDumperDLL source files"   FILES ${APIDumperDLLSources})
-
-        include_directories("${APIInterceptor_SOURCE_DIR}/include/APIDumperDLL")
-    endif()
 endif()
 
 set(LIBRARY_OUTPUT_PATH ${APIInterceptor_BINARY_DIR}/bin)
@@ -209,4 +195,26 @@ if (APIINTERCEPTOR_BUILD_LIBS)
 
     source_group ("APIDump Loader include files"  FILES ${APIDumpLoaderIncludes})
     source_group ("APIDump Loader source files"   FILES ${APIDumpLoaderSources})
+endif()
+
+if (APIINTERCEPTOR_BUILD_TOOLS)
+    file(GLOB APIDumperDLLIncludes  "${APIInterceptor_SOURCE_DIR}/include/APIDumperDLL/*.h")
+    file(GLOB APIDumperDLLSources   "${APIInterceptor_SOURCE_DIR}/src/APIDumperDLL/*.cpp")
+    file(GLOB APIDumpPrinterSources "${APIInterceptor_SOURCE_DIR}/src/APIDumpPrinter/*.cpp")
+
+    add_executable(APIDumper           "${APIInterceptor_SOURCE_DIR}/src/APIDumper/main.cpp")
+    add_executable(APIDumpPrinter      ${APIDumpPrinterSources})
+    add_library   (APIDumperDLL SHARED ${APIDumperDLLIncludes} ${APIDumperDLLSources})
+
+    target_link_libraries(APIDumper      Detours)
+    target_link_libraries(APIDumperDLL   APIInterceptor)
+    target_link_libraries(APIDumpPrinter APIDumpLoader)
+
+    add_dependencies(APIDumper APIDumperDLL)
+
+    source_group ("APIDumperDLL include files"  FILES ${APIDumperDLLIncludes})
+    source_group ("APIDumperDLL source files"   FILES ${APIDumperDLLSources})
+    source_group ("APIDumpPrinter source files" FILES ${APIDumpPinterSources})
+
+    include_directories("${APIInterceptor_SOURCE_DIR}/include/APIDumperDLL")
 endif()
