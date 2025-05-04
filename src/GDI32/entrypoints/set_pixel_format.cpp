@@ -5,6 +5,7 @@
 #include "Common/callbacks.h"
 #include "Common/globals.h"
 #include "Common/macros.h"
+#include "Common/tracker.h"
 #include "GDI32/entrypoints/set_pixel_format.h"
 #include "GDI32/globals.h"
 #include "GDI32/utils_trace.h"
@@ -19,6 +20,7 @@ BOOL WINAPI GDI32::set_pixel_format(HDC                          in_hdc,
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr   = nullptr;
     BOOL                                    result                  = false;
     bool                                    should_pass_through     = true;
+    APIInterceptor::Tracker                 tracker;
 
     AI_TRACE("SetPixelFormat(\n"
              " in_hdc=[%p]\n"
@@ -28,25 +30,28 @@ BOOL WINAPI GDI32::set_pixel_format(HDC                          in_hdc,
              in_format,
              GDI32::convert_pixel_format_descriptor_to_raw_string(in_pixel_format_descriptor_ptr) );
 
-    if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GDI32_SETPIXELFORMAT,
-                                                     &pre_callback_func_ptr,
-                                                     &pre_callback_func_arg) )
+    if (tracker.is_top_level_api_call() )
     {
-        const auto pfd_data_chunk_id = APIInterceptor::register_data_chunk(in_pixel_format_descriptor_ptr,
-                                                                           sizeof(*in_pixel_format_descriptor_ptr) );
-
-        const APIInterceptor::APIFunctionArgument args[] =
+        if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GDI32_SETPIXELFORMAT,
+                                                         &pre_callback_func_ptr,
+                                                         &pre_callback_func_arg) )
         {
-            APIInterceptor::APIFunctionArgument::create_void_ptr     (in_hdc),
-            APIInterceptor::APIFunctionArgument::create_i32          (in_format),
-            APIInterceptor::APIFunctionArgument::create_data_chunk_id(pfd_data_chunk_id),
-        };
+            const auto pfd_data_chunk_id = APIInterceptor::register_data_chunk(in_pixel_format_descriptor_ptr,
+                                                                               sizeof(*in_pixel_format_descriptor_ptr) );
 
-        pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GDI32_SETPIXELFORMAT,
-                              sizeof(args) / sizeof(args[0]),
-                              args,
-                              pre_callback_func_arg,
-                             &should_pass_through);
+            const APIInterceptor::APIFunctionArgument args[] =
+            {
+                APIInterceptor::APIFunctionArgument::create_void_ptr     (in_hdc),
+                APIInterceptor::APIFunctionArgument::create_i32          (in_format),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(pfd_data_chunk_id),
+            };
+
+            pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GDI32_SETPIXELFORMAT,
+                                  sizeof(args) / sizeof(args[0]),
+                                  args,
+                                  pre_callback_func_arg,
+                                 &should_pass_through);
+        }
     }
 
     if (should_pass_through)
@@ -56,15 +61,18 @@ BOOL WINAPI GDI32::set_pixel_format(HDC                          in_hdc,
                                                                                                            in_pixel_format_descriptor_ptr);
     }
 
-    if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GDI32_SETPIXELFORMAT,
-                                                      &post_callback_func_ptr,
-                                                      &post_callback_func_arg) )
+    if (tracker.is_top_level_api_call() )
     {
-        const auto result_arg = APIInterceptor::APIFunctionArgument::create_i32(result);
+        if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GDI32_SETPIXELFORMAT,
+                                                          &post_callback_func_ptr,
+                                                          &post_callback_func_arg) )
+        {
+            const auto result_arg = APIInterceptor::APIFunctionArgument::create_i32(result);
 
-        post_callback_func_ptr(APIInterceptor::APIFUNCTION_GDI32_SETPIXELFORMAT,
-                               post_callback_func_arg,
-                              &result_arg);
+            post_callback_func_ptr(APIInterceptor::APIFUNCTION_GDI32_SETPIXELFORMAT,
+                                   post_callback_func_arg,
+                                  &result_arg);
+        }
     }
 
     return result;

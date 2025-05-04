@@ -5,6 +5,7 @@
 #include <Windows.h>
 #include "Common/callbacks.h"
 #include "Common/types.h"
+#include <assert.h>
 #include <vector>
 
 typedef std::vector<uint8_t>   U8Vec;
@@ -16,6 +17,7 @@ typedef std::pair<APIInterceptor::PFNPRECALLBACKFUNCPROC,  void*> PreAPIFuncCall
 static         auto                        g_post_api_func_callback_vec = std::vector<PostAPIFuncCallback>(APIInterceptor::APIFUNCTION_COUNT);
 static         auto                        g_pre_api_func_callback_vec  = std::vector<PreAPIFuncCallback> (APIInterceptor::APIFUNCTION_COUNT);
 AI_THREADLOCAL bool                        g_callbacks_enabled          = true;
+AI_THREADLOCAL uint32_t                    g_n_api_calls_intercepted    = 0;
 static         std::vector<U8VecUniquePtr> g_data_chunk_vec;
 
 void APIInterceptor::disable_callbacks_for_this_thread()
@@ -81,6 +83,22 @@ bool APIInterceptor::get_pre_callback_for_function(const APIFunction&           
 
         result = (data_ptr->first != nullptr);
     }
+
+    return result;
+}
+
+void APIInterceptor::on_api_call_interception_finished()
+{
+    assert(g_n_api_calls_intercepted > 0);
+
+    g_n_api_calls_intercepted--;
+}
+
+bool APIInterceptor::on_api_call_interception_started()
+{
+    const bool result = (g_n_api_calls_intercepted == 0);
+
+    g_n_api_calls_intercepted++;
 
     return result;
 }

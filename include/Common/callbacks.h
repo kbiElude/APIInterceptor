@@ -41,6 +41,9 @@ namespace APIInterceptor
     uint32_t    get_n_data_chunks  ();
     DataChunkID register_data_chunk(const void*     in_data_ptr,
                                     const uint32_t& in_n_bytes);
+
+    void on_api_call_interception_finished();
+    bool on_api_call_interception_started ();
 }
 
 #endif /* COMMON_CALLBACKS_H */
