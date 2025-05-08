@@ -21,6 +21,7 @@ namespace APIInterceptor
         APIFUNCTION_GDI32_GETPIXELFORMAT,
         APIFUNCTION_GDI32_SETPIXELFORMAT,
         APIFUNCTION_GDI32_SWAPBUFFERS,
+        APIFUNCTION_GDI32_LAST              = APIFUNCTION_GDI32_SWAPBUFFERS,
 
         /* OpenGL */
         APIFUNCTION_GL_FIRST,
@@ -624,7 +625,9 @@ namespace APIInterceptor
         APIFUNCTION_WGL_WGLSHARELISTS,
         APIFUNCTION_WGL_WGLSWAPINTERVALEXT,
         APIFUNCTION_WGL_WGLSWAPLAYERBUFFERS,
+        APIFUNCTION_WGL_LAST = APIFUNCTION_WGL_WGLSWAPLAYERBUFFERS,
 
+        /* Always last */
         APIFUNCTION_COUNT,
         APIFUNCTION_UNKNOWN = APIFUNCTION_COUNT
     };
@@ -858,6 +861,11 @@ namespace APIInterceptor
         const unsigned int&   get_u32          () const;
         const unsigned int*   get_u32_ptr      () const;
         const void*           get_ptr          () const;
+
+        const void* get_value_ptr() const
+        {
+            return &value;
+        }
 
         uint32_t deserialize_from_u8_ptr(const uint8_t*        in_u8_ptr);
         void     serialize_to_u8_vec    (std::vector<uint8_t>* inout_u8_vec_ptr) const;

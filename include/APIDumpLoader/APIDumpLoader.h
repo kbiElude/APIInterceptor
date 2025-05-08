@@ -15,14 +15,24 @@ namespace APIDumpLoader
     typedef struct DumpedAPICall
     {
         std::vector<APIInterceptor::APIFunctionArgument>     arg_vec;
-        APIInterceptor::APIFunction                          func           = APIInterceptor::APIFunction::APIFUNCTION_UNKNOWN;
-        std::unique_ptr<APIInterceptor::APIFunctionArgument> returned_value;
+        APIInterceptor::APIFunction                          func               = APIInterceptor::APIFunction::APIFUNCTION_UNKNOWN;
+        std::unique_ptr<APIInterceptor::APIFunctionArgument> returned_value_ptr;
     } DumpedAPICall;
 
+    typedef std::vector<uint8_t>                 DataChunk;
+    typedef std::unique_ptr<DataChunk>           DataChunkUniquePtr;
     typedef std::vector<DumpedAPICall>           DumpedAPICallVector;
     typedef std::unique_ptr<DumpedAPICallVector> DumpedAPICallVectorUniquePtr;
 
-    DumpedAPICallVectorUniquePtr create_dumped_api_call_vec_from_file(const char* in_filename_ptr);
+    typedef struct Workload
+    {
+        std::vector<DataChunkUniquePtr> data_chunk_ptr_vec;
+        DumpedAPICallVectorUniquePtr    dumped_api_call_vec_ptr;
+    } Workload;
+
+    typedef std::unique_ptr<Workload> WorkloadUniquePtr;
+
+    WorkloadUniquePtr create_workload_from_file(const char* in_filename_ptr);
 }
 
 #endif /* APIDUMPLOADER_H */
