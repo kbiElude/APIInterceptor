@@ -1,7 +1,8 @@
 /* API Interceptor (c) 2024 Dominik Witczak
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
-  */
+ */
+#include "Common/logger.h"
 #include "OpenGL/entrypoints/GL2.0/gl_get_shaderiv.h"
 #include "OpenGL/globals.h"
 #include "OpenGL/utils_enum.h"

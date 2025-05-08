@@ -2,6 +2,7 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
+#include "Common/logger.h"
 #include "OpenGL/entrypoints/GL1.4/gl_point_parameteriv.h"
 #include "OpenGL/globals.h"
 #include "OpenGL/utils_enum.h"

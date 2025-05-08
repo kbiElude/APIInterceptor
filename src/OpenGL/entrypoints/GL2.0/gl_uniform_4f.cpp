@@ -2,6 +2,7 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
+#include "Common/logger.h"
 #include "OpenGL/entrypoints/GL2.0/gl_uniform_4f.h"
 #include "OpenGL/globals.h"
 #include "WGL/globals.h"

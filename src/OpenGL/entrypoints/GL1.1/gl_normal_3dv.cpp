@@ -4,6 +4,7 @@
  */
 #include "OpenGL/entrypoints/GL1.1/gl_normal_3dv.h"
 #include "OpenGL/globals.h"
+#include "Common/logger.h"
 #include "OpenGL/utils_enum.h"
 #include "WGL/globals.h"
 

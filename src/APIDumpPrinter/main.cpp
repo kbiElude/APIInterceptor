@@ -598,6 +598,8 @@ const char* get_string(const APIInterceptor::APIFunction& in_func)
         case APIInterceptor::APIFunction::APIFUNCTION_GL_GLVIEWPORT:                                result_ptr = "glViewport";                            break;
         case APIInterceptor::APIFunction::APIFUNCTION_GL_GLWAITSYNC:                                result_ptr = "glWaitSync";                            break;
 
+        case APIInterceptor::APIFunction::APIFUNCTION_USER32_CREATEWINDOWEXA: result_ptr = "CreateWindowExA"; break;
+
         case APIInterceptor::APIFunction::APIFUNCTION_WGL_WGLCOPYCONTEXT:             result_ptr = "wglCopyContext";             break;
         case APIInterceptor::APIFunction::APIFUNCTION_WGL_WGLCREATECONTEXT:           result_ptr = "wglCreateContext";           break;
         case APIInterceptor::APIFunction::APIFUNCTION_WGL_WGLCREATECONTEXTATTRIBSARB: result_ptr = "wglCreateContextAttribsARB"; break;
@@ -624,8 +626,8 @@ const char* get_string(const APIInterceptor::APIFunction& in_func)
 void main(int   in_argc,
           char* in_argv[])
 {
-    APIDumpLoader::DumpedAPICallVectorUniquePtr api_dump_ptr;
-    const char*                                 dump_filename_ptr = nullptr;
+    const char*                      dump_filename_ptr = nullptr;
+    APIDumpLoader::WorkloadUniquePtr workload_ptr;
 
     if (in_argc > 1)
     {
@@ -643,19 +645,19 @@ void main(int   in_argc,
     }
 
     /* Load the workload */
-    api_dump_ptr = APIDumpLoader::create_dumped_api_call_vec_from_file(dump_filename_ptr);
+    workload_ptr = APIDumpLoader::create_workload_from_file(dump_filename_ptr);
 
-    if (api_dump_ptr == nullptr)
+    if (workload_ptr == nullptr)
     {
         fprintf(stderr,
                 "[!] Could not parse the specified workload.\n");
 
-        assert(api_dump_ptr != nullptr);
+        assert(workload_ptr != nullptr);
         goto end;
     }
 
     /* Dump the contents in human-readable format. */
-    for (const auto& current_api_call : *api_dump_ptr)
+    for (const auto& current_api_call : *workload_ptr->dumped_api_call_vec_ptr)
     {
         const auto n_args = static_cast<uint32_t>(current_api_call.arg_vec.size() );
 
@@ -668,8 +670,8 @@ void main(int   in_argc,
                     ++n_arg)
         {
             bool       arg_valid       = true;
-            const auto current_arg_ptr = (n_arg != n_args) ? &current_api_call.arg_vec.at        (n_arg)
-                                                           :  current_api_call.returned_value.get();
+            const auto current_arg_ptr = (n_arg != n_args) ? &current_api_call.arg_vec.at            (n_arg)
+                                                           :  current_api_call.returned_value_ptr.get();
 
             if (n_arg == n_args)
             {

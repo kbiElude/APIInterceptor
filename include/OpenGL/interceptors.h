@@ -6,6 +6,7 @@
 #define OPENGL_INTERCEPTORS_H
 
 #include "Common/globals.h"
+#include <string>
 #include <unordered_map>
 #include <vector>
 

@@ -219,7 +219,7 @@ const void* APIInterceptor::APIFunctionArgument::get_ptr_internal() const
 
 void APIInterceptor::APIFunctionArgument::set_ptr_internal(const void* in_ptr)
 {
-    value.value_ptr_as_u64 = static_cast<uint64_t>(reinterpret_cast<intptr_t>(in_ptr) );
+    value.value_ptr_as_u64 = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(in_ptr) );
 }
 
 void APIInterceptor::APIFunctionArgument::serialize_to_u8_vec(std::vector<uint8_t>* inout_u8_vec_ptr) const

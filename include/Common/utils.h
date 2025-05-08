@@ -6,6 +6,7 @@
 #define COMMON_UTILS_H
 
 #include "types.h"
+#include <string>
 
 namespace APIInterceptor
 {

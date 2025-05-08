@@ -24,7 +24,7 @@ private:
     struct DumpedAPICall
     {
         APIInterceptor::APIFunction         api_func      = APIInterceptor::APIFunction::APIFUNCTION_UNKNOWN;
-        APIInterceptor::APIFunctionArgument args[10]      {};
+        APIInterceptor::APIFunctionArgument args[14]      {};
         uint32_t                            n_args        = 0;
         APIInterceptor::APIFunctionArgument returned_value{};
     };

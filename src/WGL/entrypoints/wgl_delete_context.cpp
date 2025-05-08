@@ -4,6 +4,7 @@
  */
 #include "Common/callbacks.h"
 #include "Common/globals.h"
+#include "Common/logger.h"
 #include "Common/tracker.h"
 #include "WGL/entrypoints/wgl_delete_context.h"
 #include "WGL/globals.h"

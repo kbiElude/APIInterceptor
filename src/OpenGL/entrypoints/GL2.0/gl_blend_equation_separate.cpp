@@ -2,6 +2,7 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
+#include "Common/logger.h"
 #include "OpenGL/entrypoints/GL2.0/gl_blend_equation_separate.h"
 #include "OpenGL/globals.h"
 #include "OpenGL/utils_enum.h"

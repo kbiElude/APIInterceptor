@@ -3,6 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "Common/callbacks.h"
+#include "Common/logger.h"
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL1.3/gl_active_texture.h"
 #include "OpenGL/globals.h"

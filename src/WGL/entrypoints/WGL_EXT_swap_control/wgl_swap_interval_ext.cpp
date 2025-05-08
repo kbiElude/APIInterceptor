@@ -4,6 +4,7 @@
  */
 #include "Common/callbacks.h"
 #include "Common/globals.h"
+#include "Common/logger.h"
 #include "Common/tracker.h"
 #include "WGL/entrypoints/WGL_EXT_swap_control/wgl_swap_interval_ext.h"
 #include "WGL/globals.h"

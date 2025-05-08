@@ -5,6 +5,7 @@
 #include "Common/callbacks.h"
 #include "APIDumper.h"
 #include <cassert>
+#include <mutex>
 
 static std::mutex g_mutex;
 

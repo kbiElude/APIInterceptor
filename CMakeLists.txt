@@ -49,12 +49,20 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
     file(GLOB GDI32Sources  "${APIInterceptor_SOURCE_DIR}/src/GDI32/*.cpp"
                             "${APIInterceptor_SOURCE_DIR}/src/GDI32/entrypoints/*.cpp")
 
-    add_library(GDI32 STATIC ${CommonIncludes}
-                            ${GDI32Sources}
-                            ${GDI32Includes})
+    file(GLOB User32Includes "${APIInterceptor_SOURCE_DIR}/include/User32/*.h"
+                             "${APIInterceptor_SOURCE_DIR}/include/User32/entrypoints/*.h")
+    file(GLOB User32Sources  "${APIInterceptor_SOURCE_DIR}/src/User32/*.cpp"
+                             "${APIInterceptor_SOURCE_DIR}/src/User32/entrypoints/*.cpp")
+
+    add_library(GDI32  STATIC ${CommonIncludes}
+                              ${GDI32Sources}
+                              ${GDI32Includes})
+    add_library(User32 STATIC ${CommonIncludes}
+                              ${User32Sources}
+                              ${User32Includes})
 
     FILE(GLOB KhronosIncludes "${APIInterceptor_SOURCE_DIR}/include/Khronos/GL/*.h"
-                            "${APIInterceptor_SOURCE_DIR}/include/Khronos/KHR/*.h")
+                              "${APIInterceptor_SOURCE_DIR}/include/Khronos/KHR/*.h")
 
     FILE(GLOB OpenGL32EntrypointsIncludes "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_color_buffer_float/*.h"
                                         "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_copy_buffer/*.h"
@@ -168,6 +176,9 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
     add_dependencies     (APIInterceptor OpenGL)
     target_link_libraries(APIInterceptor OpenGL ${OPENGL_gl_LIBRARY})
 
+    add_dependencies     (APIInterceptor User32)
+    target_link_libraries(APIInterceptor User32)
+
     add_dependencies     (APIInterceptor WGL)
     target_link_libraries(APIInterceptor WGL ${OPENGL_gl_LIBRARY})
 
@@ -178,6 +189,8 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
     source_group ("Entrypoint source files"  FILES ${OpenGL32EntrypointsSources})
     source_group ("OpenGL32 include files"   FILES ${OpenGL32Includes})
     source_group ("OpenGL32 source files"    FILES ${OpenGL32Sources})
+    source_group ("User32 include files"     FILES ${User32Includes})
+    source_group ("User32 source files"      FILES ${User32Sources})
     source_group ("WGL include files"        FILES ${WGLIncludes})
     source_group ("WGL source files"         FILES ${WGLSources})
 endif()

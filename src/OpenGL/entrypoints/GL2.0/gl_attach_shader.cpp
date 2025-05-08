@@ -2,6 +2,7 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
+#include "Common/logger.h"
 #include "Common/callbacks.h"
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL2.0/gl_attach_shader.h"

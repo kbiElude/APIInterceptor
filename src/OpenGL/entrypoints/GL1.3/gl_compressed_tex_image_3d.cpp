@@ -2,6 +2,7 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
+#include "Common/logger.h"
 #include "OpenGL/entrypoints/GL1.3/gl_compressed_tex_image_3d.h"
 #include "OpenGL/globals.h"
 #include "OpenGL/utils_enum.h"

@@ -5,6 +5,7 @@
 #include "Common/utils.h"
 #include "OpenGL/utils_enum.h"
 #include <cassert>
+#include <sstream>
 
 void APIInterceptor::convert_api_command_to_string(const APICommand& in_api_command,
                                                    std::string*      out_string_ptr)

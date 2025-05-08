@@ -6,6 +6,7 @@
 #include "Common/callbacks.h"
 #include "Common/types.h"
 #include <assert.h>
+#include <memory>
 #include <vector>
 
 typedef std::vector<uint8_t>   U8Vec;

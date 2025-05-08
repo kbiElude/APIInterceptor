@@ -4,6 +4,7 @@
  */
 #include "Common/callbacks.h"
 #include "Common/globals.h"
+#include "Common/logger.h"
 #include "Common/tracker.h"
 #include "WGL/entrypoints/WGL_ARB_create_context/wgl_create_context_attribs_arb.h"
 #include "WGL/globals.h"

@@ -4,6 +4,7 @@
  */
 #include "apitracer_config.h"
 #include "Common/globals.h"
+#include "Common/logger.h"
 #include "WGL/globals.h"
 #include "WGL/entrypoints/WGL_ARB_create_context/wgl_create_context_attribs_arb.h"
 #include "WGL/entrypoints/WGL_ARB_extensions_string/wgl_get_extensions_string_arb.h"

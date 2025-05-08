@@ -2,6 +2,7 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
+#include "Common/logger.h"
 #include "OpenGL/entrypoints/GL3.0/gl_transform_feedback_varyings.h"
 #include "OpenGL/globals.h"
 #include "OpenGL/utils_enum.h"

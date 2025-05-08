@@ -3,6 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "Common/callbacks.h"
+#include "Common/logger.h"
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL1.0/gl_stencil_mask.h"
 #include "OpenGL/globals.h"

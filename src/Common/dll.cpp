@@ -7,14 +7,17 @@
 #include <vector>
 #include "../deps/Detours/src/detours.h"
 
+#include "common/logger.h"
 #include "GDI32/interceptors.h"
 #include "OpenGL/interceptors.h"
+#include "User32/interceptors.h"
 #include "WGL/interceptors.h"
 
 const std::vector<APIInterceptor::FunctionInterceptor> g_function_interceptors[] =
 {
     GDI32::get_function_interceptors (),
     OpenGL::get_function_interceptors(),
+    User32::get_function_interceptors(),
     WGL::get_function_interceptors   (),
 };
 

@@ -4,6 +4,7 @@
  */
 #include "Common/callbacks.h"
 #include "Common/globals.h"
+#include "Common/logger.h"
 #include "Common/macros.h"
 #include "Common/tracker.h"
 #include "GDI32/globals.h"

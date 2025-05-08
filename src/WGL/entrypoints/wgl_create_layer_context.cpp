@@ -4,6 +4,7 @@
  */
 #include "Common/callbacks.h"
 #include "Common/globals.h"
+#include "Common/logger.h"
 #include "Common/tracker.h"
 #include "Khronos/GL/glcorearb.h"
 #include "Khronos/GL/wglext.h"
