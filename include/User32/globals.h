@@ -10,8 +10,10 @@
 namespace User32
 {
     typedef HWND (WINAPI *PFNCREATEWINDOWEXAPROC) (DWORD, LPCSTR, LPCSTR, DWORD, int, int, int, int, HWND, HMENU, HINSTANCE, LPVOID);
+    typedef HDC  (WINAPI *PFNGETDCPROC)           (HWND);
 
     extern void* g_cached_create_window_ex_a_func_ptr;
+    extern void* g_cached_get_dc_func_ptr;
 }
 
 #endif /* USER32_GLOBALS_H */

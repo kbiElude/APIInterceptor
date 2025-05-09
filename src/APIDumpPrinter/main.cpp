@@ -599,6 +599,7 @@ const char* get_string(const APIInterceptor::APIFunction& in_func)
         case APIInterceptor::APIFunction::APIFUNCTION_GL_GLWAITSYNC:                                result_ptr = "glWaitSync";                            break;
 
         case APIInterceptor::APIFunction::APIFUNCTION_USER32_CREATEWINDOWEXA: result_ptr = "CreateWindowExA"; break;
+        case APIInterceptor::APIFunction::APIFUNCTION_USER32_GETDC:           result_ptr = "GetDC";           break;
 
         case APIInterceptor::APIFunction::APIFUNCTION_WGL_WGLCOPYCONTEXT:             result_ptr = "wglCopyContext";             break;
         case APIInterceptor::APIFunction::APIFUNCTION_WGL_WGLCREATECONTEXT:           result_ptr = "wglCreateContext";           break;
