@@ -114,9 +114,12 @@ APIInterceptor::DataChunkID APIInterceptor::register_data_chunk(const void*     
         new U8Vec(in_n_bytes)
     );
 
-    memcpy(new_data_chunk_ptr->data(),
-           in_data_ptr,
-           in_n_bytes);
+    if (in_n_bytes != 0)
+    {
+        memcpy(new_data_chunk_ptr->data(),
+               in_data_ptr,
+               in_n_bytes);
+    }
 
     g_data_chunk_vec.emplace_back(
         std::move(new_data_chunk_ptr)

@@ -124,7 +124,6 @@ APIDumpLoader::WorkloadUniquePtr APIDumpLoader::create_workload_from_file(const 
                 const uint32_t     chunk_size         = *reinterpret_cast<const uint32_t*>(data_u8_ptr);
                 DataChunkUniquePtr new_data_chunk_ptr;
 
-                assert(chunk_size               != 0);
                 assert(data_u8_ptr + chunk_size <  file_data_u8_end_ptr);
 
                 data_u8_ptr += sizeof(uint32_t);
@@ -133,9 +132,12 @@ APIDumpLoader::WorkloadUniquePtr APIDumpLoader::create_workload_from_file(const 
                     new DataChunk(chunk_size)
                 );
 
-                memcpy(new_data_chunk_ptr->data(),
-                       data_u8_ptr,
-                       chunk_size);
+                if (chunk_size > 0)
+                {
+                    memcpy(new_data_chunk_ptr->data(),
+                           data_u8_ptr,
+                           chunk_size);
+                }
 
                 result_ptr->data_chunk_ptr_vec.emplace_back(std::move(new_data_chunk_ptr) );
 

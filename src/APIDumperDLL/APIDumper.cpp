@@ -24,7 +24,7 @@ APIDumper::~APIDumper()
      * TODO: We should be dumping contents asynchronously every specified interval.. But this will have to do for now.
      */
     auto file_handle = ::fopen("result_dump.workload",
-                               "w+");
+                               "wb");
 
     if (file_handle != nullptr)
     {
@@ -95,9 +95,12 @@ APIDumper::~APIDumper()
             *reinterpret_cast<uint32_t*>(helper_u8_ptr)  = data_chunk_size;
             helper_u8_ptr                               += sizeof(uint32_t);
 
-            memcpy(helper_u8_ptr,
-                   data_chunk_ptr,
-                   data_chunk_size);
+            if (data_chunk_size > 0)
+            {
+                memcpy(helper_u8_ptr,
+                       data_chunk_ptr,
+                       data_chunk_size);
+            }
         }
 
         ::fwrite(helper_u8_vec.data(),
