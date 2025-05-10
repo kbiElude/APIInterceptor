@@ -195,11 +195,14 @@ void APIDumper::on_post_callback(APIInterceptor::APIFunction                in_a
 
         if (this_ptr->m_dumped_api_call_vec.back().api_func != in_api_func)
         {
+            const auto this_thread_id = std::this_thread::get_id();
+
             auto vec_iterator = std::find_if(this_ptr->m_dumped_api_call_vec.rbegin(),
                                              this_ptr->m_dumped_api_call_vec.rend  (),
                                              [&](const DumpedAPICall& in_api_call)
                                              {
-                                                return in_api_call.api_func == in_api_func;
+                                                return (in_api_call.api_func  == in_api_func)    &&
+                                                       (in_api_call.thread_id == this_thread_id);
                                              });
 
             assert(vec_iterator != this_ptr->m_dumped_api_call_vec.rend() );
@@ -253,8 +256,9 @@ void APIDumper::on_pre_callback(APIInterceptor::APIFunction                in_ap
         {
             DumpedAPICall new_item;
 
-            new_item.api_func = in_api_func;
-            new_item.n_args   = in_n_args;
+            new_item.api_func  = in_api_func;
+            new_item.n_args    = in_n_args;
+            new_item.thread_id = std::this_thread::get_id();
 
             for (uint32_t n_arg = 0;
                           n_arg < in_n_args;

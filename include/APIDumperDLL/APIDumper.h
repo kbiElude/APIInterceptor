@@ -6,6 +6,7 @@
 #define APIDUMPER_H
 
 #include <memory>
+#include <thread>
 
 /* Forward decls */
 class                              APIDumper;
@@ -27,6 +28,7 @@ private:
         APIInterceptor::APIFunctionArgument args[14]      {};
         uint32_t                            n_args        = 0;
         APIInterceptor::APIFunctionArgument returned_value{};
+        std::thread::id                     thread_id;
     };
 
     /* Private funcs */
