@@ -669,7 +669,7 @@ void main(int   in_argc,
     /* Dump the contents in human-readable format. */
     for (const auto& current_api_call : *workload_ptr->dumped_api_call_vec_ptr)
     {
-        const auto n_args = static_cast<uint32_t>(current_api_call.arg_vec.size() );
+        const auto n_args = static_cast<uint32_t>(current_api_call.arg_in_vec.size() );
 
         fprintf(stdout,
                 "%s(",
@@ -680,7 +680,7 @@ void main(int   in_argc,
                     ++n_arg)
         {
             bool       arg_valid       = true;
-            const auto current_arg_ptr = (n_arg != n_args) ? &current_api_call.arg_vec.at            (n_arg)
+            const auto current_arg_ptr = (n_arg != n_args) ? &current_api_call.arg_in_vec.at         (n_arg)
                                                            :  current_api_call.returned_value_ptr.get();
 
             if (n_arg == n_args)

@@ -57,6 +57,8 @@ BOOL WINAPI WGL::swap_interval_ext(int in_interval)
 
             post_callback_func_ptr(APIInterceptor::APIFUNCTION_WGL_WGLSWAPINTERVALEXT,
                                    post_callback_func_arg,
+                                   0,       /* in_n_args_out   */
+                               nullptr, /* in_args_out_ptr */
                                   &result_arg);
         }
     }

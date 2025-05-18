@@ -57,6 +57,8 @@ GLboolean AI_APIENTRY OpenGL::aiIsEnabled(GLenum cap)
 
             post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLISENABLED,
                                    post_callback_func_arg,
+                                   0,       /* in_n_args_out   */
+                                   nullptr, /* in_args_out_ptr */
                                   &result_arg);
         }
     }

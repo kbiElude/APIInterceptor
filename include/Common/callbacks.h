@@ -19,6 +19,8 @@ namespace APIInterceptor
     /* Callback done after the API call is invoked. */
     typedef void (*PFNPOSTCALLBACKFUNCPROC)(APIFunction                in_api_func,
                                             void*                      in_user_arg_ptr,
+                                            uint32_t                   in_n_args_out,
+                                            const APIFunctionArgument* in_args_out_ptr,
                                             const APIFunctionArgument* out_returned_value_ptr);
 
     void disable_callbacks_for_this_thread();

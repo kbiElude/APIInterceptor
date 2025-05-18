@@ -58,6 +58,8 @@ BOOL WINAPI GDI32::swap_buffers(HDC in_hdc)
 
             post_callback_func_ptr(APIInterceptor::APIFUNCTION_GDI32_SWAPBUFFERS,
                                    post_callback_func_arg,
+                                   0,       /* in_n_args_out   */
+                                   nullptr, /* in_args_out_ptr */
                                   &result_arg);
         }
     }

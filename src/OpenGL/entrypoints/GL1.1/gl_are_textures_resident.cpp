@@ -66,6 +66,8 @@ GLboolean AI_APIENTRY OpenGL::aiAreTexturesResident(GLsizei       n,
 
             post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLARETEXTURESRESIDENT,
                                    post_callback_func_arg,
+                                   0,       /* in_n_args_out   */
+                                   nullptr, /* in_args_out_ptr */
                                   &result_arg);
         }
     }

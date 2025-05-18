@@ -60,6 +60,8 @@ BOOL WINAPI WGL::share_lists(HGLRC in_hglrc1,
 
             post_callback_func_ptr(APIInterceptor::APIFUNCTION_WGL_WGLSHARELISTS,
                                    post_callback_func_arg,
+                                   0,       /* in_n_args_out   */
+                               nullptr, /* in_args_out_ptr */
                                   &result_arg);
         }
     }

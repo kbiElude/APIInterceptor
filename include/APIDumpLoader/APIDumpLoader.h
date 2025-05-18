@@ -15,7 +15,8 @@ namespace APIDumpLoader
     /* Forward decls */
     typedef struct DumpedAPICall
     {
-        std::vector<APIInterceptor::APIFunctionArgument>     arg_vec;
+        std::vector<APIInterceptor::APIFunctionArgument>     arg_in_vec;
+        std::vector<APIInterceptor::APIFunctionArgument>     arg_out_vec;
         APIInterceptor::APIFunction                          func               = APIInterceptor::APIFunction::APIFUNCTION_UNKNOWN;
         std::unique_ptr<APIInterceptor::APIFunctionArgument> returned_value_ptr;
     } DumpedAPICall;
@@ -24,7 +25,7 @@ namespace APIDumpLoader
     {
         std::vector<uint8_t>    data_u8_vec;
         std::array<uint32_t, 2> extents;
-    };
+    } DumpedSurface;
 
     typedef std::vector<uint8_t>                 DataChunk;
     typedef std::unique_ptr<DataChunk>           DataChunkUniquePtr;

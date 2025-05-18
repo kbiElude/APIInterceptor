@@ -53,6 +53,8 @@ HDC WINAPI User32::get_dc(HWND in_hwnd)
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_USER32_GETDC,
                                post_callback_func_arg,
+                               0,       /* in_n_args_out   */
+                               nullptr, /* in_args_out_ptr */
                               &result_arg);
     }
 

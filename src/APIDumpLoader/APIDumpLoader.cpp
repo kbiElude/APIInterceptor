@@ -86,23 +86,35 @@ APIDumpLoader::WorkloadUniquePtr APIDumpLoader::create_workload_from_file(const 
                       n_api_call < n_api_calls;
                     ++n_api_call)
         {
-            auto     current_api_call_func   = APIInterceptor::APIFunction::APIFUNCTION_UNKNOWN;
-            auto     current_api_call_ptr    = &result_ptr->dumped_api_call_vec_ptr->at(n_api_call);
-            uint32_t n_current_api_call_args = 0;
+            auto     current_api_call_func       = APIInterceptor::APIFunction::APIFUNCTION_UNKNOWN;
+            auto     current_api_call_ptr        = &result_ptr->dumped_api_call_vec_ptr->at(n_api_call);
+            uint32_t n_current_api_call_in_args  = 0;
+            uint32_t n_current_api_call_out_args = 0;
 
             current_api_call_func  = *reinterpret_cast<const APIInterceptor::APIFunction*>(data_u8_ptr);
             data_u8_ptr           += sizeof(APIInterceptor::APIFunction);
 
-            n_current_api_call_args  = *reinterpret_cast<const uint32_t*>(data_u8_ptr);
-            data_u8_ptr             += sizeof(uint32_t);
+            n_current_api_call_in_args   = *reinterpret_cast<const uint32_t*>(data_u8_ptr);
+            data_u8_ptr                 += sizeof(uint32_t);
 
-            current_api_call_ptr->arg_vec.resize(n_current_api_call_args);
+            n_current_api_call_out_args  = *reinterpret_cast<const uint32_t*>(data_u8_ptr);
+            data_u8_ptr                 += sizeof(uint32_t);
+
+            current_api_call_ptr->arg_in_vec.resize (n_current_api_call_in_args);
+            current_api_call_ptr->arg_out_vec.resize(n_current_api_call_out_args);
 
             for (uint32_t n_api_call_arg = 0;
-                          n_api_call_arg < n_current_api_call_args;
+                          n_api_call_arg < n_current_api_call_in_args;
                         ++n_api_call_arg)
             {
-                data_u8_ptr += current_api_call_ptr->arg_vec.at(n_api_call_arg).deserialize_from_u8_ptr(data_u8_ptr);
+                data_u8_ptr += current_api_call_ptr->arg_in_vec.at(n_api_call_arg).deserialize_from_u8_ptr(data_u8_ptr);
+            }
+
+            for (uint32_t n_api_call_arg = 0;
+                          n_api_call_arg < n_current_api_call_out_args;
+                        ++n_api_call_arg)
+            {
+                data_u8_ptr += current_api_call_ptr->arg_out_vec.at(n_api_call_arg).deserialize_from_u8_ptr(data_u8_ptr);
             }
 
             {

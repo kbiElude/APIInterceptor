@@ -55,7 +55,7 @@ APIDumper::~APIDumper()
             uint8_t*   helper_u8_ptr          =  nullptr;
             const auto helper_u8_vec_pre_size =  helper_u8_vec.size      ();
 
-            helper_u8_vec.resize(helper_u8_vec_pre_size + sizeof(APIInterceptor::APIFunction) + sizeof(uint32_t) );
+            helper_u8_vec.resize(helper_u8_vec_pre_size + sizeof(APIInterceptor::APIFunction) + sizeof(uint32_t) * 2);
 
             helper_u8_ptr = &helper_u8_vec.at(helper_u8_vec_pre_size);
 
@@ -64,12 +64,21 @@ APIDumper::~APIDumper()
 
             *reinterpret_cast<uint32_t*>(helper_u8_ptr)  = current_api_call_ptr->n_args_in;
              helper_u8_ptr                              += sizeof(uint32_t);
+            *reinterpret_cast<uint32_t*>(helper_u8_ptr)  = current_api_call_ptr->n_args_out;
+             helper_u8_ptr                              += sizeof(uint32_t);
 
             for (uint32_t n_api_call_arg = 0;
                           n_api_call_arg < current_api_call_ptr->n_args_in;
                         ++n_api_call_arg)
             {
                 current_api_call_ptr->args_in[n_api_call_arg].serialize_to_u8_vec(&helper_u8_vec);
+            }
+
+            for (uint32_t n_api_call_arg = 0;
+                          n_api_call_arg < current_api_call_ptr->n_args_out;
+                        ++n_api_call_arg)
+            {
+                current_api_call_ptr->args_out[n_api_call_arg].serialize_to_u8_vec(&helper_u8_vec);
             }
 
             current_api_call_ptr->returned_value.serialize_to_u8_vec(&helper_u8_vec);
@@ -207,6 +216,8 @@ end:
 
 void APIDumper::on_post_callback(APIInterceptor::APIFunction                in_api_func,
                                  void*                                      in_user_arg_ptr,
+                                 uint32_t                                   in_n_args_out,
+                                 const APIInterceptor::APIFunctionArgument* in_args_out_ptr,
                                  const APIInterceptor::APIFunctionArgument* in_returned_value_ptr)
 {
     std::lock_guard<std::mutex> guard(g_mutex);
@@ -254,7 +265,15 @@ void APIDumper::on_post_callback(APIInterceptor::APIFunction                in_a
         assert(api_call_item_ptr != nullptr);
         if (api_call_item_ptr != nullptr)
         {
+            api_call_item_ptr->n_args_out     =  in_n_args_out;
             api_call_item_ptr->returned_value = *in_returned_value_ptr;
+
+            for (uint32_t n_arg = 0;
+                          n_arg < in_n_args_out;
+                        ++n_arg)
+            {
+                api_call_item_ptr->args_out[n_arg] = in_args_out_ptr[n_arg];
+            }
         }
     }
 

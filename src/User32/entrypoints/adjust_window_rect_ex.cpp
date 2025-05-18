@@ -62,10 +62,23 @@ BOOL WINAPI User32::adjust_window_rect_ex(LPRECT in_rect_ptr,
                                                       &post_callback_func_ptr,
                                                       &post_callback_func_arg) )
     {
-        const auto result_arg = APIInterceptor::APIFunctionArgument::create_i32(result);
+        const auto result_arg         = APIInterceptor::APIFunctionArgument::create_i32(result);
+        const auto rect_data_chunk_id = APIInterceptor::register_data_chunk            (in_rect_ptr,
+                                                                                        (in_rect_ptr != nullptr) ? sizeof(RECT)
+                                                                                                                 : 0);
+
+        const APIInterceptor::APIFunctionArgument args[] =
+        {
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(rect_data_chunk_id),
+            APIInterceptor::APIFunctionArgument::create_u32          (in_style),
+            APIInterceptor::APIFunctionArgument::create_i32          (in_menu),
+            APIInterceptor::APIFunctionArgument::create_u32          (in_ex_style),
+        };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_USER32_ADJUSTWINDOWRECTEX,
                                post_callback_func_arg,
+                               static_cast<uint32_t>(sizeof(args) / sizeof(args[0]) ),
+                               args,
                               &result_arg);
     }
 

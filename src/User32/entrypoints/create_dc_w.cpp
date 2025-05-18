@@ -69,6 +69,8 @@ HDC WINAPI User32::create_dc_w(LPCWSTR         in_driver_ptr,
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_USER32_CREATEDCW,
                                post_callback_func_arg,
+                               0,       /* in_n_args_out   */
+                               nullptr, /* in_args_out_ptr */
                               &result_arg);
     }
 

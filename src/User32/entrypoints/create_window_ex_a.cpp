@@ -106,6 +106,8 @@ HWND WINAPI User32::create_window_ex_a(DWORD     in_ex_style,
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_USER32_CREATEWINDOWEXA,
                                post_callback_func_arg,
+                               0,       /* in_n_args_out   */
+                               nullptr, /* in_args_out_ptr */
                               &result_arg);
     }
 
