@@ -2,7 +2,10 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
+#include <Windows.h>
 #include "Common/callbacks.h"
+#include "GL/gl.h"
+#include "OpenGL/types.h"
 #include "APIDumper.h"
 #include <cassert>
 #include <mutex>
@@ -11,8 +14,9 @@ static std::mutex g_mutex;
 
 
 APIDumper::APIDumper()
-    :m_n_frames_dumped (0),
-     m_n_frames_to_dump(UINT32_MAX)
+    :m_dump_swapchain_on_present(false),
+     m_n_frames_dumped          (0),
+     m_n_frames_to_dump         (UINT32_MAX)
 {
     /* Stub */
 }
@@ -28,16 +32,18 @@ APIDumper::~APIDumper()
 
     if (file_handle != nullptr)
     {
-        const uint32_t       n_api_calls   = static_cast<uint32_t>            (m_dumped_api_call_vec.size() );
-        const uint32_t       n_data_chunks = APIInterceptor::get_n_data_chunks();
+        const uint32_t       n_api_calls       = static_cast<uint32_t>            (m_dumped_api_call_vec.size() );
+        const uint32_t       n_data_chunks     = APIInterceptor::get_n_data_chunks();
+        const uint32_t       n_dumped_surfaces = static_cast<uint32_t>            (m_dumped_surface_vec.size() );
         std::vector<uint8_t> helper_u8_vec;
 
         /* Workload props come first.  */
         {
-            helper_u8_vec.resize(sizeof(uint32_t) * 2 );
+            helper_u8_vec.resize(sizeof(uint32_t) * 3 );
 
             *(reinterpret_cast<uint32_t*>(helper_u8_vec.data() ) + 0) = n_api_calls;
             *(reinterpret_cast<uint32_t*>(helper_u8_vec.data() ) + 1) = n_data_chunks;
+            *(reinterpret_cast<uint32_t*>(helper_u8_vec.data() ) + 2) = n_dumped_surfaces;
         }
 
         /* Follow with API calls ..*/
@@ -69,7 +75,7 @@ APIDumper::~APIDumper()
             current_api_call_ptr->returned_value.serialize_to_u8_vec(&helper_u8_vec);
         }
 
-        /* ..and finish with data chunks */
+        /* ..through data chunks */
         for (uint32_t n_data_chunk = 0;
                       n_data_chunk < n_data_chunks;
                     ++n_data_chunk)
@@ -103,6 +109,28 @@ APIDumper::~APIDumper()
             }
         }
 
+        /* ..finishing off with dumped surfaces, if any */
+        for (uint32_t n_surface = 0;
+                      n_surface < n_dumped_surfaces;
+                    ++n_surface)
+        {
+            uint8_t*   helper_u8_ptr          =  nullptr;
+            const auto helper_u8_vec_pre_size =  helper_u8_vec.size     ();
+            const auto surface_props_ptr      = &m_dumped_surface_vec.at(n_surface);
+
+            helper_u8_vec.resize(helper_u8_vec_pre_size + sizeof(uint32_t) * 3 + surface_props_ptr->u8_vec_ptr->size() );
+
+            helper_u8_ptr = helper_u8_vec.data() + helper_u8_vec_pre_size;
+
+            *(reinterpret_cast<uint32_t*>(helper_u8_ptr) + 0) = surface_props_ptr->extents_u32vec2.at(0);
+            *(reinterpret_cast<uint32_t*>(helper_u8_ptr) + 1) = surface_props_ptr->extents_u32vec2.at(1);
+            *(reinterpret_cast<uint32_t*>(helper_u8_ptr) + 2) = surface_props_ptr->u8_vec_ptr->size  ();
+
+            memcpy(helper_u8_ptr + sizeof(uint32_t) * 3,
+                   surface_props_ptr->u8_vec_ptr->data(),
+                   surface_props_ptr->u8_vec_ptr->size() );
+        }
+
         ::fwrite(helper_u8_vec.data(),
                  helper_u8_vec.size(),
                  1,
@@ -132,8 +160,9 @@ bool APIDumper::init()
 
     /* Load settings */
     {
-        FILE* settings_file_handle = ::fopen("apidumper_settings.bin",
-                                             "rb");
+        uint8_t settings_data_raw_u8vec8[8] = {};
+        FILE*   settings_file_handle        = ::fopen("apidumper_settings.bin",
+                                                      "rb");
 
         if (settings_file_handle == nullptr)
         {
@@ -142,8 +171,8 @@ bool APIDumper::init()
             goto end;
         }
 
-        if (::fread(&m_n_frames_to_dump,
-                     sizeof(m_n_frames_to_dump),
+        if (::fread(settings_data_raw_u8vec8,
+                     sizeof(settings_data_raw_u8vec8),
                      1,
                      settings_file_handle) != 1)
         {
@@ -151,6 +180,9 @@ bool APIDumper::init()
 
             goto end;
         }
+
+        m_n_frames_to_dump          = *reinterpret_cast<const uint32_t*>(settings_data_raw_u8vec8 + 0);
+        m_dump_swapchain_on_present = *reinterpret_cast<const uint32_t*>(settings_data_raw_u8vec8 + 4) != 0;
 
         ::fclose(settings_file_handle);
     }
@@ -246,6 +278,48 @@ void APIDumper::on_pre_callback(APIInterceptor::APIFunction                in_ap
     APIDumper*                  this_ptr(reinterpret_cast<APIDumper*>(in_user_arg_ptr) );
 
     assert(sizeof(DumpedAPICall::args) / sizeof(DumpedAPICall::args[0]) >= in_n_args);
+
+    if (in_api_func                           == APIInterceptor::APIFUNCTION_GDI32_SWAPBUFFERS &&
+        this_ptr->m_n_frames_dumped           <  this_ptr->m_n_frames_to_dump                  &&
+        this_ptr->m_dump_swapchain_on_present)
+    {
+        std::unique_ptr<std::vector<uint8_t> > swapchain_data_u8_vec_ptr;
+        std::array<uint32_t, 2>                swapchain_extents_u32vec2 = {640, 480};
+        RECT                                   window_client_rect        = {};
+        const auto                             window_handle             = ::WindowFromDC(reinterpret_cast<HDC>(const_cast<void*>(in_args_ptr[0].get_ptr() )));
+
+        ::GetClientRect(window_handle,
+                       &window_client_rect);
+
+        swapchain_extents_u32vec2[0] = window_client_rect.right  - window_client_rect.left;
+        swapchain_extents_u32vec2[1] = window_client_rect.bottom - window_client_rect.top;
+
+        swapchain_data_u8_vec_ptr.reset(
+            new std::vector<uint8_t>(swapchain_extents_u32vec2[0] * swapchain_extents_u32vec2[1] * 4 /* rgba8_unorm */)
+        );
+
+        /* Read color buffer */
+        ::glReadPixels(0, /* x */
+                       0, /* y */
+                       swapchain_extents_u32vec2[0],
+                       swapchain_extents_u32vec2[1],
+                       GL_RGBA,
+                       GL_UNSIGNED_BYTE,
+                       swapchain_data_u8_vec_ptr->data() );
+        ::glFinish    ();
+
+        /* Store for later use */
+        {
+            DumpedSurface new_surface;
+
+            new_surface.extents_u32vec2 = swapchain_extents_u32vec2;
+            new_surface.u8_vec_ptr      = std::move(swapchain_data_u8_vec_ptr);
+
+            this_ptr->m_dumped_surface_vec.emplace_back(
+                std::move(new_surface)
+            );
+        }
+    }
 
     /* Do NOT dump the API call if we've already dumped sufficient number of frames! */
     if (this_ptr->m_n_frames_dumped < this_ptr->m_n_frames_to_dump)

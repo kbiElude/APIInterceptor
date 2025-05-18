@@ -11,13 +11,14 @@ int main(int   in_argc,
 {
     std::string apidumper_dll_file_name  = "APIDumperDLL.dll";
     std::string dll_dir;
-    uint32_t    n_file_path_cmd_line_arg = 1;
-    uint32_t    n_frames_to_dump         = UINT32_MAX;
-    int         result                   = EXIT_FAILURE;
+    uint32_t    dump_swapchain_on_present = 0;
+    uint32_t    n_file_path_cmd_line_arg  = 1;
+    uint32_t    n_frames_to_dump          = UINT32_MAX;
+    int         result                    = EXIT_FAILURE;
     std::string working_dir;
 
     /* Parse arguments if specified */
-    if (in_argc > n_file_path_cmd_line_arg)
+    while (static_cast<uint32_t>(in_argc) > n_file_path_cmd_line_arg)
     {
         if (std::string(in_argv[n_file_path_cmd_line_arg]) == "--dump-n-frames")
         {
@@ -49,6 +50,16 @@ int main(int   in_argc,
 
             n_file_path_cmd_line_arg += 2;
         }
+        else
+        if (std::string(in_argv[n_file_path_cmd_line_arg]) == "--dump-swapchain-on-present")
+        {
+            dump_swapchain_on_present = 1;
+            n_file_path_cmd_line_arg  ++;
+        }
+        else
+        {
+            break;
+        }
     }
 
     if (static_cast<uint32_t>(in_argc) <= n_file_path_cmd_line_arg)
@@ -56,11 +67,15 @@ int main(int   in_argc,
         fprintf(stderr,
                 "To dump API calls used by an app, launch it with the following cmd line args:\n"
                 "\n"
-                "APIDumper.exe (--dump-n-frames VALUE) c:\\path\\to\\file\\file.exe (app args)\n"
+                "APIDumper.exe (--dump-n-frames VALUE) (--dump-swapchain-on-present) c:\\path\\to\\file\\file.exe (app args)\n"
                 "\n"
                 "The --dump-n-frames VALUE is optional; if specified, VALUE should be an uint\n"
                 "telling the number of presented frames to include in the dump. By default,\n"
                 "it's UINT32_MAX.\n"
+                "\n"
+                "The --dump-swapchain-on-present is optional; if specified, swapchain contents (color / depth) will\n"
+                "be taken right before present and stored in the dump. Use --dump-n-frames to limit the number of\n"
+                "frames to be dumped.\n"
                 "\n"
                 "If the app takes arguments, specify them by replacing (app args) accordingly.\n"
                 "No arguments? Just skip the part.\n"
@@ -143,6 +158,18 @@ int main(int   in_argc,
         auto              settings_file_handle = ::fopen(settings_filename.c_str(),
                                                          "w+");
 
+        uint8_t settings_data_u8vec8[8] = {};
+
+        static_assert(sizeof(n_frames_to_dump)          == sizeof(uint32_t), "Size mismatch");
+        static_assert(sizeof(dump_swapchain_on_present) == sizeof(uint32_t), "Size mismatch");
+
+        memcpy(settings_data_u8vec8,
+              &n_frames_to_dump,
+               sizeof(uint32_t) );
+        memcpy(settings_data_u8vec8 + sizeof(uint32_t),
+              &dump_swapchain_on_present,
+               sizeof(uint32_t) );
+
         if (settings_file_handle == nullptr)
         {
             fprintf(stderr,
@@ -152,8 +179,8 @@ int main(int   in_argc,
             goto end;
         }
 
-        if (::fwrite(&n_frames_to_dump,
-                     sizeof(uint32_t),
+        if (::fwrite(settings_data_u8vec8,
+                     sizeof(settings_data_u8vec8),
                      1,
                      settings_file_handle) != 1)
         {

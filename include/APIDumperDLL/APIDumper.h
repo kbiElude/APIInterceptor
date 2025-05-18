@@ -5,6 +5,7 @@
 #if !defined(APIDUMPER_H)
 #define APIDUMPER_H
 
+#include <array>
 #include <memory>
 #include <thread>
 
@@ -31,6 +32,12 @@ private:
         std::thread::id                     thread_id;
     };
 
+    struct DumpedSurface
+    {
+        std::array<uint32_t, 2>                extents_u32vec2;
+        std::unique_ptr<std::vector<uint8_t> > u8_vec_ptr;
+    };
+
     /* Private funcs */
     APIDumper();
 
@@ -47,6 +54,8 @@ private:
 
     /* Private vars */
     std::vector<DumpedAPICall> m_dumped_api_call_vec;
+    std::vector<DumpedSurface> m_dumped_surface_vec;
+    bool                       m_dump_swapchain_on_present;
     uint32_t                   m_n_frames_dumped;
     uint32_t                   m_n_frames_to_dump;
 };

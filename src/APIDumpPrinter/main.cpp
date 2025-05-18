@@ -1,5 +1,7 @@
+#include <Windows.h>
 #include <assert.h>
 #include <stdio.h>
+#include <string>
 #include "APIDumpLoader/APIDumpLoader.h"
 
 const char* get_string(const APIInterceptor::APIFunction& in_func)
@@ -644,7 +646,9 @@ void main(int   in_argc,
         fprintf(stdout,
                 "In order to use the tool, workload file must be specified via cmd line arg. Example:\n"
                 "\n"
-                "APIDumpPrinter drive:\\path\\to\\file.workload\n");
+                "APIDumpPrinter drive:\\path\\to\\file.workload\n"
+                "\n"
+                "If any surface dumps are included in the workload, they will be stored in the working directory.\n");
 
         goto end;
     }
@@ -741,6 +745,56 @@ void main(int   in_argc,
 
         fprintf(stdout,
                 "\n");
+    }
+
+    /* Any surfaces included in the workload? */
+    if (workload_ptr->dumped_surface_vec_ptr->size() > 0)
+    {
+        std::string target_directory;
+        {
+            const DWORD          n_bytes_needed          = ::GetCurrentDirectoryA(0,        /* nBufferLength */
+                                                                                  nullptr); /* lpBuffer      */
+            std::vector<uint8_t> target_directory_u8_vec(n_bytes_needed);
+
+            ::GetCurrentDirectoryA(n_bytes_needed,
+                                   reinterpret_cast<LPTSTR>(target_directory_u8_vec.data() ));
+
+            target_directory = std::string(reinterpret_cast<char*>(target_directory_u8_vec.data() ));
+        }
+
+        for (uint32_t n_surface = 0;
+                      n_surface < workload_ptr->dumped_surface_vec_ptr->size();
+                    ++n_surface)
+        {
+            auto              surface_props_ptr = &workload_ptr->dumped_surface_vec_ptr->at(n_surface);
+            const std::string filename          = target_directory                              +
+                                                  "//surface_"                                  +
+                                                  std::to_string(n_surface)                     +
+                                                  "_"                                           +
+                                                  std::to_string(surface_props_ptr->extents[0]) +
+                                                  "x"                                           +
+                                                  std::to_string(surface_props_ptr->extents[1]) +
+                                                  ".raw";
+            FILE*             file_handle       = nullptr;
+
+            file_handle = ::fopen(filename.c_str(),
+                                  "wb");
+
+            if (file_handle == nullptr)
+            {
+                fprintf(stderr,
+                        "[!] Could not open [%s] for writing.\n",
+                        filename.c_str() );
+
+                continue;
+            }
+
+            ::fwrite(surface_props_ptr->data_u8_vec.data(),
+                     surface_props_ptr->data_u8_vec.size(),
+                     1,
+                     file_handle);
+            ::fclose(file_handle);
+        }
     }
 end:
     ;

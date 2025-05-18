@@ -61,11 +61,13 @@ APIDumpLoader::WorkloadUniquePtr APIDumpLoader::create_workload_from_file(const 
     /* Parse the file.. */
     result_ptr.reset                         (new Workload           () );
     result_ptr->dumped_api_call_vec_ptr.reset(new DumpedAPICallVector() );
+    result_ptr->dumped_surface_vec_ptr.reset (new DumpedSurfaceVector() );
 
     {
         uint8_t* data_u8_ptr   = file_data_u8_vec.data();
         uint32_t n_api_calls   = 0;
         uint32_t n_data_chunks = 0;
+        uint32_t n_surfaces    = 0;
 
         n_api_calls  = *reinterpret_cast<uint32_t*>(data_u8_ptr);
         data_u8_ptr += sizeof(uint32_t);
@@ -73,7 +75,11 @@ APIDumpLoader::WorkloadUniquePtr APIDumpLoader::create_workload_from_file(const 
         n_data_chunks  = *reinterpret_cast<uint32_t*>(data_u8_ptr);
         data_u8_ptr   += sizeof(uint32_t);
 
+        n_surfaces   = *reinterpret_cast<uint32_t*>(data_u8_ptr);
+        data_u8_ptr += sizeof(uint32_t);
+
         result_ptr->dumped_api_call_vec_ptr->resize(n_api_calls);
+        result_ptr->dumped_surface_vec_ptr->resize (n_surfaces);
 
         /* API calls go first. */
         for (uint32_t n_api_call = 0;
@@ -116,10 +122,12 @@ APIDumpLoader::WorkloadUniquePtr APIDumpLoader::create_workload_from_file(const 
         }
 
         /* Data chunks follow. */
+        for (uint32_t n_data_chunk = 0;
+                      n_data_chunk < n_data_chunks;
+                    ++n_data_chunk)
         {
             const auto file_data_u8_end_ptr = file_data_u8_vec.data() + file_data_u8_vec.size();
 
-            while (data_u8_ptr < file_data_u8_end_ptr)
             {
                 const uint32_t     chunk_size         = *reinterpret_cast<const uint32_t*>(data_u8_ptr);
                 DataChunkUniquePtr new_data_chunk_ptr;
@@ -143,8 +151,29 @@ APIDumpLoader::WorkloadUniquePtr APIDumpLoader::create_workload_from_file(const 
 
                 data_u8_ptr += chunk_size;
             }
+        }
 
-            assert(data_u8_ptr == file_data_u8_end_ptr);
+        /* Finish with surfaces. */
+        for (uint32_t n_surface = 0;
+                      n_surface < n_surfaces;
+                    ++n_surface)
+        {
+            uint32_t       n_bytes         = 0;
+            DumpedSurface* new_surface_ptr = &result_ptr->dumped_surface_vec_ptr->at(n_surface);
+
+            new_surface_ptr->extents[0] = *(reinterpret_cast<const uint32_t*>(data_u8_ptr) + 0);
+            new_surface_ptr->extents[1] = *(reinterpret_cast<const uint32_t*>(data_u8_ptr) + 1);
+            n_bytes                    = *(reinterpret_cast<const uint32_t*>(data_u8_ptr) + 2);
+
+            data_u8_ptr += sizeof(uint32_t) * 3;
+
+            new_surface_ptr->data_u8_vec.resize(n_bytes);
+
+            memcpy(new_surface_ptr->data_u8_vec.data(),
+                   data_u8_ptr,
+                   n_bytes);
+
+            data_u8_ptr += n_bytes;
         }
     }
 end:
