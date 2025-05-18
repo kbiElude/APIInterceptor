@@ -600,12 +600,13 @@ const char* get_string(const APIInterceptor::APIFunction& in_func)
         case APIInterceptor::APIFunction::APIFUNCTION_GL_GLVIEWPORT:                                result_ptr = "glViewport";                            break;
         case APIInterceptor::APIFunction::APIFUNCTION_GL_GLWAITSYNC:                                result_ptr = "glWaitSync";                            break;
 
-        case APIInterceptor::APIFunction::APIFUNCTION_USER32_CREATEDCA:       result_ptr = "CreateDCA";       break;
-        case APIInterceptor::APIFunction::APIFUNCTION_USER32_CREATEDCW:       result_ptr = "CreateDCW";       break;
-        case APIInterceptor::APIFunction::APIFUNCTION_USER32_CREATEWINDOWEXA: result_ptr = "CreateWindowExA"; break;
-        case APIInterceptor::APIFunction::APIFUNCTION_USER32_CREATEWINDOWEXW: result_ptr = "CreateWindowExW"; break;
-        case APIInterceptor::APIFunction::APIFUNCTION_USER32_GETDC:           result_ptr = "GetDC";           break;
-        case APIInterceptor::APIFunction::APIFUNCTION_USER32_RELEASEDC:       result_ptr = "ReleaseDC";       break;
+        case APIInterceptor::APIFunction::APIFUNCTION_USER32_ADJUSTWINDOWRECTEX: result_ptr = "AdjustWindowRectEx"; break;
+        case APIInterceptor::APIFunction::APIFUNCTION_USER32_CREATEDCA:          result_ptr = "CreateDCA";          break;
+        case APIInterceptor::APIFunction::APIFUNCTION_USER32_CREATEDCW:          result_ptr = "CreateDCW";          break;
+        case APIInterceptor::APIFunction::APIFUNCTION_USER32_CREATEWINDOWEXA:    result_ptr = "CreateWindowExA";    break;
+        case APIInterceptor::APIFunction::APIFUNCTION_USER32_CREATEWINDOWEXW:    result_ptr = "CreateWindowExW";    break;
+        case APIInterceptor::APIFunction::APIFUNCTION_USER32_GETDC:              result_ptr = "GetDC";              break;
+        case APIInterceptor::APIFunction::APIFUNCTION_USER32_RELEASEDC:          result_ptr = "ReleaseDC";          break;
 
         case APIInterceptor::APIFunction::APIFUNCTION_WGL_WGLCOPYCONTEXT:             result_ptr = "wglCopyContext";             break;
         case APIInterceptor::APIFunction::APIFUNCTION_WGL_WGLCREATECONTEXT:           result_ptr = "wglCreateContext";           break;
