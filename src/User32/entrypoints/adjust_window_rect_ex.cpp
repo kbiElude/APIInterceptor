@@ -53,9 +53,9 @@ BOOL WINAPI User32::adjust_window_rect_ex(LPRECT in_rect_ptr,
     if (should_pass_through)
     {
         result = reinterpret_cast<User32::PFNADJUSTWINDOWRECTEXPROC>(User32::g_cached_adjust_window_rect_ex_func_ptr)(in_rect_ptr,
-                                                                                                                     in_style,
-                                                                                                                     in_menu,
-                                                                                                                     in_ex_style);
+                                                                                                                      in_style,
+                                                                                                                      in_menu,
+                                                                                                                      in_ex_style);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_USER32_ADJUSTWINDOWRECTEX,

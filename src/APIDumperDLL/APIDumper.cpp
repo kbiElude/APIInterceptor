@@ -62,14 +62,14 @@ APIDumper::~APIDumper()
             *reinterpret_cast<APIInterceptor::APIFunction*>(helper_u8_ptr)  = current_api_call_ptr->api_func;
              helper_u8_ptr                                                 += sizeof(APIInterceptor::APIFunction);
 
-            *reinterpret_cast<uint32_t*>(helper_u8_ptr)  = current_api_call_ptr->n_args;
+            *reinterpret_cast<uint32_t*>(helper_u8_ptr)  = current_api_call_ptr->n_args_in;
              helper_u8_ptr                              += sizeof(uint32_t);
 
             for (uint32_t n_api_call_arg = 0;
-                          n_api_call_arg < current_api_call_ptr->n_args;
+                          n_api_call_arg < current_api_call_ptr->n_args_in;
                         ++n_api_call_arg)
             {
-                current_api_call_ptr->args[n_api_call_arg].serialize_to_u8_vec(&helper_u8_vec);
+                current_api_call_ptr->args_in[n_api_call_arg].serialize_to_u8_vec(&helper_u8_vec);
             }
 
             current_api_call_ptr->returned_value.serialize_to_u8_vec(&helper_u8_vec);
@@ -269,15 +269,15 @@ void APIDumper::on_post_callback(APIInterceptor::APIFunction                in_a
 }
 
 void APIDumper::on_pre_callback(APIInterceptor::APIFunction                in_api_func,
-                                uint32_t                                   in_n_args,
-                                const APIInterceptor::APIFunctionArgument* in_args_ptr,
+                                uint32_t                                   in_n_args_in,
+                                const APIInterceptor::APIFunctionArgument* in_args_in_ptr,
                                 void*                                      in_user_arg_ptr,
                                 bool*                                      out_should_pass_through_ptr)
 {
     std::lock_guard<std::mutex> guard   (g_mutex);
     APIDumper*                  this_ptr(reinterpret_cast<APIDumper*>(in_user_arg_ptr) );
 
-    assert(sizeof(DumpedAPICall::args) / sizeof(DumpedAPICall::args[0]) >= in_n_args);
+    assert(sizeof(DumpedAPICall::args_in) / sizeof(DumpedAPICall::args_in[0]) >= in_n_args_in);
 
     if (in_api_func                           == APIInterceptor::APIFUNCTION_GDI32_SWAPBUFFERS &&
         this_ptr->m_n_frames_dumped           <  this_ptr->m_n_frames_to_dump                  &&
@@ -286,7 +286,7 @@ void APIDumper::on_pre_callback(APIInterceptor::APIFunction                in_ap
         std::unique_ptr<std::vector<uint8_t> > swapchain_data_u8_vec_ptr;
         std::array<uint32_t, 2>                swapchain_extents_u32vec2 = {640, 480};
         RECT                                   window_client_rect        = {};
-        const auto                             window_handle             = ::WindowFromDC(reinterpret_cast<HDC>(const_cast<void*>(in_args_ptr[0].get_ptr() )));
+        const auto                             window_handle             = ::WindowFromDC(reinterpret_cast<HDC>(const_cast<void*>(in_args_in_ptr[0].get_ptr() )));
 
         ::GetClientRect(window_handle,
                        &window_client_rect);
@@ -334,14 +334,14 @@ void APIDumper::on_pre_callback(APIInterceptor::APIFunction                in_ap
             DumpedAPICall new_item;
 
             new_item.api_func  = in_api_func;
-            new_item.n_args    = in_n_args;
+            new_item.n_args_in = in_n_args_in;
             new_item.thread_id = std::this_thread::get_id();
 
             for (uint32_t n_arg = 0;
-                          n_arg < in_n_args;
+                          n_arg < in_n_args_in;
                         ++n_arg)
             {
-                new_item.args[n_arg] = in_args_ptr[n_arg];
+                new_item.args_in[n_arg] = in_args_in_ptr[n_arg];
             }
 
             this_ptr->m_dumped_api_call_vec.emplace_back(new_item);
