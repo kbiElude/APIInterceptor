@@ -7,6 +7,7 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL1.0/gl_tex_image_2d.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/utils.h"
 #include "OpenGL/utils_enum.h"
 #include "WGL/globals.h"
 
@@ -42,17 +43,25 @@ void AI_APIENTRY OpenGL::aiTexImage2D(GLenum      target,
                                                          &callback_func_ptr,
                                                          &callback_func_arg) )
         {
+            const auto n_pixels_bytes       = Utils::get_n_texture_data_bytes    (width,
+                                                                                  height,
+                                                                                  1,
+                                                                                  format,
+                                                                                  type);
+            const auto pixels_data_chunk_id = APIInterceptor::register_data_chunk(pixels,
+                                                                                  n_pixels_bytes);
+
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32     (target),
-                APIInterceptor::APIFunctionArgument::create_i32     (level),
-                APIInterceptor::APIFunctionArgument::create_i32     (internalformat),
-                APIInterceptor::APIFunctionArgument::create_i32     (width),
-                APIInterceptor::APIFunctionArgument::create_i32     (height),
-                APIInterceptor::APIFunctionArgument::create_i32     (border),
-                APIInterceptor::APIFunctionArgument::create_u32     (format),
-                APIInterceptor::APIFunctionArgument::create_u32     (type),
-                APIInterceptor::APIFunctionArgument::create_void_ptr(pixels)
+                APIInterceptor::APIFunctionArgument::create_u32          (target),
+                APIInterceptor::APIFunctionArgument::create_i32          (level),
+                APIInterceptor::APIFunctionArgument::create_i32          (internalformat),
+                APIInterceptor::APIFunctionArgument::create_i32          (width),
+                APIInterceptor::APIFunctionArgument::create_i32          (height),
+                APIInterceptor::APIFunctionArgument::create_i32          (border),
+                APIInterceptor::APIFunctionArgument::create_u32          (format),
+                APIInterceptor::APIFunctionArgument::create_u32          (type),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(pixels_data_chunk_id)
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLTEXIMAGE2D,
