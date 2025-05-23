@@ -57,7 +57,7 @@ HGLRC WINAPI WGL::create_context(HDC in_hdc)
             post_callback_func_ptr(APIInterceptor::APIFUNCTION_WGL_WGLCREATECONTEXT,
                                    post_callback_func_arg,
                                    0,       /* in_n_args_out   */
-                               nullptr, /* in_args_out_ptr */
+                                   nullptr, /* in_args_out_ptr */
                                   &result_arg);
         }
     }

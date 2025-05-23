@@ -12,10 +12,12 @@
 void AI_APIENTRY OpenGL::aiGenTextures(GLsizei n,
                                        GLuint* textures)
 {
-    void*                                  callback_func_arg   = nullptr;
-    APIInterceptor::PFNPRECALLBACKFUNCPROC callback_func_ptr   = nullptr;
-    bool                                   should_pass_through = true;
-    APIInterceptor::Tracker                tracker;
+    void*                                   post_callback_func_arg = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
+    void*                                   pre_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
+    bool                                    should_pass_through    = true;
+    APIInterceptor::Tracker                 tracker;
 
     if (tracker.is_top_level_api_call() )
     {
@@ -24,8 +26,8 @@ void AI_APIENTRY OpenGL::aiGenTextures(GLsizei n,
                  textures);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGENTEXTURES,
-                                                         &callback_func_ptr,
-                                                         &callback_func_arg) )
+                                                         &pre_callback_func_ptr,
+                                                         &pre_callback_func_arg) )
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
@@ -33,11 +35,11 @@ void AI_APIENTRY OpenGL::aiGenTextures(GLsizei n,
                 APIInterceptor::APIFunctionArgument::create_u32_ptr(textures),
             };
 
-            callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGENTEXTURES,
-                              sizeof(args) / sizeof(args[0]),
-                              args,
-                              callback_func_arg,
-                             &should_pass_through);
+            pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGENTEXTURES,
+                                  sizeof(args) / sizeof(args[0]),
+                                  args,
+                                  pre_callback_func_arg,
+                                 &should_pass_through);
         }
     }
 
@@ -48,5 +50,27 @@ void AI_APIENTRY OpenGL::aiGenTextures(GLsizei n,
     {
         reinterpret_cast<PFNGLGENTEXTURESPROC>(OpenGL::g_cached_gl_gen_textures)(n,
                                                                                  textures);
+    }
+
+    if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGENTEXTURES,
+                                                      &post_callback_func_ptr,
+                                                      &post_callback_func_arg) )
+    {
+        APIInterceptor::APIFunctionArgument result_arg;
+        const auto                          textures_chunk_id = APIInterceptor::register_data_chunk(textures,
+                                                                                                    (textures != nullptr) ? sizeof(GLsizei) * sizeof(GLuint)
+                                                                                                                          : 0);
+
+        const APIInterceptor::APIFunctionArgument args[] =
+        {
+            APIInterceptor::APIFunctionArgument::create_i32           (n),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(textures_chunk_id),
+        };
+
+        post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGENTEXTURES,
+                               post_callback_func_arg,
+                               static_cast<uint32_t>(sizeof(args) / sizeof(args[0]) ),
+                               args,
+                              &result_arg);
     }
 }
