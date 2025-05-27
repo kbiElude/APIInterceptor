@@ -293,8 +293,7 @@ void APIDumper::on_pre_callback(APIInterceptor::APIFunction                in_ap
                                 void*                                      in_user_arg_ptr,
                                 bool*                                      out_should_pass_through_ptr)
 {
-    std::lock_guard<std::mutex> guard   (g_mutex);
-    APIDumper*                  this_ptr(reinterpret_cast<APIDumper*>(in_user_arg_ptr) );
+    APIDumper* this_ptr(reinterpret_cast<APIDumper*>(in_user_arg_ptr) );
 
     assert(sizeof(DumpedAPICall::args_in) / sizeof(DumpedAPICall::args_in[0]) >= in_n_args_in);
 
@@ -329,7 +328,8 @@ void APIDumper::on_pre_callback(APIInterceptor::APIFunction                in_ap
 
         /* Store for later use */
         {
-            DumpedSurface new_surface;
+            std::lock_guard<std::mutex> guard      (g_mutex);
+            DumpedSurface               new_surface;
 
             new_surface.extents_u32vec2 = swapchain_extents_u32vec2;
             new_surface.u8_vec_ptr      = std::move(swapchain_data_u8_vec_ptr);
@@ -363,7 +363,11 @@ void APIDumper::on_pre_callback(APIInterceptor::APIFunction                in_ap
                 new_item.args_in[n_arg] = in_args_in_ptr[n_arg];
             }
 
-            this_ptr->m_dumped_api_call_vec.emplace_back(new_item);
+            {
+                std::lock_guard<std::mutex> guard(g_mutex);
+
+                this_ptr->m_dumped_api_call_vec.emplace_back(new_item);
+            }
         }
     }
 
