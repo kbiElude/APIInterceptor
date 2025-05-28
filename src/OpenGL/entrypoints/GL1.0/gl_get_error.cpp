@@ -28,7 +28,7 @@ GLenum AI_APIENTRY OpenGL::aiGetError(void)
                                                          &pre_callback_func_ptr,
                                                          &pre_callback_func_arg) )
         {
-            pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETDOUBLEV,
+            pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETERROR,
                                   0,       /* in_n_args   */
                                   nullptr, /* in_args_ptr */
                                   pre_callback_func_arg,
