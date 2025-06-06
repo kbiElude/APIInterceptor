@@ -5,7 +5,7 @@
 #include "Common/logger.h"
 #include "OpenGL/entrypoints/GL3.0/gl_begin_transform_feedback.h"
 #include "OpenGL/globals.h"
-#include "OpenGL/utils_enum.h"
+#include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
 void AI_APIENTRY OpenGL::aiBeginTransformFeedback(GLenum primitiveMode)

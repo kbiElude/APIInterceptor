@@ -5,7 +5,7 @@
 #include "Common/logger.h"
 #include "OpenGL/entrypoints/GL1.3/gl_compressed_tex_image_1d.h"
 #include "OpenGL/globals.h"
-#include "OpenGL/utils_enum.h"
+#include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
 void AI_APIENTRY OpenGL::aiCompressedTexImage1D(GLenum      target,

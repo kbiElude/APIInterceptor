@@ -5,7 +5,7 @@
 #include "Common/logger.h"
 #include "OpenGL/entrypoints/GL3.0/gl_get_tex_parameter_i_iv.h"
 #include "OpenGL/globals.h"
-#include "OpenGL/utils_enum.h"
+#include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
 void AI_APIENTRY OpenGL::aiGetTexParameterIiv(GLenum target,

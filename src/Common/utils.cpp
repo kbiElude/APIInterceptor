@@ -3,7 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "Common/utils.h"
-#include "OpenGL/utils_enum.h"
+#include "OpenGLUtils/utils_enum.h"
 #include <cassert>
 #include <sstream>
 

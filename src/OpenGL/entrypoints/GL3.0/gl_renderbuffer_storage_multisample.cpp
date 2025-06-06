@@ -5,7 +5,7 @@
 #include "Common/logger.h"
 #include "OpenGL/entrypoints/GL3.0/gl_renderbuffer_storage_multisample.h"
 #include "OpenGL/globals.h"
-#include "OpenGL/utils_enum.h"
+#include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
 void AI_APIENTRY OpenGL::aiRenderbufferStorageMultisample(GLenum  target,

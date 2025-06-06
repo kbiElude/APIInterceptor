@@ -7,7 +7,7 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL1.1/gl_polygon_stipple.h"
 #include "OpenGL/globals.h"
-#include "OpenGL/utils_enum.h"
+#include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
 void AI_APIENTRY OpenGL::aiPolygonStipple(const GLubyte *mask)

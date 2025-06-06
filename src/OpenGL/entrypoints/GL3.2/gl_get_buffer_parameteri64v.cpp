@@ -5,7 +5,7 @@
 #include "Common/logger.h"
 #include "OpenGL/entrypoints/GL3.2/gl_get_buffer_parameteri64v.h"
 #include "OpenGL/globals.h"
-#include "OpenGL/utils_enum.h"
+#include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
 void AI_APIENTRY OpenGL::aiGetBufferParameteri64v(GLenum   target,

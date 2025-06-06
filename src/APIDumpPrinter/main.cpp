@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string>
 #include "APIDumpLoader/APIDumpLoader.h"
+#include "OpenGLUtils/utils_enum.h"
 
 const char* get_string(const APIInterceptor::APIFunction& in_func)
 {
@@ -721,6 +722,26 @@ void main(int   in_argc,
                     case APIInterceptor::APIFunctionArgumentType::ARGTYPE_VOID_PTR: fprintf(stdout, "[!] 0x%p", current_arg_ptr->get_ptr     () ); break;
 
                     case APIInterceptor::APIFunctionArgumentType::ARGTYPE_DATA_CHUNK_ID:  fprintf(stdout, "[data chunk %d]", current_arg_ptr->get_data_chunk_id() ); break;
+
+                    case APIInterceptor::APIFunctionArgumentType::ARGTYPE_I32_GLENUM:
+                    {
+                        const auto arg_gl_enum = current_arg_ptr->get_i32_glenum();
+
+                        fprintf(stdout,
+                                OpenGL::Utils::get_raw_string_for_gl_enum(arg_gl_enum) );
+
+                        break;
+                    }
+
+                    case APIInterceptor::APIFunctionArgumentType::ARGTYPE_U32_GLENUM:
+                    {
+                        const auto arg_gl_enum = current_arg_ptr->get_u32_glenum();
+
+                        fprintf(stdout,
+                                OpenGL::Utils::get_raw_string_for_gl_enum(arg_gl_enum) );
+
+                        break;
+                    }
 
                     default:
                     {

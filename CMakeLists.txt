@@ -138,12 +138,20 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
     FILE(GLOB OpenGL32Includes "${APIInterceptor_SOURCE_DIR}/include/OpenGL/*.h")
     FILE(GLOB OpenGL32Sources  "${APIInterceptor_SOURCE_DIR}/src/OpenGL/*.cpp")
 
-    add_library(OpenGL STATIC ${CommonIncludes}
-                            ${KhronosIncludes}
-                            ${OpenGL32EntrypointsSources}
-                            ${OpenGL32EntrypointsIncludes}
-                            ${OpenGL32Sources}
-                            ${OpenGL32Includes})
+    FILE(GLOB OpenGL32UtilsIncludes "${APIInterceptor_SOURCE_DIR}/include/OpenGLUtils/*.h")
+    FILE(GLOB OpenGL32UtilsSources  "${APIInterceptor_SOURCE_DIR}/src/OpenGLUtils/*.cpp")
+
+    add_library(OpenGLUtils STATIC ${OpenGL32UtilsIncludes}
+                                   ${OpenGL32UtilsSources})
+
+    add_library          (OpenGL STATIC ${CommonIncludes}
+                                         ${KhronosIncludes}
+                                         ${OpenGL32EntrypointsSources}
+                                         ${OpenGL32EntrypointsIncludes}
+                                         ${OpenGL32Sources}
+                                         ${OpenGL32Includes})
+    add_dependencies     (OpenGL OpenGLUtils)
+    target_link_libraries(OpenGL OpenGLUtils)
 
     file(GLOB WGLIncludes "${APIInterceptor_SOURCE_DIR}/include/WGL/*.h"
                         "${APIInterceptor_SOURCE_DIR}/include/WGL/entrypoints/*.h"
@@ -221,7 +229,7 @@ if (APIINTERCEPTOR_BUILD_TOOLS)
 
     target_link_libraries(APIDumper      Detours)
     target_link_libraries(APIDumperDLL   APIInterceptor)
-    target_link_libraries(APIDumpPrinter APIDumpLoader)
+    target_link_libraries(APIDumpPrinter APIDumpLoader OpenGLUtils)
 
     add_dependencies(APIDumper APIDumperDLL)
 

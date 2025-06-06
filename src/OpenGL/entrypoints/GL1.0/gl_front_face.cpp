@@ -7,7 +7,7 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL1.0/gl_front_face.h"
 #include "OpenGL/globals.h"
-#include "OpenGL/utils_enum.h"
+#include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
 void AI_APIENTRY OpenGL::aiFrontFace(GLenum mode)

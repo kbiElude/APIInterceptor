@@ -2,10 +2,10 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
-#include "Common/debug.h"
+#include <assert.h>
 #include "Common/globals.h"
 #include "Common/macros.h"
-#include "OpenGL/utils_enum.h"
+#include "OpenGLUtils/utils_enum.h"
 
 /* For GL 1.1 compatibility profile support */
 #include "GL/gl.h"
@@ -48,7 +48,7 @@ const char* OpenGL::Utils::get_raw_string_for_gl_bitfield(const OpenGL::Bitfield
 
         case OpenGL::BitfieldType::Sync_Condition_Mask:
         {
-            AI_ASSERT(in_enum == GL_SYNC_GPU_COMMANDS_COMPLETE);
+            assert(in_enum == GL_SYNC_GPU_COMMANDS_COMPLETE);
 
             snprintf(result,
                      sizeof(result),
@@ -69,7 +69,7 @@ const char* OpenGL::Utils::get_raw_string_for_gl_bitfield(const OpenGL::Bitfield
 
         default:
         {
-            AI_ASSERT_FAIL();
+            assert(false);
         }
     }
 
