@@ -32,9 +32,9 @@ void AI_APIENTRY OpenGL::aiTexGendv(GLenum          coord,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32     (coord),
-                APIInterceptor::APIFunctionArgument::create_u32     (pname),
-                APIInterceptor::APIFunctionArgument::create_fp64_ptr(params),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(coord),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(pname),
+                APIInterceptor::APIFunctionArgument::create_fp64_ptr  (params),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLTEXGENDV,

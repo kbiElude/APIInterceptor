@@ -28,7 +28,7 @@ void AI_APIENTRY OpenGL::aiDepthFunc(GLenum func)
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32(func)
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(func)
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLDEPTHFUNC,

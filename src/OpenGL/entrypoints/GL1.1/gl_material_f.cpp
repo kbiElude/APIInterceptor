@@ -32,9 +32,9 @@ void AI_APIENTRY OpenGL::aiMaterialf(GLenum  face,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32 (face),
-                APIInterceptor::APIFunctionArgument::create_u32 (pname),
-                APIInterceptor::APIFunctionArgument::create_fp32(param),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(face),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(pname),
+                APIInterceptor::APIFunctionArgument::create_fp32      (param),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLMATERIALF,

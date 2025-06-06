@@ -40,13 +40,13 @@ void AI_APIENTRY OpenGL::aiCopyTexImage1D(GLenum  target,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32(target),
-                APIInterceptor::APIFunctionArgument::create_i32(level),
-                APIInterceptor::APIFunctionArgument::create_u32(internalformat),
-                APIInterceptor::APIFunctionArgument::create_i32(x),
-                APIInterceptor::APIFunctionArgument::create_i32(y),
-                APIInterceptor::APIFunctionArgument::create_i32(width),
-                APIInterceptor::APIFunctionArgument::create_i32(border),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(target),
+                APIInterceptor::APIFunctionArgument::create_i32       (level),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(internalformat),
+                APIInterceptor::APIFunctionArgument::create_i32       (x),
+                APIInterceptor::APIFunctionArgument::create_i32       (y),
+                APIInterceptor::APIFunctionArgument::create_i32       (width),
+                APIInterceptor::APIFunctionArgument::create_i32       (border),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLCOPYTEXIMAGE1D,

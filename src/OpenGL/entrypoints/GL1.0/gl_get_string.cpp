@@ -29,7 +29,7 @@ const GLubyte* APIENTRY OpenGL::aiGetString(GLenum name)
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32(name),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(name),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETSTRING,

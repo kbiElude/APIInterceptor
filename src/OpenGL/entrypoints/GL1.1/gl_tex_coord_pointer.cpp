@@ -34,10 +34,10 @@ void AI_APIENTRY OpenGL::aiTexCoordPointer(GLint         size,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_i32     (size),
-                APIInterceptor::APIFunctionArgument::create_u32     (type),
-                APIInterceptor::APIFunctionArgument::create_i32     (stride),
-                APIInterceptor::APIFunctionArgument::create_void_ptr(pointer),
+                APIInterceptor::APIFunctionArgument::create_i32       (size),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(type),
+                APIInterceptor::APIFunctionArgument::create_i32       (stride),
+                APIInterceptor::APIFunctionArgument::create_void_ptr  (pointer),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLTEXCOORDPOINTER,

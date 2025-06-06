@@ -28,7 +28,7 @@ void AI_APIENTRY OpenGL::aiEnableClientState(GLenum array)
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32(array),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(array),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLENABLECLIENTSTATE,

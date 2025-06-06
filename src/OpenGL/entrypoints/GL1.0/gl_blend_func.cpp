@@ -30,8 +30,8 @@ void AI_APIENTRY OpenGL::aiBlendFunc(GLenum sfactor,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32(sfactor),
-                APIInterceptor::APIFunctionArgument::create_u32(dfactor),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(sfactor),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(dfactor),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLBLENDFUNC,

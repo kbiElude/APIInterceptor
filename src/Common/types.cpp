@@ -99,6 +99,13 @@ const int& APIInterceptor::APIFunctionArgument::get_i32() const
     return value.value_i32;
 }
 
+const int& APIInterceptor::APIFunctionArgument::get_i32_glenum() const
+{
+    assert(type == APIFunctionArgumentType::ARGTYPE_I32_GLENUM);
+
+    return value.value_i32;
+
+}
 const int* APIInterceptor::APIFunctionArgument::get_i32_ptr() const
 {
     assert(type == APIFunctionArgumentType::ARGTYPE_I32_PTR);
@@ -114,14 +121,16 @@ uint32_t APIInterceptor::APIFunctionArgument::get_n_arg_value_bytes() const
     {
         case ARGTYPE_DATA_CHUNK_ID: result = static_cast<uint32_t>(sizeof(DataChunkID) ); break;
 
-        case ARGTYPE_F32:      result = static_cast<uint32_t>(sizeof(float)    ); break;
-        case ARGTYPE_F64:      result = static_cast<uint32_t>(sizeof(double)   ); break;
-        case ARGTYPE_I8:       result = static_cast<uint32_t>(sizeof(int8_t)   ); break;
-        case ARGTYPE_I16:      result = static_cast<uint32_t>(sizeof(int16_t)  ); break;
-        case ARGTYPE_I32:      result = static_cast<uint32_t>(sizeof(int32_t)  ); break;
-        case ARGTYPE_U8:       result = static_cast<uint32_t>(sizeof(uint8_t)  ); break;
-        case ARGTYPE_U16:      result = static_cast<uint32_t>(sizeof(uint16_t) ); break;
-        case ARGTYPE_U32:      result = static_cast<uint32_t>(sizeof(uint32_t) ); break;
+        case ARGTYPE_F32:        result = static_cast<uint32_t>(sizeof(float)    ); break;
+        case ARGTYPE_F64:        result = static_cast<uint32_t>(sizeof(double)   ); break;
+        case ARGTYPE_I8:         result = static_cast<uint32_t>(sizeof(int8_t)   ); break;
+        case ARGTYPE_I16:        result = static_cast<uint32_t>(sizeof(int16_t)  ); break;
+        case ARGTYPE_I32:        result = static_cast<uint32_t>(sizeof(int32_t)  ); break;
+        case ARGTYPE_I32_GLENUM: result = static_cast<uint32_t>(sizeof(int32_t)  ); break;
+        case ARGTYPE_U8:         result = static_cast<uint32_t>(sizeof(uint8_t)  ); break;
+        case ARGTYPE_U16:        result = static_cast<uint32_t>(sizeof(uint16_t) ); break;
+        case ARGTYPE_U32:        result = static_cast<uint32_t>(sizeof(uint32_t) ); break;
+        case ARGTYPE_U32_GLENUM: result = static_cast<uint32_t>(sizeof(uint32_t) ); break;
 
         case ARGTYPE_F32_PTR:  /* fall-back */
         case ARGTYPE_F64_PTR:  /* fall-back */
@@ -184,6 +193,13 @@ const unsigned short* APIInterceptor::APIFunctionArgument::get_u16_ptr() const
 const unsigned int& APIInterceptor::APIFunctionArgument::get_u32() const
 {
     assert(type == APIFunctionArgumentType::ARGTYPE_U32);
+
+    return value.value_u32;
+}
+
+const unsigned int& APIInterceptor::APIFunctionArgument::get_u32_glenum() const
+{
+    assert(type == APIFunctionArgumentType::ARGTYPE_U32_GLENUM);
 
     return value.value_u32;
 }

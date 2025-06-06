@@ -30,8 +30,8 @@ void AI_APIENTRY OpenGL::aiAccum(GLenum  op,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32 (op),
-                APIInterceptor::APIFunctionArgument::create_fp32(value),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(op),
+                APIInterceptor::APIFunctionArgument::create_fp32      (value),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLACCUM,

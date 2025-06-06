@@ -42,14 +42,14 @@ void AI_APIENTRY OpenGL::aiCopyTexSubImage2D(GLenum  target,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32(target),
-                APIInterceptor::APIFunctionArgument::create_i32(level),
-                APIInterceptor::APIFunctionArgument::create_i32(xoffset),
-                APIInterceptor::APIFunctionArgument::create_i32(yoffset),
-                APIInterceptor::APIFunctionArgument::create_i32(x),
-                APIInterceptor::APIFunctionArgument::create_i32(y),
-                APIInterceptor::APIFunctionArgument::create_i32(width),
-                APIInterceptor::APIFunctionArgument::create_i32(height),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(target),
+                APIInterceptor::APIFunctionArgument::create_i32       (level),
+                APIInterceptor::APIFunctionArgument::create_i32       (xoffset),
+                APIInterceptor::APIFunctionArgument::create_i32       (yoffset),
+                APIInterceptor::APIFunctionArgument::create_i32       (x),
+                APIInterceptor::APIFunctionArgument::create_i32       (y),
+                APIInterceptor::APIFunctionArgument::create_i32       (width),
+                APIInterceptor::APIFunctionArgument::create_i32       (height),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLCOPYTEXSUBIMAGE2D,

@@ -46,16 +46,16 @@ void AI_APIENTRY OpenGL::aiMap2f(GLenum         target,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32     (target),
-                APIInterceptor::APIFunctionArgument::create_fp32    (u1),
-                APIInterceptor::APIFunctionArgument::create_fp32    (u2),
-                APIInterceptor::APIFunctionArgument::create_i32     (ustride),
-                APIInterceptor::APIFunctionArgument::create_i32     (uorder),
-                APIInterceptor::APIFunctionArgument::create_fp32    (v1),
-                APIInterceptor::APIFunctionArgument::create_fp32    (v2),
-                APIInterceptor::APIFunctionArgument::create_i32     (vstride),
-                APIInterceptor::APIFunctionArgument::create_i32     (vorder),
-                APIInterceptor::APIFunctionArgument::create_fp32_ptr(points),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(target),
+                APIInterceptor::APIFunctionArgument::create_fp32      (u1),
+                APIInterceptor::APIFunctionArgument::create_fp32      (u2),
+                APIInterceptor::APIFunctionArgument::create_i32       (ustride),
+                APIInterceptor::APIFunctionArgument::create_i32       (uorder),
+                APIInterceptor::APIFunctionArgument::create_fp32      (v1),
+                APIInterceptor::APIFunctionArgument::create_fp32      (v2),
+                APIInterceptor::APIFunctionArgument::create_i32       (vstride),
+                APIInterceptor::APIFunctionArgument::create_i32       (vorder),
+                APIInterceptor::APIFunctionArgument::create_fp32_ptr  (points),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLMAP2F,

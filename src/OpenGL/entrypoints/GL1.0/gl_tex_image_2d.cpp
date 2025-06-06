@@ -53,14 +53,14 @@ void AI_APIENTRY OpenGL::aiTexImage2D(GLenum      target,
 
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32          (target),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum   (target),
                 APIInterceptor::APIFunctionArgument::create_i32          (level),
-                APIInterceptor::APIFunctionArgument::create_i32          (internalformat),
+                APIInterceptor::APIFunctionArgument::create_i32_glenum   (internalformat),
                 APIInterceptor::APIFunctionArgument::create_i32          (width),
                 APIInterceptor::APIFunctionArgument::create_i32          (height),
                 APIInterceptor::APIFunctionArgument::create_i32          (border),
-                APIInterceptor::APIFunctionArgument::create_u32          (format),
-                APIInterceptor::APIFunctionArgument::create_u32          (type),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum   (format),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum   (type),
                 APIInterceptor::APIFunctionArgument::create_data_chunk_id(pixels_data_chunk_id)
             };
 

@@ -30,8 +30,8 @@ void AI_APIENTRY OpenGL::aiGetDoublev(GLenum    pname,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32    (pname),
-                APIInterceptor::APIFunctionArgument::create_fp64_ptr(data),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(pname),
+                APIInterceptor::APIFunctionArgument::create_fp64_ptr  (data),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETDOUBLEV,

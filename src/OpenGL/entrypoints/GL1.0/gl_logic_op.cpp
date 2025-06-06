@@ -28,7 +28,7 @@ void AI_APIENTRY OpenGL::aiLogicOp(GLenum opcode)
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32(opcode),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(opcode),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLLOGICOP,

@@ -30,8 +30,8 @@ void AI_APIENTRY OpenGL::aiGetPixelMapfv(GLenum   map,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32     (map),
-                APIInterceptor::APIFunctionArgument::create_fp32_ptr(values),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(map),
+                APIInterceptor::APIFunctionArgument::create_fp32_ptr  (values),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETPIXELMAPFV,

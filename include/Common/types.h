@@ -665,6 +665,9 @@ namespace APIInterceptor
 
         ARGTYPE_DATA_CHUNK_ID,
 
+        ARGTYPE_I32_GLENUM,
+        ARGTYPE_U32_GLENUM,
+
         UNKNOWN
     };
 
@@ -774,6 +777,16 @@ namespace APIInterceptor
             return result;
         }
 
+        static APIFunctionArgument create_i32_glenum(const int& in_value)
+        {
+            APIFunctionArgument result;
+
+            result.type            = ARGTYPE_I32_GLENUM;
+            result.value.value_i32 = in_value;
+
+            return result;
+        }
+
         static APIFunctionArgument create_i32_ptr(const int* in_value_ptr)
         {
             APIFunctionArgument result;
@@ -809,6 +822,16 @@ namespace APIInterceptor
             APIFunctionArgument result;
 
             result.type            = ARGTYPE_U32;
+            result.value.value_u32 = in_value;
+
+            return result;
+        }
+
+        static APIFunctionArgument create_u32_glenum(const unsigned int& in_value)
+        {
+            APIFunctionArgument result;
+
+            result.type            = ARGTYPE_U32_GLENUM;
             result.value.value_u32 = in_value;
 
             return result;
@@ -864,12 +887,14 @@ namespace APIInterceptor
         const short&          get_i16          () const;
         const short*          get_i16_ptr      () const;
         const int&            get_i32          () const;
+        const int&            get_i32_glenum   () const;
         const int*            get_i32_ptr      () const;
         const unsigned char&  get_u8           () const;
         const unsigned char*  get_u8_ptr       () const;
         const unsigned short& get_u16          () const;
         const unsigned short* get_u16_ptr      () const;
         const unsigned int&   get_u32          () const;
+        const unsigned int&   get_u32_glenum   () const;
         const unsigned int*   get_u32_ptr      () const;
         const void*           get_ptr          () const;
 

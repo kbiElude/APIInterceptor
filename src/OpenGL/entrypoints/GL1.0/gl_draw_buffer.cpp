@@ -28,7 +28,7 @@ void AI_APIENTRY OpenGL::aiDrawBuffer(GLenum buf)
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32(buf),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(buf),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLDRAWBUFFER,

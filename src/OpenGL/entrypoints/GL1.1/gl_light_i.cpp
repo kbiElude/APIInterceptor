@@ -32,9 +32,9 @@ void AI_APIENTRY OpenGL::aiLighti(GLenum light,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32(light),
-                APIInterceptor::APIFunctionArgument::create_u32(pname),
-                APIInterceptor::APIFunctionArgument::create_i32(param),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(light),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(pname),
+                APIInterceptor::APIFunctionArgument::create_i32       (param),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLLIGHTI,

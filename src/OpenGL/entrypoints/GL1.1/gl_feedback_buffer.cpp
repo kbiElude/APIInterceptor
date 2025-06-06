@@ -32,9 +32,9 @@ void AI_APIENTRY OpenGL::aiFeedbackBuffer(GLsizei  size,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_i32     (size),
-                APIInterceptor::APIFunctionArgument::create_u32     (type),
-                APIInterceptor::APIFunctionArgument::create_fp32_ptr(buffer),
+                APIInterceptor::APIFunctionArgument::create_i32       (size),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(type),
+                APIInterceptor::APIFunctionArgument::create_fp32_ptr  (buffer),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLFEEDBACKBUFFER,

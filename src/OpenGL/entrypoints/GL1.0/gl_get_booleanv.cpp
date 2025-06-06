@@ -30,8 +30,8 @@ void AI_APIENTRY OpenGL::aiGetBooleanv(GLenum     pname,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32   (pname),
-                APIInterceptor::APIFunctionArgument::create_u8_ptr(data),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(pname),
+                APIInterceptor::APIFunctionArgument::create_u8_ptr    (data),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETBOOLEANV,

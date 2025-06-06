@@ -36,11 +36,11 @@ void AI_APIENTRY OpenGL::aiDrawPixels(GLsizei       width,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_i32     (width),
-                APIInterceptor::APIFunctionArgument::create_i32     (height),
-                APIInterceptor::APIFunctionArgument::create_u32     (format),
-                APIInterceptor::APIFunctionArgument::create_u32     (type),
-                APIInterceptor::APIFunctionArgument::create_void_ptr(pixels),
+                APIInterceptor::APIFunctionArgument::create_i32       (width),
+                APIInterceptor::APIFunctionArgument::create_i32       (height),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(format),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(type),
+                APIInterceptor::APIFunctionArgument::create_void_ptr  (pixels),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLDRAWPIXELS,

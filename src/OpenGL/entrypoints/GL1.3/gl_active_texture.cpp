@@ -28,7 +28,7 @@ void AI_APIENTRY OpenGL::aiActiveTexture(GLenum texture)
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32(texture),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(texture),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLACTIVETEXTURE,

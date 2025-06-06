@@ -28,7 +28,7 @@ void AI_APIENTRY OpenGL::aiEnable(GLenum cap)
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32(cap)
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(cap)
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLENABLE,

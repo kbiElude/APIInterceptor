@@ -42,14 +42,14 @@ void AI_APIENTRY OpenGL::aiTexImage1D(GLenum      target,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32     (target),
-                APIInterceptor::APIFunctionArgument::create_i32     (level),
-                APIInterceptor::APIFunctionArgument::create_i32     (internalformat),
-                APIInterceptor::APIFunctionArgument::create_i32     (width),
-                APIInterceptor::APIFunctionArgument::create_i32     (border),
-                APIInterceptor::APIFunctionArgument::create_u32     (format),
-                APIInterceptor::APIFunctionArgument::create_u32     (type),
-                APIInterceptor::APIFunctionArgument::create_void_ptr(pixels),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(target),
+                APIInterceptor::APIFunctionArgument::create_i32       (level),
+                APIInterceptor::APIFunctionArgument::create_i32_glenum(internalformat),
+                APIInterceptor::APIFunctionArgument::create_i32       (width),
+                APIInterceptor::APIFunctionArgument::create_i32       (border),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(format),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(type),
+                APIInterceptor::APIFunctionArgument::create_void_ptr  (pixels),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLTEXIMAGE1D,

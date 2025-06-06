@@ -32,9 +32,9 @@ void AI_APIENTRY OpenGL::aiInterleavedArrays(GLenum        format,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32     (format),
-                APIInterceptor::APIFunctionArgument::create_i32     (stride),
-                APIInterceptor::APIFunctionArgument::create_void_ptr(pointer),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(format),
+                APIInterceptor::APIFunctionArgument::create_i32       (stride),
+                APIInterceptor::APIFunctionArgument::create_void_ptr  (pointer),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLINTERLEAVEDARRRAYS,

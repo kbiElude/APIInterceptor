@@ -30,8 +30,8 @@ void AI_APIENTRY OpenGL::aiAlphaFunc(GLenum   func,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32 (func),
-                APIInterceptor::APIFunctionArgument::create_fp32(ref),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(func),
+                APIInterceptor::APIFunctionArgument::create_fp32      (ref),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLALPHAFUNC,

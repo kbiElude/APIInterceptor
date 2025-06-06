@@ -32,9 +32,9 @@ void AI_APIENTRY OpenGL::aiGetMapdv(GLenum    target,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32     (target),
-                APIInterceptor::APIFunctionArgument::create_u32     (query),
-                APIInterceptor::APIFunctionArgument::create_fp64_ptr(v),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(target),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(query),
+                APIInterceptor::APIFunctionArgument::create_fp64_ptr  (v),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETMAPDV,

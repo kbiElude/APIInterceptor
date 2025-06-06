@@ -30,8 +30,8 @@ void AI_APIENTRY OpenGL::aiGetClipPlane(GLenum    plane,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32     (plane),
-                APIInterceptor::APIFunctionArgument::create_fp64_ptr(equation),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(plane),
+                APIInterceptor::APIFunctionArgument::create_fp64_ptr  (equation),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETCLIPPLANE,

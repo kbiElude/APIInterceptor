@@ -36,11 +36,11 @@ void AI_APIENTRY OpenGL::aiEvalMesh2(GLenum mode,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32(mode),
-                APIInterceptor::APIFunctionArgument::create_i32(i1),
-                APIInterceptor::APIFunctionArgument::create_i32(i2),
-                APIInterceptor::APIFunctionArgument::create_i32(j1),
-                APIInterceptor::APIFunctionArgument::create_i32(j2),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(mode),
+                APIInterceptor::APIFunctionArgument::create_i32       (i1),
+                APIInterceptor::APIFunctionArgument::create_i32       (i2),
+                APIInterceptor::APIFunctionArgument::create_i32       (j1),
+                APIInterceptor::APIFunctionArgument::create_i32       (j2),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLEVALMESH2,

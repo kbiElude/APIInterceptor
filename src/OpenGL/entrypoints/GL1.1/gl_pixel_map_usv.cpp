@@ -32,9 +32,9 @@ void AI_APIENTRY OpenGL::aiPixelMapusv(GLenum          map,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32    (map),
-                APIInterceptor::APIFunctionArgument::create_i32    (mapsize),
-                APIInterceptor::APIFunctionArgument::create_u16_ptr(values),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(map),
+                APIInterceptor::APIFunctionArgument::create_i32       (mapsize),
+                APIInterceptor::APIFunctionArgument::create_u16_ptr   (values),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLPIXELMAPUSV,

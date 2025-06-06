@@ -34,10 +34,10 @@ void AI_APIENTRY OpenGL::aiGetTexLevelParameterfv(GLenum   target,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32     (target),
-                APIInterceptor::APIFunctionArgument::create_i32     (level),
-                APIInterceptor::APIFunctionArgument::create_u32     (pname),
-                APIInterceptor::APIFunctionArgument::create_fp32_ptr(params),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(target),
+                APIInterceptor::APIFunctionArgument::create_i32       (level),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(pname),
+                APIInterceptor::APIFunctionArgument::create_fp32_ptr  (params),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETTEXLEVELPARAMETERFV,

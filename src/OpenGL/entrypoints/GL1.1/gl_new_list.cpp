@@ -30,8 +30,8 @@ void AI_APIENTRY OpenGL::aiNewList(GLuint list,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32(list),
-                APIInterceptor::APIFunctionArgument::create_u32(mode),
+                APIInterceptor::APIFunctionArgument::create_u32       (list),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(mode),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLNEWLIST,

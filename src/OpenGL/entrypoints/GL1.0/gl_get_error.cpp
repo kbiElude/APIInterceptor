@@ -47,7 +47,7 @@ GLenum AI_APIENTRY OpenGL::aiGetError(void)
                                                           &post_callback_func_ptr,
                                                           &post_callback_func_arg) )
         {
-            const auto result_arg = APIInterceptor::APIFunctionArgument::create_u32(result);
+            const auto result_arg = APIInterceptor::APIFunctionArgument::create_u32_glenum(result);
 
             post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETERROR,
                                    post_callback_func_arg,

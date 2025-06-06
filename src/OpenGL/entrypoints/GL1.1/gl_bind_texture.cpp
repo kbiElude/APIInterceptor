@@ -30,8 +30,8 @@ void AI_APIENTRY OpenGL::aiBindTexture(GLenum target,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32(target),
-                APIInterceptor::APIFunctionArgument::create_u32(texture),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(target),
+                APIInterceptor::APIFunctionArgument::create_u32       (texture),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLBINDTEXTURE,

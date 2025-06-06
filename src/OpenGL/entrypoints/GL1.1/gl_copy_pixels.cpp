@@ -36,11 +36,11 @@ void AI_APIENTRY OpenGL::aiCopyPixels(GLint   x,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_i32(x),
-                APIInterceptor::APIFunctionArgument::create_i32(y),
-                APIInterceptor::APIFunctionArgument::create_i32(width),
-                APIInterceptor::APIFunctionArgument::create_i32(height),
-                APIInterceptor::APIFunctionArgument::create_u32(type),
+                APIInterceptor::APIFunctionArgument::create_i32       (x),
+                APIInterceptor::APIFunctionArgument::create_i32       (y),
+                APIInterceptor::APIFunctionArgument::create_i32       (width),
+                APIInterceptor::APIFunctionArgument::create_i32       (height),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(type),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLCOPYPIXELS,

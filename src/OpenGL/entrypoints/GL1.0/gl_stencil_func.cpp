@@ -32,9 +32,9 @@ void AI_APIENTRY OpenGL::aiStencilFunc(GLenum func,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32(func),
-                APIInterceptor::APIFunctionArgument::create_i32(ref),
-                APIInterceptor::APIFunctionArgument::create_u32(mask),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(func),
+                APIInterceptor::APIFunctionArgument::create_i32       (ref),
+                APIInterceptor::APIFunctionArgument::create_u32       (mask),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLSTENCILFUNC,

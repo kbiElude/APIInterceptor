@@ -30,8 +30,8 @@ void AI_APIENTRY OpenGL::aiColorMaterial(GLenum face,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32(face),
-                APIInterceptor::APIFunctionArgument::create_u32(mode),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(face),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(mode),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLCOLORMATERIAL,

@@ -34,10 +34,10 @@ void AI_APIENTRY OpenGL::aiDrawElements(GLenum      mode,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32     (mode),
-                APIInterceptor::APIFunctionArgument::create_i32     (count),
-                APIInterceptor::APIFunctionArgument::create_u32     (type),
-                APIInterceptor::APIFunctionArgument::create_void_ptr(indices),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(mode),
+                APIInterceptor::APIFunctionArgument::create_i32       (count),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(type),
+                APIInterceptor::APIFunctionArgument::create_void_ptr  (indices),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLDRAWELEMENTS,

@@ -38,12 +38,12 @@ void AI_APIENTRY OpenGL::aiMap1d(GLenum          target,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32     (target),
-                APIInterceptor::APIFunctionArgument::create_fp64    (u1),
-                APIInterceptor::APIFunctionArgument::create_fp64    (u2),
-                APIInterceptor::APIFunctionArgument::create_i32     (stride),
-                APIInterceptor::APIFunctionArgument::create_i32     (order),
-                APIInterceptor::APIFunctionArgument::create_fp64_ptr(points),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(target),
+                APIInterceptor::APIFunctionArgument::create_fp64      (u1),
+                APIInterceptor::APIFunctionArgument::create_fp64      (u2),
+                APIInterceptor::APIFunctionArgument::create_i32       (stride),
+                APIInterceptor::APIFunctionArgument::create_i32       (order),
+                APIInterceptor::APIFunctionArgument::create_fp64_ptr  (points),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLMAP1D,
