@@ -54,6 +54,8 @@ uint32_t OpenGL::Utils::get_n_components_for_format(const GLenum& in_format)
         case GL_BGR:             result = 3; break;
         case GL_BGRA:            result = 4; break;
         case GL_DEPTH_COMPONENT: result = 1; break;
+        case GL_LUMINANCE:       result = 1; break;
+        case GL_LUMINANCE_ALPHA: result = 2; break;
         case GL_RED:             result = 1; break;
         case GL_RG:              result = 2; break;
         case GL_RGB:             result = 3; break;
