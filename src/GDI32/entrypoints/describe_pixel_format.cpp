@@ -66,8 +66,7 @@ int WINAPI GDI32::describe_pixel_format(HDC                     in_hdc,
                                                           &post_callback_func_arg) )
         {
             const auto pfd_data_chunk_id = APIInterceptor::register_data_chunk                      (out_pixel_format_descriptor_ptr,
-                                                                                                     (out_pixel_format_descriptor_ptr != nullptr) ? sizeof(*out_pixel_format_descriptor_ptr)
-                                                                                                                                                  : 0);
+                                                                                                     sizeof(PIXELFORMATDESCRIPTOR) );
             const auto result_arg        = APIInterceptor::APIFunctionArgument::create_data_chunk_id(pfd_data_chunk_id);
 
             post_callback_func_ptr(APIInterceptor::APIFUNCTION_GDI32_DESCRIBEPIXELFORMAT,

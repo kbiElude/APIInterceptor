@@ -104,7 +104,7 @@ bool APIInterceptor::on_api_call_interception_started()
     return result;
 }
 
-APIInterceptor::DataChunkID APIInterceptor::register_data_chunk(const void*     in_data_ptr,
+APIInterceptor::DataChunkID APIInterceptor::register_data_chunk(const void*     in_opt_data_ptr,
                                                                 const uint32_t& in_n_bytes)
 {
     U8VecUniquePtr new_data_chunk_ptr;
@@ -114,11 +114,14 @@ APIInterceptor::DataChunkID APIInterceptor::register_data_chunk(const void*     
         new U8Vec(in_n_bytes)
     );
 
-    if (in_n_bytes != 0)
+    if (in_opt_data_ptr != nullptr)
     {
-        memcpy(new_data_chunk_ptr->data(),
-               in_data_ptr,
-               in_n_bytes);
+        if (in_n_bytes != 0)
+        {
+            memcpy(new_data_chunk_ptr->data(),
+                   in_opt_data_ptr,
+                   in_n_bytes);
+        }
     }
 
     g_data_chunk_vec.emplace_back(
