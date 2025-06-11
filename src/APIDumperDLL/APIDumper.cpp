@@ -366,6 +366,20 @@ void APIDumper::on_pre_callback(APIInterceptor::APIFunction                in_ap
             {
                 std::lock_guard<std::mutex> guard(g_mutex);
 
+                /* Work around an issue in 32-bit builds where we can easily trigger bad_alloc excp here if we run out of
+                 * available mem in the process space. This postpones the moment the exception happens - it will ultimately
+                 * happen, just at a later time.
+                 */
+                #if defined(_X86_)
+                {
+                    if (this_ptr->m_dumped_api_call_vec.size() == this_ptr->m_dumped_api_call_vec.capacity() )
+                    {
+                        /* A small number here gives us longer frame rendering times, potentially yielding more interesting frames. */
+                        this_ptr->m_dumped_api_call_vec.reserve(this_ptr->m_dumped_api_call_vec.size() + 2000);
+                    }
+                }
+                #endif
+
                 this_ptr->m_dumped_api_call_vec.emplace_back(new_item);
             }
         }
