@@ -26,9 +26,12 @@ void AI_APIENTRY OpenGL::aiVertex2sv(const GLshort* v)
                                                          &callback_func_ptr,
                                                          &callback_func_arg) )
         {
+            const auto data_chunk_id = APIInterceptor::register_data_chunk(v,
+                                                                           sizeof(GLshort) * 2);
+
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_i16_ptr(v),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(data_chunk_id),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLVERTEX2SV,

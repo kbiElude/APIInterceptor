@@ -26,9 +26,12 @@ void AI_APIENTRY OpenGL::aiVertex4dv(const GLdouble* v)
                                                          &callback_func_ptr,
                                                          &callback_func_arg) )
         {
+            const auto data_chunk_id = APIInterceptor::register_data_chunk(v,
+                                                                           sizeof(GLdouble) * 4);
+
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_fp64_ptr(v),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(data_chunk_id),
             };
 
             callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLVERTEX4DV,
