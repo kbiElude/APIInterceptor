@@ -133,7 +133,7 @@ APIDumper::~APIDumper()
 
             *(reinterpret_cast<uint32_t*>(helper_u8_ptr) + 0) = surface_props_ptr->extents_u32vec2.at(0);
             *(reinterpret_cast<uint32_t*>(helper_u8_ptr) + 1) = surface_props_ptr->extents_u32vec2.at(1);
-            *(reinterpret_cast<uint32_t*>(helper_u8_ptr) + 2) = surface_props_ptr->u8_vec_ptr->size  ();
+            *(reinterpret_cast<uint32_t*>(helper_u8_ptr) + 2) = static_cast<uint32_t>                (surface_props_ptr->u8_vec_ptr->size() );
 
             memcpy(helper_u8_ptr + sizeof(uint32_t) * 3,
                    surface_props_ptr->u8_vec_ptr->data(),

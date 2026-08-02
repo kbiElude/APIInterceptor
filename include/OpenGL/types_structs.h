@@ -9,9 +9,24 @@
 
 namespace OpenGL
 {
+    struct BufferMappingState
+    {
+        BufferMappingAccess access     = BufferMappingAccess::UNKNOWN;
+        void*               mapped_ptr = nullptr;
+    };
+
+    struct BufferProps
+    {
+        BufferMappingState mapping_state;
+        uint32_t           size_bytes    = 0;
+    };
+
+    typedef std::unique_ptr<BufferProps> BufferPropsUniquePtr;
+
     struct ContextState
     {
-        GLuint bound_buffers[static_cast<size_t>(BufferBindingTarget::COUNT)];
+        GLuint                                           bound_buffers[static_cast<size_t>(BufferBindingTarget::COUNT)];
+        std::unordered_map<GLuint, BufferPropsUniquePtr> buffer_object_id_to_buffer_props_ptr_map;
 
         ContextState();
     };

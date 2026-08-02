@@ -36,6 +36,15 @@ namespace OpenGL
 
         COUNT
     };
+
+    enum class BufferMappingAccess
+    {
+        READ_ONLY,
+        READ_WRITE,
+        WRITE_ONLY,
+
+        UNKNOWN
+    };
 };
 
 #endif /* AI_TYPES_ENUMS_H */

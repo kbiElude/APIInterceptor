@@ -9,6 +9,28 @@
 /* For GL 1.1 compatibility profile support */
 #include "GL/gl.h"
 
+bool OpenGL::Utils::get_buffer_mapping_access_for_gl_enum(const GLenum&        in_access,
+                                                          BufferMappingAccess* out_result_ptr)
+{
+    bool result = true;
+
+    switch (in_access)
+    {
+        case GL_READ_ONLY:  *out_result_ptr = BufferMappingAccess::READ_ONLY;  break;
+        case GL_READ_WRITE: *out_result_ptr = BufferMappingAccess::READ_WRITE; break;
+        case GL_WRITE_ONLY: *out_result_ptr = BufferMappingAccess::WRITE_ONLY; break;
+
+        default:
+        {
+            assert(false);
+
+            result = false;
+        }
+    }
+
+    return result;
+}
+
 bool OpenGL::Utils::get_buffer_binding_target_for_gl_enum(const GLenum&        in_target,
                                                           BufferBindingTarget* out_result_ptr)
 {

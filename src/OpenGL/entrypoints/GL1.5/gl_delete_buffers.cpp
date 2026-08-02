@@ -7,6 +7,7 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL1.5/gl_delete_buffers.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/state_tracker.h"
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
@@ -49,5 +50,17 @@ void AI_APIENTRY OpenGL::aiDeleteBuffers(GLsizei       n,
     {
         reinterpret_cast<PFNGLDELETEBUFFERSPROC>(OpenGL::g_cached_gl_delete_buffers)(n,
                                                                                      buffers);
+    }
+
+    if (tracker.is_top_level_api_call() && buffers != nullptr)
+    {
+        auto& context = OpenGL::get_context_state();
+
+        for (GLsizei n_buffer = 0;
+                     n_buffer < n;
+                   ++n_buffer)
+        {
+            context.buffer_object_id_to_buffer_props_ptr_map.erase(buffers[n_buffer]);
+        }
     }
 }
