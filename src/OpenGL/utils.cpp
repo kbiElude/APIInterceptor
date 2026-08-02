@@ -9,6 +9,27 @@
 /* For GL 1.1 compatibility profile support */
 #include "GL/gl.h"
 
+bool OpenGL::Utils::get_buffer_binding_target_for_gl_enum(const GLenum&        in_target,
+                                                          BufferBindingTarget* out_result_ptr)
+{
+    bool result = true;
+
+    switch (in_target)
+    {
+        case GL_ARRAY_BUFFER:         *out_result_ptr = BufferBindingTarget::ARRAY_BUFFER;         break;
+        case GL_ELEMENT_ARRAY_BUFFER: *out_result_ptr = BufferBindingTarget::ELEMENT_ARRAY_BUFFER; break;
+
+        default:
+        {
+            assert(false);
+
+            result = false;
+        }
+    }
+
+    return result;
+}
+
 uint32_t OpenGL::Utils::get_n_bytes_for_type(const GLenum& in_type)
 {
     uint32_t result = 0;

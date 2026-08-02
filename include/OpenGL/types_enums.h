@@ -28,6 +28,14 @@ namespace OpenGL
         Sync_Condition_Mask, // glFenceSync()
         Wait_Sync_Mask,      // glClientWaitSync()
     };
+
+    enum class BufferBindingTarget
+    {
+        ARRAY_BUFFER,
+        ELEMENT_ARRAY_BUFFER,
+
+        COUNT
+    };
 };
 
 #endif /* AI_TYPES_ENUMS_H */

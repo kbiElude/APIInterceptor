@@ -9,6 +9,13 @@
 
 namespace OpenGL
 {
+    struct ContextState
+    {
+        GLuint bound_buffers[static_cast<size_t>(BufferBindingTarget::COUNT)];
+
+        ContextState();
+    };
+
     struct DispatchTable
     {
         Context* bound_context_ptr;

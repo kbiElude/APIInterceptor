@@ -11,13 +11,15 @@ namespace OpenGL
 {
     namespace Utils
     {
-        uint32_t get_n_bytes_for_type       (const GLenum&   in_type);
-        uint32_t get_n_components_for_format(const GLenum&   in_format);
-        uint32_t get_n_texture_data_bytes   (const uint32_t& in_width,
-                                             const uint32_t& in_height,
-                                             const uint32_t& in_depth,
-                                             const GLenum&   in_format,
-                                             const GLenum&   in_type);
+        bool     get_buffer_binding_target_for_gl_enum(const GLenum&          in_target,
+                                                       BufferBindingTarget*   out_result_ptr);
+        uint32_t get_n_bytes_for_type                 (const GLenum&          in_type);
+        uint32_t get_n_components_for_format          (const GLenum&          in_format);
+        uint32_t get_n_texture_data_bytes             (const uint32_t&        in_width,
+                                                       const uint32_t&        in_height,
+                                                       const uint32_t&        in_depth,
+                                                       const GLenum&          in_format,
+                                                       const GLenum&          in_type);
     }
 };
 

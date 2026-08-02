@@ -7,6 +7,8 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL1.5/gl_bind_buffer.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/state_tracker.h"
+#include "OpenGL/utils.h"
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
@@ -46,5 +48,18 @@ void AI_APIENTRY OpenGL::aiBindBuffer(GLenum target,
     {
         reinterpret_cast<PFNGLBINDBUFFERPROC>(OpenGL::g_cached_gl_bind_buffer)(target,
                                                                                buffer);
+    }
+
+    if (tracker.is_top_level_api_call() )
+    {
+        OpenGL::BufferBindingTarget binding_target;
+
+        if (OpenGL::Utils::get_buffer_binding_target_for_gl_enum(target,
+                                                                 &binding_target) )
+        {
+            auto& context = OpenGL::get_context_state();
+
+            context.bound_buffers[static_cast<size_t>(binding_target)] = buffer;
+        }
     }
 }

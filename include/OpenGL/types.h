@@ -29,4 +29,9 @@ namespace OpenGL
 #include "OpenGL/types_structs.h"
 #include "OpenGL/types_interfaces.h"
 
+namespace OpenGL
+{
+    typedef std::unique_ptr<ContextState> ContextStateUniquePtr;
+}
+
 #endif /* AI_TYPES_H */

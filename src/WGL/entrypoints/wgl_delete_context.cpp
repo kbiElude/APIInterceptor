@@ -6,6 +6,7 @@
 #include "Common/globals.h"
 #include "Common/logger.h"
 #include "Common/tracker.h"
+#include "OpenGL/state_tracker.h"
 #include "WGL/entrypoints/wgl_delete_context.h"
 #include "WGL/globals.h"
 
@@ -41,5 +42,9 @@ BOOL WINAPI WGL::delete_context(HGLRC in_hglrc)
         AI_ASSERT(should_pass_through);
     }
 
-    return reinterpret_cast<PFNWGLDELETECONTEXTPROC>(WGL::g_cached_delete_context_func_ptr)(in_hglrc);
+    const BOOL result = reinterpret_cast<PFNWGLDELETECONTEXTPROC>(WGL::g_cached_delete_context_func_ptr)(in_hglrc);
+
+    OpenGL::on_context_destroyed(in_hglrc);
+
+    return result;
 }
