@@ -2,7 +2,9 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
+#include "Common/callbacks.h"
 #include "Common/logger.h"
+#include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL1.3/gl_sample_coverage.h"
 #include "OpenGL/globals.h"
 #include "OpenGLUtils/utils_enum.h"
@@ -11,12 +13,38 @@
 void AI_APIENTRY OpenGL::aiSampleCoverage(GLfloat   value,
                                           GLboolean invert)
 {
-    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+    void*                                  callback_func_arg   = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC callback_func_ptr   = nullptr;
+    bool                                   should_pass_through = true;
+    APIInterceptor::Tracker                tracker;
 
-    AI_TRACE("glSampleCoverage(value=[%.4f] invert=[%d])",
-             value,
-             (invert == GL_TRUE) ? 1 : 0);
+    if (tracker.is_top_level_api_call() )
+    {
+        AI_TRACE("glSampleCoverage(value=[%.4f] invert=[%d])",
+                 value,
+                 (invert == GL_TRUE) ? 1 : 0);
 
-    reinterpret_cast<PFNGLSAMPLECOVERAGEPROC>(g_cached_gl_sample_coverage)(value,
-                                                                           invert);
+        if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLSAMPLECOVERAGE,
+                                                         &callback_func_ptr,
+                                                         &callback_func_arg) )
+        {
+            const APIInterceptor::APIFunctionArgument args[] =
+            {
+                APIInterceptor::APIFunctionArgument::create_fp32(value),
+                APIInterceptor::APIFunctionArgument::create_u8  (invert),
+            };
+
+            callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLSAMPLECOVERAGE,
+                              sizeof(args) / sizeof(args[0]),
+                              args,
+                              callback_func_arg,
+                             &should_pass_through);
+        }
+    }
+
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLSAMPLECOVERAGEPROC>(g_cached_gl_sample_coverage)(value,
+                                                                               invert);
+    }
 }

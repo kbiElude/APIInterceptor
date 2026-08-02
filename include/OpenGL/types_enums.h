@@ -5,6 +5,19 @@
 #ifndef AI_TYPES_ENUMS_H
 #define AI_TYPES_ENUMS_H
 
+/* Compatibility-profile GL 1.4 point-parameter tokens removed from the core profile.
+ * glcorearb.h and glext.h cannot be included together, so these are defined manually
+ * using their canonical values from the OpenGL registry. */
+#ifndef GL_POINT_SIZE_MIN
+    #define GL_POINT_SIZE_MIN             0x8126
+#endif
+#ifndef GL_POINT_SIZE_MAX
+    #define GL_POINT_SIZE_MAX             0x8127
+#endif
+#ifndef GL_POINT_DISTANCE_ATTENUATION
+    #define GL_POINT_DISTANCE_ATTENUATION 0x8129
+#endif
+
 namespace OpenGL
 {
     enum class BitfieldType
