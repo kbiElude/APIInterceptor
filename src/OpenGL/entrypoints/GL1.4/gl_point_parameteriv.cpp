@@ -4,6 +4,7 @@
  */
 #include "Common/callbacks.h"
 #include "Common/logger.h"
+#include "Common/macros.h"
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL1.4/gl_point_parameteriv.h"
 #include "OpenGL/globals.h"
@@ -13,10 +14,13 @@
 void AI_APIENTRY OpenGL::aiPointParameteriv(GLenum       pname,
                                             const GLint* params)
 {
-    void*                                  callback_func_arg   = nullptr;
-    APIInterceptor::PFNPRECALLBACKFUNCPROC callback_func_ptr   = nullptr;
-    bool                                   should_pass_through = true;
-    APIInterceptor::Tracker                tracker;
+    void*                                   post_callback_func_arg = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
+    void*                                   pre_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
+    bool                                    should_pass_through    = true;
+    APIInterceptor::Tracker                 tracker;
+    uint32_t                                params_chunk_id        = 0;
 
     if (tracker.is_top_level_api_call() )
     {
@@ -24,37 +28,59 @@ void AI_APIENTRY OpenGL::aiPointParameteriv(GLenum       pname,
                  OpenGL::Utils::get_raw_string_for_gl_enum(pname),
                  params);
 
+        AI_ASSERT(pname == GL_POINT_SIZE_MIN             ||
+                  pname == GL_POINT_SIZE_MAX             ||
+                  pname == GL_POINT_FADE_THRESHOLD_SIZE  ||
+                  pname == GL_POINT_DISTANCE_ATTENUATION);
+
+        /* GL_POINT_DISTANCE_ATTENUATION takes 3 ints; all other point pnames take 1. */
+        const uint32_t n_ints = (pname == GL_POINT_DISTANCE_ATTENUATION) ? 3 : 1;
+
+        params_chunk_id = APIInterceptor::register_data_chunk(params,
+                                                              (params != nullptr) ? sizeof(GLint) * n_ints : 0);
+
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLPOINTPARAMETERIV,
-                                                         &callback_func_ptr,
-                                                         &callback_func_arg) )
+                                                         &pre_callback_func_ptr,
+                                                         &pre_callback_func_arg) )
         {
-            AI_ASSERT(pname == GL_POINT_SIZE_MIN             ||
-                      pname == GL_POINT_SIZE_MAX             ||
-                      pname == GL_POINT_FADE_THRESHOLD_SIZE  ||
-                      pname == GL_POINT_DISTANCE_ATTENUATION);
-
-            /* GL_POINT_DISTANCE_ATTENUATION takes 3 ints; all other point pnames take 1. */
-            const uint32_t n_ints          = (pname == GL_POINT_DISTANCE_ATTENUATION) ? 3 : 1;
-            const auto     params_chunk_id = APIInterceptor::register_data_chunk(params,
-                                                                                 (params != nullptr) ? sizeof(GLint) * n_ints : 0);
-
             const APIInterceptor::APIFunctionArgument args[] =
             {
                 APIInterceptor::APIFunctionArgument::create_u32_glenum   (pname),
                 APIInterceptor::APIFunctionArgument::create_data_chunk_id(params_chunk_id),
             };
 
-            callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLPOINTPARAMETERIV,
-                              sizeof(args) / sizeof(args[0]),
-                              args,
-                              callback_func_arg,
-                             &should_pass_through);
+            pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLPOINTPARAMETERIV,
+                                  sizeof(args) / sizeof(args[0]),
+                                  args,
+                                  pre_callback_func_arg,
+                                 &should_pass_through);
         }
     }
+
+    AI_ASSERT(should_pass_through);
 
     if (should_pass_through)
     {
         reinterpret_cast<PFNGLPOINTPARAMETERIVPROC>(g_cached_gl_point_parameteriv)(pname,
                                                                                    params);
+    }
+
+    if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLPOINTPARAMETERIV,
+                                                      &post_callback_func_ptr,
+                                                      &post_callback_func_arg) )
+    {
+        APIInterceptor::APIFunctionArgument result_arg;
+
+        const APIInterceptor::APIFunctionArgument args[] =
+        {
+            APIInterceptor::APIFunctionArgument::create_u32_glenum   (pname),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(params_chunk_id),
+        };
+
+        post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLPOINTPARAMETERIV,
+                               post_callback_func_arg,
+                               static_cast<uint32_t>(sizeof(args) / sizeof(args[0]) ),
+                               args,
+                              &result_arg);
     }
 }

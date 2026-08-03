@@ -6,6 +6,9 @@
 #define AI_TYPES_H
 
 #include "Khronos/GL/glcorearb.h"
+#undef GL_VERSION_1_3  /* allow glext.h to define its compat-profile 1.3 typedefs (MultiTexCoord, LoadTransposeMatrix, etc.) */
+#undef GL_VERSION_1_4  /* allow glext.h to define its compat-profile 1.4 typedefs (FogCoord, SecondaryColor, WindowPos) */
+#include "Khronos/GL/glext.h"
 #include <cstdint>
 #include <chrono>
 #include <memory>

@@ -9,7 +9,7 @@
 
 namespace OpenGL
 {
-    void AI_APIENTRY aiRenderMode(GLenum mode);
+    GLint AI_APIENTRY aiRenderMode(GLenum mode);
 }
 
 #endif /* AI_GL_RENDER_MODE_H */

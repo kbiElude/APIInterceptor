@@ -355,10 +355,12 @@ typedef void           (AI_APIENTRY* PFNGLVERTEXPOINTERPROC)         (GLint size
 typedef void           (AI_APIENTRY* PFNGLVIEWPORTPROC)              (GLint x, GLint y, GLsizei width, GLsizei height);
 
 /* GL_EXT_texture_object */
-#define GL_TEXTURE_PRIORITY_EXT   (0x8066)
-#define GL_TEXTURE_RESIDENT_EXT   (0x8067)
-#define GL_TEXTURE_1D_BINDING_EXT 0x8068
-#define GL_TEXTURE_2D_BINDING_EXT 0x8069
-#define GL_TEXTURE_3D_BINDING_EXT 0x806A
+#ifndef GL_TEXTURE_PRIORITY_EXT
+    #define GL_TEXTURE_PRIORITY_EXT   (0x8066)
+    #define GL_TEXTURE_RESIDENT_EXT   (0x8067)
+    #define GL_TEXTURE_1D_BINDING_EXT 0x8068
+    #define GL_TEXTURE_2D_BINDING_EXT 0x8069
+    #define GL_TEXTURE_3D_BINDING_EXT 0x806A
+#endif
 
 #endif /* AI_TYPES_TYPEDEFS_H */

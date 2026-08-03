@@ -4,6 +4,7 @@
  */
 #include "Common/callbacks.h"
 #include "Common/logger.h"
+#include "Common/macros.h"
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL1.1/gl_load_identity.h"
 #include "OpenGL/globals.h"
@@ -12,29 +13,46 @@
 
 void AI_APIENTRY OpenGL::aiLoadIdentity()
 {
-    void*                                  callback_func_arg   = nullptr;
-    APIInterceptor::PFNPRECALLBACKFUNCPROC callback_func_ptr   = nullptr;
-    bool                                   should_pass_through = true;
-    APIInterceptor::Tracker                tracker;
+    void*                                   post_callback_func_arg = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
+    void*                                   pre_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
+    bool                                    should_pass_through    = true;
+    APIInterceptor::Tracker                 tracker;
 
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glLoadIdentity()");
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLLOADIDENTITY,
-                                                         &callback_func_ptr,
-                                                         &callback_func_arg) )
+                                                         &pre_callback_func_ptr,
+                                                         &pre_callback_func_arg) )
         {
-            callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLLOADIDENTITY,
+            pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLLOADIDENTITY,
                               0,
                               nullptr,
-                              callback_func_arg,
+                              pre_callback_func_arg,
                              &should_pass_through);
         }
     }
 
+    AI_ASSERT(should_pass_through);
+
     if (should_pass_through)
     {
         reinterpret_cast<PFNGLLOADIDENTITYPROC>(OpenGL::g_cached_gl_load_identity)();
+    }
+
+    if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLLOADIDENTITY,
+                                                      &post_callback_func_ptr,
+                                                      &post_callback_func_arg) )
+    {
+        APIInterceptor::APIFunctionArgument result_arg;
+
+        post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLLOADIDENTITY,
+                               post_callback_func_arg,
+                               0,
+                               nullptr,
+                              &result_arg);
     }
 }

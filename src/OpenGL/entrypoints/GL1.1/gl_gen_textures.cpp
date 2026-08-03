@@ -32,7 +32,7 @@ void AI_APIENTRY OpenGL::aiGenTextures(GLsizei n,
             const APIInterceptor::APIFunctionArgument args[] =
             {
                 APIInterceptor::APIFunctionArgument::create_i32    (n),
-                APIInterceptor::APIFunctionArgument::create_u32_ptr(textures),
+                APIInterceptor::APIFunctionArgument::create_void_ptr(textures),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGENTEXTURES,

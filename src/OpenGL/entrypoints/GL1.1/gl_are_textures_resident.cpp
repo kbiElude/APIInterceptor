@@ -37,8 +37,8 @@ GLboolean AI_APIENTRY OpenGL::aiAreTexturesResident(GLsizei       n,
             const APIInterceptor::APIFunctionArgument args[] =
             {
                 APIInterceptor::APIFunctionArgument::create_i32    (n),
-                APIInterceptor::APIFunctionArgument::create_u32_ptr(textures),
-                APIInterceptor::APIFunctionArgument::create_u8_ptr (residences),
+                APIInterceptor::APIFunctionArgument::create_void_ptr(textures),
+                APIInterceptor::APIFunctionArgument::create_void_ptr (residences),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLARETEXTURESRESIDENT,
