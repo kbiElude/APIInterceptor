@@ -675,6 +675,34 @@
 #include "OpenGL/entrypoints/GL3.2/gl_tex_image_2d_multisample.h"
 #include "OpenGL/entrypoints/GL3.2/gl_tex_image_3d_multisample.h"
 #include "OpenGL/entrypoints/GL3.2/gl_wait_sync.h"
+#include "OpenGL/entrypoints/GL3.3/gl_bind_frag_data_location_indexed.h"
+#include "OpenGL/entrypoints/GL3.3/gl_bind_sampler.h"
+#include "OpenGL/entrypoints/GL3.3/gl_delete_samplers.h"
+#include "OpenGL/entrypoints/GL3.3/gl_gen_samplers.h"
+#include "OpenGL/entrypoints/GL3.3/gl_get_frag_data_index.h"
+#include "OpenGL/entrypoints/GL3.3/gl_get_query_objecti64v.h"
+#include "OpenGL/entrypoints/GL3.3/gl_get_query_objectui64v.h"
+#include "OpenGL/entrypoints/GL3.3/gl_get_sampler_parameterfv.h"
+#include "OpenGL/entrypoints/GL3.3/gl_get_sampler_parameter_iiv.h"
+#include "OpenGL/entrypoints/GL3.3/gl_get_sampler_parameter_iuiv.h"
+#include "OpenGL/entrypoints/GL3.3/gl_get_sampler_parameteriv.h"
+#include "OpenGL/entrypoints/GL3.3/gl_is_sampler.h"
+#include "OpenGL/entrypoints/GL3.3/gl_query_counter.h"
+#include "OpenGL/entrypoints/GL3.3/gl_sampler_parameterf.h"
+#include "OpenGL/entrypoints/GL3.3/gl_sampler_parameterfv.h"
+#include "OpenGL/entrypoints/GL3.3/gl_sampler_parameteri.h"
+#include "OpenGL/entrypoints/GL3.3/gl_sampler_parameter_iiv.h"
+#include "OpenGL/entrypoints/GL3.3/gl_sampler_parameter_iuiv.h"
+#include "OpenGL/entrypoints/GL3.3/gl_sampler_parameteriv.h"
+#include "OpenGL/entrypoints/GL3.3/gl_vertex_attrib_divisor.h"
+#include "OpenGL/entrypoints/GL3.3/gl_vertex_attrib_p1ui.h"
+#include "OpenGL/entrypoints/GL3.3/gl_vertex_attrib_p1uiv.h"
+#include "OpenGL/entrypoints/GL3.3/gl_vertex_attrib_p2ui.h"
+#include "OpenGL/entrypoints/GL3.3/gl_vertex_attrib_p2uiv.h"
+#include "OpenGL/entrypoints/GL3.3/gl_vertex_attrib_p3ui.h"
+#include "OpenGL/entrypoints/GL3.3/gl_vertex_attrib_p3uiv.h"
+#include "OpenGL/entrypoints/GL3.3/gl_vertex_attrib_p4ui.h"
+#include "OpenGL/entrypoints/GL3.3/gl_vertex_attrib_p4uiv.h"
 
 #include "OpenGL/entrypoints/GL_ARB_color_buffer_float/gl_clamp_color_arb.h"
 
@@ -1232,6 +1260,35 @@ std::unordered_map<std::string, void*> OpenGL::get_func_name_to_func_ptr_map()
     result["glTexImage2DMultisample"]           = OpenGL::aiTexImage2DMultisample;
     result["glTexImage3DMultisample"]           = OpenGL::aiTexImage3DMultisample;
     result["glWaitSync"]                        = OpenGL::aiWaitSync;
+
+    result["glBindFragDataLocationIndexed"] = OpenGL::aiBindFragDataLocationIndexed;
+    result["glBindSampler"]                 = OpenGL::aiBindSampler;
+    result["glDeleteSamplers"]              = OpenGL::aiDeleteSamplers;
+    result["glGenSamplers"]                 = OpenGL::aiGenSamplers;
+    result["glGetFragDataIndex"]            = OpenGL::aiGetFragDataIndex;
+    result["glGetQueryObjecti64v"]          = OpenGL::aiGetQueryObjecti64v;
+    result["glGetQueryObjectui64v"]         = OpenGL::aiGetQueryObjectui64v;
+    result["glGetSamplerParameterfv"]       = OpenGL::aiGetSamplerParameterfv;
+    result["glGetSamplerParameterIiv"]      = OpenGL::aiGetSamplerParameterIiv;
+    result["glGetSamplerParameterIuiv"]     = OpenGL::aiGetSamplerParameterIuiv;
+    result["glGetSamplerParameteriv"]       = OpenGL::aiGetSamplerParameteriv;
+    result["glIsSampler"]                   = OpenGL::aiIsSampler;
+    result["glQueryCounter"]                = OpenGL::aiQueryCounter;
+    result["glSamplerParameterf"]           = OpenGL::aiSamplerParameterf;
+    result["glSamplerParameterfv"]          = OpenGL::aiSamplerParameterfv;
+    result["glSamplerParameteri"]           = OpenGL::aiSamplerParameteri;
+    result["glSamplerParameterIiv"]         = OpenGL::aiSamplerParameterIiv;
+    result["glSamplerParameterIuiv"]        = OpenGL::aiSamplerParameterIuiv;
+    result["glSamplerParameteriv"]          = OpenGL::aiSamplerParameteriv;
+    result["glVertexAttribDivisor"]         = OpenGL::aiVertexAttribDivisor;
+    result["glVertexAttribP1ui"]            = OpenGL::aiVertexAttribP1ui;
+    result["glVertexAttribP1uiv"]           = OpenGL::aiVertexAttribP1uiv;
+    result["glVertexAttribP2ui"]            = OpenGL::aiVertexAttribP2ui;
+    result["glVertexAttribP2uiv"]           = OpenGL::aiVertexAttribP2uiv;
+    result["glVertexAttribP3ui"]            = OpenGL::aiVertexAttribP3ui;
+    result["glVertexAttribP3uiv"]           = OpenGL::aiVertexAttribP3uiv;
+    result["glVertexAttribP4ui"]            = OpenGL::aiVertexAttribP4ui;
+    result["glVertexAttribP4uiv"]           = OpenGL::aiVertexAttribP4uiv;
 
     result["glClampColorARB"] = OpenGL::aiClampColorARB;
 

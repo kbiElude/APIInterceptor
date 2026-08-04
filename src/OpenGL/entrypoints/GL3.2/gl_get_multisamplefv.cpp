@@ -2,7 +2,10 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
+#include "Common/callbacks.h"
 #include "Common/logger.h"
+#include "Common/macros.h"
+#include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL3.2/gl_get_multisamplefv.h"
 #include "OpenGL/globals.h"
 #include "OpenGLUtils/utils_enum.h"
@@ -12,14 +15,68 @@ void AI_APIENTRY OpenGL::aiGetMultisamplefv(GLenum   pname,
                                             GLuint   index,
                                             GLfloat* val)
 {
-    AI_WARN("TODO: API call interception not implemented in %s", __FILE__);
+    void*                                   post_callback_func_arg = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
+    void*                                   pre_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
+    bool                                    should_pass_through    = true;
+    APIInterceptor::Tracker                 tracker;
 
-    AI_TRACE("glGetMultisamplefv(pname=[%s] index=[%u] val=[%p])",
-             OpenGL::Utils::get_raw_string_for_gl_enum(pname),
-             index,
-             val);
+    if (tracker.is_top_level_api_call() )
+    {
+        AI_TRACE("glGetMultisamplefv(pname=[%s] index=[%u] val=[%p])",
+                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 index,
+                 val);
 
-    reinterpret_cast<PFNGLGETMULTISAMPLEFVPROC>(OpenGL::g_cached_gl_get_multisamplefv)(pname,
-                                                                                       index,
-                                                                                       val);
+        if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETMULTISAMPLEFV,
+                                                         &pre_callback_func_ptr,
+                                                         &pre_callback_func_arg) )
+        {
+            const APIInterceptor::APIFunctionArgument args[] =
+            {
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(pname),
+                APIInterceptor::APIFunctionArgument::create_u32       (index),
+                APIInterceptor::APIFunctionArgument::create_fp32_ptr  (val),
+            };
+
+            pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETMULTISAMPLEFV,
+                                  sizeof(args) / sizeof(args[0]),
+                                  args,
+                                  pre_callback_func_arg,
+                                 &should_pass_through);
+        }
+    }
+
+    AI_ASSERT(should_pass_through);
+
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLGETMULTISAMPLEFVPROC>(OpenGL::g_cached_gl_get_multisamplefv)(pname,
+                                                                                            index,
+                                                                                            val);
+    }
+
+    if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETMULTISAMPLEFV,
+                                                      &post_callback_func_ptr,
+                                                      &post_callback_func_arg) )
+    {
+        APIInterceptor::APIFunctionArgument result_arg;
+        /* glGetMultisamplefv always writes 2 floats (x, y sample position) */
+        const auto                          val_chunk_id = APIInterceptor::register_data_chunk(val,
+                                                                                               (val != nullptr) ? sizeof(GLfloat) * 2 : 0);
+
+        const APIInterceptor::APIFunctionArgument args[] =
+        {
+            APIInterceptor::APIFunctionArgument::create_u32_glenum    (pname),
+            APIInterceptor::APIFunctionArgument::create_u32           (index),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id (val_chunk_id),
+        };
+
+        post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETMULTISAMPLEFV,
+                               post_callback_func_arg,
+                               static_cast<uint32_t>(sizeof(args) / sizeof(args[0]) ),
+                               args,
+                              &result_arg);
+    }
 }

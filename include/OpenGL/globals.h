@@ -727,6 +727,36 @@ namespace OpenGL
     extern void* g_cached_gl_vertex_attrib_pointer;
     extern void* g_cached_gl_viewport;
     extern void* g_cached_gl_wait_sync;
+
+    /* GL 3.3 */
+    extern void* g_cached_gl_bind_frag_data_location_indexed;
+    extern void* g_cached_gl_bind_sampler;
+    extern void* g_cached_gl_delete_samplers;
+    extern void* g_cached_gl_gen_samplers;
+    extern void* g_cached_gl_get_frag_data_index;
+    extern void* g_cached_gl_get_query_objecti64v;
+    extern void* g_cached_gl_get_query_objectui64v;
+    extern void* g_cached_gl_get_sampler_parameterfv;
+    extern void* g_cached_gl_get_sampler_parameter_iiv;
+    extern void* g_cached_gl_get_sampler_parameter_iuiv;
+    extern void* g_cached_gl_get_sampler_parameteriv;
+    extern void* g_cached_gl_is_sampler;
+    extern void* g_cached_gl_query_counter;
+    extern void* g_cached_gl_sampler_parameterf;
+    extern void* g_cached_gl_sampler_parameterfv;
+    extern void* g_cached_gl_sampler_parameteri;
+    extern void* g_cached_gl_sampler_parameter_iiv;
+    extern void* g_cached_gl_sampler_parameter_iuiv;
+    extern void* g_cached_gl_sampler_parameteriv;
+    extern void* g_cached_gl_vertex_attrib_divisor;
+    extern void* g_cached_gl_vertex_attrib_p1ui;
+    extern void* g_cached_gl_vertex_attrib_p1uiv;
+    extern void* g_cached_gl_vertex_attrib_p2ui;
+    extern void* g_cached_gl_vertex_attrib_p2uiv;
+    extern void* g_cached_gl_vertex_attrib_p3ui;
+    extern void* g_cached_gl_vertex_attrib_p3uiv;
+    extern void* g_cached_gl_vertex_attrib_p4ui;
+    extern void* g_cached_gl_vertex_attrib_p4uiv;
     extern void* g_cached_gl_window_pos_2d;
     extern void* g_cached_gl_window_pos_2dv;
     extern void* g_cached_gl_window_pos_2f;
