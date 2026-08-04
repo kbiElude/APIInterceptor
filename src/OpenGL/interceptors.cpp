@@ -703,6 +703,52 @@
 #include "OpenGL/entrypoints/GL3.3/gl_vertex_attrib_p3uiv.h"
 #include "OpenGL/entrypoints/GL3.3/gl_vertex_attrib_p4ui.h"
 #include "OpenGL/entrypoints/GL3.3/gl_vertex_attrib_p4uiv.h"
+#include "OpenGL/entrypoints/GL4.0/gl_begin_query_indexed.h"
+#include "OpenGL/entrypoints/GL4.0/gl_bind_transform_feedback.h"
+#include "OpenGL/entrypoints/GL4.0/gl_blend_equationi.h"
+#include "OpenGL/entrypoints/GL4.0/gl_blend_equation_separatei.h"
+#include "OpenGL/entrypoints/GL4.0/gl_blend_funci.h"
+#include "OpenGL/entrypoints/GL4.0/gl_blend_func_separatei.h"
+#include "OpenGL/entrypoints/GL4.0/gl_delete_transform_feedbacks.h"
+#include "OpenGL/entrypoints/GL4.0/gl_draw_arrays_indirect.h"
+#include "OpenGL/entrypoints/GL4.0/gl_draw_elements_indirect.h"
+#include "OpenGL/entrypoints/GL4.0/gl_draw_transform_feedback.h"
+#include "OpenGL/entrypoints/GL4.0/gl_draw_transform_feedback_stream.h"
+#include "OpenGL/entrypoints/GL4.0/gl_end_query_indexed.h"
+#include "OpenGL/entrypoints/GL4.0/gl_gen_transform_feedbacks.h"
+#include "OpenGL/entrypoints/GL4.0/gl_get_active_subroutine_name.h"
+#include "OpenGL/entrypoints/GL4.0/gl_get_active_subroutine_uniformiv.h"
+#include "OpenGL/entrypoints/GL4.0/gl_get_active_subroutine_uniform_name.h"
+#include "OpenGL/entrypoints/GL4.0/gl_get_program_stageiv.h"
+#include "OpenGL/entrypoints/GL4.0/gl_get_query_indexediv.h"
+#include "OpenGL/entrypoints/GL4.0/gl_get_subroutine_index.h"
+#include "OpenGL/entrypoints/GL4.0/gl_get_subroutine_uniform_location.h"
+#include "OpenGL/entrypoints/GL4.0/gl_get_uniformdv.h"
+#include "OpenGL/entrypoints/GL4.0/gl_get_uniform_subroutineuiv.h"
+#include "OpenGL/entrypoints/GL4.0/gl_is_transform_feedback.h"
+#include "OpenGL/entrypoints/GL4.0/gl_min_sample_shading.h"
+#include "OpenGL/entrypoints/GL4.0/gl_patch_parameterfv.h"
+#include "OpenGL/entrypoints/GL4.0/gl_patch_parameteri.h"
+#include "OpenGL/entrypoints/GL4.0/gl_pause_transform_feedback.h"
+#include "OpenGL/entrypoints/GL4.0/gl_resume_transform_feedback.h"
+#include "OpenGL/entrypoints/GL4.0/gl_uniform1d.h"
+#include "OpenGL/entrypoints/GL4.0/gl_uniform1dv.h"
+#include "OpenGL/entrypoints/GL4.0/gl_uniform2d.h"
+#include "OpenGL/entrypoints/GL4.0/gl_uniform2dv.h"
+#include "OpenGL/entrypoints/GL4.0/gl_uniform3d.h"
+#include "OpenGL/entrypoints/GL4.0/gl_uniform3dv.h"
+#include "OpenGL/entrypoints/GL4.0/gl_uniform4d.h"
+#include "OpenGL/entrypoints/GL4.0/gl_uniform4dv.h"
+#include "OpenGL/entrypoints/GL4.0/gl_uniform_matrix2dv.h"
+#include "OpenGL/entrypoints/GL4.0/gl_uniform_matrix2x3dv.h"
+#include "OpenGL/entrypoints/GL4.0/gl_uniform_matrix2x4dv.h"
+#include "OpenGL/entrypoints/GL4.0/gl_uniform_matrix3dv.h"
+#include "OpenGL/entrypoints/GL4.0/gl_uniform_matrix3x2dv.h"
+#include "OpenGL/entrypoints/GL4.0/gl_uniform_matrix3x4dv.h"
+#include "OpenGL/entrypoints/GL4.0/gl_uniform_matrix4dv.h"
+#include "OpenGL/entrypoints/GL4.0/gl_uniform_matrix4x2dv.h"
+#include "OpenGL/entrypoints/GL4.0/gl_uniform_matrix4x3dv.h"
+#include "OpenGL/entrypoints/GL4.0/gl_uniform_subroutinesuiv.h"
 
 #include "OpenGL/entrypoints/GL_ARB_color_buffer_float/gl_clamp_color_arb.h"
 
@@ -1289,6 +1335,53 @@ std::unordered_map<std::string, void*> OpenGL::get_func_name_to_func_ptr_map()
     result["glVertexAttribP3uiv"]           = OpenGL::aiVertexAttribP3uiv;
     result["glVertexAttribP4ui"]            = OpenGL::aiVertexAttribP4ui;
     result["glVertexAttribP4uiv"]           = OpenGL::aiVertexAttribP4uiv;
+
+    result["glBeginQueryIndexed"]              = OpenGL::aiBeginQueryIndexed;
+    result["glBindTransformFeedback"]          = OpenGL::aiBindTransformFeedback;
+    result["glBlendEquationi"]                 = OpenGL::aiBlendEquationi;
+    result["glBlendEquationSeparatei"]         = OpenGL::aiBlendEquationSeparatei;
+    result["glBlendFunci"]                     = OpenGL::aiBlendFunci;
+    result["glBlendFuncSeparatei"]             = OpenGL::aiBlendFuncSeparatei;
+    result["glDeleteTransformFeedbacks"]       = OpenGL::aiDeleteTransformFeedbacks;
+    result["glDrawArraysIndirect"]             = OpenGL::aiDrawArraysIndirect;
+    result["glDrawElementsIndirect"]           = OpenGL::aiDrawElementsIndirect;
+    result["glDrawTransformFeedback"]          = OpenGL::aiDrawTransformFeedback;
+    result["glDrawTransformFeedbackStream"]    = OpenGL::aiDrawTransformFeedbackStream;
+    result["glEndQueryIndexed"]                = OpenGL::aiEndQueryIndexed;
+    result["glGenTransformFeedbacks"]          = OpenGL::aiGenTransformFeedbacks;
+    result["glGetActiveSubroutineName"]        = OpenGL::aiGetActiveSubroutineName;
+    result["glGetActiveSubroutineUniformiv"]   = OpenGL::aiGetActiveSubroutineUniformiv;
+    result["glGetActiveSubroutineUniformName"] = OpenGL::aiGetActiveSubroutineUniformName;
+    result["glGetProgramStageiv"]              = OpenGL::aiGetProgramStageiv;
+    result["glGetQueryIndexediv"]              = OpenGL::aiGetQueryIndexediv;
+    result["glGetSubroutineIndex"]             = OpenGL::aiGetSubroutineIndex;
+    result["glGetSubroutineUniformLocation"]   = OpenGL::aiGetSubroutineUniformLocation;
+    result["glGetUniformdv"]                   = OpenGL::aiGetUniformdv;
+    result["glGetUniformSubroutineuiv"]        = OpenGL::aiGetUniformSubroutineuiv;
+    result["glIsTransformFeedback"]            = OpenGL::aiIsTransformFeedback;
+    result["glMinSampleShading"]               = OpenGL::aiMinSampleShading;
+    result["glPatchParameterfv"]               = OpenGL::aiPatchParameterfv;
+    result["glPatchParameteri"]                = OpenGL::aiPatchParameteri;
+    result["glPauseTransformFeedback"]         = OpenGL::aiPauseTransformFeedback;
+    result["glResumeTransformFeedback"]        = OpenGL::aiResumeTransformFeedback;
+    result["glUniform1d"]                      = OpenGL::aiUniform1d;
+    result["glUniform1dv"]                     = OpenGL::aiUniform1dv;
+    result["glUniform2d"]                      = OpenGL::aiUniform2d;
+    result["glUniform2dv"]                     = OpenGL::aiUniform2dv;
+    result["glUniform3d"]                      = OpenGL::aiUniform3d;
+    result["glUniform3dv"]                     = OpenGL::aiUniform3dv;
+    result["glUniform4d"]                      = OpenGL::aiUniform4d;
+    result["glUniform4dv"]                     = OpenGL::aiUniform4dv;
+    result["glUniformMatrix2dv"]               = OpenGL::aiUniformMatrix2dv;
+    result["glUniformMatrix2x3dv"]             = OpenGL::aiUniformMatrix2x3dv;
+    result["glUniformMatrix2x4dv"]             = OpenGL::aiUniformMatrix2x4dv;
+    result["glUniformMatrix3dv"]               = OpenGL::aiUniformMatrix3dv;
+    result["glUniformMatrix3x2dv"]             = OpenGL::aiUniformMatrix3x2dv;
+    result["glUniformMatrix3x4dv"]             = OpenGL::aiUniformMatrix3x4dv;
+    result["glUniformMatrix4dv"]               = OpenGL::aiUniformMatrix4dv;
+    result["glUniformMatrix4x2dv"]             = OpenGL::aiUniformMatrix4x2dv;
+    result["glUniformMatrix4x3dv"]             = OpenGL::aiUniformMatrix4x3dv;
+    result["glUniformSubroutinesuiv"]          = OpenGL::aiUniformSubroutinesuiv;
 
     result["glClampColorARB"] = OpenGL::aiClampColorARB;
 

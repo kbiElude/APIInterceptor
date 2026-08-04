@@ -1,0 +1,67 @@
+/* API Interceptor (c) 2024 Dominik Witczak
+ *
+ * This code is licensed under MIT license (see LICENSE.txt for details)
+ */
+#include "Common/callbacks.h"
+#include "Common/logger.h"
+#include "Common/macros.h"
+#include "Common/tracker.h"
+#include "OpenGL/entrypoints/GL4.0/gl_is_transform_feedback.h"
+#include "OpenGL/globals.h"
+#include "WGL/globals.h"
+
+GLboolean AI_APIENTRY OpenGL::aiIsTransformFeedback(GLuint id)
+{
+    void*                                   post_callback_func_arg = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
+    void*                                   pre_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
+    GLboolean                               result                 = GL_FALSE;
+    bool                                    should_pass_through    = true;
+    APIInterceptor::Tracker                 tracker;
+
+    if (tracker.is_top_level_api_call() )
+    {
+        AI_TRACE("glIsTransformFeedback(id=[%u])",
+                 id);
+
+        if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLISTRANSFORMFEEDBACK,
+                                                         &pre_callback_func_ptr,
+                                                         &pre_callback_func_arg) )
+        {
+            const APIInterceptor::APIFunctionArgument args[] =
+            {
+                APIInterceptor::APIFunctionArgument::create_u32(id),
+            };
+
+            pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLISTRANSFORMFEEDBACK,
+                                  sizeof(args) / sizeof(args[0]),
+                                  args,
+                                  pre_callback_func_arg,
+                                 &should_pass_through);
+        }
+    }
+
+    if (should_pass_through)
+    {
+        result = reinterpret_cast<PFNGLISTRANSFORMFEEDBACKPROC>(OpenGL::g_cached_gl_is_transform_feedback)(id);
+    }
+
+    if (tracker.is_top_level_api_call() )
+    {
+        if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLISTRANSFORMFEEDBACK,
+                                                          &post_callback_func_ptr,
+                                                          &post_callback_func_arg) )
+        {
+            const auto result_arg = APIInterceptor::APIFunctionArgument::create_u8(result);
+
+            post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLISTRANSFORMFEEDBACK,
+                                   post_callback_func_arg,
+                                   0,
+                                   nullptr,
+                                  &result_arg);
+        }
+    }
+
+    return result;
+}
