@@ -8,6 +8,7 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL1.1/gl_tex_sub_image_2d.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/utils.h"
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
@@ -27,6 +28,7 @@ void AI_APIENTRY OpenGL::aiTexSubImage2D(GLenum      target,
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
     APIInterceptor::Tracker                 tracker;
+    uint32_t                                pixels_data_chunk_id   = 0;
 
     if (tracker.is_top_level_api_call() )
     {
@@ -41,28 +43,35 @@ void AI_APIENTRY OpenGL::aiTexSubImage2D(GLenum      target,
                  OpenGL::Utils::get_raw_string_for_gl_enum(type),
                  pixels);
 
+        pixels_data_chunk_id = APIInterceptor::register_data_chunk(pixels,
+                                                                   Utils::get_n_texture_data_bytes(static_cast<uint32_t>(width),
+                                                                                                   static_cast<uint32_t>(height),
+                                                                                                   1,
+                                                                                                   format,
+                                                                                                   type) );
+
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTEXSUBIMAGE2D,
                                                          &pre_callback_func_ptr,
                                                          &pre_callback_func_arg) )
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32_glenum(target),
-                APIInterceptor::APIFunctionArgument::create_i32       (level),
-                APIInterceptor::APIFunctionArgument::create_i32       (xoffset),
-                APIInterceptor::APIFunctionArgument::create_i32       (yoffset),
-                APIInterceptor::APIFunctionArgument::create_i32       (width),
-                APIInterceptor::APIFunctionArgument::create_i32       (height),
-                APIInterceptor::APIFunctionArgument::create_u32_glenum(format),
-                APIInterceptor::APIFunctionArgument::create_u32_glenum(type),
-                APIInterceptor::APIFunctionArgument::create_void_ptr  (pixels)
+                APIInterceptor::APIFunctionArgument::create_u32_glenum   (target),
+                APIInterceptor::APIFunctionArgument::create_i32          (level),
+                APIInterceptor::APIFunctionArgument::create_i32          (xoffset),
+                APIInterceptor::APIFunctionArgument::create_i32          (yoffset),
+                APIInterceptor::APIFunctionArgument::create_i32          (width),
+                APIInterceptor::APIFunctionArgument::create_i32          (height),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum   (format),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum   (type),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(pixels_data_chunk_id),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLTEXSUBIMAGE2D,
-                              sizeof(args) / sizeof(args[0]),
-                              args,
-                              pre_callback_func_arg,
-                             &should_pass_through);
+                                  sizeof(args) / sizeof(args[0]),
+                                  args,
+                                  pre_callback_func_arg,
+                                 &should_pass_through);
         }
     }
 
@@ -89,15 +98,15 @@ void AI_APIENTRY OpenGL::aiTexSubImage2D(GLenum      target,
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_u32_glenum(target),
-            APIInterceptor::APIFunctionArgument::create_i32       (level),
-            APIInterceptor::APIFunctionArgument::create_i32       (xoffset),
-            APIInterceptor::APIFunctionArgument::create_i32       (yoffset),
-            APIInterceptor::APIFunctionArgument::create_i32       (width),
-            APIInterceptor::APIFunctionArgument::create_i32       (height),
-            APIInterceptor::APIFunctionArgument::create_u32_glenum(format),
-            APIInterceptor::APIFunctionArgument::create_u32_glenum(type),
-            APIInterceptor::APIFunctionArgument::create_void_ptr  (pixels)
+            APIInterceptor::APIFunctionArgument::create_u32_glenum   (target),
+            APIInterceptor::APIFunctionArgument::create_i32          (level),
+            APIInterceptor::APIFunctionArgument::create_i32          (xoffset),
+            APIInterceptor::APIFunctionArgument::create_i32          (yoffset),
+            APIInterceptor::APIFunctionArgument::create_i32          (width),
+            APIInterceptor::APIFunctionArgument::create_i32          (height),
+            APIInterceptor::APIFunctionArgument::create_u32_glenum   (format),
+            APIInterceptor::APIFunctionArgument::create_u32_glenum   (type),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(pixels_data_chunk_id),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLTEXSUBIMAGE2D,

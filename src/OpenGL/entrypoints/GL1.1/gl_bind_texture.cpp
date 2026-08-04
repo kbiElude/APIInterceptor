@@ -8,6 +8,8 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL1.1/gl_bind_texture.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/state_tracker.h"
+#include "OpenGL/utils.h"
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
@@ -51,6 +53,17 @@ void AI_APIENTRY OpenGL::aiBindTexture(GLenum target,
     {
         reinterpret_cast<PFNGLBINDTEXTUREPROC>(OpenGL::g_cached_gl_bind_texture)(target,
                                                                                  texture);
+    }
+
+    if (tracker.is_top_level_api_call() )
+    {
+        TextureBindingTarget binding_target;
+
+        if (Utils::get_texture_binding_target_for_gl_enum(target,
+                                                         &binding_target) )
+        {
+            get_context_state().bound_textures[static_cast<size_t>(binding_target)] = texture;
+        }
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBINDTEXTURE,

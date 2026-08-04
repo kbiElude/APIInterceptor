@@ -6,8 +6,54 @@
 #include "OpenGL/utils.h"
 #include <cassert>
 
-/* For GL 1.1 compatibility profile support */
-#include "GL/gl.h"
+/* gl/gl.h provides compatibility-profile tokens (GL_LUMINANCE, GL_LUMINANCE_ALPHA, etc.)
+ * that are absent from glcorearb.h but valid as pixel transfer formats. */
+#include "gl/gl.h"
+
+bool OpenGL::Utils::get_texture_binding_target_for_gl_enum(const GLenum&         in_target,
+                                                           TextureBindingTarget* out_result_ptr)
+{
+    bool result = true;
+
+    switch (in_target)
+    {
+        case GL_TEXTURE_1D:         *out_result_ptr = TextureBindingTarget::TEXTURE_1D;         break;
+        case GL_TEXTURE_1D_ARRAY:   *out_result_ptr = TextureBindingTarget::TEXTURE_1D_ARRAY;   break;
+        case GL_TEXTURE_2D:         *out_result_ptr = TextureBindingTarget::TEXTURE_2D;         break;
+        case GL_TEXTURE_2D_ARRAY:   *out_result_ptr = TextureBindingTarget::TEXTURE_2D_ARRAY;   break;
+        case GL_TEXTURE_3D:         *out_result_ptr = TextureBindingTarget::TEXTURE_3D;         break;
+        case GL_TEXTURE_BUFFER:     *out_result_ptr = TextureBindingTarget::TEXTURE_BUFFER;     break;
+
+        case GL_TEXTURE_CUBE_MAP:
+        case GL_TEXTURE_CUBE_MAP_POSITIVE_X:
+        case GL_TEXTURE_CUBE_MAP_NEGATIVE_X:
+        case GL_TEXTURE_CUBE_MAP_POSITIVE_Y:
+        case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y:
+        case GL_TEXTURE_CUBE_MAP_POSITIVE_Z:
+        case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z:
+        {
+            *out_result_ptr = TextureBindingTarget::TEXTURE_CUBE_MAP;
+
+            break;
+        }
+
+        case GL_TEXTURE_RECTANGLE:
+        {
+            *out_result_ptr = TextureBindingTarget::TEXTURE_RECTANGLE;
+
+            break;
+        }
+
+        default:
+        {
+            assert(false);
+
+            result = false;
+        }
+    }
+
+    return result;
+}
 
 bool OpenGL::Utils::get_buffer_mapping_access_for_gl_enum(const GLenum&        in_access,
                                                           BufferMappingAccess* out_result_ptr)
@@ -52,31 +98,67 @@ bool OpenGL::Utils::get_buffer_binding_target_for_gl_enum(const GLenum&        i
     return result;
 }
 
+bool OpenGL::Utils::is_packed_pixel_type(const GLenum& in_type)
+{
+    switch (in_type)
+    {
+        case GL_UNSIGNED_BYTE_3_3_2:
+        case GL_UNSIGNED_BYTE_2_3_3_REV:
+        case GL_UNSIGNED_SHORT_5_6_5:
+        case GL_UNSIGNED_SHORT_5_6_5_REV:
+        case GL_UNSIGNED_SHORT_4_4_4_4:
+        case GL_UNSIGNED_SHORT_4_4_4_4_REV:
+        case GL_UNSIGNED_SHORT_5_5_5_1:
+        case GL_UNSIGNED_SHORT_1_5_5_5_REV:
+        case GL_UNSIGNED_INT_8_8_8_8:
+        case GL_UNSIGNED_INT_8_8_8_8_REV:
+        case GL_UNSIGNED_INT_10_10_10_2:
+        case GL_UNSIGNED_INT_2_10_10_10_REV:
+        case GL_UNSIGNED_INT_24_8:
+        case GL_UNSIGNED_INT_5_9_9_9_REV:
+        case GL_UNSIGNED_INT_10F_11F_11F_REV:
+        case GL_FLOAT_32_UNSIGNED_INT_24_8_REV:
+        {
+            return true;
+        }
+
+        default:
+        {
+            return false;
+        }
+    }
+}
+
 uint32_t OpenGL::Utils::get_n_bytes_for_type(const GLenum& in_type)
 {
     uint32_t result = 0;
 
     switch (in_type)
     {
-        case GL_BYTE:                        result = static_cast<uint32_t>(sizeof(int8_t)  );  break;
-        case GL_FLOAT:                       result = static_cast<uint32_t>(sizeof(float)   );  break;
-        case GL_INT:                         result = static_cast<uint32_t>(sizeof(int32_t) );  break;
-        case GL_SHORT:                       result = static_cast<uint32_t>(sizeof(int16_t) );  break;
-        case GL_UNSIGNED_BYTE:               result = static_cast<uint32_t>(sizeof(uint8_t) );  break;
-        case GL_UNSIGNED_BYTE_2_3_3_REV:     result = 1;                                        break;
-        case GL_UNSIGNED_BYTE_3_3_2:         result = 1;                                        break;
-        case GL_UNSIGNED_INT:                result = static_cast<uint32_t>(sizeof(uint32_t) ); break;
-        case GL_UNSIGNED_INT_2_10_10_10_REV: result = 4;                                        break;
-        case GL_UNSIGNED_INT_8_8_8_8:        result = 4;                                        break;
-        case GL_UNSIGNED_INT_8_8_8_8_REV:    result = 4;                                        break;
-        case GL_UNSIGNED_INT_10_10_10_2:     result = 4;                                        break;
-        case GL_UNSIGNED_SHORT:              result = static_cast<uint32_t>(sizeof(uint16_t) ); break;
-        case GL_UNSIGNED_SHORT_1_5_5_5_REV:  result = 2;                                        break;
-        case GL_UNSIGNED_SHORT_4_4_4_4:      result = 2;                                        break;
-        case GL_UNSIGNED_SHORT_4_4_4_4_REV:  result = 2;                                        break;
-        case GL_UNSIGNED_SHORT_5_5_5_1:      result = 2;                                        break;
-        case GL_UNSIGNED_SHORT_5_6_5:        result = 2;                                        break;
-        case GL_UNSIGNED_SHORT_5_6_5_REV:    result = 2;                                        break;
+        case GL_BYTE:                              result = static_cast<uint32_t>(sizeof(int8_t)  );  break;
+        case GL_FLOAT:                             result = static_cast<uint32_t>(sizeof(float)   );  break;
+        case GL_HALF_FLOAT:                        result = 2;                                        break;
+        case GL_INT:                               result = static_cast<uint32_t>(sizeof(int32_t) );  break;
+        case GL_SHORT:                             result = static_cast<uint32_t>(sizeof(int16_t) );  break;
+        case GL_UNSIGNED_BYTE:                     result = static_cast<uint32_t>(sizeof(uint8_t) );  break;
+        case GL_UNSIGNED_BYTE_2_3_3_REV:           result = 1;                                        break;
+        case GL_UNSIGNED_BYTE_3_3_2:               result = 1;                                        break;
+        case GL_UNSIGNED_INT:                      result = static_cast<uint32_t>(sizeof(uint32_t) ); break;
+        case GL_UNSIGNED_INT_2_10_10_10_REV:       result = 4;                                        break;
+        case GL_UNSIGNED_INT_5_9_9_9_REV:          result = 4;                                        break;
+        case GL_UNSIGNED_INT_8_8_8_8:              result = 4;                                        break;
+        case GL_UNSIGNED_INT_8_8_8_8_REV:          result = 4;                                        break;
+        case GL_UNSIGNED_INT_10_10_10_2:           result = 4;                                        break;
+        case GL_UNSIGNED_INT_10F_11F_11F_REV:      result = 4;                                        break;
+        case GL_UNSIGNED_INT_24_8:                 result = 4;                                        break;
+        case GL_FLOAT_32_UNSIGNED_INT_24_8_REV:    result = 8;                                        break;
+        case GL_UNSIGNED_SHORT:                    result = static_cast<uint32_t>(sizeof(uint16_t) ); break;
+        case GL_UNSIGNED_SHORT_1_5_5_5_REV:        result = 2;                                        break;
+        case GL_UNSIGNED_SHORT_4_4_4_4:            result = 2;                                        break;
+        case GL_UNSIGNED_SHORT_4_4_4_4_REV:        result = 2;                                        break;
+        case GL_UNSIGNED_SHORT_5_5_5_1:            result = 2;                                        break;
+        case GL_UNSIGNED_SHORT_5_6_5:              result = 2;                                        break;
+        case GL_UNSIGNED_SHORT_5_6_5_REV:          result = 2;                                        break;
 
         default:
         {
@@ -94,15 +176,27 @@ uint32_t OpenGL::Utils::get_n_components_for_format(const GLenum& in_format)
 
     switch (in_format)
     {
+        case GL_ALPHA:           result = 1; break;
         case GL_BGR:             result = 3; break;
+        case GL_BGR_INTEGER:     result = 3; break;
         case GL_BGRA:            result = 4; break;
+        case GL_BGRA_INTEGER:    result = 4; break;
+        case GL_BLUE:            result = 1; break;
+        case GL_BLUE_INTEGER:    result = 1; break;
         case GL_DEPTH_COMPONENT: result = 1; break;
+        case GL_DEPTH_STENCIL:   result = 1; break;
+        case GL_GREEN:           result = 1; break;
+        case GL_GREEN_INTEGER:   result = 1; break;
         case GL_LUMINANCE:       result = 1; break;
         case GL_LUMINANCE_ALPHA: result = 2; break;
         case GL_RED:             result = 1; break;
+        case GL_RED_INTEGER:     result = 1; break;
         case GL_RG:              result = 2; break;
+        case GL_RG_INTEGER:      result = 2; break;
         case GL_RGB:             result = 3; break;
+        case GL_RGB_INTEGER:     result = 3; break;
         case GL_RGBA:            result = 4; break;
+        case GL_RGBA_INTEGER:    result = 4; break;
         case GL_STENCIL_INDEX:   result = 1; break;
 
         default:
@@ -121,12 +215,19 @@ uint32_t OpenGL::Utils::get_n_texture_data_bytes(const uint32_t& in_width,
                                                  const GLenum&   in_format,
                                                  const GLenum&   in_type)
 {
-    const auto n_bytes_per_component = get_n_bytes_for_type       (in_type);
-    const auto n_components          = get_n_components_for_format(in_format);
-    const auto n_texels              = in_width * in_height * in_depth;
+    const auto n_texels = in_width * in_height * in_depth;
+    uint32_t   n_bytes_per_texel;
 
-    const auto     n_bytes_per_texel = n_components * n_bytes_per_component;
-    const uint32_t result            = n_texels     * n_bytes_per_texel;
+    if (is_packed_pixel_type(in_type) )
+    {
+        n_bytes_per_texel = get_n_bytes_for_type(in_type);
+    }
+    else
+    {
+        n_bytes_per_texel = get_n_components_for_format(in_format) * get_n_bytes_for_type(in_type);
+    }
+
+    const uint32_t result = n_texels * n_bytes_per_texel;
 
     assert(result != 0);
     return result;

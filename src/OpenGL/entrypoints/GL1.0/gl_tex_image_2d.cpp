@@ -8,6 +8,7 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL1.0/gl_tex_image_2d.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/state_tracker.h"
 #include "OpenGL/utils.h"
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
@@ -90,6 +91,21 @@ void AI_APIENTRY OpenGL::aiTexImage2D(GLenum      target,
                                                                                 format,
                                                                                 type,
                                                                                 pixels);
+
+        TextureBindingTarget binding_target;
+
+        if (tracker.is_top_level_api_call                 ()              &&
+            Utils::get_texture_binding_target_for_gl_enum(target,
+                                                         &binding_target) )
+        {
+            auto& context = get_context_state();
+
+            context.set_texture_level_props(context.bound_textures[static_cast<size_t>(binding_target)],
+                                            level,
+                                            static_cast<uint32_t>(width),
+                                            static_cast<uint32_t>(height),
+                                            1);
+        }
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTEXIMAGE2D,

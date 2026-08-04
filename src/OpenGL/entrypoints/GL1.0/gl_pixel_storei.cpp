@@ -27,6 +27,42 @@ void AI_APIENTRY OpenGL::aiPixelStorei(GLenum pname,
                  OpenGL::Utils::get_raw_string_for_gl_enum(pname),
                  param);
 
+        switch (pname)
+        {
+            case GL_PACK_ALIGNMENT:
+            case GL_UNPACK_ALIGNMENT:
+            {
+                AI_ASSERT(param == 4);
+
+                break;
+            }
+
+            case GL_PACK_IMAGE_HEIGHT:
+            case GL_PACK_ROW_LENGTH:
+            case GL_PACK_SKIP_IMAGES:
+            case GL_PACK_SKIP_PIXELS:
+            case GL_PACK_SKIP_ROWS:
+            case GL_PACK_SWAP_BYTES:
+            case GL_PACK_LSB_FIRST:
+            case GL_UNPACK_IMAGE_HEIGHT:
+            case GL_UNPACK_ROW_LENGTH:
+            case GL_UNPACK_SKIP_IMAGES:
+            case GL_UNPACK_SKIP_PIXELS:
+            case GL_UNPACK_SKIP_ROWS:
+            case GL_UNPACK_SWAP_BYTES:
+            case GL_UNPACK_LSB_FIRST:
+            {
+                AI_ASSERT(param == 0);
+
+                break;
+            }
+
+            default:
+            {
+                break;
+            }
+        }
+
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLPIXELSTOREI,
                                                          &pre_callback_func_ptr,
                                                          &pre_callback_func_arg) )

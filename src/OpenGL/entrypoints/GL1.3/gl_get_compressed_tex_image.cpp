@@ -7,6 +7,8 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL1.3/gl_get_compressed_tex_image.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/state_tracker.h"
+#include "OpenGL/utils.h"
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
@@ -60,19 +62,28 @@ void AI_APIENTRY OpenGL::aiGetCompressedTexImage(GLenum target,
                                                       &post_callback_func_ptr,
                                                       &post_callback_func_arg) )
     {
-        /* Query the compressed image size directly from the driver. This is a nested
-         * GL call but safe: the Tracker already marks this thread as non-top-level,
-         * so the interceptor won't re-enter the callback system. */
-        GLint compressed_size = 0;
+        uint32_t img_chunk_id = 0;
 
-        reinterpret_cast<PFNGLGETTEXLEVELPARAMETERIVPROC>(OpenGL::g_cached_gl_get_tex_level_parameteriv)(target,
-                                                                                                         level,
-                                                                                                         GL_TEXTURE_COMPRESSED_IMAGE_SIZE,
-                                                                                                        &compressed_size);
+        if (img != nullptr)
+        {
+            TextureBindingTarget binding_target;
+
+            if (Utils::get_texture_binding_target_for_gl_enum(target,
+                                                             &binding_target) )
+            {
+                const auto& context     = get_context_state              ();
+                const auto  texture_id  = context.bound_textures         [static_cast<size_t>(binding_target)];
+                const auto  level_props = context.get_texture_level_props(texture_id,
+                                                                          level);
+
+                AI_ASSERT(level_props.compressed_size_bytes != 0);
+
+                img_chunk_id = APIInterceptor::register_data_chunk(img,
+                                                                   level_props.compressed_size_bytes);
+            }
+        }
 
         APIInterceptor::APIFunctionArgument result_arg;
-        const auto                          img_chunk_id = APIInterceptor::register_data_chunk(img,
-                                                                                               (img != nullptr) ? static_cast<uint32_t>(compressed_size) : 0);
 
         const APIInterceptor::APIFunctionArgument args[] =
         {

@@ -45,6 +45,21 @@ namespace OpenGL
 
         UNKNOWN
     };
+
+    enum class TextureBindingTarget
+    {
+        TEXTURE_1D,
+        TEXTURE_1D_ARRAY,
+        TEXTURE_2D,
+        TEXTURE_2D_ARRAY,
+        TEXTURE_3D,
+        TEXTURE_BUFFER,
+        TEXTURE_CUBE_MAP,
+        TEXTURE_RECTANGLE,
+
+        COUNT,
+        UNKNOWN
+    };
 };
 
 #endif /* AI_TYPES_ENUMS_H */
