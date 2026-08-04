@@ -775,6 +775,115 @@
 #include "OpenGL/entrypoints/GL_EXT_texture_object/gl_is_texture_ext.h"
 #include "OpenGL/entrypoints/GL_EXT_texture_object/gl_prioritize_textures_ext.h"
 
+#include "OpenGL/entrypoints/GL_ARB_transpose_matrix/gl_load_transpose_matrixd_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_transpose_matrix/gl_load_transpose_matrixf_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_transpose_matrix/gl_mult_transpose_matrixd_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_transpose_matrix/gl_mult_transpose_matrixf_arb.h"
+
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_client_active_texture_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_1d_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_1dv_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_1f_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_1fv_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_1i_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_1iv_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_1s_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_1sv_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_2d_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_2dv_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_2f_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_2fv_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_2i_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_2iv_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_2s_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_2sv_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_3d_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_3dv_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_3f_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_3fv_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_3i_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_3iv_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_3s_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_3sv_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_4d_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_4dv_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_4f_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_4fv_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_4i_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_4iv_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_4s_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_multitexture/gl_multi_tex_coord_4sv_arb.h"
+
+#include "OpenGL/entrypoints/GL_ARB_vertex_array_object/gl_bind_vertex_array_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_vertex_array_object/gl_delete_vertex_arrays_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_vertex_array_object/gl_gen_vertex_arrays_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_vertex_array_object/gl_is_vertex_array_arb.h"
+
+#include "OpenGL/entrypoints/GL_ARB_window_pos/gl_window_pos_2d_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_window_pos/gl_window_pos_2dv_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_window_pos/gl_window_pos_2f_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_window_pos/gl_window_pos_2fv_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_window_pos/gl_window_pos_2i_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_window_pos/gl_window_pos_2iv_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_window_pos/gl_window_pos_2s_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_window_pos/gl_window_pos_2sv_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_window_pos/gl_window_pos_3d_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_window_pos/gl_window_pos_3dv_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_window_pos/gl_window_pos_3f_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_window_pos/gl_window_pos_3fv_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_window_pos/gl_window_pos_3i_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_window_pos/gl_window_pos_3iv_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_window_pos/gl_window_pos_3s_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_window_pos/gl_window_pos_3sv_arb.h"
+
+#include "OpenGL/entrypoints/GL_EXT_blend_func_separate/gl_blend_func_separate_ext.h"
+
+#include "OpenGL/entrypoints/GL_EXT_draw_buffers2/gl_color_maski_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_draw_buffers2/gl_disablei_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_draw_buffers2/gl_enablei_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_draw_buffers2/gl_get_booleani_v_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_draw_buffers2/gl_get_integeri_v_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_draw_buffers2/gl_is_enabledi_ext.h"
+
+#include "OpenGL/entrypoints/GL_EXT_fog_coord/gl_fog_coordd_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_fog_coord/gl_fog_coorddv_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_fog_coord/gl_fog_coordf_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_fog_coord/gl_fog_coordfv_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_fog_coord/gl_fog_coord_pointer_ext.h"
+
+#include "OpenGL/entrypoints/GL_EXT_multi_draw_arrays/gl_multi_draw_arrays_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_multi_draw_arrays/gl_multi_draw_elements_ext.h"
+
+#include "OpenGL/entrypoints/GL_EXT_secondary_color/gl_secondary_color_3b_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_secondary_color/gl_secondary_color_3bv_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_secondary_color/gl_secondary_color_3d_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_secondary_color/gl_secondary_color_3dv_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_secondary_color/gl_secondary_color_3f_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_secondary_color/gl_secondary_color_3fv_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_secondary_color/gl_secondary_color_3i_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_secondary_color/gl_secondary_color_3iv_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_secondary_color/gl_secondary_color_3s_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_secondary_color/gl_secondary_color_3sv_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_secondary_color/gl_secondary_color_3ub_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_secondary_color/gl_secondary_color_3ubv_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_secondary_color/gl_secondary_color_3ui_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_secondary_color/gl_secondary_color_3uiv_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_secondary_color/gl_secondary_color_3us_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_secondary_color/gl_secondary_color_3usv_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_secondary_color/gl_secondary_color_pointer_ext.h"
+
+#include "OpenGL/entrypoints/GL_EXT_transform_feedback/gl_begin_transform_feedback_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_transform_feedback/gl_bind_buffer_base_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_transform_feedback/gl_bind_buffer_range_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_transform_feedback/gl_end_transform_feedback_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_transform_feedback/gl_get_transform_feedback_varying_ext.h"
+#include "OpenGL/entrypoints/GL_EXT_transform_feedback/gl_transform_feedback_varyings_ext.h"
+
+#include "OpenGL/entrypoints/GL_NV_conditional_render/gl_begin_conditional_render_nv.h"
+#include "OpenGL/entrypoints/GL_NV_conditional_render/gl_end_conditional_render_nv.h"
+
+#include "OpenGL/entrypoints/GL_NV_primitive_restart/gl_primitive_restart_index_nv.h"
+
 #include "OpenGL/globals.h"
 #include "OpenGL/interceptors.h"
 
@@ -1223,6 +1332,127 @@ std::unordered_map<std::string, void*> OpenGL::get_func_name_to_func_ptr_map()
     result["glGenTexturesEXT"]         = OpenGL::aiGenTexturesEXT;
     result["glIsTextureEXT"]           = OpenGL::aiIsTextureEXT;
     result["glPrioritizeTexturesEXT"]  = OpenGL::aiPrioritizeTexturesEXT;
+
+    /* GL_ARB_transpose_matrix */
+    result["glLoadTransposeMatrixdARB"] = OpenGL::aiLoadTransposeMatrixdARB;
+    result["glLoadTransposeMatrixfARB"] = OpenGL::aiLoadTransposeMatrixfARB;
+    result["glMultTransposeMatrixdARB"] = OpenGL::aiMultTransposeMatrixdARB;
+    result["glMultTransposeMatrixfARB"] = OpenGL::aiMultTransposeMatrixfARB;
+
+    /* GL_ARB_multitexture (missing entries) */
+    result["glClientActiveTextureARB"] = OpenGL::aiClientActiveTextureARB;
+    result["glMultiTexCoord1dARB"]     = OpenGL::aiMultiTexCoord1dARB;
+    result["glMultiTexCoord1dvARB"]    = OpenGL::aiMultiTexCoord1dvARB;
+    result["glMultiTexCoord1fARB"]     = OpenGL::aiMultiTexCoord1fARB;
+    result["glMultiTexCoord1fvARB"]    = OpenGL::aiMultiTexCoord1fvARB;
+    result["glMultiTexCoord1iARB"]     = OpenGL::aiMultiTexCoord1iARB;
+    result["glMultiTexCoord1ivARB"]    = OpenGL::aiMultiTexCoord1ivARB;
+    result["glMultiTexCoord1sARB"]     = OpenGL::aiMultiTexCoord1sARB;
+    result["glMultiTexCoord1svARB"]    = OpenGL::aiMultiTexCoord1svARB;
+    result["glMultiTexCoord2dARB"]     = OpenGL::aiMultiTexCoord2dARB;
+    result["glMultiTexCoord2dvARB"]    = OpenGL::aiMultiTexCoord2dvARB;
+    result["glMultiTexCoord2fARB"]     = OpenGL::aiMultiTexCoord2fARB;
+    result["glMultiTexCoord2fvARB"]    = OpenGL::aiMultiTexCoord2fvARB;
+    result["glMultiTexCoord2iARB"]     = OpenGL::aiMultiTexCoord2iARB;
+    result["glMultiTexCoord2ivARB"]    = OpenGL::aiMultiTexCoord2ivARB;
+    result["glMultiTexCoord2sARB"]     = OpenGL::aiMultiTexCoord2sARB;
+    result["glMultiTexCoord2svARB"]    = OpenGL::aiMultiTexCoord2svARB;
+    result["glMultiTexCoord3dARB"]     = OpenGL::aiMultiTexCoord3dARB;
+    result["glMultiTexCoord3dvARB"]    = OpenGL::aiMultiTexCoord3dvARB;
+    result["glMultiTexCoord3fARB"]     = OpenGL::aiMultiTexCoord3fARB;
+    result["glMultiTexCoord3fvARB"]    = OpenGL::aiMultiTexCoord3fvARB;
+    result["glMultiTexCoord3iARB"]     = OpenGL::aiMultiTexCoord3iARB;
+    result["glMultiTexCoord3ivARB"]    = OpenGL::aiMultiTexCoord3ivARB;
+    result["glMultiTexCoord3sARB"]     = OpenGL::aiMultiTexCoord3sARB;
+    result["glMultiTexCoord3svARB"]    = OpenGL::aiMultiTexCoord3svARB;
+    result["glMultiTexCoord4dARB"]     = OpenGL::aiMultiTexCoord4dARB;
+    result["glMultiTexCoord4dvARB"]    = OpenGL::aiMultiTexCoord4dvARB;
+    result["glMultiTexCoord4fARB"]     = OpenGL::aiMultiTexCoord4fARB;
+    result["glMultiTexCoord4fvARB"]    = OpenGL::aiMultiTexCoord4fvARB;
+    result["glMultiTexCoord4iARB"]     = OpenGL::aiMultiTexCoord4iARB;
+    result["glMultiTexCoord4ivARB"]    = OpenGL::aiMultiTexCoord4ivARB;
+    result["glMultiTexCoord4sARB"]     = OpenGL::aiMultiTexCoord4sARB;
+    result["glMultiTexCoord4svARB"]    = OpenGL::aiMultiTexCoord4svARB;
+
+    /* GL_ARB_vertex_array_object */
+    result["glBindVertexArrayARB"]    = OpenGL::aiBindVertexArrayARB;
+    result["glDeleteVertexArraysARB"] = OpenGL::aiDeleteVertexArraysARB;
+    result["glGenVertexArraysARB"]    = OpenGL::aiGenVertexArraysARB;
+    result["glIsVertexArrayARB"]      = OpenGL::aiIsVertexArrayARB;
+
+    /* GL_ARB_window_pos */
+    result["glWindowPos2dARB"]  = OpenGL::aiWindowPos2dARB;
+    result["glWindowPos2dvARB"] = OpenGL::aiWindowPos2dvARB;
+    result["glWindowPos2fARB"]  = OpenGL::aiWindowPos2fARB;
+    result["glWindowPos2fvARB"] = OpenGL::aiWindowPos2fvARB;
+    result["glWindowPos2iARB"]  = OpenGL::aiWindowPos2iARB;
+    result["glWindowPos2ivARB"] = OpenGL::aiWindowPos2ivARB;
+    result["glWindowPos2sARB"]  = OpenGL::aiWindowPos2sARB;
+    result["glWindowPos2svARB"] = OpenGL::aiWindowPos2svARB;
+    result["glWindowPos3dARB"]  = OpenGL::aiWindowPos3dARB;
+    result["glWindowPos3dvARB"] = OpenGL::aiWindowPos3dvARB;
+    result["glWindowPos3fARB"]  = OpenGL::aiWindowPos3fARB;
+    result["glWindowPos3fvARB"] = OpenGL::aiWindowPos3fvARB;
+    result["glWindowPos3iARB"]  = OpenGL::aiWindowPos3iARB;
+    result["glWindowPos3ivARB"] = OpenGL::aiWindowPos3ivARB;
+    result["glWindowPos3sARB"]  = OpenGL::aiWindowPos3sARB;
+    result["glWindowPos3svARB"] = OpenGL::aiWindowPos3svARB;
+
+    /* GL_EXT_blend_func_separate */
+    result["glBlendFuncSeparateEXT"] = OpenGL::aiBlendFuncSeparateEXT;
+
+    /* GL_EXT_draw_buffers2 */
+    result["glColorMaskiEXT"]    = OpenGL::aiColorMaskiEXT;
+    result["glDisableiEXT"]      = OpenGL::aiDisableiEXT;
+    result["glEnableiEXT"]       = OpenGL::aiEnableiEXT;
+    result["glGetBooleani_vEXT"] = OpenGL::aiGetBooleani_vEXT;
+    result["glGetIntegeri_vEXT"] = OpenGL::aiGetIntegeri_vEXT;
+    result["glIsEnablediEXT"]    = OpenGL::aiIsEnablediEXT;
+
+    /* GL_EXT_fog_coord */
+    result["glFogCoorddEXT"]       = OpenGL::aiFogCoorddEXT;
+    result["glFogCoorddvEXT"]      = OpenGL::aiFogCoorddvEXT;
+    result["glFogCoordfEXT"]       = OpenGL::aiFogCoordfEXT;
+    result["glFogCoordfvEXT"]      = OpenGL::aiFogCoordfvEXT;
+    result["glFogCoordPointerEXT"] = OpenGL::aiFogCoordPointerEXT;
+
+    /* GL_EXT_multi_draw_arrays */
+    result["glMultiDrawArraysEXT"]   = OpenGL::aiMultiDrawArraysEXT;
+    result["glMultiDrawElementsEXT"] = OpenGL::aiMultiDrawElementsEXT;
+
+    /* GL_EXT_secondary_color */
+    result["glSecondaryColor3bEXT"]       = OpenGL::aiSecondaryColor3bEXT;
+    result["glSecondaryColor3bvEXT"]      = OpenGL::aiSecondaryColor3bvEXT;
+    result["glSecondaryColor3dEXT"]       = OpenGL::aiSecondaryColor3dEXT;
+    result["glSecondaryColor3dvEXT"]      = OpenGL::aiSecondaryColor3dvEXT;
+    result["glSecondaryColor3fEXT"]       = OpenGL::aiSecondaryColor3fEXT;
+    result["glSecondaryColor3fvEXT"]      = OpenGL::aiSecondaryColor3fvEXT;
+    result["glSecondaryColor3iEXT"]       = OpenGL::aiSecondaryColor3iEXT;
+    result["glSecondaryColor3ivEXT"]      = OpenGL::aiSecondaryColor3ivEXT;
+    result["glSecondaryColor3sEXT"]       = OpenGL::aiSecondaryColor3sEXT;
+    result["glSecondaryColor3svEXT"]      = OpenGL::aiSecondaryColor3svEXT;
+    result["glSecondaryColor3ubEXT"]      = OpenGL::aiSecondaryColor3ubEXT;
+    result["glSecondaryColor3ubvEXT"]     = OpenGL::aiSecondaryColor3ubvEXT;
+    result["glSecondaryColor3uiEXT"]      = OpenGL::aiSecondaryColor3uiEXT;
+    result["glSecondaryColor3uivEXT"]     = OpenGL::aiSecondaryColor3uivEXT;
+    result["glSecondaryColor3usEXT"]      = OpenGL::aiSecondaryColor3usEXT;
+    result["glSecondaryColor3usvEXT"]     = OpenGL::aiSecondaryColor3usvEXT;
+    result["glSecondaryColorPointerEXT"]  = OpenGL::aiSecondaryColorPointerEXT;
+
+    /* GL_EXT_transform_feedback */
+    result["glBeginTransformFeedbackEXT"]      = OpenGL::aiBeginTransformFeedbackEXT;
+    result["glBindBufferBaseEXT"]              = OpenGL::aiBindBufferBaseEXT;
+    result["glBindBufferRangeEXT"]             = OpenGL::aiBindBufferRangeEXT;
+    result["glEndTransformFeedbackEXT"]        = OpenGL::aiEndTransformFeedbackEXT;
+    result["glGetTransformFeedbackVaryingEXT"] = OpenGL::aiGetTransformFeedbackVaryingEXT;
+    result["glTransformFeedbackVaryingsEXT"]   = OpenGL::aiTransformFeedbackVaryingsEXT;
+
+    /* GL_NV_conditional_render */
+    result["glBeginConditionalRenderNV"] = OpenGL::aiBeginConditionalRenderNV;
+    result["glEndConditionalRenderNV"]   = OpenGL::aiEndConditionalRenderNV;
+
+    /* GL_NV_primitive_restart */
+    result["glPrimitiveRestartIndexNV"] = OpenGL::aiPrimitiveRestartIndexNV;
 
     /* Compatibility profile (<= GL 1.1) */
     result["glAccum"]               = OpenGL::aiAccum;
