@@ -954,6 +954,17 @@ namespace OpenGL
     extern void* g_cached_gl_vertex_attrib_iformat;
     extern void* g_cached_gl_vertex_attrib_lformat;
     extern void* g_cached_gl_vertex_binding_divisor;
+
+    /* GL 4.4 */
+    extern void* g_cached_gl_bind_buffers_base;
+    extern void* g_cached_gl_bind_buffers_range;
+    extern void* g_cached_gl_bind_image_textures;
+    extern void* g_cached_gl_bind_samplers;
+    extern void* g_cached_gl_bind_textures;
+    extern void* g_cached_gl_bind_vertex_buffers;
+    extern void* g_cached_gl_buffer_storage;
+    extern void* g_cached_gl_clear_tex_image;
+    extern void* g_cached_gl_clear_tex_sub_image;
     extern void* g_cached_gl_window_pos_2d;
     extern void* g_cached_gl_window_pos_2dv;
     extern void* g_cached_gl_window_pos_2f;

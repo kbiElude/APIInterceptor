@@ -892,6 +892,15 @@
 #include "OpenGL/entrypoints/GL4.3/gl_vertex_attrib_iformat.h"
 #include "OpenGL/entrypoints/GL4.3/gl_vertex_attrib_lformat.h"
 #include "OpenGL/entrypoints/GL4.3/gl_vertex_binding_divisor.h"
+#include "OpenGL/entrypoints/GL4.4/gl_bind_buffers_base.h"
+#include "OpenGL/entrypoints/GL4.4/gl_bind_buffers_range.h"
+#include "OpenGL/entrypoints/GL4.4/gl_bind_image_textures.h"
+#include "OpenGL/entrypoints/GL4.4/gl_bind_samplers.h"
+#include "OpenGL/entrypoints/GL4.4/gl_bind_textures.h"
+#include "OpenGL/entrypoints/GL4.4/gl_bind_vertex_buffers.h"
+#include "OpenGL/entrypoints/GL4.4/gl_buffer_storage.h"
+#include "OpenGL/entrypoints/GL4.4/gl_clear_tex_image.h"
+#include "OpenGL/entrypoints/GL4.4/gl_clear_tex_sub_image.h"
 
 #include "OpenGL/entrypoints/GL_ARB_color_buffer_float/gl_clamp_color_arb.h"
 
@@ -1671,6 +1680,16 @@ std::unordered_map<std::string, void*> OpenGL::get_func_name_to_func_ptr_map()
     result["glVertexAttribIFormat"]              = OpenGL::aiVertexAttribIFormat;
     result["glVertexAttribLFormat"]              = OpenGL::aiVertexAttribLFormat;
     result["glVertexBindingDivisor"]             = OpenGL::aiVertexBindingDivisor;
+
+    result["glBindBuffersBase"]    = OpenGL::aiBindBuffersBase;
+    result["glBindBuffersRange"]   = OpenGL::aiBindBuffersRange;
+    result["glBindImageTextures"]  = OpenGL::aiBindImageTextures;
+    result["glBindSamplers"]       = OpenGL::aiBindSamplers;
+    result["glBindTextures"]       = OpenGL::aiBindTextures;
+    result["glBindVertexBuffers"]  = OpenGL::aiBindVertexBuffers;
+    result["glBufferStorage"]      = OpenGL::aiBufferStorage;
+    result["glClearTexImage"]      = OpenGL::aiClearTexImage;
+    result["glClearTexSubImage"]   = OpenGL::aiClearTexSubImage;
 
     result["glClampColorARB"] = OpenGL::aiClampColorARB;
 

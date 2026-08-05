@@ -891,6 +891,17 @@ void* OpenGL::g_cached_gl_vertex_attrib_format                   = nullptr;
 void* OpenGL::g_cached_gl_vertex_attrib_iformat                  = nullptr;
 void* OpenGL::g_cached_gl_vertex_attrib_lformat                  = nullptr;
 void* OpenGL::g_cached_gl_vertex_binding_divisor                 = nullptr;
+
+/* GL 4.4 */
+void* OpenGL::g_cached_gl_bind_buffers_base                      = nullptr;
+void* OpenGL::g_cached_gl_bind_buffers_range                     = nullptr;
+void* OpenGL::g_cached_gl_bind_image_textures                    = nullptr;
+void* OpenGL::g_cached_gl_bind_samplers                          = nullptr;
+void* OpenGL::g_cached_gl_bind_textures                          = nullptr;
+void* OpenGL::g_cached_gl_bind_vertex_buffers                    = nullptr;
+void* OpenGL::g_cached_gl_buffer_storage                         = nullptr;
+void* OpenGL::g_cached_gl_clear_tex_image                        = nullptr;
+void* OpenGL::g_cached_gl_clear_tex_sub_image                    = nullptr;
 void* OpenGL::g_cached_gl_window_pos_2d                          = nullptr;
 void* OpenGL::g_cached_gl_window_pos_2dv                         = nullptr;
 void* OpenGL::g_cached_gl_window_pos_2f                          = nullptr;
