@@ -78,6 +78,7 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
     FILE(GLOB OpenGL32EntrypointsIncludes_GL3_3  "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL3.3/*.h")
     FILE(GLOB OpenGL32EntrypointsIncludes_GL4_0  "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL4.0/*.h")
     FILE(GLOB OpenGL32EntrypointsIncludes_GL4_1  "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL4.1/*.h")
+    FILE(GLOB OpenGL32EntrypointsIncludes_GL4_2  "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL4.2/*.h")
 
     FILE(GLOB OpenGL32EntrypointsIncludes_GL_ARB_color_buffer_float    "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_color_buffer_float/*.h")
     FILE(GLOB OpenGL32EntrypointsIncludes_GL_ARB_copy_buffer           "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_copy_buffer/*.h")
@@ -145,6 +146,7 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
         ${OpenGL32EntrypointsIncludes_GL3_3}
         ${OpenGL32EntrypointsIncludes_GL4_0}
         ${OpenGL32EntrypointsIncludes_GL4_1}
+        ${OpenGL32EntrypointsIncludes_GL4_2}
         ${OpenGL32EntrypointsIncludes_GL_ARB_color_buffer_float}
         ${OpenGL32EntrypointsIncludes_GL_ARB_copy_buffer}
         ${OpenGL32EntrypointsIncludes_GL_ARB_depth_buffer_float}
@@ -210,6 +212,7 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
     FILE(GLOB OpenGL32EntrypointsSources_GL3_3  "${APIInterceptor_SOURCE_DIR}/src/OpenGL/entrypoints/GL3.3/*.cpp")
     FILE(GLOB OpenGL32EntrypointsSources_GL4_0  "${APIInterceptor_SOURCE_DIR}/src/OpenGL/entrypoints/GL4.0/*.cpp")
     FILE(GLOB OpenGL32EntrypointsSources_GL4_1  "${APIInterceptor_SOURCE_DIR}/src/OpenGL/entrypoints/GL4.1/*.cpp")
+    FILE(GLOB OpenGL32EntrypointsSources_GL4_2  "${APIInterceptor_SOURCE_DIR}/src/OpenGL/entrypoints/GL4.2/*.cpp")
 
     set(OpenGL32EntrypointsSources
         ${OpenGL32EntrypointsSources_GL1_0}
@@ -225,7 +228,8 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
         ${OpenGL32EntrypointsSources_GL3_2}
         ${OpenGL32EntrypointsSources_GL3_3}
         ${OpenGL32EntrypointsSources_GL4_0}
-        ${OpenGL32EntrypointsSources_GL4_1})
+        ${OpenGL32EntrypointsSources_GL4_1}
+        ${OpenGL32EntrypointsSources_GL4_2})
 
     FILE(GLOB OpenGL32Includes "${APIInterceptor_SOURCE_DIR}/include/OpenGL/*.h")
     FILE(GLOB OpenGL32Sources  "${APIInterceptor_SOURCE_DIR}/src/OpenGL/*.cpp")
@@ -299,6 +303,7 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
     source_group ("Entrypoint include files\\GL3.3"  FILES ${OpenGL32EntrypointsIncludes_GL3_3})
     source_group ("Entrypoint include files\\GL4.0"  FILES ${OpenGL32EntrypointsIncludes_GL4_0})
     source_group ("Entrypoint include files\\GL4.1"  FILES ${OpenGL32EntrypointsIncludes_GL4_1})
+    source_group ("Entrypoint include files\\GL4.2"  FILES ${OpenGL32EntrypointsIncludes_GL4_2})
     source_group ("Entrypoint include files\\GL_ARB_color_buffer_float"     FILES ${OpenGL32EntrypointsIncludes_GL_ARB_color_buffer_float})
     source_group ("Entrypoint include files\\GL_ARB_copy_buffer"            FILES ${OpenGL32EntrypointsIncludes_GL_ARB_copy_buffer})
     source_group ("Entrypoint include files\\GL_ARB_depth_buffer_float"     FILES ${OpenGL32EntrypointsIncludes_GL_ARB_depth_buffer_float})
@@ -364,6 +369,7 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
     source_group ("Entrypoint source files\\GL3.3"  FILES ${OpenGL32EntrypointsSources_GL3_3})
     source_group ("Entrypoint source files\\GL4.0"  FILES ${OpenGL32EntrypointsSources_GL4_0})
     source_group ("Entrypoint source files\\GL4.1"  FILES ${OpenGL32EntrypointsSources_GL4_1})
+    source_group ("Entrypoint source files\\GL4.2"  FILES ${OpenGL32EntrypointsSources_GL4_2})
     source_group ("OpenGL32 include files"   FILES ${OpenGL32Includes})
     source_group ("OpenGL32 source files"    FILES ${OpenGL32Sources})
     source_group ("User32 include files"     FILES ${User32Includes})

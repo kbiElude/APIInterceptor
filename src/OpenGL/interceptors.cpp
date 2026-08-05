@@ -837,6 +837,18 @@
 #include "OpenGL/entrypoints/GL4.1/gl_viewport_arrayv.h"
 #include "OpenGL/entrypoints/GL4.1/gl_viewport_indexedf.h"
 #include "OpenGL/entrypoints/GL4.1/gl_viewport_indexedfv.h"
+#include "OpenGL/entrypoints/GL4.2/gl_bind_image_texture.h"
+#include "OpenGL/entrypoints/GL4.2/gl_draw_arrays_instanced_base_instance.h"
+#include "OpenGL/entrypoints/GL4.2/gl_draw_elements_instanced_base_instance.h"
+#include "OpenGL/entrypoints/GL4.2/gl_draw_elements_instanced_base_vertex_base_instance.h"
+#include "OpenGL/entrypoints/GL4.2/gl_draw_transform_feedback_instanced.h"
+#include "OpenGL/entrypoints/GL4.2/gl_draw_transform_feedback_stream_instanced.h"
+#include "OpenGL/entrypoints/GL4.2/gl_get_active_atomic_counter_bufferiv.h"
+#include "OpenGL/entrypoints/GL4.2/gl_get_internalformativ.h"
+#include "OpenGL/entrypoints/GL4.2/gl_memory_barrier.h"
+#include "OpenGL/entrypoints/GL4.2/gl_tex_storage1d.h"
+#include "OpenGL/entrypoints/GL4.2/gl_tex_storage2d.h"
+#include "OpenGL/entrypoints/GL4.2/gl_tex_storage3d.h"
 
 #include "OpenGL/entrypoints/GL_ARB_color_buffer_float/gl_clamp_color_arb.h"
 
@@ -1559,6 +1571,19 @@ std::unordered_map<std::string, void*> OpenGL::get_func_name_to_func_ptr_map()
     result["glViewportArrayv"]                = OpenGL::aiViewportArrayv;
     result["glViewportIndexedf"]              = OpenGL::aiViewportIndexedf;
     result["glViewportIndexedfv"]             = OpenGL::aiViewportIndexedfv;
+
+    result["glBindImageTexture"]                                 = OpenGL::aiBindImageTexture;
+    result["glDrawArraysInstancedBaseInstance"]                  = OpenGL::aiDrawArraysInstancedBaseInstance;
+    result["glDrawElementsInstancedBaseInstance"]                = OpenGL::aiDrawElementsInstancedBaseInstance;
+    result["glDrawElementsInstancedBaseVertexBaseInstance"]      = OpenGL::aiDrawElementsInstancedBaseVertexBaseInstance;
+    result["glDrawTransformFeedbackInstanced"]                   = OpenGL::aiDrawTransformFeedbackInstanced;
+    result["glDrawTransformFeedbackStreamInstanced"]             = OpenGL::aiDrawTransformFeedbackStreamInstanced;
+    result["glGetActiveAtomicCounterBufferiv"]                   = OpenGL::aiGetActiveAtomicCounterBufferiv;
+    result["glGetInternalformativ"]                              = OpenGL::aiGetInternalformativ;
+    result["glMemoryBarrier"]                                    = OpenGL::aiMemoryBarrier;
+    result["glTexStorage1D"]                                     = OpenGL::aiTexStorage1D;
+    result["glTexStorage2D"]                                     = OpenGL::aiTexStorage2D;
+    result["glTexStorage3D"]                                     = OpenGL::aiTexStorage3D;
 
     result["glClampColorARB"] = OpenGL::aiClampColorARB;
 

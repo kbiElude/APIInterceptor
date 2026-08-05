@@ -895,6 +895,20 @@ namespace OpenGL
     extern void* g_cached_gl_viewport_arrayv;
     extern void* g_cached_gl_viewport_indexedf;
     extern void* g_cached_gl_viewport_indexedfv;
+
+    /* GL 4.2 */
+    extern void* g_cached_gl_bind_image_texture;
+    extern void* g_cached_gl_draw_arrays_instanced_base_instance;
+    extern void* g_cached_gl_draw_elements_instanced_base_instance;
+    extern void* g_cached_gl_draw_elements_instanced_base_vertex_base_instance;
+    extern void* g_cached_gl_draw_transform_feedback_instanced;
+    extern void* g_cached_gl_draw_transform_feedback_stream_instanced;
+    extern void* g_cached_gl_get_active_atomic_counter_bufferiv;
+    extern void* g_cached_gl_get_internalformativ;
+    extern void* g_cached_gl_memory_barrier;
+    extern void* g_cached_gl_tex_storage1d;
+    extern void* g_cached_gl_tex_storage2d;
+    extern void* g_cached_gl_tex_storage3d;
     extern void* g_cached_gl_window_pos_2d;
     extern void* g_cached_gl_window_pos_2dv;
     extern void* g_cached_gl_window_pos_2f;

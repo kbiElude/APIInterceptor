@@ -832,6 +832,20 @@ void* OpenGL::g_cached_gl_vertex_attrib_l_pointer                = nullptr;
 void* OpenGL::g_cached_gl_viewport_arrayv                        = nullptr;
 void* OpenGL::g_cached_gl_viewport_indexedf                      = nullptr;
 void* OpenGL::g_cached_gl_viewport_indexedfv                     = nullptr;
+
+/* GL 4.2 */
+void* OpenGL::g_cached_gl_bind_image_texture                                  = nullptr;
+void* OpenGL::g_cached_gl_draw_arrays_instanced_base_instance                 = nullptr;
+void* OpenGL::g_cached_gl_draw_elements_instanced_base_instance               = nullptr;
+void* OpenGL::g_cached_gl_draw_elements_instanced_base_vertex_base_instance   = nullptr;
+void* OpenGL::g_cached_gl_draw_transform_feedback_instanced                   = nullptr;
+void* OpenGL::g_cached_gl_draw_transform_feedback_stream_instanced            = nullptr;
+void* OpenGL::g_cached_gl_get_active_atomic_counter_bufferiv                  = nullptr;
+void* OpenGL::g_cached_gl_get_internalformativ                                = nullptr;
+void* OpenGL::g_cached_gl_memory_barrier                                      = nullptr;
+void* OpenGL::g_cached_gl_tex_storage1d                                       = nullptr;
+void* OpenGL::g_cached_gl_tex_storage2d                                       = nullptr;
+void* OpenGL::g_cached_gl_tex_storage3d                                       = nullptr;
 void* OpenGL::g_cached_gl_window_pos_2d                          = nullptr;
 void* OpenGL::g_cached_gl_window_pos_2dv                         = nullptr;
 void* OpenGL::g_cached_gl_window_pos_2f                          = nullptr;
