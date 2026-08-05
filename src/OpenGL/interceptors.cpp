@@ -749,6 +749,94 @@
 #include "OpenGL/entrypoints/GL4.0/gl_uniform_matrix4x2dv.h"
 #include "OpenGL/entrypoints/GL4.0/gl_uniform_matrix4x3dv.h"
 #include "OpenGL/entrypoints/GL4.0/gl_uniform_subroutinesuiv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_active_shader_program.h"
+#include "OpenGL/entrypoints/GL4.1/gl_bind_program_pipeline.h"
+#include "OpenGL/entrypoints/GL4.1/gl_clear_depthf.h"
+#include "OpenGL/entrypoints/GL4.1/gl_create_shader_programv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_delete_program_pipelines.h"
+#include "OpenGL/entrypoints/GL4.1/gl_depth_range_arrayv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_depth_rangef.h"
+#include "OpenGL/entrypoints/GL4.1/gl_depth_range_indexed.h"
+#include "OpenGL/entrypoints/GL4.1/gl_gen_program_pipelines.h"
+#include "OpenGL/entrypoints/GL4.1/gl_get_doublei_v.h"
+#include "OpenGL/entrypoints/GL4.1/gl_get_floati_v.h"
+#include "OpenGL/entrypoints/GL4.1/gl_get_program_binary.h"
+#include "OpenGL/entrypoints/GL4.1/gl_get_program_pipeline_info_log.h"
+#include "OpenGL/entrypoints/GL4.1/gl_get_program_pipelineiv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_get_shader_precision_format.h"
+#include "OpenGL/entrypoints/GL4.1/gl_get_vertex_attrib_ldv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_is_program_pipeline.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_binary.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_parameteri.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform1d.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform1dv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform1f.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform1fv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform1i.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform1iv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform1ui.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform1uiv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform2d.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform2dv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform2f.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform2fv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform2i.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform2iv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform2ui.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform2uiv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform3d.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform3dv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform3f.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform3fv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform3i.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform3iv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform3ui.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform3uiv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform4d.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform4dv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform4f.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform4fv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform4i.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform4iv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform4ui.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform4uiv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform_matrix2dv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform_matrix2fv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform_matrix2x3dv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform_matrix2x3fv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform_matrix2x4dv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform_matrix2x4fv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform_matrix3dv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform_matrix3fv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform_matrix3x2dv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform_matrix3x2fv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform_matrix3x4dv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform_matrix3x4fv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform_matrix4dv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform_matrix4fv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform_matrix4x2dv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform_matrix4x2fv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform_matrix4x3dv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_program_uniform_matrix4x3fv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_release_shader_compiler.h"
+#include "OpenGL/entrypoints/GL4.1/gl_scissor_arrayv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_scissor_indexed.h"
+#include "OpenGL/entrypoints/GL4.1/gl_scissor_indexedv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_shader_binary.h"
+#include "OpenGL/entrypoints/GL4.1/gl_use_program_stages.h"
+#include "OpenGL/entrypoints/GL4.1/gl_validate_program_pipeline.h"
+#include "OpenGL/entrypoints/GL4.1/gl_vertex_attrib_l1d.h"
+#include "OpenGL/entrypoints/GL4.1/gl_vertex_attrib_l1dv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_vertex_attrib_l2d.h"
+#include "OpenGL/entrypoints/GL4.1/gl_vertex_attrib_l2dv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_vertex_attrib_l3d.h"
+#include "OpenGL/entrypoints/GL4.1/gl_vertex_attrib_l3dv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_vertex_attrib_l4d.h"
+#include "OpenGL/entrypoints/GL4.1/gl_vertex_attrib_l4dv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_vertex_attrib_l_pointer.h"
+#include "OpenGL/entrypoints/GL4.1/gl_viewport_arrayv.h"
+#include "OpenGL/entrypoints/GL4.1/gl_viewport_indexedf.h"
+#include "OpenGL/entrypoints/GL4.1/gl_viewport_indexedfv.h"
 
 #include "OpenGL/entrypoints/GL_ARB_color_buffer_float/gl_clamp_color_arb.h"
 
@@ -1382,6 +1470,95 @@ std::unordered_map<std::string, void*> OpenGL::get_func_name_to_func_ptr_map()
     result["glUniformMatrix4x2dv"]             = OpenGL::aiUniformMatrix4x2dv;
     result["glUniformMatrix4x3dv"]             = OpenGL::aiUniformMatrix4x3dv;
     result["glUniformSubroutinesuiv"]          = OpenGL::aiUniformSubroutinesuiv;
+
+    result["glActiveShaderProgram"]           = OpenGL::aiActiveShaderProgram;
+    result["glBindProgramPipeline"]           = OpenGL::aiBindProgramPipeline;
+    result["glClearDepthf"]                   = OpenGL::aiClearDepthf;
+    result["glCreateShaderProgramv"]          = OpenGL::aiCreateShaderProgramv;
+    result["glDeleteProgramPipelines"]        = OpenGL::aiDeleteProgramPipelines;
+    result["glDepthRangeArrayv"]              = OpenGL::aiDepthRangeArrayv;
+    result["glDepthRangef"]                   = OpenGL::aiDepthRangef;
+    result["glDepthRangeIndexed"]             = OpenGL::aiDepthRangeIndexed;
+    result["glGenProgramPipelines"]           = OpenGL::aiGenProgramPipelines;
+    result["glGetDoublei_v"]                  = OpenGL::aiGetDoublei_v;
+    result["glGetFloati_v"]                   = OpenGL::aiGetFloati_v;
+    result["glGetProgramBinary"]              = OpenGL::aiGetProgramBinary;
+    result["glGetProgramPipelineInfoLog"]     = OpenGL::aiGetProgramPipelineInfoLog;
+    result["glGetProgramPipelineiv"]          = OpenGL::aiGetProgramPipelineiv;
+    result["glGetShaderPrecisionFormat"]      = OpenGL::aiGetShaderPrecisionFormat;
+    result["glGetVertexAttribLdv"]            = OpenGL::aiGetVertexAttribLdv;
+    result["glIsProgramPipeline"]             = OpenGL::aiIsProgramPipeline;
+    result["glProgramBinary"]                 = OpenGL::aiProgramBinary;
+    result["glProgramParameteri"]             = OpenGL::aiProgramParameteri;
+    result["glProgramUniform1d"]              = OpenGL::aiProgramUniform1d;
+    result["glProgramUniform1dv"]             = OpenGL::aiProgramUniform1dv;
+    result["glProgramUniform1f"]              = OpenGL::aiProgramUniform1f;
+    result["glProgramUniform1fv"]             = OpenGL::aiProgramUniform1fv;
+    result["glProgramUniform1i"]              = OpenGL::aiProgramUniform1i;
+    result["glProgramUniform1iv"]             = OpenGL::aiProgramUniform1iv;
+    result["glProgramUniform1ui"]             = OpenGL::aiProgramUniform1ui;
+    result["glProgramUniform1uiv"]            = OpenGL::aiProgramUniform1uiv;
+    result["glProgramUniform2d"]              = OpenGL::aiProgramUniform2d;
+    result["glProgramUniform2dv"]             = OpenGL::aiProgramUniform2dv;
+    result["glProgramUniform2f"]              = OpenGL::aiProgramUniform2f;
+    result["glProgramUniform2fv"]             = OpenGL::aiProgramUniform2fv;
+    result["glProgramUniform2i"]              = OpenGL::aiProgramUniform2i;
+    result["glProgramUniform2iv"]             = OpenGL::aiProgramUniform2iv;
+    result["glProgramUniform2ui"]             = OpenGL::aiProgramUniform2ui;
+    result["glProgramUniform2uiv"]            = OpenGL::aiProgramUniform2uiv;
+    result["glProgramUniform3d"]              = OpenGL::aiProgramUniform3d;
+    result["glProgramUniform3dv"]             = OpenGL::aiProgramUniform3dv;
+    result["glProgramUniform3f"]              = OpenGL::aiProgramUniform3f;
+    result["glProgramUniform3fv"]             = OpenGL::aiProgramUniform3fv;
+    result["glProgramUniform3i"]              = OpenGL::aiProgramUniform3i;
+    result["glProgramUniform3iv"]             = OpenGL::aiProgramUniform3iv;
+    result["glProgramUniform3ui"]             = OpenGL::aiProgramUniform3ui;
+    result["glProgramUniform3uiv"]            = OpenGL::aiProgramUniform3uiv;
+    result["glProgramUniform4d"]              = OpenGL::aiProgramUniform4d;
+    result["glProgramUniform4dv"]             = OpenGL::aiProgramUniform4dv;
+    result["glProgramUniform4f"]              = OpenGL::aiProgramUniform4f;
+    result["glProgramUniform4fv"]             = OpenGL::aiProgramUniform4fv;
+    result["glProgramUniform4i"]              = OpenGL::aiProgramUniform4i;
+    result["glProgramUniform4iv"]             = OpenGL::aiProgramUniform4iv;
+    result["glProgramUniform4ui"]             = OpenGL::aiProgramUniform4ui;
+    result["glProgramUniform4uiv"]            = OpenGL::aiProgramUniform4uiv;
+    result["glProgramUniformMatrix2dv"]       = OpenGL::aiProgramUniformMatrix2dv;
+    result["glProgramUniformMatrix2fv"]       = OpenGL::aiProgramUniformMatrix2fv;
+    result["glProgramUniformMatrix2x3dv"]     = OpenGL::aiProgramUniformMatrix2x3dv;
+    result["glProgramUniformMatrix2x3fv"]     = OpenGL::aiProgramUniformMatrix2x3fv;
+    result["glProgramUniformMatrix2x4dv"]     = OpenGL::aiProgramUniformMatrix2x4dv;
+    result["glProgramUniformMatrix2x4fv"]     = OpenGL::aiProgramUniformMatrix2x4fv;
+    result["glProgramUniformMatrix3dv"]       = OpenGL::aiProgramUniformMatrix3dv;
+    result["glProgramUniformMatrix3fv"]       = OpenGL::aiProgramUniformMatrix3fv;
+    result["glProgramUniformMatrix3x2dv"]     = OpenGL::aiProgramUniformMatrix3x2dv;
+    result["glProgramUniformMatrix3x2fv"]     = OpenGL::aiProgramUniformMatrix3x2fv;
+    result["glProgramUniformMatrix3x4dv"]     = OpenGL::aiProgramUniformMatrix3x4dv;
+    result["glProgramUniformMatrix3x4fv"]     = OpenGL::aiProgramUniformMatrix3x4fv;
+    result["glProgramUniformMatrix4dv"]       = OpenGL::aiProgramUniformMatrix4dv;
+    result["glProgramUniformMatrix4fv"]       = OpenGL::aiProgramUniformMatrix4fv;
+    result["glProgramUniformMatrix4x2dv"]     = OpenGL::aiProgramUniformMatrix4x2dv;
+    result["glProgramUniformMatrix4x2fv"]     = OpenGL::aiProgramUniformMatrix4x2fv;
+    result["glProgramUniformMatrix4x3dv"]     = OpenGL::aiProgramUniformMatrix4x3dv;
+    result["glProgramUniformMatrix4x3fv"]     = OpenGL::aiProgramUniformMatrix4x3fv;
+    result["glReleaseShaderCompiler"]         = OpenGL::aiReleaseShaderCompiler;
+    result["glScissorArrayv"]                 = OpenGL::aiScissorArrayv;
+    result["glScissorIndexed"]                = OpenGL::aiScissorIndexed;
+    result["glScissorIndexedv"]               = OpenGL::aiScissorIndexedv;
+    result["glShaderBinary"]                  = OpenGL::aiShaderBinary;
+    result["glUseProgramStages"]              = OpenGL::aiUseProgramStages;
+    result["glValidateProgramPipeline"]       = OpenGL::aiValidateProgramPipeline;
+    result["glVertexAttribL1d"]               = OpenGL::aiVertexAttribL1d;
+    result["glVertexAttribL1dv"]              = OpenGL::aiVertexAttribL1dv;
+    result["glVertexAttribL2d"]               = OpenGL::aiVertexAttribL2d;
+    result["glVertexAttribL2dv"]              = OpenGL::aiVertexAttribL2dv;
+    result["glVertexAttribL3d"]               = OpenGL::aiVertexAttribL3d;
+    result["glVertexAttribL3dv"]              = OpenGL::aiVertexAttribL3dv;
+    result["glVertexAttribL4d"]               = OpenGL::aiVertexAttribL4d;
+    result["glVertexAttribL4dv"]              = OpenGL::aiVertexAttribL4dv;
+    result["glVertexAttribLPointer"]          = OpenGL::aiVertexAttribLPointer;
+    result["glViewportArrayv"]                = OpenGL::aiViewportArrayv;
+    result["glViewportIndexedf"]              = OpenGL::aiViewportIndexedf;
+    result["glViewportIndexedfv"]             = OpenGL::aiViewportIndexedfv;
 
     result["glClampColorARB"] = OpenGL::aiClampColorARB;
 
