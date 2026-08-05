@@ -849,6 +849,49 @@
 #include "OpenGL/entrypoints/GL4.2/gl_tex_storage1d.h"
 #include "OpenGL/entrypoints/GL4.2/gl_tex_storage2d.h"
 #include "OpenGL/entrypoints/GL4.2/gl_tex_storage3d.h"
+#include "OpenGL/entrypoints/GL4.3/gl_bind_vertex_buffer.h"
+#include "OpenGL/entrypoints/GL4.3/gl_clear_buffer_data.h"
+#include "OpenGL/entrypoints/GL4.3/gl_clear_buffer_sub_data.h"
+#include "OpenGL/entrypoints/GL4.3/gl_copy_image_sub_data.h"
+#include "OpenGL/entrypoints/GL4.3/gl_debug_message_callback.h"
+#include "OpenGL/entrypoints/GL4.3/gl_debug_message_control.h"
+#include "OpenGL/entrypoints/GL4.3/gl_debug_message_insert.h"
+#include "OpenGL/entrypoints/GL4.3/gl_dispatch_compute.h"
+#include "OpenGL/entrypoints/GL4.3/gl_dispatch_compute_indirect.h"
+#include "OpenGL/entrypoints/GL4.3/gl_framebuffer_parameteri.h"
+#include "OpenGL/entrypoints/GL4.3/gl_get_debug_message_log.h"
+#include "OpenGL/entrypoints/GL4.3/gl_get_framebuffer_parameteriv.h"
+#include "OpenGL/entrypoints/GL4.3/gl_get_internalformati64v.h"
+#include "OpenGL/entrypoints/GL4.3/gl_get_object_label.h"
+#include "OpenGL/entrypoints/GL4.3/gl_get_object_ptr_label.h"
+#include "OpenGL/entrypoints/GL4.3/gl_get_program_interfaceiv.h"
+#include "OpenGL/entrypoints/GL4.3/gl_get_program_resource_index.h"
+#include "OpenGL/entrypoints/GL4.3/gl_get_program_resourceiv.h"
+#include "OpenGL/entrypoints/GL4.3/gl_get_program_resource_location.h"
+#include "OpenGL/entrypoints/GL4.3/gl_get_program_resource_location_index.h"
+#include "OpenGL/entrypoints/GL4.3/gl_get_program_resource_name.h"
+#include "OpenGL/entrypoints/GL4.3/gl_invalidate_buffer_data.h"
+#include "OpenGL/entrypoints/GL4.3/gl_invalidate_buffer_sub_data.h"
+#include "OpenGL/entrypoints/GL4.3/gl_invalidate_framebuffer.h"
+#include "OpenGL/entrypoints/GL4.3/gl_invalidate_sub_framebuffer.h"
+#include "OpenGL/entrypoints/GL4.3/gl_invalidate_tex_image.h"
+#include "OpenGL/entrypoints/GL4.3/gl_invalidate_tex_sub_image.h"
+#include "OpenGL/entrypoints/GL4.3/gl_multi_draw_arrays_indirect.h"
+#include "OpenGL/entrypoints/GL4.3/gl_multi_draw_elements_indirect.h"
+#include "OpenGL/entrypoints/GL4.3/gl_object_label.h"
+#include "OpenGL/entrypoints/GL4.3/gl_object_ptr_label.h"
+#include "OpenGL/entrypoints/GL4.3/gl_pop_debug_group.h"
+#include "OpenGL/entrypoints/GL4.3/gl_push_debug_group.h"
+#include "OpenGL/entrypoints/GL4.3/gl_shader_storage_block_binding.h"
+#include "OpenGL/entrypoints/GL4.3/gl_tex_buffer_range.h"
+#include "OpenGL/entrypoints/GL4.3/gl_tex_storage2d_multisample.h"
+#include "OpenGL/entrypoints/GL4.3/gl_tex_storage3d_multisample.h"
+#include "OpenGL/entrypoints/GL4.3/gl_texture_view.h"
+#include "OpenGL/entrypoints/GL4.3/gl_vertex_attrib_binding.h"
+#include "OpenGL/entrypoints/GL4.3/gl_vertex_attrib_format.h"
+#include "OpenGL/entrypoints/GL4.3/gl_vertex_attrib_iformat.h"
+#include "OpenGL/entrypoints/GL4.3/gl_vertex_attrib_lformat.h"
+#include "OpenGL/entrypoints/GL4.3/gl_vertex_binding_divisor.h"
 
 #include "OpenGL/entrypoints/GL_ARB_color_buffer_float/gl_clamp_color_arb.h"
 
@@ -1584,6 +1627,50 @@ std::unordered_map<std::string, void*> OpenGL::get_func_name_to_func_ptr_map()
     result["glTexStorage1D"]                                     = OpenGL::aiTexStorage1D;
     result["glTexStorage2D"]                                     = OpenGL::aiTexStorage2D;
     result["glTexStorage3D"]                                     = OpenGL::aiTexStorage3D;
+
+    result["glBindVertexBuffer"]                 = OpenGL::aiBindVertexBuffer;
+    result["glClearBufferData"]                  = OpenGL::aiClearBufferData;
+    result["glClearBufferSubData"]               = OpenGL::aiClearBufferSubData;
+    result["glCopyImageSubData"]                 = OpenGL::aiCopyImageSubData;
+    result["glDebugMessageCallback"]             = OpenGL::aiDebugMessageCallback;
+    result["glDebugMessageControl"]              = OpenGL::aiDebugMessageControl;
+    result["glDebugMessageInsert"]               = OpenGL::aiDebugMessageInsert;
+    result["glDispatchCompute"]                  = OpenGL::aiDispatchCompute;
+    result["glDispatchComputeIndirect"]          = OpenGL::aiDispatchComputeIndirect;
+    result["glFramebufferParameteri"]            = OpenGL::aiFramebufferParameteri;
+    result["glGetDebugMessageLog"]               = OpenGL::aiGetDebugMessageLog;
+    result["glGetFramebufferParameteriv"]        = OpenGL::aiGetFramebufferParameteriv;
+    result["glGetInternalformati64v"]            = OpenGL::aiGetInternalformati64v;
+    result["glGetObjectLabel"]                   = OpenGL::aiGetObjectLabel;
+    result["glGetObjectPtrLabel"]                = OpenGL::aiGetObjectPtrLabel;
+    result["glGetProgramInterfaceiv"]            = OpenGL::aiGetProgramInterfaceiv;
+    result["glGetProgramResourceIndex"]          = OpenGL::aiGetProgramResourceIndex;
+    result["glGetProgramResourceiv"]             = OpenGL::aiGetProgramResourceiv;
+    result["glGetProgramResourceLocation"]       = OpenGL::aiGetProgramResourceLocation;
+    result["glGetProgramResourceLocationIndex"]  = OpenGL::aiGetProgramResourceLocationIndex;
+    result["glGetProgramResourceName"]           = OpenGL::aiGetProgramResourceName;
+    result["glInvalidateBufferData"]             = OpenGL::aiInvalidateBufferData;
+    result["glInvalidateBufferSubData"]          = OpenGL::aiInvalidateBufferSubData;
+    result["glInvalidateFramebuffer"]            = OpenGL::aiInvalidateFramebuffer;
+    result["glInvalidateSubFramebuffer"]         = OpenGL::aiInvalidateSubFramebuffer;
+    result["glInvalidateTexImage"]               = OpenGL::aiInvalidateTexImage;
+    result["glInvalidateTexSubImage"]            = OpenGL::aiInvalidateTexSubImage;
+    result["glMultiDrawArraysIndirect"]          = OpenGL::aiMultiDrawArraysIndirect;
+    result["glMultiDrawElementsIndirect"]        = OpenGL::aiMultiDrawElementsIndirect;
+    result["glObjectLabel"]                      = OpenGL::aiObjectLabel;
+    result["glObjectPtrLabel"]                   = OpenGL::aiObjectPtrLabel;
+    result["glPopDebugGroup"]                    = OpenGL::aiPopDebugGroup;
+    result["glPushDebugGroup"]                   = OpenGL::aiPushDebugGroup;
+    result["glShaderStorageBlockBinding"]        = OpenGL::aiShaderStorageBlockBinding;
+    result["glTexBufferRange"]                   = OpenGL::aiTexBufferRange;
+    result["glTexStorage2DMultisample"]          = OpenGL::aiTexStorage2DMultisample;
+    result["glTexStorage3DMultisample"]          = OpenGL::aiTexStorage3DMultisample;
+    result["glTextureView"]                      = OpenGL::aiTextureView;
+    result["glVertexAttribBinding"]              = OpenGL::aiVertexAttribBinding;
+    result["glVertexAttribFormat"]               = OpenGL::aiVertexAttribFormat;
+    result["glVertexAttribIFormat"]              = OpenGL::aiVertexAttribIFormat;
+    result["glVertexAttribLFormat"]              = OpenGL::aiVertexAttribLFormat;
+    result["glVertexBindingDivisor"]             = OpenGL::aiVertexBindingDivisor;
 
     result["glClampColorARB"] = OpenGL::aiClampColorARB;
 
