@@ -901,6 +901,116 @@
 #include "OpenGL/entrypoints/GL4.4/gl_buffer_storage.h"
 #include "OpenGL/entrypoints/GL4.4/gl_clear_tex_image.h"
 #include "OpenGL/entrypoints/GL4.4/gl_clear_tex_sub_image.h"
+#include "OpenGL/entrypoints/GL4.5/gl_bind_texture_unit.h"
+#include "OpenGL/entrypoints/GL4.5/gl_blit_named_framebuffer.h"
+#include "OpenGL/entrypoints/GL4.5/gl_check_named_framebuffer_status.h"
+#include "OpenGL/entrypoints/GL4.5/gl_clear_named_buffer_data.h"
+#include "OpenGL/entrypoints/GL4.5/gl_clear_named_buffer_sub_data.h"
+#include "OpenGL/entrypoints/GL4.5/gl_clear_named_framebufferfi.h"
+#include "OpenGL/entrypoints/GL4.5/gl_clear_named_framebufferfv.h"
+#include "OpenGL/entrypoints/GL4.5/gl_clear_named_framebufferiv.h"
+#include "OpenGL/entrypoints/GL4.5/gl_clear_named_framebufferuiv.h"
+#include "OpenGL/entrypoints/GL4.5/gl_clip_control.h"
+#include "OpenGL/entrypoints/GL4.5/gl_compressed_texture_sub_image1d.h"
+#include "OpenGL/entrypoints/GL4.5/gl_compressed_texture_sub_image2d.h"
+#include "OpenGL/entrypoints/GL4.5/gl_compressed_texture_sub_image3d.h"
+#include "OpenGL/entrypoints/GL4.5/gl_copy_named_buffer_sub_data.h"
+#include "OpenGL/entrypoints/GL4.5/gl_copy_texture_sub_image1d.h"
+#include "OpenGL/entrypoints/GL4.5/gl_copy_texture_sub_image2d.h"
+#include "OpenGL/entrypoints/GL4.5/gl_copy_texture_sub_image3d.h"
+#include "OpenGL/entrypoints/GL4.5/gl_create_buffers.h"
+#include "OpenGL/entrypoints/GL4.5/gl_create_framebuffers.h"
+#include "OpenGL/entrypoints/GL4.5/gl_create_program_pipelines.h"
+#include "OpenGL/entrypoints/GL4.5/gl_create_queries.h"
+#include "OpenGL/entrypoints/GL4.5/gl_create_renderbuffers.h"
+#include "OpenGL/entrypoints/GL4.5/gl_create_samplers.h"
+#include "OpenGL/entrypoints/GL4.5/gl_create_textures.h"
+#include "OpenGL/entrypoints/GL4.5/gl_create_transform_feedbacks.h"
+#include "OpenGL/entrypoints/GL4.5/gl_create_vertex_arrays.h"
+#include "OpenGL/entrypoints/GL4.5/gl_disable_vertex_array_attrib.h"
+#include "OpenGL/entrypoints/GL4.5/gl_enable_vertex_array_attrib.h"
+#include "OpenGL/entrypoints/GL4.5/gl_flush_mapped_named_buffer_range.h"
+#include "OpenGL/entrypoints/GL4.5/gl_generate_texture_mipmap.h"
+#include "OpenGL/entrypoints/GL4.5/gl_get_compressed_texture_image.h"
+#include "OpenGL/entrypoints/GL4.5/gl_get_compressed_texture_sub_image.h"
+#include "OpenGL/entrypoints/GL4.5/gl_get_graphics_reset_status.h"
+#include "OpenGL/entrypoints/GL4.5/gl_get_named_buffer_parameteri64v.h"
+#include "OpenGL/entrypoints/GL4.5/gl_get_named_buffer_parameteriv.h"
+#include "OpenGL/entrypoints/GL4.5/gl_get_named_buffer_pointerv.h"
+#include "OpenGL/entrypoints/GL4.5/gl_get_named_buffer_sub_data.h"
+#include "OpenGL/entrypoints/GL4.5/gl_get_named_framebuffer_attachment_parameteriv.h"
+#include "OpenGL/entrypoints/GL4.5/gl_get_named_framebuffer_parameteriv.h"
+#include "OpenGL/entrypoints/GL4.5/gl_get_named_renderbuffer_parameteriv.h"
+#include "OpenGL/entrypoints/GL4.5/gl_getn_compressed_tex_image.h"
+#include "OpenGL/entrypoints/GL4.5/gl_getn_tex_image.h"
+#include "OpenGL/entrypoints/GL4.5/gl_getn_uniformdv.h"
+#include "OpenGL/entrypoints/GL4.5/gl_getn_uniformfv.h"
+#include "OpenGL/entrypoints/GL4.5/gl_getn_uniformiv.h"
+#include "OpenGL/entrypoints/GL4.5/gl_getn_uniformuiv.h"
+#include "OpenGL/entrypoints/GL4.5/gl_get_query_buffer_objecti64v.h"
+#include "OpenGL/entrypoints/GL4.5/gl_get_query_buffer_objectiv.h"
+#include "OpenGL/entrypoints/GL4.5/gl_get_query_buffer_objectui64v.h"
+#include "OpenGL/entrypoints/GL4.5/gl_get_query_buffer_objectuiv.h"
+#include "OpenGL/entrypoints/GL4.5/gl_get_texture_image.h"
+#include "OpenGL/entrypoints/GL4.5/gl_get_texture_level_parameterfv.h"
+#include "OpenGL/entrypoints/GL4.5/gl_get_texture_level_parameteriv.h"
+#include "OpenGL/entrypoints/GL4.5/gl_get_texture_parameterfv.h"
+#include "OpenGL/entrypoints/GL4.5/gl_get_texture_parameteriiv.h"
+#include "OpenGL/entrypoints/GL4.5/gl_get_texture_parameteriuiv.h"
+#include "OpenGL/entrypoints/GL4.5/gl_get_texture_parameteriv.h"
+#include "OpenGL/entrypoints/GL4.5/gl_get_texture_sub_image.h"
+#include "OpenGL/entrypoints/GL4.5/gl_get_transform_feedbacki64_v.h"
+#include "OpenGL/entrypoints/GL4.5/gl_get_transform_feedbacki_v.h"
+#include "OpenGL/entrypoints/GL4.5/gl_get_transform_feedbackiv.h"
+#include "OpenGL/entrypoints/GL4.5/gl_get_vertex_array_indexed64iv.h"
+#include "OpenGL/entrypoints/GL4.5/gl_get_vertex_array_indexediv.h"
+#include "OpenGL/entrypoints/GL4.5/gl_get_vertex_arrayiv.h"
+#include "OpenGL/entrypoints/GL4.5/gl_invalidate_named_framebuffer_data.h"
+#include "OpenGL/entrypoints/GL4.5/gl_invalidate_named_framebuffer_sub_data.h"
+#include "OpenGL/entrypoints/GL4.5/gl_map_named_buffer.h"
+#include "OpenGL/entrypoints/GL4.5/gl_map_named_buffer_range.h"
+#include "OpenGL/entrypoints/GL4.5/gl_memory_barrier_by_region.h"
+#include "OpenGL/entrypoints/GL4.5/gl_named_buffer_data.h"
+#include "OpenGL/entrypoints/GL4.5/gl_named_buffer_storage.h"
+#include "OpenGL/entrypoints/GL4.5/gl_named_buffer_sub_data.h"
+#include "OpenGL/entrypoints/GL4.5/gl_named_framebuffer_draw_buffer.h"
+#include "OpenGL/entrypoints/GL4.5/gl_named_framebuffer_draw_buffers.h"
+#include "OpenGL/entrypoints/GL4.5/gl_named_framebuffer_parameteri.h"
+#include "OpenGL/entrypoints/GL4.5/gl_named_framebuffer_read_buffer.h"
+#include "OpenGL/entrypoints/GL4.5/gl_named_framebuffer_renderbuffer.h"
+#include "OpenGL/entrypoints/GL4.5/gl_named_framebuffer_texture.h"
+#include "OpenGL/entrypoints/GL4.5/gl_named_framebuffer_texture_layer.h"
+#include "OpenGL/entrypoints/GL4.5/gl_named_renderbuffer_storage.h"
+#include "OpenGL/entrypoints/GL4.5/gl_named_renderbuffer_storage_multisample.h"
+#include "OpenGL/entrypoints/GL4.5/gl_readn_pixels.h"
+#include "OpenGL/entrypoints/GL4.5/gl_texture_barrier.h"
+#include "OpenGL/entrypoints/GL4.5/gl_texture_buffer.h"
+#include "OpenGL/entrypoints/GL4.5/gl_texture_buffer_range.h"
+#include "OpenGL/entrypoints/GL4.5/gl_texture_parameterf.h"
+#include "OpenGL/entrypoints/GL4.5/gl_texture_parameterfv.h"
+#include "OpenGL/entrypoints/GL4.5/gl_texture_parameteri.h"
+#include "OpenGL/entrypoints/GL4.5/gl_texture_parameteriiv.h"
+#include "OpenGL/entrypoints/GL4.5/gl_texture_parameteriuiv.h"
+#include "OpenGL/entrypoints/GL4.5/gl_texture_parameteriv.h"
+#include "OpenGL/entrypoints/GL4.5/gl_texture_storage1d.h"
+#include "OpenGL/entrypoints/GL4.5/gl_texture_storage2d.h"
+#include "OpenGL/entrypoints/GL4.5/gl_texture_storage2d_multisample.h"
+#include "OpenGL/entrypoints/GL4.5/gl_texture_storage3d.h"
+#include "OpenGL/entrypoints/GL4.5/gl_texture_storage3d_multisample.h"
+#include "OpenGL/entrypoints/GL4.5/gl_texture_sub_image1d.h"
+#include "OpenGL/entrypoints/GL4.5/gl_texture_sub_image2d.h"
+#include "OpenGL/entrypoints/GL4.5/gl_texture_sub_image3d.h"
+#include "OpenGL/entrypoints/GL4.5/gl_transform_feedback_buffer_base.h"
+#include "OpenGL/entrypoints/GL4.5/gl_transform_feedback_buffer_range.h"
+#include "OpenGL/entrypoints/GL4.5/gl_unmap_named_buffer.h"
+#include "OpenGL/entrypoints/GL4.5/gl_vertex_array_attrib_binding.h"
+#include "OpenGL/entrypoints/GL4.5/gl_vertex_array_attrib_format.h"
+#include "OpenGL/entrypoints/GL4.5/gl_vertex_array_attrib_iformat.h"
+#include "OpenGL/entrypoints/GL4.5/gl_vertex_array_attrib_lformat.h"
+#include "OpenGL/entrypoints/GL4.5/gl_vertex_array_binding_divisor.h"
+#include "OpenGL/entrypoints/GL4.5/gl_vertex_array_element_buffer.h"
+#include "OpenGL/entrypoints/GL4.5/gl_vertex_array_vertex_buffer.h"
+#include "OpenGL/entrypoints/GL4.5/gl_vertex_array_vertex_buffers.h"
 
 #include "OpenGL/entrypoints/GL_ARB_color_buffer_float/gl_clamp_color_arb.h"
 
@@ -1690,6 +1800,117 @@ std::unordered_map<std::string, void*> OpenGL::get_func_name_to_func_ptr_map()
     result["glBufferStorage"]      = OpenGL::aiBufferStorage;
     result["glClearTexImage"]      = OpenGL::aiClearTexImage;
     result["glClearTexSubImage"]   = OpenGL::aiClearTexSubImage;
+
+    result["glBindTextureUnit"]                               = OpenGL::aiBindTextureUnit;
+    result["glBlitNamedFramebuffer"]                          = OpenGL::aiBlitNamedFramebuffer;
+    result["glCheckNamedFramebufferStatus"]                   = OpenGL::aiCheckNamedFramebufferStatus;
+    result["glClearNamedBufferData"]                          = OpenGL::aiClearNamedBufferData;
+    result["glClearNamedBufferSubData"]                       = OpenGL::aiClearNamedBufferSubData;
+    result["glClearNamedFramebufferfi"]                       = OpenGL::aiClearNamedFramebufferfi;
+    result["glClearNamedFramebufferfv"]                       = OpenGL::aiClearNamedFramebufferfv;
+    result["glClearNamedFramebufferiv"]                       = OpenGL::aiClearNamedFramebufferiv;
+    result["glClearNamedFramebufferuiv"]                      = OpenGL::aiClearNamedFramebufferuiv;
+    result["glClipControl"]                                   = OpenGL::aiClipControl;
+    result["glCompressedTextureSubImage1D"]                   = OpenGL::aiCompressedTextureSubImage1D;
+    result["glCompressedTextureSubImage2D"]                   = OpenGL::aiCompressedTextureSubImage2D;
+    result["glCompressedTextureSubImage3D"]                   = OpenGL::aiCompressedTextureSubImage3D;
+    result["glCopyNamedBufferSubData"]                        = OpenGL::aiCopyNamedBufferSubData;
+    result["glCopyTextureSubImage1D"]                         = OpenGL::aiCopyTextureSubImage1D;
+    result["glCopyTextureSubImage2D"]                         = OpenGL::aiCopyTextureSubImage2D;
+    result["glCopyTextureSubImage3D"]                         = OpenGL::aiCopyTextureSubImage3D;
+    result["glCreateBuffers"]                                 = OpenGL::aiCreateBuffers;
+    result["glCreateFramebuffers"]                            = OpenGL::aiCreateFramebuffers;
+    result["glCreateProgramPipelines"]                        = OpenGL::aiCreateProgramPipelines;
+    result["glCreateQueries"]                                 = OpenGL::aiCreateQueries;
+    result["glCreateRenderbuffers"]                           = OpenGL::aiCreateRenderbuffers;
+    result["glCreateSamplers"]                                = OpenGL::aiCreateSamplers;
+    result["glCreateTextures"]                                = OpenGL::aiCreateTextures;
+    result["glCreateTransformFeedbacks"]                      = OpenGL::aiCreateTransformFeedbacks;
+    result["glCreateVertexArrays"]                            = OpenGL::aiCreateVertexArrays;
+    result["glDisableVertexArrayAttrib"]                      = OpenGL::aiDisableVertexArrayAttrib;
+    result["glEnableVertexArrayAttrib"]                       = OpenGL::aiEnableVertexArrayAttrib;
+    result["glFlushMappedNamedBufferRange"]                   = OpenGL::aiFlushMappedNamedBufferRange;
+    result["glGenerateTextureMipmap"]                         = OpenGL::aiGenerateTextureMipmap;
+    result["glGetCompressedTextureImage"]                     = OpenGL::aiGetCompressedTextureImage;
+    result["glGetCompressedTextureSubImage"]                  = OpenGL::aiGetCompressedTextureSubImage;
+    result["glGetGraphicsResetStatus"]                        = OpenGL::aiGetGraphicsResetStatus;
+    result["glGetNamedBufferParameteri64v"]                   = OpenGL::aiGetNamedBufferParameteri64v;
+    result["glGetNamedBufferParameteriv"]                     = OpenGL::aiGetNamedBufferParameteriv;
+    result["glGetNamedBufferPointerv"]                        = OpenGL::aiGetNamedBufferPointerv;
+    result["glGetNamedBufferSubData"]                         = OpenGL::aiGetNamedBufferSubData;
+    result["glGetNamedFramebufferAttachmentParameteriv"]      = OpenGL::aiGetNamedFramebufferAttachmentParameteriv;
+    result["glGetNamedFramebufferParameteriv"]                = OpenGL::aiGetNamedFramebufferParameteriv;
+    result["glGetNamedRenderbufferParameteriv"]               = OpenGL::aiGetNamedRenderbufferParameteriv;
+    result["glGetnCompressedTexImage"]                        = OpenGL::aiGetnCompressedTexImage;
+    result["glGetnTexImage"]                                  = OpenGL::aiGetnTexImage;
+    result["glGetnUniformdv"]                                 = OpenGL::aiGetnUniformdv;
+    result["glGetnUniformfv"]                                 = OpenGL::aiGetnUniformfv;
+    result["glGetnUniformiv"]                                 = OpenGL::aiGetnUniformiv;
+    result["glGetnUniformuiv"]                                = OpenGL::aiGetnUniformuiv;
+    result["glGetQueryBufferObjecti64v"]                      = OpenGL::aiGetQueryBufferObjecti64v;
+    result["glGetQueryBufferObjectiv"]                        = OpenGL::aiGetQueryBufferObjectiv;
+    result["glGetQueryBufferObjectui64v"]                     = OpenGL::aiGetQueryBufferObjectui64v;
+    result["glGetQueryBufferObjectuiv"]                       = OpenGL::aiGetQueryBufferObjectuiv;
+    result["glGetTextureImage"]                               = OpenGL::aiGetTextureImage;
+    result["glGetTextureLevelParameterfv"]                    = OpenGL::aiGetTextureLevelParameterfv;
+    result["glGetTextureLevelParameteriv"]                    = OpenGL::aiGetTextureLevelParameteriv;
+    result["glGetTextureParameterfv"]                         = OpenGL::aiGetTextureParameterfv;
+    result["glGetTextureParameterIiv"]                        = OpenGL::aiGetTextureParameterIiv;
+    result["glGetTextureParameterIuiv"]                       = OpenGL::aiGetTextureParameterIuiv;
+    result["glGetTextureParameteriv"]                         = OpenGL::aiGetTextureParameteriv;
+    result["glGetTextureSubImage"]                            = OpenGL::aiGetTextureSubImage;
+    result["glGetTransformFeedbacki64_v"]                     = OpenGL::aiGetTransformFeedbacki64_v;
+    result["glGetTransformFeedbacki_v"]                       = OpenGL::aiGetTransformFeedbacki_v;
+    result["glGetTransformFeedbackiv"]                        = OpenGL::aiGetTransformFeedbackiv;
+    result["glGetVertexArrayIndexed64iv"]                     = OpenGL::aiGetVertexArrayIndexed64iv;
+    result["glGetVertexArrayIndexediv"]                       = OpenGL::aiGetVertexArrayIndexediv;
+    result["glGetVertexArrayiv"]                              = OpenGL::aiGetVertexArrayiv;
+    result["glInvalidateNamedFramebufferData"]                = OpenGL::aiInvalidateNamedFramebufferData;
+    result["glInvalidateNamedFramebufferSubData"]             = OpenGL::aiInvalidateNamedFramebufferSubData;
+    result["glMapNamedBuffer"]                                = OpenGL::aiMapNamedBuffer;
+    result["glMapNamedBufferRange"]                           = OpenGL::aiMapNamedBufferRange;
+    result["glMemoryBarrierByRegion"]                         = OpenGL::aiMemoryBarrierByRegion;
+    result["glNamedBufferData"]                               = OpenGL::aiNamedBufferData;
+    result["glNamedBufferStorage"]                            = OpenGL::aiNamedBufferStorage;
+    result["glNamedBufferSubData"]                            = OpenGL::aiNamedBufferSubData;
+    result["glNamedFramebufferDrawBuffer"]                    = OpenGL::aiNamedFramebufferDrawBuffer;
+    result["glNamedFramebufferDrawBuffers"]                   = OpenGL::aiNamedFramebufferDrawBuffers;
+    result["glNamedFramebufferParameteri"]                    = OpenGL::aiNamedFramebufferParameteri;
+    result["glNamedFramebufferReadBuffer"]                    = OpenGL::aiNamedFramebufferReadBuffer;
+    result["glNamedFramebufferRenderbuffer"]                  = OpenGL::aiNamedFramebufferRenderbuffer;
+    result["glNamedFramebufferTexture"]                       = OpenGL::aiNamedFramebufferTexture;
+    result["glNamedFramebufferTextureLayer"]                  = OpenGL::aiNamedFramebufferTextureLayer;
+    result["glNamedRenderbufferStorage"]                      = OpenGL::aiNamedRenderbufferStorage;
+    result["glNamedRenderbufferStorageMultisample"]           = OpenGL::aiNamedRenderbufferStorageMultisample;
+    result["glReadnPixels"]                                   = OpenGL::aiReadnPixels;
+    result["glTextureBarrier"]                                = OpenGL::aiTextureBarrier;
+    result["glTextureBuffer"]                                 = OpenGL::aiTextureBuffer;
+    result["glTextureBufferRange"]                            = OpenGL::aiTextureBufferRange;
+    result["glTextureParameterf"]                             = OpenGL::aiTextureParameterf;
+    result["glTextureParameterfv"]                            = OpenGL::aiTextureParameterfv;
+    result["glTextureParameteri"]                             = OpenGL::aiTextureParameteri;
+    result["glTextureParameterIiv"]                           = OpenGL::aiTextureParameterIiv;
+    result["glTextureParameterIuiv"]                          = OpenGL::aiTextureParameterIuiv;
+    result["glTextureParameteriv"]                            = OpenGL::aiTextureParameteriv;
+    result["glTextureStorage1D"]                              = OpenGL::aiTextureStorage1D;
+    result["glTextureStorage2D"]                              = OpenGL::aiTextureStorage2D;
+    result["glTextureStorage2DMultisample"]                   = OpenGL::aiTextureStorage2DMultisample;
+    result["glTextureStorage3D"]                              = OpenGL::aiTextureStorage3D;
+    result["glTextureStorage3DMultisample"]                   = OpenGL::aiTextureStorage3DMultisample;
+    result["glTextureSubImage1D"]                             = OpenGL::aiTextureSubImage1D;
+    result["glTextureSubImage2D"]                             = OpenGL::aiTextureSubImage2D;
+    result["glTextureSubImage3D"]                             = OpenGL::aiTextureSubImage3D;
+    result["glTransformFeedbackBufferBase"]                   = OpenGL::aiTransformFeedbackBufferBase;
+    result["glTransformFeedbackBufferRange"]                  = OpenGL::aiTransformFeedbackBufferRange;
+    result["glUnmapNamedBuffer"]                              = OpenGL::aiUnmapNamedBuffer;
+    result["glVertexArrayAttribBinding"]                      = OpenGL::aiVertexArrayAttribBinding;
+    result["glVertexArrayAttribFormat"]                       = OpenGL::aiVertexArrayAttribFormat;
+    result["glVertexArrayAttribIFormat"]                      = OpenGL::aiVertexArrayAttribIFormat;
+    result["glVertexArrayAttribLFormat"]                      = OpenGL::aiVertexArrayAttribLFormat;
+    result["glVertexArrayBindingDivisor"]                     = OpenGL::aiVertexArrayBindingDivisor;
+    result["glVertexArrayElementBuffer"]                      = OpenGL::aiVertexArrayElementBuffer;
+    result["glVertexArrayVertexBuffer"]                       = OpenGL::aiVertexArrayVertexBuffer;
+    result["glVertexArrayVertexBuffers"]                      = OpenGL::aiVertexArrayVertexBuffers;
 
     result["glClampColorARB"] = OpenGL::aiClampColorARB;
 
