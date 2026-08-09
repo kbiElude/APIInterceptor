@@ -1,8 +1,9 @@
-cmake_minimum_required (VERSION 2.8)    
+cmake_minimum_required (VERSION 3.10)
 project (APIInterceptor)
 
 option(APIINTERCEPTOR_BUILD_INTERCEPTOR "Build API interceptor projects"             ON)
 option(APIINTERCEPTOR_BUILD_LIBS        "Build static libs (API Dump Loader)"        ON)
+option(APIINTERCEPTOR_BUILD_TESTS       "Build automated tests"                      ON)
 option(APIINTERCEPTOR_BUILD_TOOLS       "Build tools (API Dumper, API Dump Printer)" ON)
 option(APIINTERCEPTOR_DUMP_API_CALLS    "Dump API calls to text files (debugging)"   OFF)
 
@@ -431,4 +432,17 @@ if (APIINTERCEPTOR_BUILD_TOOLS)
     source_group ("APIDumpPrinter source files" FILES ${APIDumpPinterSources})
 
     include_directories("${APIInterceptor_SOURCE_DIR}/include/APIDumperDLL")
+endif()
+
+if (APIINTERCEPTOR_BUILD_TESTS)
+    add_subdirectory(deps/gtest)
+
+    file(GLOB APIInterceptorTestsSources "${APIInterceptor_SOURCE_DIR}/src/Tests/*.cpp")
+
+    add_executable(APIInterceptorTests ${APIInterceptorTestsSources})
+
+    target_link_libraries(APIInterceptorTests gtest_main)
+
+    enable_testing()
+    add_test(NAME APIInterceptorTests COMMAND APIInterceptorTests)
 endif()

@@ -35,8 +35,8 @@ void AI_APIENTRY OpenGL::aiInvalidateBufferSubData(GLuint     buffer,
             const APIInterceptor::APIFunctionArgument args[] =
             {
                 APIInterceptor::APIFunctionArgument::create_u32(buffer),
-                APIInterceptor::APIFunctionArgument::create_i32(offset),
-                APIInterceptor::APIFunctionArgument::create_i32(length),
+                APIInterceptor::APIFunctionArgument::create_i64(offset),
+                APIInterceptor::APIFunctionArgument::create_i64(length),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLINVALIDATEBUFFERSUBDATA,
@@ -65,8 +65,8 @@ void AI_APIENTRY OpenGL::aiInvalidateBufferSubData(GLuint     buffer,
         const APIInterceptor::APIFunctionArgument args[] =
         {
             APIInterceptor::APIFunctionArgument::create_u32(buffer),
-            APIInterceptor::APIFunctionArgument::create_i32(offset),
-            APIInterceptor::APIFunctionArgument::create_i32(length),
+            APIInterceptor::APIFunctionArgument::create_i64(offset),
+            APIInterceptor::APIFunctionArgument::create_i64(length),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLINVALIDATEBUFFERSUBDATA,

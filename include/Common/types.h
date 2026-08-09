@@ -1100,6 +1100,9 @@ namespace APIInterceptor
         ARGTYPE_I32_GLENUM,
         ARGTYPE_U32_GLENUM,
 
+        ARGTYPE_I64,
+        ARGTYPE_U64,
+
         UNKNOWN
     };
 
@@ -1229,6 +1232,16 @@ namespace APIInterceptor
             return result;
         }
 
+        static APIFunctionArgument create_i64(const int64_t& in_value)
+        {
+            APIFunctionArgument result;
+
+            result.type            = ARGTYPE_I64;
+            result.value.value_i64 = in_value;
+
+            return result;
+        }
+
         static APIFunctionArgument create_u16(const unsigned short& in_value)
         {
             APIFunctionArgument result;
@@ -1279,6 +1292,16 @@ namespace APIInterceptor
             return result;
         }
 
+        static APIFunctionArgument create_u64(const uint64_t& in_value)
+        {
+            APIFunctionArgument result;
+
+            result.type            = ARGTYPE_U64;
+            result.value.value_u64 = in_value;
+
+            return result;
+        }
+
         static APIFunctionArgument create_u8(const unsigned char& in_value)
         {
             APIFunctionArgument result;
@@ -1321,6 +1344,7 @@ namespace APIInterceptor
         const int&            get_i32          () const;
         const int&            get_i32_glenum   () const;
         const int*            get_i32_ptr      () const;
+        const int64_t&        get_i64          () const;
         const unsigned char&  get_u8           () const;
         const unsigned char*  get_u8_ptr       () const;
         const unsigned short& get_u16          () const;
@@ -1328,6 +1352,7 @@ namespace APIInterceptor
         const unsigned int&   get_u32          () const;
         const unsigned int&   get_u32_glenum   () const;
         const unsigned int*   get_u32_ptr      () const;
+        const uint64_t&       get_u64          () const;
         const void*           get_ptr          () const;
 
         const void* get_value_ptr() const
@@ -1355,10 +1380,12 @@ namespace APIInterceptor
             char           value_i8;
             short          value_i16;
             int            value_i32;
+            int64_t        value_i64;
             DataChunkID    value_id;
             unsigned char  value_u8;
             unsigned short value_u16;
             unsigned int   value_u32;
+            uint64_t       value_u64;
             uint64_t       value_ptr_as_u64;
         } value;
 

@@ -39,7 +39,7 @@ void AI_APIENTRY OpenGL::aiBindVertexBuffer(GLuint   bindingindex,
             {
                 APIInterceptor::APIFunctionArgument::create_u32(bindingindex),
                 APIInterceptor::APIFunctionArgument::create_u32(buffer),
-                APIInterceptor::APIFunctionArgument::create_i32(offset),
+                APIInterceptor::APIFunctionArgument::create_i64(offset),
                 APIInterceptor::APIFunctionArgument::create_i32(stride),
             };
 
@@ -71,7 +71,7 @@ void AI_APIENTRY OpenGL::aiBindVertexBuffer(GLuint   bindingindex,
         {
             APIInterceptor::APIFunctionArgument::create_u32(bindingindex),
             APIInterceptor::APIFunctionArgument::create_u32(buffer),
-            APIInterceptor::APIFunctionArgument::create_i32(offset),
+            APIInterceptor::APIFunctionArgument::create_i64(offset),
             APIInterceptor::APIFunctionArgument::create_i32(stride),
         };
 

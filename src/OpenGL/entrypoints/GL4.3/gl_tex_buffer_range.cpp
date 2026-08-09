@@ -42,8 +42,8 @@ void AI_APIENTRY OpenGL::aiTexBufferRange(GLenum     target,
                 APIInterceptor::APIFunctionArgument::create_u32_glenum(target),
                 APIInterceptor::APIFunctionArgument::create_u32_glenum(internalformat),
                 APIInterceptor::APIFunctionArgument::create_u32       (buffer),
-                APIInterceptor::APIFunctionArgument::create_i32       (offset),
-                APIInterceptor::APIFunctionArgument::create_i32       (size),
+                APIInterceptor::APIFunctionArgument::create_i64       (offset),
+                APIInterceptor::APIFunctionArgument::create_i64       (size),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLTEXBUFFERRANGE,
@@ -76,8 +76,8 @@ void AI_APIENTRY OpenGL::aiTexBufferRange(GLenum     target,
             APIInterceptor::APIFunctionArgument::create_u32_glenum(target),
             APIInterceptor::APIFunctionArgument::create_u32_glenum(internalformat),
             APIInterceptor::APIFunctionArgument::create_u32       (buffer),
-            APIInterceptor::APIFunctionArgument::create_i32       (offset),
-            APIInterceptor::APIFunctionArgument::create_i32       (size),
+            APIInterceptor::APIFunctionArgument::create_i64       (offset),
+            APIInterceptor::APIFunctionArgument::create_i64       (size),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLTEXBUFFERRANGE,

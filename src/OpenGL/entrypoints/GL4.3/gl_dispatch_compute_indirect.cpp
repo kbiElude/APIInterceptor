@@ -30,7 +30,7 @@ void AI_APIENTRY OpenGL::aiDispatchComputeIndirect(GLintptr indirect)
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_i32(indirect),
+                APIInterceptor::APIFunctionArgument::create_i64(indirect),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLDISPATCHCOMPUTEINDIRECT,
@@ -56,7 +56,7 @@ void AI_APIENTRY OpenGL::aiDispatchComputeIndirect(GLintptr indirect)
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_i32(indirect),
+            APIInterceptor::APIFunctionArgument::create_i64(indirect),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLDISPATCHCOMPUTEINDIRECT,
