@@ -1016,8 +1016,17 @@
 
 #include "OpenGL/entrypoints/GL_ARB_draw_buffers/gl_draw_buffers_arb.h"
 
+#include "OpenGL/entrypoints/GL_ARB_draw_buffers_blend/gl_blend_equationi_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_draw_buffers_blend/gl_blend_equation_separatei_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_draw_buffers_blend/gl_blend_funci_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_draw_buffers_blend/gl_blend_func_separatei_arb.h"
+
 #include "OpenGL/entrypoints/GL_ARB_draw_instanced/gl_draw_arrays_instanced_arb.h"
 #include "OpenGL/entrypoints/GL_ARB_draw_instanced/gl_draw_elements_instanced_arb.h"
+
+#include "OpenGL/entrypoints/GL_ARB_instanced_arrays/gl_draw_arrays_instanced_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_instanced_arrays/gl_draw_elements_instanced_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_instanced_arrays/gl_vertex_attrib_divisor_arb.h"
 
 #include "OpenGL/entrypoints/GL_ARB_multisample/gl_sample_coverage_arb.h"
 
@@ -1034,6 +1043,8 @@
 
 #include "OpenGL/entrypoints/GL_ARB_point_parameters/gl_point_parameterf_arb.h"
 #include "OpenGL/entrypoints/GL_ARB_point_parameters/gl_point_parameterfv_arb.h"
+
+#include "OpenGL/entrypoints/GL_ARB_sample_shading/gl_min_sample_shading_arb.h"
 
 #include "OpenGL/entrypoints/GL_ARB_texture_buffer_object/gl_tex_buffer_arb.h"
 
@@ -1093,6 +1104,7 @@
 #include "OpenGL/entrypoints/GL_ARB_vertex_program/gl_vertex_attrib_4Nubv_arb.h"
 #include "OpenGL/entrypoints/GL_ARB_vertex_program/gl_vertex_attrib_4Nub_arb.h"
 #include "OpenGL/entrypoints/GL_ARB_vertex_program/gl_vertex_attrib_4Nuiv_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_vertex_program/gl_vertex_attrib_4Nusv_arb.h"
 #include "OpenGL/entrypoints/GL_ARB_vertex_program/gl_vertex_attrib_4sv_arb.h"
 #include "OpenGL/entrypoints/GL_ARB_vertex_program/gl_vertex_attrib_4s_arb.h"
 #include "OpenGL/entrypoints/GL_ARB_vertex_program/gl_vertex_attrib_4ubv_arb.h"
@@ -1173,6 +1185,20 @@
 #include "OpenGL/entrypoints/GL_ARB_window_pos/gl_window_pos_3sv_arb.h"
 
 #include "OpenGL/entrypoints/GL_EXT_blend_func_separate/gl_blend_func_separate_ext.h"
+
+#include "OpenGL/entrypoints/GL_ARB_debug_output/gl_debug_message_callback_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_debug_output/gl_debug_message_control_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_debug_output/gl_debug_message_insert_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_debug_output/gl_get_debug_message_log_arb.h"
+
+#include "OpenGL/entrypoints/GL_ARB_robustness/gl_get_graphics_reset_status_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_robustness/gl_getn_compressed_tex_image_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_robustness/gl_getn_tex_image_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_robustness/gl_getn_uniformdv_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_robustness/gl_getn_uniformfv_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_robustness/gl_getn_uniformiv_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_robustness/gl_getn_uniformuiv_arb.h"
+#include "OpenGL/entrypoints/GL_ARB_robustness/gl_readn_pixels_arb.h"
 
 #include "OpenGL/entrypoints/GL_EXT_draw_buffers2/gl_color_maski_ext.h"
 #include "OpenGL/entrypoints/GL_EXT_draw_buffers2/gl_disablei_ext.h"
@@ -1589,6 +1615,7 @@ std::unordered_map<std::string, void*> OpenGL::get_func_name_to_func_ptr_map()
     result["glSamplerParameterIuiv"]        = OpenGL::aiSamplerParameterIuiv;
     result["glSamplerParameteriv"]          = OpenGL::aiSamplerParameteriv;
     result["glVertexAttribDivisor"]         = OpenGL::aiVertexAttribDivisor;
+    result["glVertexAttribDivisorARB"]      = OpenGL::aiVertexAttribDivisorARB;
     result["glVertexAttribP1ui"]            = OpenGL::aiVertexAttribP1ui;
     result["glVertexAttribP1uiv"]           = OpenGL::aiVertexAttribP1uiv;
     result["glVertexAttribP2ui"]            = OpenGL::aiVertexAttribP2ui;
@@ -1601,9 +1628,13 @@ std::unordered_map<std::string, void*> OpenGL::get_func_name_to_func_ptr_map()
     result["glBeginQueryIndexed"]              = OpenGL::aiBeginQueryIndexed;
     result["glBindTransformFeedback"]          = OpenGL::aiBindTransformFeedback;
     result["glBlendEquationi"]                 = OpenGL::aiBlendEquationi;
+    result["glBlendEquationiARB"]              = OpenGL::aiBlendEquationiARB;
     result["glBlendEquationSeparatei"]         = OpenGL::aiBlendEquationSeparatei;
+    result["glBlendEquationSeparateiARB"]      = OpenGL::aiBlendEquationSeparateiARB;
     result["glBlendFunci"]                     = OpenGL::aiBlendFunci;
+    result["glBlendFunciARB"]                  = OpenGL::aiBlendFunciARB;
     result["glBlendFuncSeparatei"]             = OpenGL::aiBlendFuncSeparatei;
+    result["glBlendFuncSeparateiARB"]          = OpenGL::aiBlendFuncSeparateiARB;
     result["glDeleteTransformFeedbacks"]       = OpenGL::aiDeleteTransformFeedbacks;
     result["glDrawArraysIndirect"]             = OpenGL::aiDrawArraysIndirect;
     result["glDrawElementsIndirect"]           = OpenGL::aiDrawElementsIndirect;
@@ -1622,6 +1653,7 @@ std::unordered_map<std::string, void*> OpenGL::get_func_name_to_func_ptr_map()
     result["glGetUniformSubroutineuiv"]        = OpenGL::aiGetUniformSubroutineuiv;
     result["glIsTransformFeedback"]            = OpenGL::aiIsTransformFeedback;
     result["glMinSampleShading"]               = OpenGL::aiMinSampleShading;
+    result["glMinSampleShadingARB"]            = OpenGL::aiMinSampleShadingARB;
     result["glPatchParameterfv"]               = OpenGL::aiPatchParameterfv;
     result["glPatchParameteri"]                = OpenGL::aiPatchParameteri;
     result["glPauseTransformFeedback"]         = OpenGL::aiPauseTransformFeedback;
@@ -1752,12 +1784,16 @@ std::unordered_map<std::string, void*> OpenGL::get_func_name_to_func_ptr_map()
     result["glClearBufferSubData"]               = OpenGL::aiClearBufferSubData;
     result["glCopyImageSubData"]                 = OpenGL::aiCopyImageSubData;
     result["glDebugMessageCallback"]             = OpenGL::aiDebugMessageCallback;
+    result["glDebugMessageCallbackARB"]          = OpenGL::aiDebugMessageCallbackARB;
     result["glDebugMessageControl"]              = OpenGL::aiDebugMessageControl;
+    result["glDebugMessageControlARB"]           = OpenGL::aiDebugMessageControlARB;
     result["glDebugMessageInsert"]               = OpenGL::aiDebugMessageInsert;
+    result["glDebugMessageInsertARB"]            = OpenGL::aiDebugMessageInsertARB;
     result["glDispatchCompute"]                  = OpenGL::aiDispatchCompute;
     result["glDispatchComputeIndirect"]          = OpenGL::aiDispatchComputeIndirect;
     result["glFramebufferParameteri"]            = OpenGL::aiFramebufferParameteri;
     result["glGetDebugMessageLog"]               = OpenGL::aiGetDebugMessageLog;
+    result["glGetDebugMessageLogARB"]            = OpenGL::aiGetDebugMessageLogARB;
     result["glGetFramebufferParameteriv"]        = OpenGL::aiGetFramebufferParameteriv;
     result["glGetInternalformati64v"]            = OpenGL::aiGetInternalformati64v;
     result["glGetObjectLabel"]                   = OpenGL::aiGetObjectLabel;
@@ -1834,6 +1870,7 @@ std::unordered_map<std::string, void*> OpenGL::get_func_name_to_func_ptr_map()
     result["glGetCompressedTextureImage"]                     = OpenGL::aiGetCompressedTextureImage;
     result["glGetCompressedTextureSubImage"]                  = OpenGL::aiGetCompressedTextureSubImage;
     result["glGetGraphicsResetStatus"]                        = OpenGL::aiGetGraphicsResetStatus;
+    result["glGetGraphicsResetStatusARB"]                     = OpenGL::aiGetGraphicsResetStatusARB;
     result["glGetNamedBufferParameteri64v"]                   = OpenGL::aiGetNamedBufferParameteri64v;
     result["glGetNamedBufferParameteriv"]                     = OpenGL::aiGetNamedBufferParameteriv;
     result["glGetNamedBufferPointerv"]                        = OpenGL::aiGetNamedBufferPointerv;
@@ -1842,11 +1879,17 @@ std::unordered_map<std::string, void*> OpenGL::get_func_name_to_func_ptr_map()
     result["glGetNamedFramebufferParameteriv"]                = OpenGL::aiGetNamedFramebufferParameteriv;
     result["glGetNamedRenderbufferParameteriv"]               = OpenGL::aiGetNamedRenderbufferParameteriv;
     result["glGetnCompressedTexImage"]                        = OpenGL::aiGetnCompressedTexImage;
+    result["glGetnCompressedTexImageARB"]                     = OpenGL::aiGetnCompressedTexImageARB;
     result["glGetnTexImage"]                                  = OpenGL::aiGetnTexImage;
+    result["glGetnTexImageARB"]                               = OpenGL::aiGetnTexImageARB;
     result["glGetnUniformdv"]                                 = OpenGL::aiGetnUniformdv;
+    result["glGetnUniformdvARB"]                              = OpenGL::aiGetnUniformdvARB;
     result["glGetnUniformfv"]                                 = OpenGL::aiGetnUniformfv;
+    result["glGetnUniformfvARB"]                              = OpenGL::aiGetnUniformfvARB;
     result["glGetnUniformiv"]                                 = OpenGL::aiGetnUniformiv;
+    result["glGetnUniformivARB"]                              = OpenGL::aiGetnUniformivARB;
     result["glGetnUniformuiv"]                                = OpenGL::aiGetnUniformuiv;
+    result["glGetnUniformuivARB"]                             = OpenGL::aiGetnUniformuivARB;
     result["glGetQueryBufferObjecti64v"]                      = OpenGL::aiGetQueryBufferObjecti64v;
     result["glGetQueryBufferObjectiv"]                        = OpenGL::aiGetQueryBufferObjectiv;
     result["glGetQueryBufferObjectui64v"]                     = OpenGL::aiGetQueryBufferObjectui64v;
@@ -1883,6 +1926,7 @@ std::unordered_map<std::string, void*> OpenGL::get_func_name_to_func_ptr_map()
     result["glNamedRenderbufferStorage"]                      = OpenGL::aiNamedRenderbufferStorage;
     result["glNamedRenderbufferStorageMultisample"]           = OpenGL::aiNamedRenderbufferStorageMultisample;
     result["glReadnPixels"]                                   = OpenGL::aiReadnPixels;
+    result["glReadnPixelsARB"]                                = OpenGL::aiReadnPixelsARB;
     result["glTextureBarrier"]                                = OpenGL::aiTextureBarrier;
     result["glTextureBuffer"]                                 = OpenGL::aiTextureBuffer;
     result["glTextureBufferRange"]                            = OpenGL::aiTextureBufferRange;
@@ -1993,6 +2037,7 @@ std::unordered_map<std::string, void*> OpenGL::get_func_name_to_func_ptr_map()
     result["glVertexAttrib4NubvARB"]        = OpenGL::aiVertexAttrib4NubvARB;
     result["glVertexAttrib4NubARB"]         = OpenGL::aiVertexAttrib4NubARB;
     result["glVertexAttrib4NuivARB"]        = OpenGL::aiVertexAttrib4NuivARB;
+    result["glVertexAttrib4NusvARB"]        = OpenGL::aiVertexAttrib4NusvARB;
     result["glVertexAttrib4svARB"]          = OpenGL::aiVertexAttrib4svARB;
     result["glVertexAttrib4sARB"]           = OpenGL::aiVertexAttrib4sARB;
     result["glVertexAttrib4ubvARB"]         = OpenGL::aiVertexAttrib4ubvARB;
@@ -2081,7 +2126,8 @@ std::unordered_map<std::string, void*> OpenGL::get_func_name_to_func_ptr_map()
     result["glBlendFuncSeparateEXT"] = OpenGL::aiBlendFuncSeparateEXT;
 
     /* GL_EXT_draw_buffers2 */
-    result["glColorMaskiEXT"]    = OpenGL::aiColorMaskiEXT;
+    result["glColorMaskIndexedEXT"] = OpenGL::aiColorMaskiEXT;
+    result["glColorMaskiEXT"]       = OpenGL::aiColorMaskiEXT;
     result["glDisableiEXT"]      = OpenGL::aiDisableiEXT;
     result["glEnableiEXT"]       = OpenGL::aiEnableiEXT;
     result["glGetBooleani_vEXT"] = OpenGL::aiGetBooleani_vEXT;

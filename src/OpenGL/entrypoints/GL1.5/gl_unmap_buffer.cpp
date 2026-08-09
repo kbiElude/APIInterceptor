@@ -94,7 +94,7 @@ GLboolean AI_APIENTRY OpenGL::aiUnmapBuffer(GLenum target)
         }
 
         if (post_callback_func_ptr != nullptr)
-        {
+        {   
             const bool is_readable    = (mapping_access == OpenGL::BufferMappingAccess::READ_WRITE);
             const auto unmap_chunk_id = APIInterceptor::register_data_chunk((is_readable)                          ? mapped_ptr
                                                                                                                    : nullptr,
