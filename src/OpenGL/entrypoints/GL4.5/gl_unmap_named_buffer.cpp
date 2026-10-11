@@ -26,6 +26,7 @@ GLboolean AI_APIENTRY OpenGL::aiUnmapNamedBuffer(GLuint buffer)
     /* Retrieve mapping state before the driver call invalidates the pointer. */
     void*                       mapped_ptr     = nullptr;
     OpenGL::BufferMappingAccess mapping_access = OpenGL::BufferMappingAccess::READ_ONLY;
+    uint32_t                    unmap_chunk_id = 0;
     uint32_t                    size_bytes     = 0;
 
     if (tracker.is_top_level_api_call() )
@@ -72,6 +73,18 @@ GLboolean AI_APIENTRY OpenGL::aiUnmapNamedBuffer(GLuint buffer)
 
     AI_ASSERT(should_pass_through);
 
+    /* Snapshot the contents before the driver call: the mapped pointer is invalid once the buffer is unmapped.
+     * Anything the application could have written to (WRITE_ONLY included) needs to be captured. */
+    if (tracker.is_top_level_api_call() && post_callback_func_ptr != nullptr)
+    {
+        const bool is_writable = (mapping_access != OpenGL::BufferMappingAccess::READ_ONLY);
+
+        unmap_chunk_id = APIInterceptor::register_data_chunk((is_writable)                          ? mapped_ptr
+                                                                                                    : nullptr,
+                                                             (is_writable && mapped_ptr != nullptr) ? size_bytes
+                                                                                                    : 0u);
+    }
+
     result = reinterpret_cast<PFNGLUNMAPNAMEDBUFFERPROC>(OpenGL::g_cached_gl_unmap_named_buffer)(buffer);
 
     if (tracker.is_top_level_api_call() )
@@ -88,12 +101,6 @@ GLboolean AI_APIENTRY OpenGL::aiUnmapNamedBuffer(GLuint buffer)
 
         if (post_callback_func_ptr != nullptr)
         {
-            const bool is_readable      = (mapping_access == OpenGL::BufferMappingAccess::READ_WRITE);
-            const auto unmap_chunk_id   = APIInterceptor::register_data_chunk((is_readable)                          ? mapped_ptr
-                                                                                                                     : nullptr,
-                                                                              (is_readable && mapped_ptr != nullptr) ? size_bytes
-                                                                                                                     : 0u);
-
             APIInterceptor::APIFunctionArgument result_arg;
 
             const APIInterceptor::APIFunctionArgument args[] =

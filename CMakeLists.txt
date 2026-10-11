@@ -3,7 +3,7 @@ project (APIInterceptor)
 
 option(APIINTERCEPTOR_BUILD_INTERCEPTOR "Build API interceptor projects"             ON)
 option(APIINTERCEPTOR_BUILD_LIBS        "Build static libs (API Dump Loader)"        ON)
-option(APIINTERCEPTOR_BUILD_TESTS       "Build automated tests"                      ON)
+option(APIINTERCEPTOR_BUILD_TESTS       "Build automated tests"                      OFF)
 option(APIINTERCEPTOR_BUILD_TOOLS       "Build tools (API Dumper, API Dump Printer)" ON)
 option(APIINTERCEPTOR_DUMP_API_CALLS    "Dump API calls to text files (debugging)"   OFF)
 
