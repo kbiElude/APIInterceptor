@@ -58,8 +58,7 @@ void AI_APIENTRY OpenGL::aiGenTextures(GLsizei n,
     {
         APIInterceptor::APIFunctionArgument result_arg;
         const auto                          textures_chunk_id = APIInterceptor::register_data_chunk(textures,
-                                                                                                    (textures != nullptr) ? sizeof(GLsizei) * sizeof(GLuint)
-                                                                                                                          : 0);
+                                                                                                    (textures != nullptr) ? sizeof(GLuint) * static_cast<uint32_t>(n) : 0);
 
         const APIInterceptor::APIFunctionArgument args[] =
         {

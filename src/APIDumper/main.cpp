@@ -5,22 +5,11 @@
 #include <Windows.h>
 #include <string>
 #include "Detours/src/detours.h"
+#include "launcher.h"
 
-enum class TargetArch
-{
-    X86,
-    X64,
-
-    Unknown
-};
-
-/* Reads the PE headers of the specified file and tells which architecture the executable was built for.
- *
- * On failure, returns false and fills out_error_ptr with a human-readable description.
- */
-static bool get_target_arch(const char*  in_filename_ptr,
-                            TargetArch*  out_arch_ptr,
-                            std::string* out_error_ptr)
+bool APIDumperLauncher::get_target_arch(const char*  in_filename_ptr,
+                                        TargetArch*  out_arch_ptr,
+                                        std::string* out_error_ptr)
 {
     IMAGE_DOS_HEADER  dos_header      = {};
     IMAGE_FILE_HEADER file_header     = {};
@@ -51,15 +40,15 @@ static bool get_target_arch(const char*  in_filename_ptr,
 
     if (::fseek(file_handle,
                 dos_header.e_lfanew,
-                SEEK_SET) != 0                      ||
+                SEEK_SET)    != 0                   ||
         ::fread(&pe_signature,
                 sizeof(pe_signature),
                 1,
                 file_handle) != 1                   ||
         ::fread(&file_header,
-            sizeof(file_header),
-            1,
-            file_handle)     != 1                   ||
+                sizeof(file_header),
+                1,
+                file_handle) != 1                   ||
         pe_signature         != IMAGE_NT_SIGNATURE)
     {
         *out_error_ptr = "Not a valid PE executable (no PE header).";
@@ -208,14 +197,14 @@ int main(int   in_argc,
 
     /* Now look for the dumper dll .. The DLL must match the target's architecture, not ours. */
     {
-        char        dll_dir_raw    [MAX_PATH] = {};
-        std::string target_arch_error;
-        TargetArch  target_arch               = TargetArch::Unknown;
-        char        working_dir_raw[MAX_PATH] = {};
+        char                          dll_dir_raw    [MAX_PATH] = {};
+        std::string                   target_arch_error;
+        APIDumperLauncher::TargetArch target_arch               = APIDumperLauncher::TargetArch::Unknown;
+        char                          working_dir_raw[MAX_PATH] = {};
 
-        if (!get_target_arch(filename_ptr,
-                            &target_arch,
-                            &target_arch_error) )
+        if (!APIDumperLauncher::get_target_arch(filename_ptr,
+                                               &target_arch,
+                                               &target_arch_error) )
         {
             fprintf(stderr,
                     "[!] Could not determine architecture of [%s]: %s\n",
@@ -226,16 +215,18 @@ int main(int   in_argc,
         }
 
         #if defined(_WIN64)
-            constexpr TargetArch launcher_arch = TargetArch::X64;
+            constexpr APIDumperLauncher::TargetArch launcher_arch = APIDumperLauncher::TargetArch::X64;
         #else
-            constexpr TargetArch launcher_arch = TargetArch::X86;
+            constexpr APIDumperLauncher::TargetArch launcher_arch = APIDumperLauncher::TargetArch::X86;
         #endif
 
         /* Detours cannot inject across architectures when launching a process this way. */
         if (target_arch != launcher_arch)
         {
-            const char* target_arch_str   = (target_arch   == TargetArch::X86) ? "x86" : "x64";
-            const char* launcher_arch_str = (launcher_arch == TargetArch::X86) ? "x86" : "x64";
+            const char* target_arch_str   = (target_arch   == APIDumperLauncher::TargetArch::X86) ? "x86"
+                                                                                                  : "x64";
+            const char* launcher_arch_str = (launcher_arch == APIDumperLauncher::TargetArch::X86) ? "x86"
+                                                                                                  : "x64";
 
             fprintf(stderr,
                     "[!] [%s] is an %s executable but this is the %s APIDumper. Use APIDumper_%s.exe instead.\n",
@@ -247,8 +238,8 @@ int main(int   in_argc,
             goto end;
         }
 
-        apidumper_dll_file_name = (target_arch == TargetArch::X86) ? "APIDumperDLL_x86.dll"
-                                                                    : "APIDumperDLL_x64.dll";
+        apidumper_dll_file_name = (target_arch == APIDumperLauncher::TargetArch::X86) ? "APIDumperDLL_x86.dll"
+                                                                                      : "APIDumperDLL_x64.dll";
 
         if (::GetCurrentDirectory(sizeof(working_dir_raw),
                                   working_dir_raw) == 0)
@@ -284,7 +275,8 @@ int main(int   in_argc,
             fprintf(stderr,
                     "[!] [%s] is an %s executable but [%s] was not found.\n",
                     filename_ptr,
-                    (target_arch == TargetArch::X86) ? "x86" : "x64",
+                    (target_arch == APIDumperLauncher::TargetArch::X86) ? "x86"
+                                                                        : "x64",
                     apidumper_dll_file_name.c_str() );
 
             goto end;
