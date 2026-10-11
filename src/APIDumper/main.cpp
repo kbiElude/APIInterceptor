@@ -6,10 +6,112 @@
 #include <string>
 #include "Detours/src/detours.h"
 
+enum class TargetArch
+{
+    X86,
+    X64,
+
+    Unknown
+};
+
+/* Reads the PE headers of the specified file and tells which architecture the executable was built for.
+ *
+ * On failure, returns false and fills out_error_ptr with a human-readable description.
+ */
+static bool get_target_arch(const char*  in_filename_ptr,
+                            TargetArch*  out_arch_ptr,
+                            std::string* out_error_ptr)
+{
+    IMAGE_DOS_HEADER  dos_header      = {};
+    IMAGE_FILE_HEADER file_header     = {};
+    FILE*             file_handle     = ::fopen(in_filename_ptr,
+                                                "rb");
+    uint32_t          pe_signature    = 0;
+    bool              result          = false;
+
+    *out_arch_ptr = TargetArch::Unknown;
+
+    if (file_handle == nullptr)
+    {
+        *out_error_ptr = "Could not open the file for reading.";
+
+        goto end;
+    }
+
+    if (::fread(&dos_header,
+                sizeof(dos_header),
+                1,
+                file_handle) != 1                   ||
+        dos_header.e_magic   != IMAGE_DOS_SIGNATURE)
+    {
+        *out_error_ptr = "Not a valid PE executable (no MZ header).";
+
+        goto end;
+    }
+
+    if (::fseek(file_handle,
+                dos_header.e_lfanew,
+                SEEK_SET) != 0                      ||
+        ::fread(&pe_signature,
+                sizeof(pe_signature),
+                1,
+                file_handle) != 1                   ||
+        ::fread(&file_header,
+            sizeof(file_header),
+            1,
+            file_handle)     != 1                   ||
+        pe_signature         != IMAGE_NT_SIGNATURE)
+    {
+        *out_error_ptr = "Not a valid PE executable (no PE header).";
+
+        goto end;
+    }
+
+    switch (file_header.Machine)
+    {
+        case IMAGE_FILE_MACHINE_I386:
+        {
+            *out_arch_ptr = TargetArch::X86;
+             result       = true;
+
+             break;
+        }
+
+        case IMAGE_FILE_MACHINE_AMD64:
+        {
+            *out_arch_ptr = TargetArch::X64;
+             result       = true;
+
+             break;
+        }
+
+        default:
+        {
+            char error_buffer[128];
+
+            snprintf(error_buffer,
+                     sizeof(error_buffer),
+                     "Unsupported target architecture (PE machine type 0x%04X). Only x86 and x64 are supported.",
+                     static_cast<uint32_t>(file_header.Machine) );
+
+            *out_error_ptr = error_buffer;
+            break;
+        }
+    }
+
+end:
+    if (file_handle != nullptr)
+    {
+        ::fclose(file_handle);
+    }
+
+    return result;
+}
+
 int main(int   in_argc,
          char* in_argv[])
 {
-    std::string apidumper_dll_file_name  = "APIDumperDLL.dll";
+    std::string apidumper_dll_file_name;
     std::string dll_dir;
     uint32_t    dump_swapchain_on_present = 0;
     uint32_t    n_file_path_cmd_line_arg  = 1;
@@ -104,10 +206,49 @@ int main(int   in_argc,
         goto end;
     }
 
-    /* Now look for the dumper dll .. */
+    /* Now look for the dumper dll .. The DLL must match the target's architecture, not ours. */
     {
-        char dll_dir_raw    [MAX_PATH] = {};
-        char working_dir_raw[MAX_PATH] = {};
+        char        dll_dir_raw    [MAX_PATH] = {};
+        std::string target_arch_error;
+        TargetArch  target_arch               = TargetArch::Unknown;
+        char        working_dir_raw[MAX_PATH] = {};
+
+        if (!get_target_arch(filename_ptr,
+                            &target_arch,
+                            &target_arch_error) )
+        {
+            fprintf(stderr,
+                    "[!] Could not determine architecture of [%s]: %s\n",
+                    filename_ptr,
+                    target_arch_error.c_str() );
+
+            goto end;
+        }
+
+        #if defined(_WIN64)
+            constexpr TargetArch launcher_arch = TargetArch::X64;
+        #else
+            constexpr TargetArch launcher_arch = TargetArch::X86;
+        #endif
+
+        /* Detours cannot inject across architectures when launching a process this way. */
+        if (target_arch != launcher_arch)
+        {
+            const char* target_arch_str   = (target_arch   == TargetArch::X86) ? "x86" : "x64";
+            const char* launcher_arch_str = (launcher_arch == TargetArch::X86) ? "x86" : "x64";
+
+            fprintf(stderr,
+                    "[!] [%s] is an %s executable but this is the %s APIDumper. Use APIDumper_%s.exe instead.\n",
+                    filename_ptr,
+                    target_arch_str,
+                    launcher_arch_str,
+                    target_arch_str);
+
+            goto end;
+        }
+
+        apidumper_dll_file_name = (target_arch == TargetArch::X86) ? "APIDumperDLL_x86.dll"
+                                                                    : "APIDumperDLL_x64.dll";
 
         if (::GetCurrentDirectory(sizeof(working_dir_raw),
                                   working_dir_raw) == 0)
@@ -140,10 +281,11 @@ int main(int   in_argc,
 
         if (::GetFileAttributes(apidumper_dll_file_name.c_str() ) == INVALID_FILE_ATTRIBUTES)
         {
-            ::MessageBox(HWND_DESKTOP,
-                         "APIDumper.dll not found in the working directory.",
-                         "Error",
-                         MB_OK | MB_ICONERROR);
+            fprintf(stderr,
+                    "[!] [%s] is an %s executable but [%s] was not found.\n",
+                    filename_ptr,
+                    (target_arch == TargetArch::X86) ? "x86" : "x64",
+                    apidumper_dll_file_name.c_str() );
 
             goto end;
         }
@@ -233,12 +375,15 @@ int main(int   in_argc,
                                          apidumper_dll_file_name.c_str(),
                                          nullptr) != TRUE)                 /* pfCreateProcessA    */
         {
-            std::string error = "Could not launch the specified process with APIDumper attached.";
+            const DWORD last_error = ::GetLastError();
 
-            ::MessageBox(HWND_DESKTOP,
-                         error.c_str(),
-                         "Error",
-                         MB_OK | MB_ICONERROR);
+            fprintf(stderr,
+                    "[!] Could not launch [%s] with [%s] attached (error %lu).\n",
+                    filename_ptr,
+                    apidumper_dll_file_name.c_str(),
+                    last_error);
+
+            goto end;
         }
 
         #if defined(_DEBUG)

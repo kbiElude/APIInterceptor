@@ -31,7 +31,7 @@ if "%SCRIPT_DIR:~-1%"=="\" set SCRIPT_DIR=%SCRIPT_DIR:~0,-1%
 set BUILD_X86_DIR=%SCRIPT_DIR%\build_x86
 set BUILD_X64_DIR=%SCRIPT_DIR%\build_x64
 set BUILD_FINAL_DIR=%SCRIPT_DIR%\build_final
-set CMAKE_GENERATOR=Visual Studio 17 2022
+set CMAKE_GENERATOR=Visual Studio 18 2026
 set BUILD_CONFIG=Release
 set MODE=incremental
 
@@ -187,10 +187,13 @@ exit /b %errorlevel%
 
 rem --- :collect_binaries ----------------------------------------
 rem  Copies runtime outputs from both build trees into build_final\.
-rem  APIDumperDLL.dll is renamed to distinguish architectures:
+rem  APIDumperDLL.dll and APIDumper.exe are renamed to distinguish architectures:
 rem    build_x64\bin\<Config>\APIDumperDLL.dll -> build_final\APIDumperDLL_x64.dll
 rem    build_x86\bin\<Config>\APIDumperDLL.dll -> build_final\APIDumperDLL_x86.dll
-rem  All other x64 outputs are copied as-is.
+rem    build_x64\bin\<Config>\APIDumper.exe    -> build_final\APIDumper_x64.exe
+rem    build_x86\bin\<Config>\APIDumper.exe    -> build_final\APIDumper_x86.exe
+rem  All other x64 outputs (incl. APIDumpPrinter.exe, which reads dumps from
+rem  either architecture) are copied as-is.
 
 :collect_binaries
 echo [*] Collecting binaries into build_final\...
@@ -212,6 +215,27 @@ if exist "%BUILD_FINAL_DIR%\APIDumperDLL.dll" (
         echo [!] Failed to rename APIDumperDLL.dll to APIDumperDLL_x64.dll.
         exit /b 1
     )
+)
+
+rem Rename the x64 launcher that was just copied.
+if exist "%BUILD_FINAL_DIR%\APIDumper.exe" (
+    del /q "%BUILD_FINAL_DIR%\APIDumper_x64.exe" >nul 2>&1
+    rename "%BUILD_FINAL_DIR%\APIDumper.exe" "APIDumper_x64.exe"
+    if %errorlevel% neq 0 (
+        echo [!] Failed to rename APIDumper.exe to APIDumper_x64.exe.
+        exit /b 1
+    )
+)
+
+rem Copy the x86 launcher.
+if not exist "%BUILD_X86_DIR%\bin\%BUILD_CONFIG%\APIDumper.exe" (
+    echo [!] x86 APIDumper.exe not found at build_x86\bin\%BUILD_CONFIG%\APIDumper.exe.
+    exit /b 1
+)
+copy /y "%BUILD_X86_DIR%\bin\%BUILD_CONFIG%\APIDumper.exe" "%BUILD_FINAL_DIR%\APIDumper_x86.exe" >nul
+if %errorlevel% neq 0 (
+    echo [!] Failed to copy x86 APIDumper.exe to build_final\APIDumper_x86.exe.
+    exit /b 1
 )
 
 rem Copy the x86 interceptor DLL.
