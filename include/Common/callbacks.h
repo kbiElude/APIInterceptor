@@ -41,8 +41,14 @@ namespace APIInterceptor
                                     const void**       out_data_ptr_ptr,
                                     uint32_t*          out_n_bytes_ptr);
     uint32_t    get_n_data_chunks  ();
-    DataChunkID register_data_chunk(const void*     in_data_ptr,
-                                    const uint32_t& in_n_bytes);
+    DataChunkID register_data_chunk(const void*        in_data_ptr,
+                                    const uint32_t&    in_n_bytes);
+    void        release_data_chunk (const DataChunkID& in_data_chunk_id);
+
+    /* Moves the contents of the data chunks out of the store, in one go. A chunk which is not there comes out empty. */
+    void take_data_chunks(const DataChunkID&                  in_first_data_chunk_id,
+                          const uint32_t&                     in_n_data_chunks,
+                          std::vector<std::vector<uint8_t> >* out_data_chunk_vec_ptr);
 
     void on_api_call_interception_finished();
     bool on_api_call_interception_started ();

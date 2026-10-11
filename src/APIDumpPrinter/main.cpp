@@ -12,103 +12,111 @@
 #include <string>
 #include <vector>
 #include "APIDumpLoader/APIDumpLoader.h"
+#include "APIDumpLoader/WorkloadReader.h"
 #include "api_info.h"
 #include "formatter.h"
 #include "printer.h"
 
-bool APIDumpPrinter::parse_api_list(const char* in_arg_ptr,
+bool APIDumpPrinter::parse_api_list(const char* in_argument_ptr,
                                     Options*    inout_options_ptr)
 {
-    std::string list(in_arg_ptr);
+    std::string list(in_argument_ptr);
     bool        result = true;
     size_t      start  = 0;
 
     while (start <= list.size() )
     {
-        const size_t end  = list.find(',',
-                                      start);
-        const auto   name = list.substr(start,
-                                        (end == std::string::npos) ? std::string::npos
-                                                                   : (end - start) );
+        const size_t separator_position = list.find(',',
+                                                    start);
+        const auto   group_name         = list.substr(start,
+                                                      (separator_position == std::string::npos) ? std::string::npos
+                                                                                                : (separator_position - start) );
         APIGroup     group;
 
-        if (!parse_api_group_name(name.c_str(),
+        if (!parse_api_group_name(group_name.c_str(),
                                  &group) )
         {
+            result = false;
+
             fprintf(stderr,
                     "[!] Unknown API [%s] in --api list.\n",
-                    name.c_str() );
+                    group_name.c_str() );
 
-            result = false;
             break;
         }
 
-        inout_options_ptr->allowed_api_groups.insert(group);
+        inout_options_ptr->allowed_api_group_set.insert(group);
 
-        if (end == std::string::npos)
+        if (separator_position == std::string::npos)
         {
             break;
         }
 
-        start = end + 1;
+        start = separator_position + 1;
     }
 
     return result;
 }
 
-bool APIDumpPrinter::parse_args(int      in_argc,
-                                char*    in_argv[],
-                                Options* out_options_ptr)
+bool APIDumpPrinter::parse_arguments(int      in_argc,
+                                     char*    in_argv[],
+                                     Options* out_options_ptr)
 {
     bool result = false;
 
-    for (int n_arg = 1; n_arg < in_argc; ++n_arg)
+    for (int n_argument = 1; n_argument < in_argc; ++n_argument)
     {
-        const std::string arg(in_argv[n_arg]);
-        const bool        has_value = (n_arg + 1 < in_argc);
+        const std::string argument(in_argv[n_argument]);
+        const bool        has_value = (n_argument + 1 < in_argc);
 
-        if (arg == "--stats")
+        if (argument == "--stats")
         {
-            out_options_ptr->show_stats = true;
+            out_options_ptr->show_statistics = true;
         }
         else
-        if (arg == "--frame"       ||
-            arg == "--api"         ||
-            arg == "--dump-chunks" ||
-            arg == "--hexdump")
+        if (argument == "--frame"       ||
+            argument == "--api"         ||
+            argument == "--dump-chunks" ||
+            argument == "--hexdump")
         {
             if (!has_value)
             {
                 fprintf(stderr,
                         "[!] %s must be followed by a value.\n",
-                        arg.c_str() );
+                        argument.c_str() );
 
                 goto end;
             }
 
-            const char* value_ptr = in_argv[++n_arg];
+            const char* value_ptr = in_argv[++n_argument];
 
-            if (arg                                           == "--frame" &&
-                parse_frame_range(value_ptr, out_options_ptr) == false)
+            if (argument == "--frame")
             {
-                fprintf(stderr,
-                        "[!] --frame expects N, A-B or A-.\n");
+                if (parse_frame_range(value_ptr,
+                                      out_options_ptr) == false)
+                {
+                    fprintf(stderr,
+                            "[!] --frame expects N, A-B or A-.\n");
 
-                goto end;
+                    goto end;
+                }
             }
             else
-            if (arg                                        == "--api" &&
-                parse_api_list(value_ptr, out_options_ptr) == false)
+            if (argument == "--api")
             {
-                goto end;
+                if (parse_api_list(value_ptr,
+                                   out_options_ptr) == false)
+                {
+                    goto end;
+                }
             }
             else
-            if (arg == "--dump-chunks")
+            if (argument == "--dump-chunks")
             {
-                out_options_ptr->chunk_dump_dir = value_ptr;
+                out_options_ptr->chunk_dump_directory = value_ptr;
             }
             else
-            if (arg == "--hexdump")
+            if (argument == "--hexdump")
             {
                 out_options_ptr->n_hexdump_bytes = static_cast<uint32_t>(strtoul(value_ptr,
                                                                                  nullptr,
@@ -116,19 +124,19 @@ bool APIDumpPrinter::parse_args(int      in_argc,
             }
         }
         else
-        if (arg.size() >  1 &&
-            arg[0]     == '-')
+        if (argument.size() >  1 &&
+            argument[0]     == '-')
         {
             fprintf(stderr,
                     "[!] Unrecognized option [%s].\n",
-                    arg.c_str() );
+                    argument.c_str() );
 
             goto end;
         }
         else
         if (out_options_ptr->workload_filename_ptr == nullptr)
         {
-            out_options_ptr->workload_filename_ptr = in_argv[n_arg];
+            out_options_ptr->workload_filename_ptr = in_argv[n_argument];
         }
         else
         {
@@ -144,32 +152,32 @@ end:
     return result;
 }
 
-bool APIDumpPrinter::parse_frame_range(const char* in_arg_ptr,
+bool APIDumpPrinter::parse_frame_range(const char* in_argument_ptr,
                                        Options*    inout_options_ptr)
 {
-    unsigned int a        = 0;
-    unsigned int b        = 0;
-    char         dash     = 0;
-    const int    n_parsed = sscanf(in_arg_ptr,
-                                   "%u%c%u",
-                                  &a,
-                                  &dash,
-                                  &b);
-    bool         result   = false;
+    unsigned int first_value = 0;
+    unsigned int last_value  = 0;
+    char         separator   = 0;
+    const int    n_parsed    = sscanf(in_argument_ptr,
+                                      "%u%c%u",
+                                     &first_value,
+                                     &separator,
+                                     &last_value);
+    bool         result      = false;
 
     if (n_parsed == 1)
     {
-        inout_options_ptr->first_frame = a;
-        inout_options_ptr->last_frame  = a;
+        inout_options_ptr->first_frame = first_value;
+        inout_options_ptr->last_frame  = first_value;
 
         result = true;
     }
     else
-    if (n_parsed >= 2 &&
-        dash     == '-')
+    if (n_parsed  >= 2 &&
+        separator == '-')
     {
-        inout_options_ptr->first_frame = a;
-        inout_options_ptr->last_frame  = (n_parsed == 3) ? b
+        inout_options_ptr->first_frame = first_value;
+        inout_options_ptr->last_frame  = (n_parsed == 3) ? last_value
                                                          : UINT32_MAX;
 
         result = (inout_options_ptr->first_frame <= inout_options_ptr->last_frame);
@@ -178,19 +186,13 @@ bool APIDumpPrinter::parse_frame_range(const char* in_arg_ptr,
     return result;
 }
 
-void APIDumpPrinter::print_stats(const std::map<APIInterceptor::APIFunction, uint32_t>& in_call_count_map,
-                                 const std::map<APIGroup, uint32_t>&                    in_group_count_map,
-                                 const uint32_t&                                        in_n_calls_selected,
-                                 const uint32_t&                                        in_n_frames_total,
-                                 const APIDumpLoader::Workload&                         in_workload)
+void APIDumpPrinter::print_statistics(const std::map<APIInterceptor::APIFunction, uint32_t>& in_call_count_map,
+                                      const std::map<APIGroup, uint32_t>&                    in_group_count_map,
+                                      const uint32_t&                                        in_n_calls_selected,
+                                      const uint32_t&                                        in_n_frames_total,
+                                      const WorkloadTotals&                                  in_totals)
 {
-    uint64_t total_chunk_bytes = 0;
     std::vector<std::pair<uint32_t, APIInterceptor::APIFunction> > sorted_vec;
-
-    for (const auto& chunk_ptr : in_workload.data_chunk_ptr_vec)
-    {
-        total_chunk_bytes += chunk_ptr->size();
-    }
 
     for (const auto& item : in_call_count_map)
     {
@@ -200,28 +202,28 @@ void APIDumpPrinter::print_stats(const std::map<APIInterceptor::APIFunction, uin
 
     std::sort(sorted_vec.begin(),
               sorted_vec.end  (),
-              [](const std::pair<uint32_t, APIInterceptor::APIFunction>& a,
-                 const std::pair<uint32_t, APIInterceptor::APIFunction>& b)
+              [](const std::pair<uint32_t, APIInterceptor::APIFunction>& in_item_a,
+                 const std::pair<uint32_t, APIInterceptor::APIFunction>& in_item_b)
               {
-                  return (a.first != b.first) ? (a.first > b.first)
-                                              : (std::string(get_function_name(a.second)) < std::string(get_function_name(b.second)));
+                  return (in_item_a.first != in_item_b.first) ? (in_item_a.first > in_item_b.first)
+                                                              : (std::string(get_function_name(in_item_a.second)) < std::string(get_function_name(in_item_b.second)));
               });
 
     fprintf(stdout,
             "Workload summary (whole file):\n");
     fprintf(stdout,
             "  API calls:     %u\n",
-            static_cast<uint32_t>(in_workload.dumped_api_call_vec_ptr->size() ));
+            in_totals.n_api_calls);
     fprintf(stdout,
             "  Frames:        %u\n",
             in_n_frames_total);
     fprintf(stdout,
             "  Data chunks:   %u (%llu bytes)\n",
-            static_cast<uint32_t>(in_workload.data_chunk_ptr_vec.size() ),
-            static_cast<unsigned long long>(total_chunk_bytes) );
+            in_totals.n_data_chunks,
+            static_cast<unsigned long long>(in_totals.n_data_chunk_bytes) );
     fprintf(stdout,
             "  Surfaces:      %u\n\n",
-            static_cast<uint32_t>(in_workload.dumped_surface_vec_ptr->size() ));
+            in_totals.n_surfaces);
 
     fprintf(stdout,
             "Selected calls: %u\n",
@@ -254,14 +256,15 @@ void APIDumpPrinter::print_usage()
             "\n"
             "APIDumpPrinter [options] drive:\\path\\to\\file.workload\n"
             "\n"
-            "Every call is printed with ALL of its input args and its returned value. If the implementation updated\n"
-            "any args by reference (e.g. IDs written by glGenTextures), they are listed as [out: argN=value].\n"
+            "Every call is printed with ALL of its input arguments and its returned value. If the implementation\n"
+            "updated any arguments by reference (e.g. IDs written by glGenTextures), they are listed as\n"
+            "[out: argN=value].\n"
             "\n"
             "Options:\n"
             "  --frame A[-B]       Only print calls from frame A (or frames A..B, inclusive). Frames are counted\n"
             "                      from 0; a frame ends with a swapchain present call. \"A-\" means A..last frame.\n"
             "  --api LIST          Only print calls from the specified comma-separated APIs.\n"
-            "                      Valid values: gdi32, gl, wgl, user32. Default: all.\n"
+            "                      Valid values: gdi32, gl, wgl, user32, d3d8. Default: all.\n"
             "  --stats             Instead of listing calls, print a call histogram and workload summary.\n"
             "                      Honors --frame and --api.\n"
             "  --dump-chunks DIR   Write each data chunk referenced by the selected calls to DIR\\chunk_NNNNNN.bin.\n"
@@ -274,100 +277,151 @@ int APIDumpPrinter::run(int   in_argc,
                         char* in_argv[])
 {
     std::map<APIInterceptor::APIFunction, uint32_t> call_count_map;
+    D3D8Decoder                                     d3d8_decoder;
     std::map<APIGroup, uint32_t>                    group_count_map;
-    uint32_t                                        n_calls_selected  = 0;
-    uint32_t                                        n_frame           = 0;
     uint32_t                                        last_header_frame = UINT32_MAX;
+    uint32_t                                        n_calls_selected  = 0;
+    uint32_t                                        n_chunks_written  = 0;
+    uint32_t                                        n_frame           = 0;
     Options                                         options;
+    APIDumpLoader::WorkloadReaderUniquePtr          reader_ptr;
     std::set<APIInterceptor::DataChunkID>           referenced_chunk_set;
     int                                             result            = EXIT_FAILURE;
-    APIDumpLoader::WorkloadUniquePtr                workload_ptr;
+    APIDumpLoader::Workload                         segment;
+    WorkloadTotals                                  totals;
 
-    if (!parse_args(in_argc,
-                    in_argv,
-                   &options) )
+    if (!parse_arguments(in_argc,
+                         in_argv,
+                        &options) )
     {
         print_usage();
 
         goto end;
     }
 
-    /* Load the workload */
-    workload_ptr = APIDumpLoader::create_workload_from_file(options.workload_filename_ptr);
+    reader_ptr = APIDumpLoader::WorkloadReader::create(options.workload_filename_ptr);
 
-    if (workload_ptr == nullptr)
+    if (reader_ptr == nullptr)
     {
         fprintf(stderr,
-                "[!] Could not parse the specified workload.\n");
+                "[!] Could not open the specified workload.\n");
 
         goto end;
     }
 
-    /* Walk through the calls, tracking frames. */
-    for (const auto& current_api_call : *workload_ptr->dumped_api_call_vec_ptr)
+    /* The workload is read, and printed, one segment at a time. */
+    while (reader_ptr->read_next_segment(&segment) )
     {
-        const bool is_in_frame_range = (n_frame >= options.first_frame && n_frame <= options.last_frame);
-        const auto api_group         = get_api_group(current_api_call.func);
-        const bool is_api_allowed    = options.allowed_api_groups.empty() ||
-                                       options.allowed_api_groups.find(api_group) != options.allowed_api_groups.end();
-
-        if (is_in_frame_range &&
-            is_api_allowed)
+        /* Walk through the calls, tracking frames. */
+        for (const auto& current_api_call : *segment.dumped_api_call_vec_ptr)
         {
-            n_calls_selected++;
+            const auto api_group         = get_api_group(current_api_call.func);
+            const bool is_in_frame_range = (n_frame >= options.first_frame &&
+                                            n_frame <= options.last_frame);
+            const bool is_api_allowed    = options.allowed_api_group_set.empty() ||
+                                           options.allowed_api_group_set.find(api_group) != options.allowed_api_group_set.end();
 
-            if (options.show_stats)
+            /* Objects are named in the order they are created, whether or not their creation is printed. */
+            if (api_group == APIGroup::D3D8)
             {
-                call_count_map [current_api_call.func]++;
-                group_count_map[api_group]++;
+                d3d8_decoder.register_created_objects(current_api_call);
             }
-            else
+
+            if (is_in_frame_range &&
+                is_api_allowed)
             {
-                if (last_header_frame != n_frame)
+                n_calls_selected++;
+
+                if (options.show_statistics)
                 {
-                    fprintf(stdout,
-                            "=== Frame %u ===\n",
-                            n_frame);
-
-                    last_header_frame = n_frame;
+                    call_count_map [current_api_call.func]++;
+                    group_count_map[api_group]++;
                 }
+                else
+                {
+                    if (last_header_frame != n_frame)
+                    {
+                        last_header_frame = n_frame;
 
-                print_call(stdout,
-                           current_api_call,
-                          *workload_ptr,
-                           options.n_hexdump_bytes,
-                          &referenced_chunk_set);
+                        fprintf(stdout,
+                                "=== Frame %u ===\n",
+                                n_frame);
+                    }
+
+                    print_call(stdout,
+                               current_api_call,
+                               segment,
+                               options.n_hexdump_bytes,
+                              &referenced_chunk_set,
+                              &d3d8_decoder);
+                }
+            }
+
+            /* A frame boundary is detected regardless of --api, so that frame numbering stays stable. */
+            if (is_frame_boundary(current_api_call.func) )
+            {
+                n_frame++;
             }
         }
 
-        /* A frame boundary is detected regardless of --api, so that frame numbering stays stable. */
-        if (is_frame_boundary(current_api_call.func) )
+        if (options.chunk_dump_directory.empty() == false)
         {
-            n_frame++;
+            n_chunks_written += write_chunks(options.chunk_dump_directory,
+                                             segment,
+                                             referenced_chunk_set);
+
+            referenced_chunk_set.clear();
+        }
+
+        /* Any surfaces included in the segment? */
+        if (options.show_statistics                       == false &&
+            segment.dumped_surface_vec_ptr->size()        >  0)
+        {
+            write_surfaces(segment,
+                           totals.n_surfaces);
+        }
+
+        totals.n_api_calls   += static_cast<uint32_t>(segment.dumped_api_call_vec_ptr->size() );
+        totals.n_data_chunks += static_cast<uint32_t>(segment.data_chunk_ptr_vec.size() );
+        totals.n_surfaces    += static_cast<uint32_t>(segment.dumped_surface_vec_ptr->size() );
+
+        for (const auto& current_data_chunk_ptr : segment.data_chunk_ptr_vec)
+        {
+            totals.n_data_chunk_bytes += current_data_chunk_ptr->size();
+        }
+
+        /* What has been read so far is out before the next segment is read. */
+        fflush(stdout);
+
+        /* No need to read on once the requested frames are past; statistics, though, cover the whole file. */
+        if (options.show_statistics == false &&
+            n_frame                 >  options.last_frame)
+        {
+            break;
         }
     }
 
-    if (options.show_stats)
+    if (options.show_statistics)
     {
-        print_stats(call_count_map,
-                    group_count_map,
-                    n_calls_selected,
-                    n_frame,
-                   *workload_ptr);
+        print_statistics(call_count_map,
+                         group_count_map,
+                         n_calls_selected,
+                         n_frame,
+                         totals);
     }
 
-    if (!options.chunk_dump_dir.empty() )
+    if (options.chunk_dump_directory.empty() == false)
     {
-        write_chunks(options.chunk_dump_dir,
-                    *workload_ptr,
-                     referenced_chunk_set);
+        fprintf(stderr,
+                "[*] Wrote %u data chunk(s) to [%s].\n",
+                n_chunks_written,
+                options.chunk_dump_directory.c_str() );
     }
 
-    /* Any surfaces included in the workload? */
-    if (options.show_stats                           == false &&
-        workload_ptr->dumped_surface_vec_ptr->size() >  0)
+    if (reader_ptr->is_truncated() )
     {
-        write_surfaces(*workload_ptr);
+        fprintf(stderr,
+                "[!] The workload ends unexpectedly. Everything up to that point has been printed.\n");
     }
 
     result = EXIT_SUCCESS;
@@ -375,72 +429,79 @@ end:
     return result;
 }
 
-void APIDumpPrinter::write_chunks(const std::string&                           in_dir,
-                                  const APIDumpLoader::Workload&               in_workload,
-                                  const std::set<APIInterceptor::DataChunkID>& in_chunk_id_set)
+uint32_t APIDumpPrinter::write_chunks(const std::string&                           in_directory,
+                                      const APIDumpLoader::Workload&               in_workload,
+                                      const std::set<APIInterceptor::DataChunkID>& in_chunk_id_set)
 {
-    if (::CreateDirectoryA(in_dir.c_str(), nullptr) == FALSE &&
-        ::GetLastError()                            != ERROR_ALREADY_EXISTS)
-    {
-        fprintf(stderr,
-                "[!] Could not create directory [%s].\n",
-                in_dir.c_str() );
+    uint32_t result = 0;
 
-        goto end;
+    const bool is_directory_created = (::CreateDirectoryA(in_directory.c_str(),
+                                                          nullptr) != FALSE);
+
+    if (is_directory_created == false)
+    {
+        if (::GetLastError() != ERROR_ALREADY_EXISTS)
+        {
+            fprintf(stderr,
+                    "[!] Could not create directory [%s].\n",
+                    in_directory.c_str() );
+
+            goto end;
+        }
     }
 
     for (const auto& chunk_id : in_chunk_id_set)
     {
-        char filename[MAX_PATH];
+        const std::vector<uint8_t>* chunk_u8_vec_ptr = APIDumpLoader::get_data_chunk_ptr(in_workload,
+                                                                                         chunk_id);
+        char                        filename_i8vec260[MAX_PATH];
+        FILE*                       file_handle      = nullptr;
 
-        if (chunk_id >= in_workload.data_chunk_ptr_vec.size() )
+        if (chunk_u8_vec_ptr == nullptr)
         {
             continue;
         }
 
-        snprintf(filename,
-                 sizeof(filename),
+        snprintf(filename_i8vec260,
+                 sizeof(filename_i8vec260),
                  "%s\\chunk_%06u.bin",
-                 in_dir.c_str(),
+                 in_directory.c_str(),
                  chunk_id);
 
-        FILE* file_handle = ::fopen(filename,
-                                    "wb");
+        file_handle = ::fopen(filename_i8vec260,
+                              "wb");
 
         if (file_handle == nullptr)
         {
             fprintf(stderr,
                     "[!] Could not open [%s] for writing.\n",
-                    filename);
+                    filename_i8vec260);
 
             continue;
         }
 
-        const auto& chunk = *in_workload.data_chunk_ptr_vec.at(chunk_id);
-
-        if (!chunk.empty() )
+        if (!chunk_u8_vec_ptr->empty() )
         {
-            ::fwrite(chunk.data(),
-                     chunk.size(),
+            ::fwrite(chunk_u8_vec_ptr->data(),
+                     chunk_u8_vec_ptr->size(),
                      1,
                      file_handle);
         }
 
         ::fclose(file_handle);
+
+        result++;
     }
 
-    fprintf(stderr,
-            "[*] Wrote %u data chunk(s) to [%s].\n",
-            static_cast<uint32_t>(in_chunk_id_set.size() ),
-            in_dir.c_str() );
-
 end:
-    ;
+    return result;
 }
 
-void APIDumpPrinter::write_surfaces(const APIDumpLoader::Workload& in_workload)
+void APIDumpPrinter::write_surfaces(const APIDumpLoader::Workload& in_workload,
+                                    const uint32_t&                in_first_surface_index)
 {
     std::string target_directory;
+
     {
         const DWORD          n_bytes_needed          = ::GetCurrentDirectoryA(0,        /* nBufferLength */
                                                                               nullptr); /* lpBuffer      */
@@ -457,13 +518,13 @@ void APIDumpPrinter::write_surfaces(const APIDumpLoader::Workload& in_workload)
                 ++n_surface)
     {
         auto              surface_props_ptr = &in_workload.dumped_surface_vec_ptr->at(n_surface);
-        const std::string filename          = target_directory                              +
-                                              "\\surface_"                                  +
-                                              std::to_string(n_surface)                     +
-                                              "_"                                           +
-                                              std::to_string(surface_props_ptr->extents[0]) +
-                                              "x"                                           +
-                                              std::to_string(surface_props_ptr->extents[1]) +
+        const std::string filename          = target_directory                                      +
+                                              "\\surface_"                                          +
+                                              std::to_string(in_first_surface_index + n_surface)    +
+                                              "_"                                                   +
+                                              std::to_string(surface_props_ptr->extents_u32vec2[0]) +
+                                              "x"                                                   +
+                                              std::to_string(surface_props_ptr->extents_u32vec2[1]) +
                                               ".raw";
         FILE*             file_handle       = ::fopen(filename.c_str(),
                                                       "wb");

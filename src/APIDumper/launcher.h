@@ -2,30 +2,29 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  *
- * Declarations of helpers used by the API Dumper launcher, defined in main.cpp.
+ * Launcher helpers (defined in main.cpp).
  */
 #ifndef APIDUMPER_LAUNCHER_H
 #define APIDUMPER_LAUNCHER_H
 
+#include "types.h"
 #include <string>
+#include <Windows.h>
 
 namespace APIDumperLauncher
 {
-    enum class TargetArch
-    {
-        X86,
-        X64,
+    /* Reads the executable's PE headers. On failure, returns false and describes the error in *out_error_ptr. */
+    bool get_target_architecture(const char*         in_filename_ptr,
+                                 TargetArchitecture* out_architecture_ptr,
+                                 std::string*        out_error_ptr);
 
-        Unknown
-    };
-
-    /* Reads the PE headers of the specified file and tells which architecture the executable was built for.
-     *
-     * On failure, returns false and fills out_error_ptr with a human-readable description.
+    /* Creates the process suspended and loads the DLL into it via an APC, before the exe's entry point. Works with PEs
+     * which Detours rejects. On failure, terminates the process and returns false (see GetLastError()).
      */
-    bool get_target_arch(const char*  in_filename_ptr,
-                         TargetArch*  out_arch_ptr,
-                         std::string* out_error_ptr);
+    bool launch_with_apc_injection(const char*          in_command_line_ptr,
+                                   const char*          in_working_directory_ptr,
+                                   const char*          in_dll_path_ptr,
+                                   PROCESS_INFORMATION* out_process_info_ptr);
 }
 
 #endif /* APIDUMPER_LAUNCHER_H */

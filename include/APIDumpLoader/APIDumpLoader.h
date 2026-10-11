@@ -24,7 +24,7 @@ namespace APIDumpLoader
     typedef struct DumpedSurface
     {
         std::vector<uint8_t>    data_u8_vec;
-        std::array<uint32_t, 2> extents;
+        std::array<uint32_t, 2> extents_u32vec2;
     } DumpedSurface;
 
     typedef std::vector<uint8_t>                 DataChunk;
@@ -39,12 +39,20 @@ namespace APIDumpLoader
         std::vector<DataChunkUniquePtr> data_chunk_ptr_vec;
         DumpedAPICallVectorUniquePtr    dumped_api_call_vec_ptr;
         DumpedSurfaceVectorUniquePtr    dumped_surface_vec_ptr;
+        uint32_t                        first_data_chunk_id = 0; /* data_chunk_ptr_vec[0] has this ID in the dump */
 
     } Workload;
 
     typedef std::unique_ptr<Workload> WorkloadUniquePtr;
 
+    /* Loads the whole file into one workload. Use WorkloadReader for dumps which are too big for that. */
     WorkloadUniquePtr create_workload_from_file(const char* in_filename_ptr);
+
+    /* Returns nullptr for a data chunk which is not part of the workload. A dump read in segments (see
+     * WorkloadReader) holds the chunks of one segment at a time.
+     */
+    const DataChunk* get_data_chunk_ptr(const Workload& in_workload,
+                                        const uint32_t& in_data_chunk_id);
 }
 
 #endif /* APIDUMPLOADER_H */

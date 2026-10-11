@@ -7,6 +7,7 @@
 #include "Common/types.h"
 #include <assert.h>
 #include <memory>
+#include <mutex>
 #include <vector>
 
 typedef std::vector<uint8_t>   U8Vec;
@@ -19,6 +20,7 @@ static         auto                        g_post_api_func_callback_vec = std::v
 static         auto                        g_pre_api_func_callback_vec  = std::vector<PreAPIFuncCallback> (APIInterceptor::APIFUNCTION_COUNT);
 AI_THREADLOCAL bool                        g_callbacks_enabled          = true;
 AI_THREADLOCAL uint32_t                    g_n_api_calls_intercepted    = 0;
+static         std::mutex                  g_data_chunk_mutex;
 static         std::vector<U8VecUniquePtr> g_data_chunk_vec;
 
 void APIInterceptor::disable_callbacks_for_this_thread()
@@ -32,14 +34,19 @@ bool APIInterceptor::get_data_chunk(const DataChunkID& in_data_chunk_id,
 {
     bool result = false;
 
-    if (g_data_chunk_vec.size() > in_data_chunk_id)
     {
-        auto data_chunk_ptr = g_data_chunk_vec.at(in_data_chunk_id).get();
+        std::lock_guard<std::mutex> lock(g_data_chunk_mutex);
 
-        *out_data_ptr_ptr = data_chunk_ptr->data ();
-        *out_n_bytes_ptr  = static_cast<uint32_t>(data_chunk_ptr->size() );
+        if (g_data_chunk_vec.size() > in_data_chunk_id         &&
+            g_data_chunk_vec.at(in_data_chunk_id) != nullptr)
+        {
+            auto data_chunk_ptr = g_data_chunk_vec.at(in_data_chunk_id).get();
 
-        result = true;
+            *out_data_ptr_ptr = data_chunk_ptr->data ();
+            *out_n_bytes_ptr  = static_cast<uint32_t>(data_chunk_ptr->size() );
+
+            result = true;
+        }
     }
 
     return result;
@@ -47,7 +54,15 @@ bool APIInterceptor::get_data_chunk(const DataChunkID& in_data_chunk_id,
 
 uint32_t APIInterceptor::get_n_data_chunks()
 {
-    return static_cast<uint32_t>(g_data_chunk_vec.size() );
+    uint32_t result = 0;
+
+    {
+        std::lock_guard<std::mutex> lock(g_data_chunk_mutex);
+
+        result = static_cast<uint32_t>(g_data_chunk_vec.size() );
+    }
+
+    return result;
 }
 
 bool APIInterceptor::get_post_callback_for_function(const APIFunction&       in_api_func,
@@ -108,7 +123,7 @@ APIInterceptor::DataChunkID APIInterceptor::register_data_chunk(const void*     
                                                                 const uint32_t& in_n_bytes)
 {
     U8VecUniquePtr new_data_chunk_ptr;
-    const auto     result             = static_cast<uint32_t>(g_data_chunk_vec.size() );
+    DataChunkID    result             = 0;
 
     new_data_chunk_ptr.reset(
         new U8Vec(in_n_bytes)
@@ -121,9 +136,15 @@ APIInterceptor::DataChunkID APIInterceptor::register_data_chunk(const void*     
                in_n_bytes);
     }
 
-    g_data_chunk_vec.emplace_back(
-        std::move(new_data_chunk_ptr)
-    );
+    {
+        std::lock_guard<std::mutex> lock(g_data_chunk_mutex);
+
+        result = static_cast<uint32_t>(g_data_chunk_vec.size() );
+
+        g_data_chunk_vec.emplace_back(
+            std::move(new_data_chunk_ptr)
+        );
+    }
 
     return result;
 }
@@ -142,5 +163,44 @@ void APIInterceptor::register_for_pre_callback(APIFunction                      
 {
     g_pre_api_func_callback_vec[static_cast<uint32_t>(in_function)] = PreAPIFuncCallback{in_callback_func_ptr,
                                                                                          in_func_user_arg};
+}
+
+void APIInterceptor::release_data_chunk(const DataChunkID& in_data_chunk_id)
+{
+    {
+        std::lock_guard<std::mutex> lock(g_data_chunk_mutex);
+
+        if (g_data_chunk_vec.size() > in_data_chunk_id)
+        {
+            g_data_chunk_vec.at(in_data_chunk_id).reset();
+        }
+    }
+}
+
+void APIInterceptor::take_data_chunks(const DataChunkID&                  in_first_data_chunk_id,
+                                      const uint32_t&                     in_n_data_chunks,
+                                      std::vector<std::vector<uint8_t> >* out_data_chunk_vec_ptr)
+{
+    out_data_chunk_vec_ptr->clear();
+    out_data_chunk_vec_ptr->resize(in_n_data_chunks);
+
+    {
+        std::lock_guard<std::mutex> lock(g_data_chunk_mutex);
+
+        for (uint32_t n_data_chunk = 0;
+                      n_data_chunk < in_n_data_chunks;
+                    ++n_data_chunk)
+        {
+            const DataChunkID data_chunk_id = in_first_data_chunk_id + n_data_chunk;
+
+            if (data_chunk_id < g_data_chunk_vec.size()       &&
+                g_data_chunk_vec.at(data_chunk_id) != nullptr)
+            {
+                out_data_chunk_vec_ptr->at(n_data_chunk) = std::move(*g_data_chunk_vec.at(data_chunk_id) );
+
+                g_data_chunk_vec.at(data_chunk_id).reset();
+            }
+        }
+    }
 }
 

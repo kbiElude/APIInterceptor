@@ -1070,6 +1070,25 @@ namespace APIInterceptor
         APIFUNCTION_USER32_RELEASEDC,
         APIFUNCTION_USER32_LAST = APIFUNCTION_USER32_RELEASEDC,
 
+        /* D3D8: Direct3DCreate8 is a flat export; the rest are COM methods generated from d3d8_methods.inl, between the
+         * unused METHODS_BEGIN and METHODS_END range markers.
+         */
+        APIFUNCTION_D3D8_DIRECT3DCREATE8,
+
+        APIFUNCTION_D3D8_METHODS_BEGIN,
+
+        #define D3D8_METHOD(INTERFACE_TAG, interface_name, METHOD_TAG, method_name, vtable_index, return_type, parameters) \
+            APIFUNCTION_D3D8_##INTERFACE_TAG##_##METHOD_TAG,
+        #include "D3D8/d3d8_methods.inl"
+        #undef D3D8_METHOD
+
+        APIFUNCTION_D3D8_METHODS_END,
+
+        APIFUNCTION_D3D8_FIRST         = APIFUNCTION_D3D8_DIRECT3DCREATE8,
+        APIFUNCTION_D3D8_LAST          = APIFUNCTION_D3D8_METHODS_END   - 1,
+        APIFUNCTION_D3D8_METHODS_FIRST = APIFUNCTION_D3D8_METHODS_BEGIN + 1,
+        APIFUNCTION_D3D8_METHODS_LAST  = APIFUNCTION_D3D8_METHODS_END   - 1,
+
         /* Always last */
         APIFUNCTION_COUNT,
         APIFUNCTION_UNKNOWN = APIFUNCTION_COUNT

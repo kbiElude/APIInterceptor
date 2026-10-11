@@ -3,8 +3,9 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "api_info.h"
+#include "function_name_table.h"
 
-const char* APIDumpPrinter::get_gl_function_name(const APIInterceptor::APIFunction& in_func)
+const char* APIDumpPrinter::get_gl_function_name(const APIInterceptor::APIFunction& in_function)
 {
     static const FunctionNameEntry name_entry_array[] =
     {
@@ -1011,5 +1012,5 @@ const char* APIDumpPrinter::get_gl_function_name(const APIInterceptor::APIFuncti
     static const FunctionNameTable name_table(name_entry_array,
                                               sizeof(name_entry_array) / sizeof(name_entry_array[0]) );
 
-    return name_table.get_name(in_func);
+    return name_table.get_name(in_function);
 }

@@ -41,20 +41,22 @@ APIInterceptor::Logger::Logger()
 
 APIInterceptor::Logger::~Logger()
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-
-    if (m_currentframe_file_ptr != nullptr)
     {
-        ::fclose(m_currentframe_file_ptr);
+        std::lock_guard<std::mutex> lock(m_mutex);
 
-        m_currentframe_file_ptr = nullptr;
-    }
+        if (m_currentframe_file_ptr != nullptr)
+        {
+            ::fclose(m_currentframe_file_ptr);
 
-    if (m_warning_file_ptr != nullptr)
-    {
-        ::fclose(m_warning_file_ptr);
+            m_currentframe_file_ptr = nullptr;
+        }
 
-        m_warning_file_ptr = nullptr;
+        if (m_warning_file_ptr != nullptr)
+        {
+            ::fclose(m_warning_file_ptr);
+
+            m_warning_file_ptr = nullptr;
+        }
     }
 }
 
@@ -100,7 +102,7 @@ void APIInterceptor::Logger::log(const LogLevel& in_log_level,
                                  ...)
 {
     va_list args;
-    char    temp[MAX_PER_FUNC_LOCAL_HELPER_STORAGE_SIZE];
+    char    temp_i8vec4096[MAX_PER_FUNC_LOCAL_HELPER_STORAGE_SIZE];
 
     if (!g_logging_enabled)
     {
@@ -110,7 +112,7 @@ void APIInterceptor::Logger::log(const LogLevel& in_log_level,
     va_start(args,
              in_message_template);
     {
-        vsprintf_s<sizeof(temp)>(temp,
+        vsprintf_s<sizeof(temp_i8vec4096)>(temp_i8vec4096,
                                  in_message_template,
                                  args);
     }
@@ -124,7 +126,7 @@ void APIInterceptor::Logger::log(const LogLevel& in_log_level,
         m_log_data_sstream << "[tid: "
                            << std::this_thread::get_id()
                            << "] "
-                           << temp
+                           << temp_i8vec4096
                            << "\n";
 
         if (use_warning_log)
@@ -170,21 +172,23 @@ end:
 
 void APIInterceptor::Logger::on_frame_presented()
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-
-    if (!g_logging_enabled)
     {
-        goto end;
+        std::lock_guard<std::mutex> lock(m_mutex);
+
+        if (!g_logging_enabled)
+        {
+            goto end;
+        }
+
+        if (g_logger_ptr->m_currentframe_file_ptr != nullptr)
+        {
+            ::fclose(g_logger_ptr->m_currentframe_file_ptr);
+
+            g_logger_ptr->m_currentframe_file_ptr = nullptr;
+        }
+
+        m_n_current_frame++;
     }
-
-    if (g_logger_ptr->m_currentframe_file_ptr != nullptr)
-    {
-        ::fclose(g_logger_ptr->m_currentframe_file_ptr);
-
-        g_logger_ptr->m_currentframe_file_ptr = nullptr;
-    }
-
-    m_n_current_frame++;
 
 end:
     ;

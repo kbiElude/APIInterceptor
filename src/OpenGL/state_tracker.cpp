@@ -76,7 +76,9 @@ OpenGL::ContextState& OpenGL::get_context_state()
 
 void OpenGL::on_context_destroyed(const HGLRC& in_hglrc)
 {
-    std::lock_guard<std::mutex> lock(g_mutex);
+    {
+        std::lock_guard<std::mutex> lock(g_mutex);
 
-    g_context_state_map.erase(in_hglrc);
+        g_context_state_map.erase(in_hglrc);
+    }
 }

@@ -18,6 +18,14 @@ if (NOT APIINTERCEPTOR_BUILD_LIBS AND APIINTERCEPTOR_BUILD_TOOLS)
     message(FATAL_ERROR "APIINTERCEPTOR_BUILD_TOOLS option requires APIINTERCEPTOR_BUILD_LIBS option to be enabled.")
 endif()
 
+if (NOT APIINTERCEPTOR_BUILD_INTERCEPTOR AND APIINTERCEPTOR_BUILD_TESTS)
+    message(FATAL_ERROR "APIINTERCEPTOR_BUILD_TESTS option requires APIINTERCEPTOR_BUILD_INTERCEPTOR option to be enabled.")
+endif()
+
+if (NOT APIINTERCEPTOR_BUILD_LIBS AND APIINTERCEPTOR_BUILD_TESTS)
+    message(FATAL_ERROR "APIINTERCEPTOR_BUILD_TESTS option requires APIINTERCEPTOR_BUILD_LIBS option to be enabled.")
+endif()
+
 unset(CMAKE_DEBUG_POSTFIX CACHE)
 
 if (MSVC)
@@ -61,6 +69,14 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
     add_library(User32 STATIC ${CommonIncludes}
                               ${User32Sources}
                               ${User32Includes})
+
+    file(GLOB Kernel32Includes "${APIInterceptor_SOURCE_DIR}/include/Kernel32/*.h")
+    file(GLOB Kernel32Sources  "${APIInterceptor_SOURCE_DIR}/src/Kernel32/*.cpp"
+                               "${APIInterceptor_SOURCE_DIR}/src/Kernel32/entrypoints/*.cpp")
+
+    add_library(Kernel32 STATIC ${CommonIncludes}
+                                ${Kernel32Sources}
+                                ${Kernel32Includes})
 
     FILE(GLOB KhronosIncludes "${APIInterceptor_SOURCE_DIR}/include/Khronos/GL/*.h"
                               "${APIInterceptor_SOURCE_DIR}/include/Khronos/KHR/*.h")
@@ -253,6 +269,24 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
     add_library(OpenGLUtils STATIC ${OpenGL32UtilsIncludes}
                                    ${OpenGL32UtilsSources})
 
+    file(GLOB D3D8Includes "${APIInterceptor_SOURCE_DIR}/include/D3D8/*.h"
+                           "${APIInterceptor_SOURCE_DIR}/include/D3D8/*.inl")
+    file(GLOB D3D8Sources  "${APIInterceptor_SOURCE_DIR}/src/D3D8/*.cpp"
+                           "${APIInterceptor_SOURCE_DIR}/src/D3D8/entrypoints/*.cpp")
+
+    file(GLOB D3D8UtilsIncludes "${APIInterceptor_SOURCE_DIR}/include/D3D8Utils/*.h")
+    file(GLOB D3D8UtilsSources  "${APIInterceptor_SOURCE_DIR}/src/D3D8Utils/*.cpp")
+
+    add_library(D3D8Utils STATIC ${D3D8Includes}
+                                 ${D3D8UtilsIncludes}
+                                 ${D3D8UtilsSources})
+
+    add_library          (D3D8 STATIC ${CommonIncludes}
+                                      ${D3D8Includes}
+                                      ${D3D8Sources})
+    add_dependencies     (D3D8 D3D8Utils Kernel32)
+    target_link_libraries(D3D8 D3D8Utils Kernel32)
+
     add_library          (OpenGL STATIC ${CommonIncludes}
                                          ${KhronosIncludes}
                                          ${OpenGL32EntrypointsSources}
@@ -287,8 +321,14 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
 
     target_link_libraries(APIInterceptor Detours)
 
+    add_dependencies     (APIInterceptor D3D8)
+    target_link_libraries(APIInterceptor D3D8)
+
     add_dependencies     (APIInterceptor GDI32)
     target_link_libraries(APIInterceptor GDI32)
+
+    add_dependencies     (APIInterceptor Kernel32)
+    target_link_libraries(APIInterceptor Kernel32)
 
     add_dependencies     (APIInterceptor OpenGL)
     target_link_libraries(APIInterceptor OpenGL ${OPENGL_gl_LIBRARY})
@@ -299,8 +339,14 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
     add_dependencies     (APIInterceptor WGL)
     target_link_libraries(APIInterceptor WGL ${OPENGL_gl_LIBRARY})
 
+    source_group ("D3D8 include files"       FILES ${D3D8Includes})
+    source_group ("D3D8 source files"        FILES ${D3D8Sources})
+    source_group ("D3D8 Utils include files" FILES ${D3D8UtilsIncludes})
+    source_group ("D3D8 Utils source files"  FILES ${D3D8UtilsSources})
     source_group ("GDI32 include files"      FILES ${GDI32Includes})
     source_group ("GDI32 source files"       FILES ${GDI32Sources})
+    source_group ("Kernel32 include files"   FILES ${Kernel32Includes})
+    source_group ("Kernel32 source files"    FILES ${Kernel32Sources})
     source_group ("Khronos include files"    FILES ${KhronosIncludes})
     source_group ("Entrypoint include files\\GL1.0"  FILES ${OpenGL32EntrypointsIncludes_GL1_0})
     source_group ("Entrypoint include files\\GL1.1"  FILES ${OpenGL32EntrypointsIncludes_GL1_1})
@@ -423,7 +469,7 @@ if (APIINTERCEPTOR_BUILD_TOOLS)
 
     target_link_libraries(APIDumper      Detours)
     target_link_libraries(APIDumperDLL   APIInterceptor)
-    target_link_libraries(APIDumpPrinter APIDumpLoader OpenGLUtils)
+    target_link_libraries(APIDumpPrinter APIDumpLoader D3D8Utils OpenGLUtils)
 
     add_dependencies(APIDumper APIDumperDLL)
 
@@ -441,7 +487,7 @@ if (APIINTERCEPTOR_BUILD_TESTS)
 
     add_executable(APIInterceptorTests ${APIInterceptorTestsSources})
 
-    target_link_libraries(APIInterceptorTests gtest_main)
+    target_link_libraries(APIInterceptorTests gtest_main APIDumpLoader D3D8Utils)
 
     enable_testing()
     add_test(NAME APIInterceptorTests COMMAND APIInterceptorTests)
