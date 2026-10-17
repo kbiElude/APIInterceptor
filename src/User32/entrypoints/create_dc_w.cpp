@@ -3,6 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "Common/callbacks.h"
+#include "Common/gate_scope.h"
 #include "Common/globals.h"
 #include "Common/logger.h"
 #include "Common/macros.h"
@@ -14,6 +15,7 @@ HDC WINAPI User32::create_dc_w(LPCWSTR         in_driver_ptr,
                                LPCWSTR         in_port_ptr,
                                const DEVMODEW* in_devmode_ptr)
 {
+    APIInterceptor::GateScope               gate_scope;
     void*                                   post_callback_func_arg  = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr  = nullptr;
     void*                                   pre_callback_func_arg   = nullptr;
@@ -23,6 +25,7 @@ HDC WINAPI User32::create_dc_w(LPCWSTR         in_driver_ptr,
 
     /* NOTE: We do NOT use a Tracker instance to track this call. The reason is drivers often call CreateDCA() and later call it
      *       from driver-managed threads, and being able to track these DC allocations is important.
+     *       A GateScope is used: it only keeps the dumper from cutting a segment in the middle of the call.
      **/
     AI_TRACE("CreateDCW(pwszDriver=[%p], pwszDevice=[%p], pszPort=[%p], pdm=[%p])\n"
              in_driver_ptr,

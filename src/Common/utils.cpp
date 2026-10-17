@@ -72,7 +72,7 @@ void APIInterceptor::convert_api_command_to_string(const APICommand& in_api_comm
             const auto arg_mask = in_api_command.api_arg_vec.at(0).get_u32();
 
             sstream << "glClear("
-                    << OpenGL::Utils::get_raw_string_for_gl_bitfield(OpenGL::BitfieldType::Clear_Buffer_Mask,
+                    << OpenGL::Utils::get_raw_string_for_gl_bitfield(OpenGL::BitfieldType::CLEAR_BUFFER_MASK,
                                                                      arg_mask)
                     << ")\n";
 

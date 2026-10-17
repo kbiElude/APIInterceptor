@@ -7,14 +7,6 @@
 #include "D3D8Utils/methods.h"
 #include <Windows.h>
 
-D3D8::VTableRegistry* D3D8::VTableRegistry::get_ptr()
-{
-    /* Never destroyed: hooks can still run during shutdown. */
-    static VTableRegistry* instance_ptr = new VTableRegistry();
-
-    return instance_ptr;
-}
-
 void* D3D8::VTableRegistry::get_original_function_ptr(const void*     in_object_ptr,
                                                       const uint32_t& in_vtable_index)
 {
@@ -37,6 +29,14 @@ void* D3D8::VTableRegistry::get_original_function_ptr(const void*     in_object_
     }
 
     return result_ptr;
+}
+
+D3D8::VTableRegistry* D3D8::VTableRegistry::get_ptr()
+{
+    /* Never destroyed: hooks can still run during shutdown. */
+    static VTableRegistry* instance_ptr = new VTableRegistry();
+
+    return instance_ptr;
 }
 
 bool D3D8::VTableRegistry::patch_vtable(const Interface& in_interface,

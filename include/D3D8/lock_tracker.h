@@ -18,8 +18,6 @@ namespace D3D8
     class LockTracker
     {
     public:
-        static LockTracker* get_ptr();
-
         /* Returns false if the object has no lock at the level (buffers and surfaces use level 0). */
         bool get_lock(const void*     in_object_ptr,
                       const uint32_t& in_level,
@@ -30,6 +28,8 @@ namespace D3D8
                          const LockRecord& in_lock_record);
         void on_unlocked(const void*       in_object_ptr,
                          const uint32_t&   in_level);
+
+        static LockTracker* get_ptr();
 
     private:
         std::mutex                                             m_mutex;

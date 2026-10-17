@@ -8,6 +8,7 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL2.0/gl_disable_vertex_attrib_array.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/state_tracker.h"
 #include "WGL/globals.h"
 
 void AI_APIENTRY OpenGL::aiDisableVertexAttribArray(GLuint index)
@@ -46,6 +47,15 @@ void AI_APIENTRY OpenGL::aiDisableVertexAttribArray(GLuint index)
     if (should_pass_through)
     {
         reinterpret_cast<PFNGLDISABLEVERTEXATTRIBARRAYPROC>(OpenGL::g_cached_gl_disable_vertex_attrib_array)(index);
+    }
+
+    if (tracker.is_top_level_api_call() )
+    {
+        auto& context = OpenGL::get_context_state();
+
+        context.client_array_manager.set_enabled(OpenGL::ClientArrayKind::GENERIC,
+                                               index,
+                                               false);  /* in_is_enabled */
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDISABLEVERTEXATTRIBARRAY,

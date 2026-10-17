@@ -6,11 +6,14 @@
 #include "Common/globals.h"
 #include "Common/logger.h"
 #include "Common/macros.h"
+#include "Common/memory_chunk.h"
 #include "Common/tracker.h"
+#include "OpenGL/buffer_mapping_manager.h"
 #include "OpenGL/entrypoints/GL4.5/gl_unmap_named_buffer.h"
 #include "OpenGL/globals.h"
 #include "OpenGL/state_tracker.h"
 #include "OpenGL/utils.h"
+#include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
 GLboolean AI_APIENTRY OpenGL::aiUnmapNamedBuffer(GLuint buffer)
@@ -22,84 +25,63 @@ GLboolean AI_APIENTRY OpenGL::aiUnmapNamedBuffer(GLuint buffer)
     GLboolean                               result                 = GL_FALSE;
     bool                                    should_pass_through    = true;
     APIInterceptor::Tracker                 tracker;
-
-    /* Retrieve mapping state before the driver call invalidates the pointer. */
-    void*                       mapped_ptr     = nullptr;
-    OpenGL::BufferMappingAccess mapping_access = OpenGL::BufferMappingAccess::READ_ONLY;
-    uint32_t                    unmap_chunk_id = 0;
-    uint32_t                    size_bytes     = 0;
+    APIInterceptor::MemoryChunk             unmap_chunk(nullptr,
+                                                        0,
+                                                        sizeof(uint8_t) );
 
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glUnmapNamedBuffer(buffer=[%u])",
                  buffer);
 
-        APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLUNMAPNAMEDBUFFER,
-                                                      &pre_callback_func_ptr,
-                                                      &pre_callback_func_arg);
-
-        APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLUNMAPNAMEDBUFFER,
-                                                       &post_callback_func_ptr,
-                                                       &post_callback_func_arg);
-
         auto& context = OpenGL::get_context_state();
 
+        /* The pointer is not valid once the buffer is unmapped, so the copy is made now. */
+        const OpenGL::BufferMappingManager::Region unmap_region = context.buffer_mapping_manager.get_unmap_region(buffer);
+
+        unmap_chunk = APIInterceptor::MemoryChunk(unmap_region.data_ptr,
+                                                  static_cast<int64_t>(unmap_region.n_bytes),
+                                                  sizeof(uint8_t) );
+
+        if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLUNMAPNAMEDBUFFER,
+                                                         &pre_callback_func_ptr,
+                                                         &pre_callback_func_arg) )
         {
-            const auto buffer_props_iterator = context.buffer_object_id_to_buffer_props_ptr_map.find(buffer);
+            const APIInterceptor::APIFunctionArgument args[] =
+            {
+                APIInterceptor::APIFunctionArgument::create_u32(buffer),
+            };
 
-            AI_ASSERT(buffer_props_iterator                               != context.buffer_object_id_to_buffer_props_ptr_map.end() );
-            AI_ASSERT(buffer_props_iterator->second                       != nullptr);
-            AI_ASSERT(buffer_props_iterator->second->mapping_state.access != OpenGL::BufferMappingAccess::UNKNOWN);
-
-            mapped_ptr     = buffer_props_iterator->second->mapping_state.mapped_ptr;
-            mapping_access = buffer_props_iterator->second->mapping_state.access;
-            size_bytes     = buffer_props_iterator->second->size_bytes;
+            pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLUNMAPNAMEDBUFFER,
+                                  sizeof(args) / sizeof(args[0]),
+                                  args,
+                                  pre_callback_func_arg,
+                                 &should_pass_through);
         }
-    }
 
-    if (pre_callback_func_ptr != nullptr)
-    {
-        const APIInterceptor::APIFunctionArgument args[] =
+        /* Nobody may ask for the copy later, but then it is not needed at all. */
+        if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLUNMAPNAMEDBUFFER,
+                                                          &post_callback_func_ptr,
+                                                          &post_callback_func_arg) )
         {
-            APIInterceptor::APIFunctionArgument::create_u32(buffer),
-        };
-
-        pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLUNMAPNAMEDBUFFER,
-                              sizeof(args) / sizeof(args[0]),
-                              args,
-                              pre_callback_func_arg,
-                             &should_pass_through);
+            unmap_chunk.get_id();
+        }
     }
 
     AI_ASSERT(should_pass_through);
 
-    /* Snapshot the contents before the driver call: the mapped pointer is invalid once the buffer is unmapped.
-     * Anything the application could have written to (WRITE_ONLY included) needs to be captured. */
-    if (tracker.is_top_level_api_call() && post_callback_func_ptr != nullptr)
+    if (should_pass_through)
     {
-        const bool is_writable = (mapping_access != OpenGL::BufferMappingAccess::READ_ONLY);
-
-        unmap_chunk_id = APIInterceptor::register_data_chunk((is_writable)                          ? mapped_ptr
-                                                                                                    : nullptr,
-                                                             (is_writable && mapped_ptr != nullptr) ? size_bytes
-                                                                                                    : 0u);
+        result = reinterpret_cast<PFNGLUNMAPNAMEDBUFFERPROC>(OpenGL::g_cached_gl_unmap_named_buffer)(buffer);
     }
-
-    result = reinterpret_cast<PFNGLUNMAPNAMEDBUFFERPROC>(OpenGL::g_cached_gl_unmap_named_buffer)(buffer);
 
     if (tracker.is_top_level_api_call() )
     {
-        auto& context = OpenGL::get_context_state();
+        OpenGL::get_context_state().buffer_mapping_manager.on_buffer_unmapped(buffer);
 
-        {
-            const auto buffer_props_iterator = context.buffer_object_id_to_buffer_props_ptr_map.find(buffer);
-
-            AI_ASSERT(buffer_props_iterator != context.buffer_object_id_to_buffer_props_ptr_map.end() );
-
-            buffer_props_iterator->second->mapping_state = OpenGL::BufferMappingState();
-        }
-
-        if (post_callback_func_ptr != nullptr)
+        if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLUNMAPNAMEDBUFFER,
+                                                          &post_callback_func_ptr,
+                                                          &post_callback_func_arg) )
         {
             APIInterceptor::APIFunctionArgument result_arg;
 
@@ -107,7 +89,7 @@ GLboolean AI_APIENTRY OpenGL::aiUnmapNamedBuffer(GLuint buffer)
             {
                 APIInterceptor::APIFunctionArgument::create_u32          (buffer),
                 APIInterceptor::APIFunctionArgument::create_u8           (result),
-                APIInterceptor::APIFunctionArgument::create_data_chunk_id(unmap_chunk_id),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(unmap_chunk.get_id() ),
             };
 
             post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLUNMAPNAMEDBUFFER,

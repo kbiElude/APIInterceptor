@@ -10,6 +10,7 @@
 #define D3D8_HOOK_POLICY_H
 
 #include "D3D8/hook_policy_base.h"
+#include "D3D8/hook_policy_helper.h"
 
 namespace D3D8
 {
@@ -17,6 +18,31 @@ namespace D3D8
     struct HookPolicy : public HookPolicyBase
     {
         /* Stub */
+    };
+
+    /* The rectangles of a Present call (see HookPolicyHelper::create_present_arguments()): both the device and the swap
+     * chain present.
+     */
+    template<typename Interface>
+    struct PresentHookPolicy : public HookPolicyBase
+    {
+        static const uint32_t n_extra_arguments = 3; /* source rectangle, destination rectangle, dirty rectangles */
+
+        static void create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
+                                           Interface*                           in_self,
+                                           const RECT*                          in_source_rect_ptr,
+                                           const RECT*                          in_dest_rect_ptr,
+                                           HWND                                 in_dest_window_override,
+                                           const RGNDATA*                       in_dirty_region_ptr)
+        {
+            (void) in_self;
+            (void) in_dest_window_override;
+
+            HookPolicyHelper::create_present_arguments(out_arguments_ptr,
+                                                       in_source_rect_ptr,
+                                                       in_dest_rect_ptr,
+                                                       in_dirty_region_ptr);
+        }
     };
 
     template<>
@@ -139,6 +165,47 @@ namespace D3D8
     };
 
     template<>
+    struct HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_DRAWRECTPATCH> : public HookPolicyBase
+    {
+        static const uint32_t n_extra_arguments = 1; /* segment counts */
+
+        static void create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
+                                           IDirect3DDevice8*                    in_self,
+                                           UINT                                 in_handle,
+                                           const float*                         in_n_segments_ptr,
+                                           const D3DRECTPATCH_INFO*             in_rect_patch_info_ptr);
+    };
+
+    template<>
+    struct HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_DRAWTRIPATCH> : public HookPolicyBase
+    {
+        static const uint32_t n_extra_arguments = 1; /* segment counts */
+
+        static void create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
+                                           IDirect3DDevice8*                    in_self,
+                                           UINT                                 in_handle,
+                                           const float*                         in_n_segments_ptr,
+                                           const D3DTRIPATCH_INFO*              in_tri_patch_info_ptr);
+    };
+
+    template<>
+    struct HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_PRESENT> : public PresentHookPolicy<IDirect3DDevice8>
+    {
+        /* Stub */
+    };
+
+    template<>
+    struct HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETCLIPPLANE> : public HookPolicyBase
+    {
+        static const uint32_t n_extra_arguments = 1; /* the plane */
+
+        static void create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
+                                           IDirect3DDevice8*                    in_self,
+                                           DWORD                                in_index,
+                                           const float*                         in_plane_ptr);
+    };
+
+    template<>
     struct HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETPALETTEENTRIES> : public HookPolicyBase
     {
         static const uint32_t n_extra_arguments = 1; /* entries */
@@ -224,6 +291,12 @@ namespace D3D8
     };
 
     template<>
+    struct HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DSWAPCHAIN8_PRESENT> : public PresentHookPolicy<IDirect3DSwapChain8>
+    {
+        /* Stub */
+    };
+
+    template<>
     struct HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DTEXTURE8_LOCKRECT> : public HookPolicyBase
     {
         static const uint32_t n_extra_arguments = 1; /* locked rectangle */
@@ -280,11 +353,11 @@ namespace D3D8
     template<>
     struct HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DVOLUME8_LOCKBOX> : public HookPolicyBase
     {
-        static void on_call_finished(const bool&        in_is_success,
-                                     IDirect3DVolume8*  in_self,
-                                     D3DLOCKED_BOX*     in_locked_box_ptr,
-                                     const D3DBOX*      in_box_ptr,
-                                     DWORD              in_flags);
+        static void on_call_finished(const bool&       in_is_success,
+                                     IDirect3DVolume8* in_self,
+                                     D3DLOCKED_BOX*    in_locked_box_ptr,
+                                     const D3DBOX*     in_box_ptr,
+                                     DWORD             in_flags);
     };
 
     template<>
@@ -301,7 +374,7 @@ namespace D3D8
     template<>
     struct HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DVOLUMETEXTURE8_LOCKBOX> : public HookPolicyBase
     {
-        static void on_call_finished(const bool&             in_is_success,
+        static void on_call_finished(const bool&              in_is_success,
                                      IDirect3DVolumeTexture8* in_self,
                                      UINT                     in_level,
                                      D3DLOCKED_BOX*           in_locked_box_ptr,

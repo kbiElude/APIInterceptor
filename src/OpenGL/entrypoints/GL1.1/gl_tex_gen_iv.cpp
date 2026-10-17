@@ -5,9 +5,11 @@
 #include "Common/callbacks.h"
 #include "Common/logger.h"
 #include "Common/macros.h"
+#include "Common/memory_chunk.h"
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL1.1/gl_tex_gen_iv.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/param_counts.h"
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
@@ -15,6 +17,9 @@ void AI_APIENTRY OpenGL::aiTexGeniv(GLenum       coord,
                                     GLenum       pname,
                                     const GLint* params)
 {
+    APIInterceptor::MemoryChunk             params_chunk(params,
+                                                         OpenGL::Utils::get_n_tex_gen_params(pname),
+                                                         sizeof(GLint));
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
@@ -35,9 +40,9 @@ void AI_APIENTRY OpenGL::aiTexGeniv(GLenum       coord,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32_glenum(coord),
-                APIInterceptor::APIFunctionArgument::create_u32_glenum(pname),
-                APIInterceptor::APIFunctionArgument::create_void_ptr  (params),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum   (coord),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum   (pname),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(params_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLTEXGENIV,
@@ -65,9 +70,9 @@ void AI_APIENTRY OpenGL::aiTexGeniv(GLenum       coord,
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_u32_glenum(coord),
-            APIInterceptor::APIFunctionArgument::create_u32_glenum(pname),
-            APIInterceptor::APIFunctionArgument::create_void_ptr  (params),
+            APIInterceptor::APIFunctionArgument::create_u32_glenum   (coord),
+            APIInterceptor::APIFunctionArgument::create_u32_glenum   (pname),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(params_chunk.get_id() ),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLTEXGENIV,

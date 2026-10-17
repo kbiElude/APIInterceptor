@@ -1374,6 +1374,11 @@ namespace APIInterceptor
         const uint64_t&       get_u64          () const;
         const void*           get_ptr          () const;
 
+        /* Value of any pointer-typed argument as recorded, whatever the pointer size of the process which was dumped.
+         * Unlike get_ptr(), safe to call for a dump of the other architecture. Such a value is a handle, not an address.
+         */
+        uint64_t get_ptr_as_u64() const;
+
         const void* get_value_ptr() const
         {
             return &value;

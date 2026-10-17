@@ -8,18 +8,20 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL2.0/gl_get_uniform_location.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/string_chunk.h"
 #include "WGL/globals.h"
 
 GLint AI_APIENTRY OpenGL::aiGetUniformLocation(GLuint        program,
                                                const GLchar* name)
 {
+    OpenGL::StringChunk                     name_chunk(name);
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
+    GLint                                   result                 = -1;
     bool                                    should_pass_through    = true;
     APIInterceptor::Tracker                 tracker;
-    GLint                                   result                 = -1;
 
     if (tracker.is_top_level_api_call() )
     {
@@ -33,8 +35,8 @@ GLint AI_APIENTRY OpenGL::aiGetUniformLocation(GLuint        program,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32     (program),
-                APIInterceptor::APIFunctionArgument::create_void_ptr(name),
+                APIInterceptor::APIFunctionArgument::create_u32          (program),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(name_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETUNIFORMLOCATION,
@@ -61,8 +63,8 @@ GLint AI_APIENTRY OpenGL::aiGetUniformLocation(GLuint        program,
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_u32     (program),
-            APIInterceptor::APIFunctionArgument::create_void_ptr(name),
+            APIInterceptor::APIFunctionArgument::create_u32          (program),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(name_chunk.get_id() ),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETUNIFORMLOCATION,

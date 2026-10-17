@@ -40,7 +40,7 @@ void AI_APIENTRY OpenGL::aiGetQueryBufferObjectui64v(GLuint   id,
                 APIInterceptor::APIFunctionArgument::create_u32       (id),
                 APIInterceptor::APIFunctionArgument::create_u32       (buffer),
                 APIInterceptor::APIFunctionArgument::create_u32_glenum(pname),
-                APIInterceptor::APIFunctionArgument::create_i32       (static_cast<GLint>(offset) ),
+                APIInterceptor::APIFunctionArgument::create_i64       (static_cast<int64_t>(offset) ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETQUERYBUFFEROBJECTUI64V,
@@ -72,7 +72,7 @@ void AI_APIENTRY OpenGL::aiGetQueryBufferObjectui64v(GLuint   id,
             APIInterceptor::APIFunctionArgument::create_u32       (id),
             APIInterceptor::APIFunctionArgument::create_u32       (buffer),
             APIInterceptor::APIFunctionArgument::create_u32_glenum(pname),
-            APIInterceptor::APIFunctionArgument::create_i32       (static_cast<GLint>(offset) ),
+            APIInterceptor::APIFunctionArgument::create_i64       (static_cast<int64_t>(offset) ),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETQUERYBUFFEROBJECTUI64V,

@@ -10,8 +10,8 @@
 #include "OpenGL/globals.h"
 #include "WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiPrioritizeTextures(GLsizei n,
-                                              const GLuint* textures,
+void AI_APIENTRY OpenGL::aiPrioritizeTextures(GLsizei         n,
+                                              const GLuint*   textures,
                                               const GLclampf* priorities)
 {
     void*                                   post_callback_func_arg = nullptr;

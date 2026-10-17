@@ -5,14 +5,18 @@
 #include "Common/callbacks.h"
 #include "Common/logger.h"
 #include "Common/macros.h"
+#include "Common/memory_chunk.h"
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL4.1/gl_delete_program_pipelines.h"
 #include "OpenGL/globals.h"
 #include "WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDeleteProgramPipelines(GLsizei        n,
-                                                  const GLuint*  pipelines)
+void AI_APIENTRY OpenGL::aiDeleteProgramPipelines(GLsizei       n,
+                                                  const GLuint* pipelines)
 {
+    APIInterceptor::MemoryChunk             pipelines_chunk(pipelines,
+                                                            n,
+                                                            sizeof(GLuint));
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
@@ -32,8 +36,8 @@ void AI_APIENTRY OpenGL::aiDeleteProgramPipelines(GLsizei        n,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_i32     (n),
-                APIInterceptor::APIFunctionArgument::create_u32_ptr (pipelines),
+                APIInterceptor::APIFunctionArgument::create_i32          (n),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(pipelines_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLDELETEPROGRAMPIPELINES,
@@ -60,8 +64,8 @@ void AI_APIENTRY OpenGL::aiDeleteProgramPipelines(GLsizei        n,
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_i32     (n),
-            APIInterceptor::APIFunctionArgument::create_u32_ptr (pipelines),
+            APIInterceptor::APIFunctionArgument::create_i32          (n),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(pipelines_chunk.get_id() ),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLDELETEPROGRAMPIPELINES,

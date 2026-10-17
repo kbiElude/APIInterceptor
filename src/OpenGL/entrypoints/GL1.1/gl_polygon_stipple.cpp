@@ -8,17 +8,28 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL1.1/gl_polygon_stipple.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/pixel_data_chunk.h"
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiPolygonStipple(const GLubyte *mask)
+void AI_APIENTRY OpenGL::aiPolygonStipple(const GLubyte* mask)
 {
+    OpenGL::PixelDataChunk                  pixels_chunk;
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
     APIInterceptor::Tracker                 tracker;
+
+    if (tracker.is_top_level_api_call() )
+    {
+        constexpr int64_t POLYGON_STIPPLE_N_PIXELS_PER_SIDE = 32;
+
+        pixels_chunk = OpenGL::PixelDataChunk::create_for_unpack_bitmap(mask,
+                                                                        POLYGON_STIPPLE_N_PIXELS_PER_SIDE,
+                                                                        POLYGON_STIPPLE_N_PIXELS_PER_SIDE);
+    }
 
     if (tracker.is_top_level_api_call() )
     {
@@ -31,7 +42,7 @@ void AI_APIENTRY OpenGL::aiPolygonStipple(const GLubyte *mask)
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_void_ptr  (mask),
+                pixels_chunk.get_arg(),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLPOLYGONSTIPPLE,
@@ -57,7 +68,7 @@ void AI_APIENTRY OpenGL::aiPolygonStipple(const GLubyte *mask)
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_void_ptr  (mask),
+            pixels_chunk.get_arg(),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLPOLYGONSTIPPLE,

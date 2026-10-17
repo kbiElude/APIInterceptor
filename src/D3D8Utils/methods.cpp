@@ -143,77 +143,77 @@ const char* D3D8::Utils::get_object_type_name_ptr(const ObjectType& in_object_ty
 
     switch (in_object_type)
     {
-        case ObjectType::BaseTexture:
+        case ObjectType::BASE_TEXTURE:
         {
             result_ptr = "BaseTexture";
 
             break;
         }
 
-        case ObjectType::CubeTexture:
+        case ObjectType::CUBE_TEXTURE:
         {
             result_ptr = "CubeTexture";
 
             break;
         }
 
-        case ObjectType::Device:
+        case ObjectType::DEVICE:
         {
             result_ptr = "Device";
 
             break;
         }
 
-        case ObjectType::Direct3D8:
+        case ObjectType::DIRECT3D8:
         {
             result_ptr = "Direct3D8";
 
             break;
         }
 
-        case ObjectType::IndexBuffer:
+        case ObjectType::INDEX_BUFFER:
         {
             result_ptr = "IndexBuffer";
 
             break;
         }
 
-        case ObjectType::Surface:
+        case ObjectType::SURFACE:
         {
             result_ptr = "Surface";
 
             break;
         }
 
-        case ObjectType::SwapChain:
+        case ObjectType::SWAP_CHAIN:
         {
             result_ptr = "SwapChain";
 
             break;
         }
 
-        case ObjectType::Texture:
+        case ObjectType::TEXTURE:
         {
             result_ptr = "Texture";
 
             break;
         }
 
-        case ObjectType::VertexBuffer:
+        case ObjectType::VERTEX_BUFFER:
         {
             result_ptr = "VertexBuffer";
 
             break;
         }
 
-        case ObjectType::Volume:
+        case ObjectType::VOLUME:
         {
             result_ptr = "Volume";
 
             break;
         }
 
-        case ObjectType::VolumeTexture:
+        case ObjectType::VOLUME_TEXTURE:
         {
             result_ptr = "VolumeTexture";
 

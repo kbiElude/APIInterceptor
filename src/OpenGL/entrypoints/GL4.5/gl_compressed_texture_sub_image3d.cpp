@@ -8,6 +8,7 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL4.5/gl_compressed_texture_sub_image3d.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/pixel_data_chunk.h"
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
@@ -23,13 +24,13 @@ void AI_APIENTRY OpenGL::aiCompressedTextureSubImage3D(GLuint      texture,
                                                        GLsizei     imageSize,
                                                        const void* data)
 {
+    OpenGL::PixelDataChunk                  pixels_chunk;
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
     APIInterceptor::Tracker                 tracker;
-    uint32_t                                data_chunk_id          = 0;
 
     if (tracker.is_top_level_api_call() )
     {
@@ -46,8 +47,8 @@ void AI_APIENTRY OpenGL::aiCompressedTextureSubImage3D(GLuint      texture,
                  static_cast<int32_t>(imageSize),
                  data);
 
-        data_chunk_id = APIInterceptor::register_data_chunk(data,
-                                                            (data != nullptr) ? static_cast<uint32_t>(imageSize) : 0u);
+        pixels_chunk = OpenGL::PixelDataChunk::create_for_unpack_bytes(data,
+                                                                       static_cast<uint64_t>(imageSize));
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCOMPRESSEDTEXTURESUBIMAGE3D,
                                                          &pre_callback_func_ptr,
@@ -64,8 +65,8 @@ void AI_APIENTRY OpenGL::aiCompressedTextureSubImage3D(GLuint      texture,
                 APIInterceptor::APIFunctionArgument::create_i32       (height),
                 APIInterceptor::APIFunctionArgument::create_i32       (depth),
                 APIInterceptor::APIFunctionArgument::create_u32_glenum(format),
-                APIInterceptor::APIFunctionArgument::create_i32          (imageSize),
-                APIInterceptor::APIFunctionArgument::create_data_chunk_id(data_chunk_id),
+                APIInterceptor::APIFunctionArgument::create_i32       (imageSize),
+                pixels_chunk.get_arg(),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLCOMPRESSEDTEXTURESUBIMAGE3D,
@@ -104,14 +105,14 @@ void AI_APIENTRY OpenGL::aiCompressedTextureSubImage3D(GLuint      texture,
             APIInterceptor::APIFunctionArgument::create_u32       (texture),
             APIInterceptor::APIFunctionArgument::create_i32       (level),
             APIInterceptor::APIFunctionArgument::create_i32       (xoffset),
-            APIInterceptor::APIFunctionArgument::create_i32          (yoffset),
-            APIInterceptor::APIFunctionArgument::create_i32          (zoffset),
-            APIInterceptor::APIFunctionArgument::create_i32          (width),
-            APIInterceptor::APIFunctionArgument::create_i32          (height),
-            APIInterceptor::APIFunctionArgument::create_i32          (depth),
-            APIInterceptor::APIFunctionArgument::create_u32_glenum   (format),
-            APIInterceptor::APIFunctionArgument::create_i32          (imageSize),
-            APIInterceptor::APIFunctionArgument::create_data_chunk_id(data_chunk_id),
+            APIInterceptor::APIFunctionArgument::create_i32       (yoffset),
+            APIInterceptor::APIFunctionArgument::create_i32       (zoffset),
+            APIInterceptor::APIFunctionArgument::create_i32       (width),
+            APIInterceptor::APIFunctionArgument::create_i32       (height),
+            APIInterceptor::APIFunctionArgument::create_i32       (depth),
+            APIInterceptor::APIFunctionArgument::create_u32_glenum(format),
+            APIInterceptor::APIFunctionArgument::create_i32       (imageSize),
+            pixels_chunk.get_arg(),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLCOMPRESSEDTEXTURESUBIMAGE3D,

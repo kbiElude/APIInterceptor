@@ -17,7 +17,7 @@ namespace D3D8
     struct ArgumentCaptureSelector;
 
     template<typename T>
-    struct ArgumentCaptureSelector<T, Utils::ArgumentCategory::ConstStruct>
+    struct ArgumentCaptureSelector<T, Utils::ArgumentCategory::CONST_STRUCT>
     {
         typedef typename Utils::PointeeOf<T>::type StructType;
 
@@ -28,7 +28,7 @@ namespace D3D8
     };
 
     template<typename T>
-    struct ArgumentCaptureSelector<T, Utils::ArgumentCategory::Guid>
+    struct ArgumentCaptureSelector<T, Utils::ArgumentCategory::GUID>
     {
         static APIInterceptor::APIFunctionArgument create_post_argument(const T&                                   in_value,
                                                                         const APIInterceptor::APIFunctionArgument& in_pre_argument,
@@ -37,7 +37,7 @@ namespace D3D8
     };
 
     template<typename T>
-    struct ArgumentCaptureSelector<T, Utils::ArgumentCategory::MutableStruct>
+    struct ArgumentCaptureSelector<T, Utils::ArgumentCategory::MUTABLE_STRUCT>
     {
         typedef typename Utils::PointeeOf<T>::type StructType;
 
@@ -48,7 +48,7 @@ namespace D3D8
     };
 
     template<typename T>
-    struct ArgumentCaptureSelector<T, Utils::ArgumentCategory::Object>
+    struct ArgumentCaptureSelector<T, Utils::ArgumentCategory::OBJECT>
     {
         static APIInterceptor::APIFunctionArgument create_post_argument(const T&                                   in_value,
                                                                         const APIInterceptor::APIFunctionArgument& in_pre_argument,
@@ -57,7 +57,7 @@ namespace D3D8
     };
 
     template<typename T>
-    struct ArgumentCaptureSelector<T, Utils::ArgumentCategory::ObjectOut>
+    struct ArgumentCaptureSelector<T, Utils::ArgumentCategory::OBJECT_OUT>
     {
         static APIInterceptor::APIFunctionArgument create_post_argument(const T&                                   in_value,
                                                                         const APIInterceptor::APIFunctionArgument& in_pre_argument,
@@ -65,8 +65,15 @@ namespace D3D8
         static APIInterceptor::APIFunctionArgument create_pre_argument (const T&                                   in_value);
     };
 
+    /* The pointer is captured as the one of an interface: before the call, the address; after it, the value written. */
     template<typename T>
-    struct ArgumentCaptureSelector<T, Utils::ArgumentCategory::Scalar>
+    struct ArgumentCaptureSelector<T, Utils::ArgumentCategory::POINTER_OUT> : public ArgumentCaptureSelector<T, Utils::ArgumentCategory::OBJECT_OUT>
+    {
+        /* Stub */
+    };
+
+    template<typename T>
+    struct ArgumentCaptureSelector<T, Utils::ArgumentCategory::SCALAR>
     {
         typedef typename ScalarConversion<T>::type ScalarType;
 
@@ -77,7 +84,7 @@ namespace D3D8
     };
 
     template<typename T>
-    struct ArgumentCaptureSelector<T, Utils::ArgumentCategory::ScalarOut>
+    struct ArgumentCaptureSelector<T, Utils::ArgumentCategory::SCALAR_OUT>
     {
         static APIInterceptor::APIFunctionArgument create_post_argument(const T&                                   in_value,
                                                                         const APIInterceptor::APIFunctionArgument& in_pre_argument,
@@ -87,7 +94,7 @@ namespace D3D8
 }
 
 template<typename T>
-APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils::ArgumentCategory::ConstStruct>::create_post_argument(const T&                                   in_value,
+APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils::ArgumentCategory::CONST_STRUCT>::create_post_argument(const T&                                   in_value,
                                                                                                                                        const APIInterceptor::APIFunctionArgument& in_pre_argument,
                                                                                                                                        const bool&                                in_is_pre_argument_valid)
 {
@@ -96,14 +103,14 @@ APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils
 }
 
 template<typename T>
-APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils::ArgumentCategory::ConstStruct>::create_pre_argument(const T& in_value)
+APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils::ArgumentCategory::CONST_STRUCT>::create_pre_argument(const T& in_value)
 {
     return ArgumentFactory::create_chunk(in_value,
                                          static_cast<uint32_t>(sizeof(StructType) ));
 }
 
 template<typename T>
-APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils::ArgumentCategory::Guid>::create_post_argument(const T&                                   in_value,
+APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils::ArgumentCategory::GUID>::create_post_argument(const T&                                   in_value,
                                                                                                                                 const APIInterceptor::APIFunctionArgument& in_pre_argument,
                                                                                                                                 const bool&                                in_is_pre_argument_valid)
 {
@@ -112,14 +119,14 @@ APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils
 }
 
 template<typename T>
-APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils::ArgumentCategory::Guid>::create_pre_argument(const T& in_value)
+APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils::ArgumentCategory::GUID>::create_pre_argument(const T& in_value)
 {
     return ArgumentFactory::create_chunk(&in_value,
                                          static_cast<uint32_t>(sizeof(GUID) ));
 }
 
 template<typename T>
-APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils::ArgumentCategory::MutableStruct>::create_post_argument(const T&                                   in_value,
+APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils::ArgumentCategory::MUTABLE_STRUCT>::create_post_argument(const T&                                   in_value,
                                                                                                                                          const APIInterceptor::APIFunctionArgument& in_pre_argument,
                                                                                                                                          const bool&                                in_is_pre_argument_valid)
 {
@@ -132,7 +139,7 @@ APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils
 
 /* Output structures hold nothing meaningful before the call. */
 template<typename T>
-APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils::ArgumentCategory::MutableStruct>::create_pre_argument(const T& in_value)
+APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils::ArgumentCategory::MUTABLE_STRUCT>::create_pre_argument(const T& in_value)
 {
     const void* const value_ptr = in_value;
 
@@ -142,7 +149,7 @@ APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils
 }
 
 template<typename T>
-APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils::ArgumentCategory::Object>::create_post_argument(const T&                                   in_value,
+APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils::ArgumentCategory::OBJECT>::create_post_argument(const T&                                   in_value,
                                                                                                                                   const APIInterceptor::APIFunctionArgument& in_pre_argument,
                                                                                                                                   const bool&                                in_is_pre_argument_valid)
 {
@@ -153,7 +160,7 @@ APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils
 }
 
 template<typename T>
-APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils::ArgumentCategory::Object>::create_pre_argument(const T& in_value)
+APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils::ArgumentCategory::OBJECT>::create_pre_argument(const T& in_value)
 {
     const void* const value_ptr = in_value;
 
@@ -161,7 +168,7 @@ APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils
 }
 
 template<typename T>
-APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils::ArgumentCategory::ObjectOut>::create_post_argument(const T&                                   in_value,
+APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils::ArgumentCategory::OBJECT_OUT>::create_post_argument(const T&                                   in_value,
                                                                                                                                      const APIInterceptor::APIFunctionArgument& in_pre_argument,
                                                                                                                                      const bool&                                in_is_pre_argument_valid)
 {
@@ -175,7 +182,7 @@ APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils
 }
 
 template<typename T>
-APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils::ArgumentCategory::ObjectOut>::create_pre_argument(const T& in_value)
+APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils::ArgumentCategory::OBJECT_OUT>::create_pre_argument(const T& in_value)
 {
     const void* const value_ptr = in_value;
 
@@ -183,7 +190,7 @@ APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils
 }
 
 template<typename T>
-APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils::ArgumentCategory::Scalar>::create_post_argument(const T&                                   in_value,
+APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils::ArgumentCategory::SCALAR>::create_post_argument(const T&                                   in_value,
                                                                                                                                  const APIInterceptor::APIFunctionArgument& in_pre_argument,
                                                                                                                                  const bool&                                in_is_pre_argument_valid)
 {
@@ -194,7 +201,7 @@ APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils
 }
 
 template<typename T>
-APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils::ArgumentCategory::Scalar>::create_pre_argument(const T& in_value)
+APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils::ArgumentCategory::SCALAR>::create_pre_argument(const T& in_value)
 {
     const ScalarType scalar_value = static_cast<ScalarType>(in_value);
 
@@ -202,7 +209,7 @@ APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils
 }
 
 template<typename T>
-APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils::ArgumentCategory::ScalarOut>::create_post_argument(const T&                                   in_value,
+APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils::ArgumentCategory::SCALAR_OUT>::create_post_argument(const T&                                   in_value,
                                                                                                                                     const APIInterceptor::APIFunctionArgument& in_pre_argument,
                                                                                                                                     const bool&                                in_is_pre_argument_valid)
 {
@@ -216,7 +223,7 @@ APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils
 }
 
 template<typename T>
-APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils::ArgumentCategory::ScalarOut>::create_pre_argument(const T& in_value)
+APIInterceptor::APIFunctionArgument D3D8::ArgumentCaptureSelector<T, D3D8::Utils::ArgumentCategory::SCALAR_OUT>::create_pre_argument(const T& in_value)
 {
     const void* const value_ptr = in_value;
 

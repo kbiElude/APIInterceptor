@@ -5,6 +5,7 @@
 #include "Common/callbacks.h"
 #include "Common/logger.h"
 #include "Common/macros.h"
+#include "Common/memory_chunk.h"
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL4.5/gl_named_framebuffer_draw_buffers.h"
 #include "OpenGL/globals.h"
@@ -14,6 +15,9 @@ void AI_APIENTRY OpenGL::aiNamedFramebufferDrawBuffers(GLuint        framebuffer
                                                        GLsizei       n,
                                                        const GLenum* bufs)
 {
+    APIInterceptor::MemoryChunk             bufs_chunk(bufs,
+                                                       n,
+                                                       sizeof(GLenum));
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
@@ -34,9 +38,9 @@ void AI_APIENTRY OpenGL::aiNamedFramebufferDrawBuffers(GLuint        framebuffer
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32    (framebuffer),
-                APIInterceptor::APIFunctionArgument::create_i32    (n),
-                APIInterceptor::APIFunctionArgument::create_u32_ptr(bufs),
+                APIInterceptor::APIFunctionArgument::create_u32          (framebuffer),
+                APIInterceptor::APIFunctionArgument::create_i32          (n),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(bufs_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLNAMEDFRAMEBUFFERDRAWBUFFERS,
@@ -64,9 +68,9 @@ void AI_APIENTRY OpenGL::aiNamedFramebufferDrawBuffers(GLuint        framebuffer
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_u32    (framebuffer),
-            APIInterceptor::APIFunctionArgument::create_i32    (n),
-            APIInterceptor::APIFunctionArgument::create_u32_ptr(bufs),
+            APIInterceptor::APIFunctionArgument::create_u32          (framebuffer),
+            APIInterceptor::APIFunctionArgument::create_i32          (n),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(bufs_chunk.get_id() ),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLNAMEDFRAMEBUFFERDRAWBUFFERS,

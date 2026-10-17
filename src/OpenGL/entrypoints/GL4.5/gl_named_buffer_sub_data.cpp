@@ -5,6 +5,7 @@
 #include "Common/callbacks.h"
 #include "Common/logger.h"
 #include "Common/macros.h"
+#include "Common/memory_chunk.h"
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL4.5/gl_named_buffer_sub_data.h"
 #include "OpenGL/globals.h"
@@ -15,6 +16,9 @@ void AI_APIENTRY OpenGL::aiNamedBufferSubData(GLuint      buffer,
                                               GLsizeiptr  size,
                                               const void* data)
 {
+    APIInterceptor::MemoryChunk             data_chunk(data,
+                                                       size,
+                                                       sizeof(uint8_t));
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
@@ -36,10 +40,10 @@ void AI_APIENTRY OpenGL::aiNamedBufferSubData(GLuint      buffer,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32      (buffer),
-                APIInterceptor::APIFunctionArgument::create_i32      (static_cast<GLint>(offset) ),
-                APIInterceptor::APIFunctionArgument::create_i32      (static_cast<GLint>(size) ),
-                APIInterceptor::APIFunctionArgument::create_void_ptr (data),
+                APIInterceptor::APIFunctionArgument::create_u32          (buffer),
+                APIInterceptor::APIFunctionArgument::create_i64          (static_cast<int64_t>(offset) ),
+                APIInterceptor::APIFunctionArgument::create_i64          (static_cast<int64_t>(size) ),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(data_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLNAMEDBUFFERSUBDATA,
@@ -68,10 +72,10 @@ void AI_APIENTRY OpenGL::aiNamedBufferSubData(GLuint      buffer,
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_u32      (buffer),
-            APIInterceptor::APIFunctionArgument::create_i32      (static_cast<GLint>(offset) ),
-            APIInterceptor::APIFunctionArgument::create_i32      (static_cast<GLint>(size) ),
-            APIInterceptor::APIFunctionArgument::create_void_ptr (data),
+            APIInterceptor::APIFunctionArgument::create_u32          (buffer),
+            APIInterceptor::APIFunctionArgument::create_i64          (static_cast<int64_t>(offset) ),
+            APIInterceptor::APIFunctionArgument::create_i64          (static_cast<int64_t>(size) ),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(data_chunk.get_id() ),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLNAMEDBUFFERSUBDATA,

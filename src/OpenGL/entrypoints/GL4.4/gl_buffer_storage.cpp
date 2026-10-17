@@ -5,6 +5,7 @@
 #include "Common/callbacks.h"
 #include "Common/logger.h"
 #include "Common/macros.h"
+#include "Common/memory_chunk.h"
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL4.4/gl_buffer_storage.h"
 #include "OpenGL/globals.h"
@@ -18,6 +19,9 @@ void AI_APIENTRY OpenGL::aiBufferStorage(GLenum      target,
                                          const void* data,
                                          GLbitfield  flags)
 {
+    APIInterceptor::MemoryChunk             data_chunk(data,
+                                                       size,
+                                                       sizeof(uint8_t));
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
@@ -39,10 +43,10 @@ void AI_APIENTRY OpenGL::aiBufferStorage(GLenum      target,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32_glenum(target),
-                APIInterceptor::APIFunctionArgument::create_i32       (static_cast<GLint>(size)),
-                APIInterceptor::APIFunctionArgument::create_void_ptr  (data),
-                APIInterceptor::APIFunctionArgument::create_u32       (flags),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum   (target),
+                APIInterceptor::APIFunctionArgument::create_i64          (static_cast<int64_t>(size) ),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(data_chunk.get_id() ),
+                APIInterceptor::APIFunctionArgument::create_u32          (flags),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLBUFFERSTORAGE,
@@ -69,18 +73,12 @@ void AI_APIENTRY OpenGL::aiBufferStorage(GLenum      target,
                                                                 &binding_target) )
         {
             auto&        context         = OpenGL::get_context_state();
-            const GLuint bound_buffer_id = context.bound_buffers[static_cast<size_t>(binding_target)];
+            const GLuint bound_buffer_id = context.buffer_manager.get_bound_buffer(binding_target);
 
             if (bound_buffer_id != 0)
             {
-                auto& buffer_props_ptr = context.buffer_object_id_to_buffer_props_ptr_map[bound_buffer_id];
-
-                if (buffer_props_ptr == nullptr)
-                {
-                    buffer_props_ptr.reset(new OpenGL::BufferProps() );
-                }
-
-                buffer_props_ptr->size_bytes = static_cast<uint32_t>(size);
+                context.buffer_manager.set_size(bound_buffer_id,
+                                                static_cast<uint64_t>(size) );
             }
         }
     }
@@ -93,10 +91,10 @@ void AI_APIENTRY OpenGL::aiBufferStorage(GLenum      target,
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_u32_glenum(target),
-            APIInterceptor::APIFunctionArgument::create_i32       (static_cast<GLint>(size)),
-            APIInterceptor::APIFunctionArgument::create_void_ptr  (data),
-            APIInterceptor::APIFunctionArgument::create_u32       (flags),
+            APIInterceptor::APIFunctionArgument::create_u32_glenum   (target),
+            APIInterceptor::APIFunctionArgument::create_i64          (static_cast<int64_t>(size) ),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(data_chunk.get_id() ),
+            APIInterceptor::APIFunctionArgument::create_u32          (flags),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLBUFFERSTORAGE,

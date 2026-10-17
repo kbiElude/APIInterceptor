@@ -8,6 +8,7 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL4.4/gl_clear_tex_sub_image.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/pixel_data_chunk.h"
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
@@ -23,6 +24,7 @@ void AI_APIENTRY OpenGL::aiClearTexSubImage(GLuint      texture,
                                             GLenum      type,
                                             const void* data)
 {
+    OpenGL::PixelDataChunk                  data_chunk;
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
@@ -45,6 +47,10 @@ void AI_APIENTRY OpenGL::aiClearTexSubImage(GLuint      texture,
                  OpenGL::Utils::get_raw_string_for_gl_enum(type),
                  data);
 
+        data_chunk = OpenGL::PixelDataChunk::create_for_texel(data,
+                                                              format,
+                                                              type);
+
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCLEARTEXSUBIMAGE,
                                                          &pre_callback_func_ptr,
                                                          &pre_callback_func_arg) )
@@ -61,7 +67,7 @@ void AI_APIENTRY OpenGL::aiClearTexSubImage(GLuint      texture,
                 APIInterceptor::APIFunctionArgument::create_i32       (depth),
                 APIInterceptor::APIFunctionArgument::create_u32_glenum(format),
                 APIInterceptor::APIFunctionArgument::create_u32_glenum(type),
-                APIInterceptor::APIFunctionArgument::create_void_ptr  (data),
+                data_chunk.get_arg(),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLCLEARTEXSUBIMAGE,
@@ -107,7 +113,7 @@ void AI_APIENTRY OpenGL::aiClearTexSubImage(GLuint      texture,
             APIInterceptor::APIFunctionArgument::create_i32       (depth),
             APIInterceptor::APIFunctionArgument::create_u32_glenum(format),
             APIInterceptor::APIFunctionArgument::create_u32_glenum(type),
-            APIInterceptor::APIFunctionArgument::create_void_ptr  (data),
+            data_chunk.get_arg(),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLCLEARTEXSUBIMAGE,

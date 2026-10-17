@@ -45,7 +45,7 @@ void AI_APIENTRY OpenGL::aiBufferData(GLenum      target,
             const APIInterceptor::APIFunctionArgument args[] =
             {
                 APIInterceptor::APIFunctionArgument::create_u32_glenum   (target),
-                APIInterceptor::APIFunctionArgument::create_i32          (static_cast<int32_t>(size) ),
+                APIInterceptor::APIFunctionArgument::create_i64          (static_cast<int64_t>(size) ),
                 APIInterceptor::APIFunctionArgument::create_data_chunk_id(data_chunk_id),
                 APIInterceptor::APIFunctionArgument::create_u32_glenum   (usage),
             };
@@ -77,7 +77,7 @@ void AI_APIENTRY OpenGL::aiBufferData(GLenum      target,
         const APIInterceptor::APIFunctionArgument args[] =
         {
             APIInterceptor::APIFunctionArgument::create_u32_glenum   (target),
-            APIInterceptor::APIFunctionArgument::create_i32          (static_cast<int32_t>(size) ),
+            APIInterceptor::APIFunctionArgument::create_i64          (static_cast<int64_t>(size) ),
             APIInterceptor::APIFunctionArgument::create_data_chunk_id(data_chunk_id),
             APIInterceptor::APIFunctionArgument::create_u32_glenum   (usage),
         };
@@ -97,18 +97,12 @@ void AI_APIENTRY OpenGL::aiBufferData(GLenum      target,
                                                                 &binding_target) )
         {
             auto&        context         = OpenGL::get_context_state();
-            const GLuint bound_buffer_id = context.bound_buffers    [static_cast<size_t>(binding_target)];
+            const GLuint bound_buffer_id = context.buffer_manager.get_bound_buffer(binding_target);
 
             if (bound_buffer_id != 0)
             {
-                auto& buffer_props_ptr = context.buffer_object_id_to_buffer_props_ptr_map[bound_buffer_id];
-
-                if (buffer_props_ptr == nullptr)
-                {
-                    buffer_props_ptr.reset(new OpenGL::BufferProps() );
-                }
-
-                buffer_props_ptr->size_bytes = static_cast<uint32_t>(size);
+                context.buffer_manager.set_size(bound_buffer_id,
+                                                static_cast<uint64_t>(size) );
             }
         }
     }

@@ -456,6 +456,48 @@ if (APIINTERCEPTOR_BUILD_LIBS)
 
     source_group ("APIDump Loader include files"  FILES ${APIDumpLoaderIncludes})
     source_group ("APIDump Loader source files"   FILES ${APIDumpLoaderSources})
+
+endif()
+
+# The replayer needs the D3D8 description of the interceptor (D3D8Utils).
+if (APIINTERCEPTOR_BUILD_INTERCEPTOR AND APIINTERCEPTOR_BUILD_LIBS)
+    file(GLOB APIDumpReplayerIncludes "${APIInterceptor_SOURCE_DIR}/include/APIDumpReplayer/*.h")
+    file(GLOB APIDumpReplayerSources  "${APIInterceptor_SOURCE_DIR}/src/APIDumpReplayer/*.cpp"
+                                      "${APIInterceptor_SOURCE_DIR}/src/APIDumpReplayer/*.h")
+
+    add_library(APIDumpReplayer SHARED ${APIDumpReplayerIncludes} ${APIDumpReplayerSources})
+
+    target_compile_definitions(APIDumpReplayer PRIVATE APIDUMPREPLAYER_BUILDING_DLL)
+    target_include_directories(APIDumpReplayer PRIVATE "${APIInterceptor_SOURCE_DIR}/src/APIDumpReplayer")
+    target_link_libraries     (APIDumpReplayer APIDumpLoader D3D8Utils gdi32 opengl32 user32 winmm)
+
+    # The control window of the player. Win32 + Direct3D 11 backends of Dear ImGui.
+    add_library(ImGui STATIC "${APIInterceptor_SOURCE_DIR}/deps/imgui/imgui.cpp"
+                             "${APIInterceptor_SOURCE_DIR}/deps/imgui/imgui_draw.cpp"
+                             "${APIInterceptor_SOURCE_DIR}/deps/imgui/imgui_tables.cpp"
+                             "${APIInterceptor_SOURCE_DIR}/deps/imgui/imgui_widgets.cpp"
+                             "${APIInterceptor_SOURCE_DIR}/deps/imgui/backends/imgui_impl_dx11.cpp"
+                             "${APIInterceptor_SOURCE_DIR}/deps/imgui/backends/imgui_impl_win32.cpp")
+
+    target_include_directories(ImGui PUBLIC "${APIInterceptor_SOURCE_DIR}/deps/imgui"
+                                            "${APIInterceptor_SOURCE_DIR}/deps/imgui/backends")
+    target_link_libraries     (ImGui d3d11 d3dcompiler dxgi dwmapi)
+
+    file(GLOB APIDumpPlayerSources "${APIInterceptor_SOURCE_DIR}/src/APIDumpPlayer/*.cpp"
+                                   "${APIInterceptor_SOURCE_DIR}/src/APIDumpPlayer/*.h")
+
+    add_executable(APIDumpPlayer ${APIDumpPlayerSources})
+
+    target_link_libraries(APIDumpPlayer APIDumpLoader APIDumpReplayer ImGui comdlg32)
+
+    # The 32-bit pair has its own names, so that the 64-bit player can find it next to itself (see PlayerLauncher).
+    if (CMAKE_SIZEOF_VOID_P EQUAL 4)
+        set_target_properties(APIDumpPlayer   PROPERTIES OUTPUT_NAME "APIDumpPlayer_x86")
+        set_target_properties(APIDumpReplayer PROPERTIES OUTPUT_NAME "APIDumpReplayer_x86")
+    endif()
+
+    source_group ("APIDump Replayer include files" FILES ${APIDumpReplayerIncludes})
+    source_group ("APIDump Replayer source files"  FILES ${APIDumpReplayerSources})
 endif()
 
 if (APIINTERCEPTOR_BUILD_TOOLS)
@@ -485,9 +527,29 @@ if (APIINTERCEPTOR_BUILD_TESTS)
 
     file(GLOB APIInterceptorTestsSources "${APIInterceptor_SOURCE_DIR}/src/Tests/*.cpp")
 
-    add_executable(APIInterceptorTests ${APIInterceptorTestsSources})
+    # Sources under test which are not part of a library.
+    add_executable(APIInterceptorTests ${APIInterceptorTestsSources}
+                                       "${APIInterceptor_SOURCE_DIR}/src/APIDumpReplayer/call_context.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/APIDumpReplayer/call_walker.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/APIDumpReplayer/frame_pacer.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/APIDumpReplayer/gl_index_replayer.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/APIDumpReplayer/gl_replay_context.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/APIDumpReplayer/object_remapper.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/Common/callbacks.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/Common/memory_chunk.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/OpenGL/buffer_manager.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/OpenGL/buffer_mapping_manager.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/OpenGL/client_array_manager.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/OpenGL/param_counts.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/OpenGL/pixel_store_manager.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/OpenGL/string_array_chunk.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/OpenGL/string_chunk.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/OpenGL/texture_manager.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/OpenGL/utils.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/WGL/utils.cpp")
 
-    target_link_libraries(APIInterceptorTests gtest_main APIDumpLoader D3D8Utils)
+    target_include_directories(APIInterceptorTests PRIVATE "${APIInterceptor_SOURCE_DIR}/src/APIDumpReplayer")
+    target_link_libraries(APIInterceptorTests gtest_main APIDumpLoader APIDumpReplayer D3D8Utils)
 
     enable_testing()
     add_test(NAME APIInterceptorTests COMMAND APIInterceptorTests)

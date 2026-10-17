@@ -5,15 +5,20 @@
 #include "Common/callbacks.h"
 #include "Common/globals.h"
 #include "Common/logger.h"
+#include "Common/memory_chunk.h"
 #include "Common/tracker.h"
 #include "WGL/entrypoints/WGL_ARB_create_context/wgl_create_context_attribs_arb.h"
 #include "WGL/globals.h"
+#include "WGL/utils.h"
 #include "WGL/utils_trace.h"
 
 HGLRC WINAPI WGL::create_context_attribs_arb(HDC        in_hdc,
                                              HGLRC      in_share_context_handle,
                                              const int* in_attrib_list_ptr)
 {
+    APIInterceptor::MemoryChunk             attrib_list_chunk(in_attrib_list_ptr,
+                                                              WGL::Utils::get_n_context_attrib_list_ints(in_attrib_list_ptr),
+                                                              sizeof(int) );
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
@@ -45,9 +50,9 @@ HGLRC WINAPI WGL::create_context_attribs_arb(HDC        in_hdc,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_void_ptr(in_hdc),
-                APIInterceptor::APIFunctionArgument::create_void_ptr(in_share_context_handle),
-                APIInterceptor::APIFunctionArgument::create_void_ptr(in_attrib_list_ptr),
+                APIInterceptor::APIFunctionArgument::create_void_ptr     (in_hdc),
+                APIInterceptor::APIFunctionArgument::create_void_ptr     (in_share_context_handle),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(attrib_list_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_WGL_WGLCREATECONTEXTATTRIBSARB,

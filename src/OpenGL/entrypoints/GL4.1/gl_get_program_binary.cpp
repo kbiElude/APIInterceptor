@@ -11,11 +11,11 @@
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetProgramBinary(GLuint    program,
-                                            GLsizei   bufSize,
-                                            GLsizei*  length,
-                                            GLenum*   binaryFormat,
-                                            void*     binary)
+void AI_APIENTRY OpenGL::aiGetProgramBinary(GLuint   program,
+                                            GLsizei  bufSize,
+                                            GLsizei* length,
+                                            GLenum*  binaryFormat,
+                                            void*    binary)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;

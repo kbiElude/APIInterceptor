@@ -5,6 +5,8 @@
 #ifndef AI_TYPES_ENUMS_H
 #define AI_TYPES_ENUMS_H
 
+#include <cstdint>
+
 /* Compatibility-profile GL 1.4 point-parameter tokens removed from the core profile.
  * glcorearb.h and glext.h cannot be included together, so these are defined manually
  * using their canonical values from the OpenGL registry. */
@@ -22,28 +24,45 @@ namespace OpenGL
 {
     enum class BitfieldType
     {
-        Blit_Mask,           // glBlitFramebuffer()
-        Buffer_Access_Mask,  // glMapBufferRange()
-        Clear_Buffer_Mask,   // glClear()
-        Sync_Condition_Mask, // glFenceSync()
-        Wait_Sync_Mask,      // glClientWaitSync()
+        BLIT_MASK,           // glBlitFramebuffer()
+        BUFFER_ACCESS_MASK,  // glMapBufferRange()
+        CLEAR_BUFFER_MASK,   // glClear()
+        SYNC_CONDITION_MASK, // glFenceSync()
+        WAIT_SYNC_MASK,      // glClientWaitSync()
     };
 
     enum class BufferBindingTarget
     {
         ARRAY_BUFFER,
+        ATOMIC_COUNTER_BUFFER,
+        COPY_READ_BUFFER,
+        COPY_WRITE_BUFFER,
+        DISPATCH_INDIRECT_BUFFER,
+        DRAW_INDIRECT_BUFFER,
         ELEMENT_ARRAY_BUFFER,
+        PIXEL_PACK_BUFFER,
+        PIXEL_UNPACK_BUFFER,
+        QUERY_BUFFER,
+        SHADER_STORAGE_BUFFER,
+        TEXTURE_BUFFER,
+        TRANSFORM_FEEDBACK_BUFFER,
+        UNIFORM_BUFFER,
 
         COUNT
     };
 
-    enum class BufferMappingAccess
+    /* The values are stored in workload files (see ClientArrayManager). */
+    enum class ClientArrayKind : uint32_t
     {
-        READ_ONLY,
-        READ_WRITE,
-        WRITE_ONLY,
-
-        UNKNOWN
+        COLOR           = 0,
+        EDGE_FLAG       = 1,
+        FOG_COORD       = 2,
+        GENERIC         = 3,
+        INDEX           = 4,
+        NORMAL          = 5,
+        SECONDARY_COLOR = 6,
+        TEX_COORD       = 7,
+        VERTEX          = 8,
     };
 
     enum class TextureBindingTarget

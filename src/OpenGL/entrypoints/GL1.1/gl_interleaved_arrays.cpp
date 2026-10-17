@@ -8,6 +8,7 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL1.1/gl_interleaved_arrays.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/state_tracker.h"
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
@@ -55,6 +56,16 @@ void AI_APIENTRY OpenGL::aiInterleavedArrays(GLenum        format,
         reinterpret_cast<PFNGLINTERLEAVEDARRAYSPROC>(OpenGL::g_cached_gl_interleaved_arrays)(format,
                                                                                              stride,
                                                                                              pointer);
+    }
+
+    if (tracker.is_top_level_api_call() )
+    {
+        auto& context = OpenGL::get_context_state();
+
+        context.client_array_manager.set_interleaved_arrays(format,
+                                                          stride,
+                                                          pointer,
+                                                          context.buffer_manager.get_bound_buffer(OpenGL::BufferBindingTarget::ARRAY_BUFFER));
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLINTERLEAVEDARRRAYS,

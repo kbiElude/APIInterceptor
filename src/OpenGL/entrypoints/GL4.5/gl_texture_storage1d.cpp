@@ -72,7 +72,7 @@ void AI_APIENTRY OpenGL::aiTextureStorage1D(GLuint  texture,
                          level < levels;
                        ++level)
             {
-                context.set_texture_level_props(texture,
+                context.texture_manager.set_level_props(texture,
                                                 level,
                                                 mip_width,
                                                 1,

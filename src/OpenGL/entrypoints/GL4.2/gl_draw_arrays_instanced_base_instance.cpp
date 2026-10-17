@@ -6,6 +6,7 @@
 #include "Common/logger.h"
 #include "Common/macros.h"
 #include "Common/tracker.h"
+#include "OpenGL/client_array_chunk.h"
 #include "OpenGL/entrypoints/GL4.2/gl_draw_arrays_instanced_base_instance.h"
 #include "OpenGL/globals.h"
 #include "OpenGLUtils/utils_enum.h"
@@ -17,12 +18,19 @@ void AI_APIENTRY OpenGL::aiDrawArraysInstancedBaseInstance(GLenum  mode,
                                                            GLsizei instancecount,
                                                            GLuint  baseinstance)
 {
+    OpenGL::ClientArrayChunk                client_arrays_chunk;
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
     APIInterceptor::Tracker                 tracker;
+
+    client_arrays_chunk.add_arrays(first,
+                                   count);
+
+    client_arrays_chunk.set_instancing(instancecount,
+                                       baseinstance);
 
     if (tracker.is_top_level_api_call() )
     {
@@ -39,11 +47,12 @@ void AI_APIENTRY OpenGL::aiDrawArraysInstancedBaseInstance(GLenum  mode,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32_glenum(mode),
-                APIInterceptor::APIFunctionArgument::create_i32       (first),
-                APIInterceptor::APIFunctionArgument::create_i32       (count),
-                APIInterceptor::APIFunctionArgument::create_i32       (instancecount),
-                APIInterceptor::APIFunctionArgument::create_u32       (baseinstance),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum   (mode),
+                APIInterceptor::APIFunctionArgument::create_i32          (first),
+                APIInterceptor::APIFunctionArgument::create_i32          (count),
+                APIInterceptor::APIFunctionArgument::create_i32          (instancecount),
+                APIInterceptor::APIFunctionArgument::create_u32          (baseinstance),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(client_arrays_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLDRAWARRAYSINSTANCEDBASEINSTANCE,
@@ -73,11 +82,12 @@ void AI_APIENTRY OpenGL::aiDrawArraysInstancedBaseInstance(GLenum  mode,
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_u32_glenum(mode),
-            APIInterceptor::APIFunctionArgument::create_i32       (first),
-            APIInterceptor::APIFunctionArgument::create_i32       (count),
-            APIInterceptor::APIFunctionArgument::create_i32       (instancecount),
-            APIInterceptor::APIFunctionArgument::create_u32       (baseinstance),
+            APIInterceptor::APIFunctionArgument::create_u32_glenum   (mode),
+            APIInterceptor::APIFunctionArgument::create_i32          (first),
+            APIInterceptor::APIFunctionArgument::create_i32          (count),
+            APIInterceptor::APIFunctionArgument::create_i32          (instancecount),
+            APIInterceptor::APIFunctionArgument::create_u32          (baseinstance),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(client_arrays_chunk.get_id() ),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLDRAWARRAYSINSTANCEDBASEINSTANCE,

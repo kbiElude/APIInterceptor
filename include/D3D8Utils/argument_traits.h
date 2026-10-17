@@ -21,18 +21,18 @@ namespace D3D8
             static const ArgumentCategory category = ArgumentCategoryOf<T>::value;
 
             static const ValueKind kind =
-                (category == ArgumentCategory::ConstStruct)   ? StructTraits<PointeeType>::kind
-              : (category == ArgumentCategory::Guid)          ? ValueKind::Guid
-              : (category == ArgumentCategory::MutableStruct) ? StructTraits<PointeeType>::kind
-              : (category == ArgumentCategory::Object)        ? ValueKind::Object
-              : (category == ArgumentCategory::ObjectOut)     ? ValueKind::ObjectOut
-              : (category == ArgumentCategory::ScalarOut)     ? ValueKindOf<PointeeType>::kind
+                (category == ArgumentCategory::CONST_STRUCT)   ? StructTraits<PointeeType>::kind
+              : (category == ArgumentCategory::GUID)          ? ValueKind::GUID
+              : (category == ArgumentCategory::MUTABLE_STRUCT) ? StructTraits<PointeeType>::kind
+              : (category == ArgumentCategory::OBJECT)        ? ValueKind::OBJECT
+              : (category == ArgumentCategory::OBJECT_OUT)     ? ValueKind::OBJECT_OUT
+              : (category == ArgumentCategory::SCALAR_OUT)     ? ValueKindOf<PointeeType>::kind
                                                               : ValueKindOf<T>::kind;
 
             static const ObjectType object_type =
-                (category == ArgumentCategory::Object)    ? InterfaceTraits<PointeeType>::object_type
-              : (category == ArgumentCategory::ObjectOut) ? InterfaceTraits<PointeePointeeType>::object_type
-                                                          : ObjectType::None;
+                (category == ArgumentCategory::OBJECT)    ? InterfaceTraits<PointeeType>::object_type
+              : (category == ArgumentCategory::OBJECT_OUT) ? InterfaceTraits<PointeePointeeType>::object_type
+                                                          : ObjectType::NONE;
         };
     }
 }

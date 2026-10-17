@@ -18,6 +18,14 @@ namespace D3D8
         static APIInterceptor::APIFunctionArgument create_locked_data_argument(const void*     in_object_ptr,
                                                                                const uint32_t& in_level);
 
+        /* Captures the rectangles of a Present call: the source and destination ones, and the dirty ones of the region
+         * (only the rectangles of RGNDATA are of interest). Writes 3 arguments.
+         */
+        static void create_present_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
+                                             const RECT*                          in_source_rect_ptr,
+                                             const RECT*                          in_dest_rect_ptr,
+                                             const RGNDATA*                       in_dirty_region_ptr);
+
         /* Cube map faces are tracked as levels of their own. */
         static uint32_t get_cube_face_level_key(const D3DCUBEMAP_FACES& in_face,
                                                 const uint32_t&         in_level);

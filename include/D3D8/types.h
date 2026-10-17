@@ -55,9 +55,6 @@ namespace D3D8
         UINT Back;
     };
 
-    /* Never decoded. */
-    struct D3DCAPS8;
-
     struct D3DCLIPSTATUS8
     {
         DWORD ClipUnion;
@@ -92,6 +89,65 @@ namespace D3D8
         D3DDEVTYPE_SW          = 3,
         D3DDEVTYPE_FORCE_DWORD = 0xffffffff
     };
+
+    struct D3DCAPS8
+    {
+        D3DDEVTYPE DeviceType;
+        UINT       AdapterOrdinal;
+        DWORD      Caps;
+        DWORD      Caps2;
+        DWORD      Caps3;
+        DWORD      PresentationIntervals;
+        DWORD      CursorCaps;
+        DWORD      DevCaps;
+        DWORD      PrimitiveMiscCaps;
+        DWORD      RasterCaps;
+        DWORD      ZCmpCaps;
+        DWORD      SrcBlendCaps;
+        DWORD      DestBlendCaps;
+        DWORD      AlphaCmpCaps;
+        DWORD      ShadeCaps;
+        DWORD      TextureCaps;
+        DWORD      TextureFilterCaps;
+        DWORD      CubeTextureFilterCaps;
+        DWORD      VolumeTextureFilterCaps;
+        DWORD      TextureAddressCaps;
+        DWORD      VolumeTextureAddressCaps;
+        DWORD      LineCaps;
+        DWORD      MaxTextureWidth;
+        DWORD      MaxTextureHeight;
+        DWORD      MaxVolumeExtent;
+        DWORD      MaxTextureRepeat;
+        DWORD      MaxTextureAspectRatio;
+        DWORD      MaxAnisotropy;
+        float      MaxVertexW;
+        float      GuardBandLeft;
+        float      GuardBandTop;
+        float      GuardBandRight;
+        float      GuardBandBottom;
+        float      ExtentsAdjust;
+        DWORD      StencilCaps;
+        DWORD      FVFCaps;
+        DWORD      TextureOpCaps;
+        DWORD      MaxTextureBlendStages;
+        DWORD      MaxSimultaneousTextures;
+        DWORD      VertexProcessingCaps;
+        DWORD      MaxActiveLights;
+        DWORD      MaxUserClipPlanes;
+        DWORD      MaxVertexBlendMatrices;
+        DWORD      MaxVertexBlendMatrixIndex;
+        float      MaxPointSize;
+        DWORD      MaxPrimitiveCount;
+        DWORD      MaxVertexIndex;
+        DWORD      MaxStreams;
+        DWORD      MaxStreamStride;
+        DWORD      VertexShaderVersion;
+        DWORD      MaxVertexShaderConst;
+        DWORD      PixelShaderVersion;
+        float      MaxPixelShaderValue;
+    };
+
+    static_assert(sizeof(D3DCAPS8) == 212, "D3DCAPS8 layout mismatch");
 
     struct D3DDEVICE_CREATION_PARAMETERS
     {
@@ -566,8 +622,8 @@ namespace D3D8
         #undef D3D8_METHOD
         #undef D3D8_INTERFACE
 
-        Count,
-        Unknown = Count
+        COUNT,
+        UNKNOWN = COUNT
     };
 
     /* A locked region of a resource, as handed out to the application. */
@@ -599,62 +655,68 @@ namespace D3D8
     /* Meaning of an API call argument; tells the printer how to decode it. */
     enum class ValueKind : uint32_t
     {
-        AdapterIdentifier,
-        BackBufferType,
-        Boolean,
-        Box,
-        ClearFlags,
-        ClipStatus,
-        Color,
-        CreateFlags,
-        CreationParameters,
-        CubeMapFace,
-        DeviceType,
-        DisplayMode,
-        Format,
-        FvfFlags,
-        GammaRamp,
-        Guid,
-        Hresult,
-        IndexBufferDesc,
-        Light,
-        LightType,
-        LockFlags,
-        LockedBox,
-        LockedRect,
-        Material,
-        Matrix,
-        MultiSampleType,
-        Object,
-        ObjectOut,
-        Plain,
-        PointArray,
-        Pool,
-        PresentParameters,
-        PrimitiveType,
-        RasterStatus,
-        Rect,
-        RectArray,
-        RenderStateType,
-        RenderStateValue,
-        ResourceType,
-        StateBlockType,
-        SurfaceDesc,
-        SwapEffect,
-        TextureStageStateType,
-        TextureStageStateValue,
-        TransformStateType,
-        UsageFlags,
-        VertexBufferDesc,
-        Viewport,
-        VolumeDesc
+        ADAPTER_IDENTIFIER,
+        BACK_BUFFER_TYPE,
+        BASIS_TYPE,
+        BOOLEAN,
+        BOX,
+        CAPS,
+        CLEAR_FLAGS,
+        CLIP_STATUS,
+        COLOR,
+        CREATE_FLAGS,
+        CREATION_PARAMETERS,
+        CUBE_MAP_FACE,
+        DEVICE_TYPE,
+        DISPLAY_MODE,
+        FLOAT_ARRAY,
+        FORMAT,
+        FVF_FLAGS,
+        GAMMA_RAMP,
+        GUID,
+        HRESULT,
+        INDEX_BUFFER_DESC,
+        LIGHT,
+        LIGHT_TYPE,
+        LOCK_FLAGS,
+        LOCKED_BOX,
+        LOCKED_RECT,
+        MATERIAL,
+        MATRIX,
+        MULTI_SAMPLE_TYPE,
+        OBJECT,
+        OBJECT_OUT,
+        ORDER_TYPE,
+        PLAIN,
+        POINT_ARRAY,
+        POOL,
+        PRESENT_PARAMETERS,
+        PRIMITIVE_TYPE,
+        RASTER_STATUS,
+        RECT,
+        RECT_ARRAY,
+        RECT_PATCH_INFO,
+        RENDER_STATE_TYPE,
+        RENDER_STATE_VALUE,
+        RESOURCE_TYPE,
+        STATE_BLOCK_TYPE,
+        SURFACE_DESC,
+        SWAP_EFFECT,
+        TEXTURE_STAGE_STATE_TYPE,
+        TEXTURE_STAGE_STATE_VALUE,
+        TRANSFORM_STATE_TYPE,
+        TRI_PATCH_INFO,
+        USAGE_FLAGS,
+        VERTEX_BUFFER_DESC,
+        VIEWPORT,
+        VOLUME_DESC
     };
 
     /* Describes an argument or a returned value of a D3D8 method. Follows ValueKind, which it depends on. */
     struct ArgumentInfo
     {
         ValueKind   kind;
-        const char* object_type_name_ptr; /* e.g. "Texture"; set for ValueKind::Object and ::ObjectOut only */
+        const char* object_type_name_ptr; /* e.g. "Texture"; set for ValueKind::OBJECT and ::ObjectOut only */
     };
 
     /* DWORD argument which holds flags or a color, or whose meaning depends on another argument. */

@@ -11,11 +11,11 @@
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetActiveSubroutineUniformiv(GLuint  program,
-                                                        GLenum  shadertype,
-                                                        GLuint  index,
-                                                        GLenum  pname,
-                                                        GLint*  values)
+void AI_APIENTRY OpenGL::aiGetActiveSubroutineUniformiv(GLuint program,
+                                                        GLenum shadertype,
+                                                        GLuint index,
+                                                        GLenum pname,
+                                                        GLint* values)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;

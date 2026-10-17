@@ -6,6 +6,7 @@
 #include "Common/logger.h"
 #include "Common/macros.h"
 #include "Common/tracker.h"
+#include "OpenGL/client_array_chunk.h"
 #include "OpenGL/entrypoints/GL1.1/gl_array_element.h"
 #include "OpenGL/globals.h"
 #include "OpenGLUtils/utils_enum.h"
@@ -13,12 +14,16 @@
 
 void AI_APIENTRY OpenGL::aiArrayElement(GLint i)
 {
+    OpenGL::ClientArrayChunk                client_arrays_chunk;
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
     APIInterceptor::Tracker                 tracker;
+
+    client_arrays_chunk.add_arrays(i,
+                                   1);
 
     if (tracker.is_top_level_api_call() )
     {
@@ -31,7 +36,8 @@ void AI_APIENTRY OpenGL::aiArrayElement(GLint i)
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_i32(i),
+                APIInterceptor::APIFunctionArgument::create_i32          (i),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(client_arrays_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLARRAYELEMENT,
@@ -57,7 +63,8 @@ void AI_APIENTRY OpenGL::aiArrayElement(GLint i)
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_i32(i),
+            APIInterceptor::APIFunctionArgument::create_i32          (i),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(client_arrays_chunk.get_id() ),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLARRAYELEMENT,

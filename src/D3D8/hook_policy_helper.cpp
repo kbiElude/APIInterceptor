@@ -5,6 +5,7 @@
 #include "D3D8/argument_factory.h"
 #include "D3D8/hook_policy_helper.h"
 #include "D3D8/lock_tracker.h"
+#include "D3D8Utils/surface_layout.h"
 #include <algorithm>
 
 APIInterceptor::APIFunctionArgument D3D8::HookPolicyHelper::create_locked_data_argument(const void*     in_object_ptr,
@@ -26,6 +27,31 @@ APIInterceptor::APIFunctionArgument D3D8::HookPolicyHelper::create_locked_data_a
                                                   : nullptr,
                                          has_data ? lock_record.n_bytes
                                                   : 0);
+}
+
+void D3D8::HookPolicyHelper::create_present_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
+                                                      const RECT*                          in_source_rect_ptr,
+                                                      const RECT*                          in_dest_rect_ptr,
+                                                      const RGNDATA*                       in_dirty_region_ptr)
+{
+    constexpr uint32_t MAX_N_RECTS = 4096; /* sanity limit */
+
+    const uint8_t* dirty_rects_ptr = nullptr;
+    uint32_t       n_dirty_rects   = 0;
+
+    if (in_dirty_region_ptr != nullptr)
+    {
+        dirty_rects_ptr = reinterpret_cast<const uint8_t*>(in_dirty_region_ptr->Buffer);
+        n_dirty_rects   = std::min<uint32_t>(in_dirty_region_ptr->rdh.nCount,
+                                             MAX_N_RECTS);
+    }
+
+    out_arguments_ptr[0] = ArgumentFactory::create_chunk(in_source_rect_ptr,
+                                                         static_cast<uint32_t>(sizeof(RECT) ));
+    out_arguments_ptr[1] = ArgumentFactory::create_chunk(in_dest_rect_ptr,
+                                                         static_cast<uint32_t>(sizeof(RECT) ));
+    out_arguments_ptr[2] = ArgumentFactory::create_chunk(dirty_rects_ptr,
+                                                         n_dirty_rects * static_cast<uint32_t>(sizeof(RECT) ));
 }
 
 uint32_t D3D8::HookPolicyHelper::get_cube_face_level_key(const D3DCUBEMAP_FACES& in_face,
@@ -175,93 +201,15 @@ uint32_t D3D8::HookPolicyHelper::get_surface_region_n_bytes(const D3DFORMAT& in_
                                                             const uint32_t&  in_height,
                                                             const uint32_t&  in_pitch)
 {
-    constexpr uint32_t BLOCK_N_PIXELS_PER_SIDE = 4; /* compressed formats are made of 4x4 blocks */
-    constexpr uint32_t DXT1_BLOCK_N_BYTES      = 8;
-    constexpr uint32_t DXT2_TO_5_BLOCK_N_BYTES = 16;
-    constexpr uint32_t PIXEL_N_BYTES_24BIT     = 3;
+    uint32_t n_row_bytes = 0;
+    uint32_t n_rows      = 0;
+    uint32_t result      = 0;
 
-    uint32_t n_block_bytes = 0;
-    uint32_t n_pixel_bytes = 0;
-    uint32_t n_rows        = in_height;
-    uint32_t n_row_bytes   = 0;
-    uint32_t result        = 0;
-
-    switch (in_format)
-    {
-        case D3DFMT_DXT1:
-        {
-            n_block_bytes = DXT1_BLOCK_N_BYTES;
-
-            break;
-        }
-
-        case D3DFMT_DXT2:
-        case D3DFMT_DXT3:
-        case D3DFMT_DXT4:
-        case D3DFMT_DXT5:
-        {
-            n_block_bytes = DXT2_TO_5_BLOCK_N_BYTES;
-
-            break;
-        }
-
-        case D3DFMT_A8:
-        case D3DFMT_A4L4:
-        case D3DFMT_L8:
-        case D3DFMT_P8:
-        case D3DFMT_R3G3B2:
-        {
-            n_pixel_bytes = sizeof(uint8_t);
-
-            break;
-        }
-
-        case D3DFMT_A1R5G5B5:
-        case D3DFMT_A4R4G4B4:
-        case D3DFMT_A8L8:
-        case D3DFMT_A8P8:
-        case D3DFMT_A8R3G3B2:
-        case D3DFMT_D15S1:
-        case D3DFMT_D16:
-        case D3DFMT_D16_LOCKABLE:
-        case D3DFMT_L6V5U5:
-        case D3DFMT_R5G6B5:
-        case D3DFMT_UYVY:
-        case D3DFMT_V8U8:
-        case D3DFMT_X1R5G5B5:
-        case D3DFMT_X4R4G4B4:
-        case D3DFMT_YUY2:
-        {
-            n_pixel_bytes = sizeof(uint16_t);
-
-            break;
-        }
-
-        case D3DFMT_R8G8B8:
-        {
-            n_pixel_bytes = PIXEL_N_BYTES_24BIT;
-
-            break;
-        }
-
-        default:
-        {
-            /* 32-bit formats, and any format this code is not aware of. */
-            n_pixel_bytes = sizeof(uint32_t);
-
-            break;
-        }
-    }
-
-    if (n_block_bytes != 0)
-    {
-        n_rows      = (in_height + BLOCK_N_PIXELS_PER_SIDE - 1) / BLOCK_N_PIXELS_PER_SIDE;
-        n_row_bytes = ((in_width + BLOCK_N_PIXELS_PER_SIDE - 1) / BLOCK_N_PIXELS_PER_SIDE) * n_block_bytes;
-    }
-    else
-    {
-        n_row_bytes = in_width * n_pixel_bytes;
-    }
+    Utils::get_surface_region_layout(in_format,
+                                     in_width,
+                                     in_height,
+                                    &n_rows,
+                                    &n_row_bytes);
 
     /* The last row is not padded up to the pitch. */
     if (n_rows != 0)

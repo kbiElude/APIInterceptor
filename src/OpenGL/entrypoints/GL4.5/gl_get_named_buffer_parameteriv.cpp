@@ -11,9 +11,9 @@
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetNamedBufferParameteriv(GLuint  buffer,
-                                                     GLenum  pname,
-                                                     GLint*  params)
+void AI_APIENTRY OpenGL::aiGetNamedBufferParameteriv(GLuint buffer,
+                                                     GLenum pname,
+                                                     GLint* params)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;

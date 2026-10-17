@@ -3,9 +3,12 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "Common/callbacks.h"
+#include "Common/globals.h"
 #include "Common/logger.h"
 #include "Common/macros.h"
+#include "Common/memory_chunk.h"
 #include "Common/tracker.h"
+#include "OpenGL/buffer_mapping_manager.h"
 #include "OpenGL/entrypoints/GL4.5/gl_map_named_buffer_range.h"
 #include "OpenGL/globals.h"
 #include "OpenGL/state_tracker.h"
@@ -28,10 +31,10 @@ void* AI_APIENTRY OpenGL::aiMapNamedBufferRange(GLuint     buffer,
 
     if (tracker.is_top_level_api_call() )
     {
-        AI_TRACE("glMapNamedBufferRange(buffer=[%u] offset=[%d] length=[%d] access=[%u])",
+        AI_TRACE("glMapNamedBufferRange(buffer=[%u] offset=[%lld] length=[%lld] access=[0x%x])",
                  buffer,
-                 static_cast<int32_t>(offset),
-                 static_cast<int32_t>(length),
+                 static_cast<long long>(offset),
+                 static_cast<long long>(length),
                  access);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMAPNAMEDBUFFERRANGE,
@@ -41,8 +44,8 @@ void* AI_APIENTRY OpenGL::aiMapNamedBufferRange(GLuint     buffer,
             const APIInterceptor::APIFunctionArgument args[] =
             {
                 APIInterceptor::APIFunctionArgument::create_u32(buffer),
-                APIInterceptor::APIFunctionArgument::create_i32(static_cast<GLint>(offset) ),
-                APIInterceptor::APIFunctionArgument::create_i32(static_cast<GLint>(length) ),
+                APIInterceptor::APIFunctionArgument::create_i64(static_cast<int64_t>(offset) ),
+                APIInterceptor::APIFunctionArgument::create_i64(static_cast<int64_t>(length) ),
                 APIInterceptor::APIFunctionArgument::create_u32(access),
             };
 
@@ -56,51 +59,50 @@ void* AI_APIENTRY OpenGL::aiMapNamedBufferRange(GLuint     buffer,
 
     AI_ASSERT(should_pass_through);
 
-    result = reinterpret_cast<PFNGLMAPNAMEDBUFFERRANGEPROC>(OpenGL::g_cached_gl_map_named_buffer_range)(buffer,
-                                                                                                         offset,
-                                                                                                         length,
-                                                                                                         access);
+    if (should_pass_through)
+    {
+        result = reinterpret_cast<PFNGLMAPNAMEDBUFFERRANGEPROC>(OpenGL::g_cached_gl_map_named_buffer_range)(buffer,
+                                                                                                            offset,
+                                                                                                            length,
+                                                                                                            access);
+    }
 
     if (tracker.is_top_level_api_call() )
     {
-        if (result != nullptr)
+        auto& context = OpenGL::get_context_state();
+
+        context.buffer_mapping_manager.on_buffer_mapped(buffer,
+                                                        result,
+                                                        offset,
+                                                        length,
+                                                        access);
+
+        if (context.buffer_mapping_manager.is_persistent(buffer) )
         {
-            const OpenGL::BufferMappingAccess mapping_access = (access & GL_MAP_READ_BIT)
-                                                                   ? ((access & GL_MAP_WRITE_BIT) ? OpenGL::BufferMappingAccess::READ_WRITE
-                                                                                                  : OpenGL::BufferMappingAccess::READ_ONLY)
-                                                                   : OpenGL::BufferMappingAccess::WRITE_ONLY;
-            auto& context          = OpenGL::get_context_state();
-            auto& buffer_props_ptr = context.buffer_object_id_to_buffer_props_ptr_map[buffer];
-
-            if (buffer_props_ptr == nullptr)
-            {
-                buffer_props_ptr.reset(new OpenGL::BufferProps() );
-            }
-
-            buffer_props_ptr->mapping_state.mapped_ptr = result;
-            buffer_props_ptr->mapping_state.access     = mapping_access;
+            AI_WARN("[!] Buffer [%u] is mapped persistently: writes between flushes or unmapping are not captured.",
+                    buffer);
         }
+
+        const OpenGL::BufferMappingManager::Region initial_region = context.buffer_mapping_manager.get_initial_region(buffer);
 
         if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMAPNAMEDBUFFERRANGE,
                                                           &post_callback_func_ptr,
                                                           &post_callback_func_arg) )
         {
-            const bool is_readable  = (access & GL_MAP_READ_BIT) != 0;
-            const auto map_chunk_id = APIInterceptor::register_data_chunk((is_readable)                      ? result
-                                                                                                              : nullptr,
-                                                                          (is_readable && result != nullptr) ? static_cast<uint32_t>(length)
-                                                                                                              : 0u);
+            APIInterceptor::MemoryChunk initial_chunk(initial_region.data_ptr,
+                                             static_cast<int64_t>(initial_region.n_bytes),
+                                             sizeof(uint8_t) );
 
             APIInterceptor::APIFunctionArgument result_arg;
 
             const APIInterceptor::APIFunctionArgument args[] =
             {
                 APIInterceptor::APIFunctionArgument::create_u32          (buffer),
-                APIInterceptor::APIFunctionArgument::create_i32          (static_cast<GLint>(offset) ),
-                APIInterceptor::APIFunctionArgument::create_i32          (static_cast<GLint>(length) ),
+                APIInterceptor::APIFunctionArgument::create_i64          (static_cast<int64_t>(offset) ),
+                APIInterceptor::APIFunctionArgument::create_i64          (static_cast<int64_t>(length) ),
                 APIInterceptor::APIFunctionArgument::create_u32          (access),
                 APIInterceptor::APIFunctionArgument::create_void_ptr     (result),
-                APIInterceptor::APIFunctionArgument::create_data_chunk_id(map_chunk_id),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(initial_chunk.get_id() ),
             };
 
             post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLMAPNAMEDBUFFERRANGE,

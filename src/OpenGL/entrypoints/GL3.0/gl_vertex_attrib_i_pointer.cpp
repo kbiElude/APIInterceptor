@@ -8,6 +8,7 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL3.0/gl_vertex_attrib_i_pointer.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/state_tracker.h"
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
@@ -63,6 +64,22 @@ void AI_APIENTRY OpenGL::aiVertexAttribIPointer(GLuint      index,
                                                                                                      type,
                                                                                                      stride,
                                                                                                      pointer);
+    }
+
+    if (tracker.is_top_level_api_call() )
+    {
+        auto& context = OpenGL::get_context_state();
+
+        context.client_array_manager.set_pointer(OpenGL::ClientArrayKind::GENERIC,
+                                               index,
+                                               size,
+                                               type,
+                                               stride,
+                                               pointer,
+                                               context.buffer_manager.get_bound_buffer(OpenGL::BufferBindingTarget::ARRAY_BUFFER),
+                                               true,   /* in_is_integer    */
+                                               false,  /* in_is_long       */
+                                               false); /* in_is_normalized */
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLVERTEXATTRIB_IPOINTER,

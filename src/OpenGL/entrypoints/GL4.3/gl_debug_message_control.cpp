@@ -11,12 +11,12 @@
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDebugMessageControl(GLenum         source,
-                                               GLenum         type,
-                                               GLenum         severity,
-                                               GLsizei        count,
-                                               const GLuint*  ids,
-                                               GLboolean      enabled)
+void AI_APIENTRY OpenGL::aiDebugMessageControl(GLenum        source,
+                                               GLenum        type,
+                                               GLenum        severity,
+                                               GLsizei       count,
+                                               const GLuint* ids,
+                                               GLboolean     enabled)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;

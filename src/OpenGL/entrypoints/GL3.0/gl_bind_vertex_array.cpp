@@ -8,6 +8,7 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL3.0/gl_bind_vertex_array.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/state_tracker.h"
 #include "WGL/globals.h"
 
 void AI_APIENTRY OpenGL::aiBindVertexArray(GLuint array)
@@ -46,6 +47,13 @@ void AI_APIENTRY OpenGL::aiBindVertexArray(GLuint array)
     if (should_pass_through)
     {
         reinterpret_cast<PFNGLBINDVERTEXARRAYPROC>(OpenGL::g_cached_gl_bind_vertex_array)(array);
+    }
+
+    if (tracker.is_top_level_api_call() )
+    {
+        auto& context = OpenGL::get_context_state();
+
+        context.client_array_manager.set_bound_vertex_array(array);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBINDVERTEXARRAY,

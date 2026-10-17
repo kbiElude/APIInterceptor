@@ -15,19 +15,19 @@
 
 namespace APIDumpPrinter
 {
-    bool parse_api_list    (const char* in_argument_ptr,
-                            Options*    inout_options_ptr);
-    bool parse_arguments   (int      in_argc,
-                            char*    in_argv[],
-                            Options* out_options_ptr);
-    bool parse_frame_range (const char* in_argument_ptr,
-                            Options*    inout_options_ptr);
-    void print_statistics  (const std::map<APIInterceptor::APIFunction, uint32_t>& in_call_count_map,
-                            const std::map<APIGroup, uint32_t>&                    in_group_count_map,
-                            const uint32_t&                                        in_n_calls_selected,
-                            const uint32_t&                                        in_n_frames_total,
-                            const WorkloadTotals&                                  in_totals);
-    void print_usage       ();
+    bool parse_api_list   (const char*                                            in_argument_ptr,
+                           Options*                                               inout_options_ptr);
+    bool parse_arguments  (int                                                    in_argc,
+                           char*                                                  in_argv[],
+                           Options*                                               out_options_ptr);
+    bool parse_frame_range(const char*                                            in_argument_ptr,
+                           Options*                                               inout_options_ptr);
+    void print_statistics (const std::map<APIInterceptor::APIFunction, uint32_t>& in_call_count_map,
+                           const std::map<APIDumpLoader::APIGroup, uint32_t>&     in_group_count_map,
+                           const uint32_t&                                        in_n_calls_selected,
+                           const uint32_t&                                        in_n_frames_total,
+                           const WorkloadTotals&                                  in_totals);
+    void print_usage      ();
 
     /* Entry point of the tool (called by the global main). */
     int run(int   in_argc,

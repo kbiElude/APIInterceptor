@@ -5,6 +5,7 @@
 #include "Common/callbacks.h"
 #include "Common/logger.h"
 #include "Common/macros.h"
+#include "Common/memory_chunk.h"
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL4.5/gl_vertex_array_vertex_buffers.h"
 #include "OpenGL/globals.h"
@@ -17,11 +18,20 @@ void AI_APIENTRY OpenGL::aiVertexArrayVertexBuffers(GLuint          vaobj,
                                                     const GLintptr* offsets,
                                                     const GLsizei*  strides)
 {
+    APIInterceptor::MemoryChunk             buffers_chunk(buffers,
+                                                          count,
+                                                          sizeof(GLuint));
+    APIInterceptor::MemoryChunk             offsets_chunk(offsets,
+                                                          count,
+                                                          sizeof(GLintptr));
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
+    APIInterceptor::MemoryChunk             strides_chunk(strides,
+                                                          count,
+                                                          sizeof(GLsizei));
     APIInterceptor::Tracker                 tracker;
 
     if (tracker.is_top_level_api_call() )
@@ -40,12 +50,12 @@ void AI_APIENTRY OpenGL::aiVertexArrayVertexBuffers(GLuint          vaobj,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32      (vaobj),
-                APIInterceptor::APIFunctionArgument::create_u32      (first),
-                APIInterceptor::APIFunctionArgument::create_i32      (count),
-                APIInterceptor::APIFunctionArgument::create_u32_ptr  (buffers),
-                APIInterceptor::APIFunctionArgument::create_void_ptr (offsets),
-                APIInterceptor::APIFunctionArgument::create_i32_ptr  (strides),
+                APIInterceptor::APIFunctionArgument::create_u32          (vaobj),
+                APIInterceptor::APIFunctionArgument::create_u32          (first),
+                APIInterceptor::APIFunctionArgument::create_i32          (count),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(buffers_chunk.get_id() ),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(offsets_chunk.get_id() ),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(strides_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLVERTEXARRAYVERTEXBUFFERS,
@@ -76,12 +86,12 @@ void AI_APIENTRY OpenGL::aiVertexArrayVertexBuffers(GLuint          vaobj,
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_u32      (vaobj),
-            APIInterceptor::APIFunctionArgument::create_u32      (first),
-            APIInterceptor::APIFunctionArgument::create_i32      (count),
-            APIInterceptor::APIFunctionArgument::create_u32_ptr  (buffers),
-            APIInterceptor::APIFunctionArgument::create_void_ptr (offsets),
-            APIInterceptor::APIFunctionArgument::create_i32_ptr  (strides),
+            APIInterceptor::APIFunctionArgument::create_u32          (vaobj),
+            APIInterceptor::APIFunctionArgument::create_u32          (first),
+            APIInterceptor::APIFunctionArgument::create_i32          (count),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(buffers_chunk.get_id() ),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(offsets_chunk.get_id() ),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(strides_chunk.get_id() ),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLVERTEXARRAYVERTEXBUFFERS,

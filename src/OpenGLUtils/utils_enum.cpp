@@ -17,8 +17,8 @@ const char* OpenGL::Utils::get_raw_string_for_gl_bitfield(const OpenGL::Bitfield
 
     switch (in_bitfield)
     {
-        case OpenGL::BitfieldType::Blit_Mask:
-        case OpenGL::BitfieldType::Clear_Buffer_Mask:
+        case OpenGL::BitfieldType::BLIT_MASK:
+        case OpenGL::BitfieldType::CLEAR_BUFFER_MASK:
         {
             snprintf(result,
                      sizeof(result),
@@ -30,7 +30,7 @@ const char* OpenGL::Utils::get_raw_string_for_gl_bitfield(const OpenGL::Bitfield
             break;
         }
 
-        case OpenGL::BitfieldType::Buffer_Access_Mask:
+        case OpenGL::BitfieldType::BUFFER_ACCESS_MASK:
         {
             snprintf(result,
                      sizeof(result),
@@ -46,7 +46,7 @@ const char* OpenGL::Utils::get_raw_string_for_gl_bitfield(const OpenGL::Bitfield
 
         }
 
-        case OpenGL::BitfieldType::Sync_Condition_Mask:
+        case OpenGL::BitfieldType::SYNC_CONDITION_MASK:
         {
             assert(in_enum == GL_SYNC_GPU_COMMANDS_COMPLETE);
 
@@ -57,7 +57,7 @@ const char* OpenGL::Utils::get_raw_string_for_gl_bitfield(const OpenGL::Bitfield
             break;
         }
 
-        case OpenGL::BitfieldType::Wait_Sync_Mask:
+        case OpenGL::BitfieldType::WAIT_SYNC_MASK:
         {
             snprintf(result,
                      sizeof(result),

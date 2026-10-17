@@ -19,6 +19,8 @@ namespace APIDumpLoader
         std::vector<APIInterceptor::APIFunctionArgument>     arg_out_vec;
         APIInterceptor::APIFunction                          func               = APIInterceptor::APIFunction::APIFUNCTION_UNKNOWN;
         std::unique_ptr<APIInterceptor::APIFunctionArgument> returned_value_ptr;
+        uint32_t                                             thread_id          = 0;
+        uint64_t                                             timestamp_qpc      = 0; /* ticks of Workload::qpc_frequency */
     } DumpedAPICall;
 
     typedef struct DumpedSurface
@@ -40,6 +42,8 @@ namespace APIDumpLoader
         DumpedAPICallVectorUniquePtr    dumped_api_call_vec_ptr;
         DumpedSurfaceVectorUniquePtr    dumped_surface_vec_ptr;
         uint32_t                        first_data_chunk_id = 0; /* data_chunk_ptr_vec[0] has this ID in the dump */
+        uint32_t                        pointer_n_bytes     = 0; /* of the process which was dumped              */
+        uint64_t                        qpc_frequency       = 0; /* ticks per second                             */
 
     } Workload;
 

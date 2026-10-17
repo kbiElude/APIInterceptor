@@ -5,9 +5,11 @@
 #include "Common/callbacks.h"
 #include "Common/logger.h"
 #include "Common/macros.h"
+#include "Common/memory_chunk.h"
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL4.5/gl_texture_parameteriv.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/param_counts.h"
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
@@ -15,6 +17,9 @@ void AI_APIENTRY OpenGL::aiTextureParameteriv(GLuint       texture,
                                               GLenum       pname,
                                               const GLint* param)
 {
+    APIInterceptor::MemoryChunk             param_chunk(param,
+                                                        OpenGL::Utils::get_n_texture_parameter_params(pname),
+                                                        sizeof(GLint));
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
@@ -35,9 +40,9 @@ void AI_APIENTRY OpenGL::aiTextureParameteriv(GLuint       texture,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32       (texture),
-                APIInterceptor::APIFunctionArgument::create_u32_glenum(pname),
-                APIInterceptor::APIFunctionArgument::create_i32_ptr   (param),
+                APIInterceptor::APIFunctionArgument::create_u32          (texture),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum   (pname),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(param_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLTEXTUREPARAMETERIV,
@@ -65,9 +70,9 @@ void AI_APIENTRY OpenGL::aiTextureParameteriv(GLuint       texture,
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_u32       (texture),
-            APIInterceptor::APIFunctionArgument::create_u32_glenum(pname),
-            APIInterceptor::APIFunctionArgument::create_i32_ptr   (param),
+            APIInterceptor::APIFunctionArgument::create_u32          (texture),
+            APIInterceptor::APIFunctionArgument::create_u32_glenum   (pname),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(param_chunk.get_id() ),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLTEXTUREPARAMETERIV,

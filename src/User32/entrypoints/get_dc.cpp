@@ -3,6 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "Common/callbacks.h"
+#include "Common/gate_scope.h"
 #include "Common/globals.h"
 #include "Common/logger.h"
 #include "Common/macros.h"
@@ -11,6 +12,7 @@
 
 HDC WINAPI User32::get_dc(HWND in_hwnd)
 {
+    APIInterceptor::GateScope               gate_scope;
     void*                                   post_callback_func_arg  = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr  = nullptr;
     void*                                   pre_callback_func_arg   = nullptr;
@@ -20,6 +22,7 @@ HDC WINAPI User32::get_dc(HWND in_hwnd)
 
     /* NOTE: We do NOT use a Tracker instance to track this call. The reason is drivers often call GetDC()
     *        from driver-managed threads, and being able to track these DC allocations is important.
+     *       A GateScope is used: it only keeps the dumper from cutting a segment in the middle of the call.
      **/
     AI_TRACE("GetDC(in_hwnd=[%p])\n"
              in_hwnd);

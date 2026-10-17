@@ -7,6 +7,7 @@
 #include "Common/logger.h"
 #include "Common/macros.h"
 #include "Common/tracker.h"
+#include "OpenGL/client_array_chunk.h"
 #include "OpenGL/entrypoints/GL1.4/gl_multi_draw_elements.h"
 #include "OpenGL/globals.h"
 #include "OpenGL/state_tracker.h"
@@ -19,14 +20,21 @@ void AI_APIENTRY OpenGL::aiMultiDrawElements(GLenum             mode,
                                              const void* const* indices,
                                              GLsizei            drawcount)
 {
+    OpenGL::ClientArrayChunk                client_arrays_chunk;
+    uint32_t                                count_chunk_id         = 0;
+    APIInterceptor::DataChunkID             indices_chunk_id;
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
     APIInterceptor::Tracker                 tracker;
-    uint32_t                                count_chunk_id         = 0;
-    APIInterceptor::DataChunkID             indices_chunk_id;
+
+    client_arrays_chunk.add_multi_elements(count,
+                                           type,
+                                           indices,
+                                           drawcount,
+                                           nullptr);
 
     if (tracker.is_top_level_api_call() )
     {
@@ -41,7 +49,7 @@ void AI_APIENTRY OpenGL::aiMultiDrawElements(GLenum             mode,
                                                              (count != nullptr) ? sizeof(GLsizei) * static_cast<uint32_t>(drawcount) : 0);
 
         const auto& context   = OpenGL::get_context_state();
-        const auto  bound_ebo = context.bound_buffers    [static_cast<size_t>(OpenGL::BufferBindingTarget::ELEMENT_ARRAY_BUFFER)];
+        const auto  bound_ebo = context.buffer_manager.get_bound_buffer(OpenGL::BufferBindingTarget::ELEMENT_ARRAY_BUFFER);
 
         if (bound_ebo != 0)
         {
@@ -92,6 +100,7 @@ void AI_APIENTRY OpenGL::aiMultiDrawElements(GLenum             mode,
                 APIInterceptor::APIFunctionArgument::create_u32_glenum   (type),
                 APIInterceptor::APIFunctionArgument::create_data_chunk_id(indices_chunk_id),
                 APIInterceptor::APIFunctionArgument::create_i32          (drawcount),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(client_arrays_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLMULTIDRAWELEMENTS,
@@ -126,6 +135,7 @@ void AI_APIENTRY OpenGL::aiMultiDrawElements(GLenum             mode,
             APIInterceptor::APIFunctionArgument::create_u32_glenum   (type),
             APIInterceptor::APIFunctionArgument::create_data_chunk_id(indices_chunk_id),
             APIInterceptor::APIFunctionArgument::create_i32          (drawcount),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(client_arrays_chunk.get_id() ),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLMULTIDRAWELEMENTS,

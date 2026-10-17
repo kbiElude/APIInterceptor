@@ -8,6 +8,8 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL3.0/gl_bind_buffer_base.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/state_tracker.h"
+#include "OpenGL/utils.h"
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
@@ -55,6 +57,18 @@ void AI_APIENTRY OpenGL::aiBindBufferBase(GLenum target,
         reinterpret_cast<PFNGLBINDBUFFERBASEPROC>(OpenGL::g_cached_gl_bind_buffer_base)(target,
                                                                                         index,
                                                                                         buffer);
+    }
+
+    if (tracker.is_top_level_api_call() )
+    {
+        OpenGL::BufferBindingTarget binding_target;
+
+        if (OpenGL::Utils::get_buffer_binding_target_for_gl_enum(target,
+                                                                &binding_target) )
+        {
+            OpenGL::get_context_state().buffer_manager.on_buffer_bound(binding_target,
+                                                                       buffer);
+        }
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBINDBUFFERBASE,

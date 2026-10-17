@@ -15,7 +15,7 @@ void APIInterceptor::Debug::assert_failed(const char*  in_filename,
                                           unsigned int in_line,
                                           const char*  in_message)
 {
-    AI_LOG(APIInterceptor::LogLevel::Error,
+    AI_LOG(APIInterceptor::LogLevel::ERR,
             "[!] Assertion failure in %s at %d: [%s]",
            in_filename,
            in_line,

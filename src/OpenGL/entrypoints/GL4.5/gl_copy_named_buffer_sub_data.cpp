@@ -40,9 +40,9 @@ void AI_APIENTRY OpenGL::aiCopyNamedBufferSubData(GLuint     readBuffer,
             {
                 APIInterceptor::APIFunctionArgument::create_u32(readBuffer),
                 APIInterceptor::APIFunctionArgument::create_u32(writeBuffer),
-                APIInterceptor::APIFunctionArgument::create_i32(static_cast<GLint>(readOffset) ),
-                APIInterceptor::APIFunctionArgument::create_i32(static_cast<GLint>(writeOffset) ),
-                APIInterceptor::APIFunctionArgument::create_i32(static_cast<GLint>(size) ),
+                APIInterceptor::APIFunctionArgument::create_i64(static_cast<int64_t>(readOffset) ),
+                APIInterceptor::APIFunctionArgument::create_i64(static_cast<int64_t>(writeOffset) ),
+                APIInterceptor::APIFunctionArgument::create_i64(static_cast<int64_t>(size) ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLCOPYNAMEDBUFFERSUBDATA,
@@ -74,9 +74,9 @@ void AI_APIENTRY OpenGL::aiCopyNamedBufferSubData(GLuint     readBuffer,
         {
             APIInterceptor::APIFunctionArgument::create_u32(readBuffer),
             APIInterceptor::APIFunctionArgument::create_u32(writeBuffer),
-            APIInterceptor::APIFunctionArgument::create_i32(static_cast<GLint>(readOffset) ),
-            APIInterceptor::APIFunctionArgument::create_i32(static_cast<GLint>(writeOffset) ),
-            APIInterceptor::APIFunctionArgument::create_i32(static_cast<GLint>(size) ),
+            APIInterceptor::APIFunctionArgument::create_i64(static_cast<int64_t>(readOffset) ),
+            APIInterceptor::APIFunctionArgument::create_i64(static_cast<int64_t>(writeOffset) ),
+            APIInterceptor::APIFunctionArgument::create_i64(static_cast<int64_t>(size) ),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLCOPYNAMEDBUFFERSUBDATA,

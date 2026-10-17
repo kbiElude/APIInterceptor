@@ -18,8 +18,6 @@ namespace D3D8
     class VTableRegistry
     {
     public:
-        static VTableRegistry* get_ptr();
-
         /* Returns nullptr if the slot has not been hooked. */
         void* get_original_function_ptr(const void*     in_object_ptr,
                                         const uint32_t& in_vtable_index);
@@ -29,6 +27,8 @@ namespace D3D8
                           const void*      in_object_ptr,
                           const HookEntry* in_hook_entry_array_ptr,
                           uint32_t         in_n_hook_entries);
+
+        static VTableRegistry* get_ptr();
 
     private:
         struct PatchedVtable

@@ -5,6 +5,7 @@
 #include "Common/callbacks.h"
 #include "Common/logger.h"
 #include "Common/macros.h"
+#include "Common/memory_chunk.h"
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL1.1/gl_delete_textures.h"
 #include "OpenGL/globals.h"
@@ -19,6 +20,9 @@ void AI_APIENTRY OpenGL::aiDeleteTextures(GLsizei       n,
     void*                                   pre_callback_func_arg  = nullptr;
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
+    APIInterceptor::MemoryChunk             textures_chunk(textures,
+                                                           n,
+                                                           sizeof(GLuint));
     APIInterceptor::Tracker                 tracker;
 
     if (tracker.is_top_level_api_call() )
@@ -33,8 +37,8 @@ void AI_APIENTRY OpenGL::aiDeleteTextures(GLsizei       n,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_i32    (n),
-                APIInterceptor::APIFunctionArgument::create_void_ptr(textures),
+                APIInterceptor::APIFunctionArgument::create_i32          (n),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(textures_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLDELETETEXTURES,
@@ -60,22 +64,7 @@ void AI_APIENTRY OpenGL::aiDeleteTextures(GLsizei       n,
                          n_texture < n;
                        ++n_texture)
             {
-                const uint64_t texture_id   = static_cast<uint64_t>(textures[n_texture]);
-                const uint64_t key_base     = texture_id << 16;
-                const uint64_t key_mask     = ~static_cast<uint64_t>(0xFFFFu);
-                auto           it           = context.texture_level_props_map.begin();
-
-                while (it != context.texture_level_props_map.end() )
-                {
-                    if ((it->first & key_mask) == key_base)
-                    {
-                        it = context.texture_level_props_map.erase(it);
-                    }
-                    else
-                    {
-                        ++it;
-                    }
-                }
+                context.texture_manager.on_texture_deleted(textures[n_texture]);
             }
         }
     }
@@ -88,8 +77,8 @@ void AI_APIENTRY OpenGL::aiDeleteTextures(GLsizei       n,
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_i32    (n),
-            APIInterceptor::APIFunctionArgument::create_void_ptr(textures),
+            APIInterceptor::APIFunctionArgument::create_i32          (n),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(textures_chunk.get_id() ),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLDELETETEXTURES,

@@ -8,6 +8,7 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL3.0/gl_transform_feedback_varyings.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/string_array_chunk.h"
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
@@ -22,6 +23,9 @@ void AI_APIENTRY OpenGL::aiTransformFeedbackVaryings(GLuint               progra
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
     APIInterceptor::Tracker                 tracker;
+    OpenGL::StringArrayChunk                varyings_chunk(varyings,
+                                                           count,
+                                                           nullptr);
 
     if (tracker.is_top_level_api_call() )
     {
@@ -37,10 +41,10 @@ void AI_APIENTRY OpenGL::aiTransformFeedbackVaryings(GLuint               progra
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32       (program),
-                APIInterceptor::APIFunctionArgument::create_i32       (count),
-                APIInterceptor::APIFunctionArgument::create_void_ptr  (varyings),
-                APIInterceptor::APIFunctionArgument::create_u32_glenum(bufferMode),
+                APIInterceptor::APIFunctionArgument::create_u32          (program),
+                APIInterceptor::APIFunctionArgument::create_i32          (count),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(varyings_chunk.get_id() ),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum   (bufferMode),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLTRANSFORMFEEDBACKVARYINGS,
@@ -69,10 +73,10 @@ void AI_APIENTRY OpenGL::aiTransformFeedbackVaryings(GLuint               progra
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_u32       (program),
-            APIInterceptor::APIFunctionArgument::create_i32       (count),
-            APIInterceptor::APIFunctionArgument::create_void_ptr  (varyings),
-            APIInterceptor::APIFunctionArgument::create_u32_glenum(bufferMode),
+            APIInterceptor::APIFunctionArgument::create_u32          (program),
+            APIInterceptor::APIFunctionArgument::create_i32          (count),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(varyings_chunk.get_id() ),
+            APIInterceptor::APIFunctionArgument::create_u32_glenum   (bufferMode),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLTRANSFORMFEEDBACKVARYINGS,

@@ -13,6 +13,7 @@
 #include <vector>
 #include "APIDumpLoader/APIDumpLoader.h"
 #include "APIDumpLoader/WorkloadReader.h"
+#include "APIDumpLoader/api_info.h"
 #include "api_info.h"
 #include "formatter.h"
 #include "printer.h"
@@ -26,15 +27,15 @@ bool APIDumpPrinter::parse_api_list(const char* in_argument_ptr,
 
     while (start <= list.size() )
     {
-        const size_t separator_position = list.find(',',
-                                                    start);
-        const auto   group_name         = list.substr(start,
-                                                      (separator_position == std::string::npos) ? std::string::npos
-                                                                                                : (separator_position - start) );
-        APIGroup     group;
+        const size_t            separator_position = list.find(',',
+                                                               start);
+        const auto              group_name         = list.substr(start,
+                                                                 (separator_position == std::string::npos) ? std::string::npos
+                                                                                                           : (separator_position - start) );
+        APIDumpLoader::APIGroup group;
 
-        if (!parse_api_group_name(group_name.c_str(),
-                                 &group) )
+        if (!APIDumpLoader::parse_api_group_name(group_name.c_str(),
+                                                &group) )
         {
             result = false;
 
@@ -187,7 +188,7 @@ bool APIDumpPrinter::parse_frame_range(const char* in_argument_ptr,
 }
 
 void APIDumpPrinter::print_statistics(const std::map<APIInterceptor::APIFunction, uint32_t>& in_call_count_map,
-                                      const std::map<APIGroup, uint32_t>&                    in_group_count_map,
+                                      const std::map<APIDumpLoader::APIGroup, uint32_t>&     in_group_count_map,
                                       const uint32_t&                                        in_n_calls_selected,
                                       const uint32_t&                                        in_n_frames_total,
                                       const WorkloadTotals&                                  in_totals)
@@ -233,7 +234,7 @@ void APIDumpPrinter::print_statistics(const std::map<APIInterceptor::APIFunction
     {
         fprintf(stdout,
                 "  %-8s %u\n",
-                get_api_group_name(item.first),
+                APIDumpLoader::get_api_group_name(item.first),
                 item.second);
     }
 
@@ -278,12 +279,13 @@ int APIDumpPrinter::run(int   in_argc,
 {
     std::map<APIInterceptor::APIFunction, uint32_t> call_count_map;
     D3D8Decoder                                     d3d8_decoder;
-    std::map<APIGroup, uint32_t>                    group_count_map;
+    std::map<APIDumpLoader::APIGroup, uint32_t>     group_count_map;
     uint32_t                                        last_header_frame = UINT32_MAX;
     uint32_t                                        n_calls_selected  = 0;
     uint32_t                                        n_chunks_written  = 0;
     uint32_t                                        n_frame           = 0;
     Options                                         options;
+    std::string                                     reader_error;
     APIDumpLoader::WorkloadReaderUniquePtr          reader_ptr;
     std::set<APIInterceptor::DataChunkID>           referenced_chunk_set;
     int                                             result            = EXIT_FAILURE;
@@ -299,12 +301,14 @@ int APIDumpPrinter::run(int   in_argc,
         goto end;
     }
 
-    reader_ptr = APIDumpLoader::WorkloadReader::create(options.workload_filename_ptr);
+    reader_ptr = APIDumpLoader::WorkloadReader::create(options.workload_filename_ptr,
+                                                      &reader_error);
 
     if (reader_ptr == nullptr)
     {
         fprintf(stderr,
-                "[!] Could not open the specified workload.\n");
+                "[!] Could not open the specified workload: %s\n",
+                reader_error.c_str() );
 
         goto end;
     }
@@ -315,14 +319,14 @@ int APIDumpPrinter::run(int   in_argc,
         /* Walk through the calls, tracking frames. */
         for (const auto& current_api_call : *segment.dumped_api_call_vec_ptr)
         {
-            const auto api_group         = get_api_group(current_api_call.func);
+            const auto api_group         = APIDumpLoader::get_api_group(current_api_call.func);
             const bool is_in_frame_range = (n_frame >= options.first_frame &&
                                             n_frame <= options.last_frame);
             const bool is_api_allowed    = options.allowed_api_group_set.empty() ||
                                            options.allowed_api_group_set.find(api_group) != options.allowed_api_group_set.end();
 
             /* Objects are named in the order they are created, whether or not their creation is printed. */
-            if (api_group == APIGroup::D3D8)
+            if (api_group == APIDumpLoader::APIGroup::D3D8)
             {
                 d3d8_decoder.register_created_objects(current_api_call);
             }
@@ -358,7 +362,7 @@ int APIDumpPrinter::run(int   in_argc,
             }
 
             /* A frame boundary is detected regardless of --api, so that frame numbering stays stable. */
-            if (is_frame_boundary(current_api_call.func) )
+            if (APIDumpLoader::is_frame_boundary(current_api_call.func) )
             {
                 n_frame++;
             }

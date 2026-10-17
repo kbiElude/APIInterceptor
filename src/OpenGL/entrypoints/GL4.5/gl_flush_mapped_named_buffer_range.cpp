@@ -3,17 +3,26 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "Common/callbacks.h"
+#include "Common/globals.h"
 #include "Common/logger.h"
 #include "Common/macros.h"
+#include "Common/memory_chunk.h"
 #include "Common/tracker.h"
+#include "OpenGL/buffer_mapping_manager.h"
 #include "OpenGL/entrypoints/GL4.5/gl_flush_mapped_named_buffer_range.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/state_tracker.h"
+#include "OpenGL/utils.h"
+#include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
 void AI_APIENTRY OpenGL::aiFlushMappedNamedBufferRange(GLuint     buffer,
                                                        GLintptr   offset,
                                                        GLsizeiptr length)
 {
+    APIInterceptor::MemoryChunk             flush_chunk(nullptr,
+                                                        0,
+                                                        sizeof(uint8_t) );
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
@@ -23,10 +32,20 @@ void AI_APIENTRY OpenGL::aiFlushMappedNamedBufferRange(GLuint     buffer,
 
     if (tracker.is_top_level_api_call() )
     {
-        AI_TRACE("glFlushMappedNamedBufferRange(buffer=[%u] offset=[%d] length=[%d])",
+        AI_TRACE("glFlushMappedNamedBufferRange(buffer=[%u] offset=[%lld] length=[%lld])",
                  buffer,
-                 static_cast<int32_t>(offset),
-                 static_cast<int32_t>(length) );
+                 static_cast<long long>(offset),
+                 static_cast<long long>(length));
+
+        auto& context = OpenGL::get_context_state();
+
+        const OpenGL::BufferMappingManager::Region flush_region = context.buffer_mapping_manager.get_flush_region(buffer,
+                                                                                                                  offset,
+                                                                                                                  length);
+
+        flush_chunk = APIInterceptor::MemoryChunk(flush_region.data_ptr,
+                                                  static_cast<int64_t>(flush_region.n_bytes),
+                                                  sizeof(uint8_t) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLFLUSHMAPPEDNAMEDBUFFERRANGE,
                                                          &pre_callback_func_ptr,
@@ -34,9 +53,10 @@ void AI_APIENTRY OpenGL::aiFlushMappedNamedBufferRange(GLuint     buffer,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32(buffer),
-                APIInterceptor::APIFunctionArgument::create_i32(static_cast<GLint>(offset) ),
-                APIInterceptor::APIFunctionArgument::create_i32(static_cast<GLint>(length) ),
+                APIInterceptor::APIFunctionArgument::create_u32          (buffer),
+                APIInterceptor::APIFunctionArgument::create_i64          (static_cast<int64_t>(offset) ),
+                APIInterceptor::APIFunctionArgument::create_i64          (static_cast<int64_t>(length) ),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(flush_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLFLUSHMAPPEDNAMEDBUFFERRANGE,
@@ -56,23 +76,27 @@ void AI_APIENTRY OpenGL::aiFlushMappedNamedBufferRange(GLuint     buffer,
                                                                                                                     length);
     }
 
-    if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLFLUSHMAPPEDNAMEDBUFFERRANGE,
-                                                      &post_callback_func_ptr,
-                                                      &post_callback_func_arg) )
+    if (tracker.is_top_level_api_call() )
     {
-        APIInterceptor::APIFunctionArgument result_arg;
-
-        const APIInterceptor::APIFunctionArgument args[] =
+        if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLFLUSHMAPPEDNAMEDBUFFERRANGE,
+                                                          &post_callback_func_ptr,
+                                                          &post_callback_func_arg) )
         {
-            APIInterceptor::APIFunctionArgument::create_u32(buffer),
-            APIInterceptor::APIFunctionArgument::create_i32(static_cast<GLint>(offset) ),
-            APIInterceptor::APIFunctionArgument::create_i32(static_cast<GLint>(length) ),
-        };
+            APIInterceptor::APIFunctionArgument result_arg;
 
-        post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLFLUSHMAPPEDNAMEDBUFFERRANGE,
-                               post_callback_func_arg,
-                               static_cast<uint32_t>(sizeof(args) / sizeof(args[0]) ),
-                               args,
-                              &result_arg);
+            const APIInterceptor::APIFunctionArgument args[] =
+            {
+                APIInterceptor::APIFunctionArgument::create_u32          (buffer),
+                APIInterceptor::APIFunctionArgument::create_i64          (static_cast<int64_t>(offset) ),
+                APIInterceptor::APIFunctionArgument::create_i64          (static_cast<int64_t>(length) ),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(flush_chunk.get_id() ),
+            };
+
+            post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLFLUSHMAPPEDNAMEDBUFFERRANGE,
+                                   post_callback_func_arg,
+                                   static_cast<uint32_t>(sizeof(args) / sizeof(args[0]) ),
+                                   args,
+                                  &result_arg);
+        }
     }
 }

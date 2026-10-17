@@ -11,7 +11,7 @@
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiPixelMapfv(GLenum        map,
+void AI_APIENTRY OpenGL::aiPixelMapfv(GLenum         map,
                                       GLsizei        mapsize,
                                       const GLfloat* values)
 {

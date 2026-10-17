@@ -27,7 +27,7 @@ GLenum AI_APIENTRY OpenGL::aiClientWaitSync(GLsync     sync,
     {
         AI_TRACE("glClientWaitSync(sync=[%p] flags=[%s] timeout=[%llu])",
                  sync,
-                 OpenGL::Utils::get_raw_string_for_gl_bitfield(OpenGL::BitfieldType::Wait_Sync_Mask, flags),
+                 OpenGL::Utils::get_raw_string_for_gl_bitfield(OpenGL::BitfieldType::WAIT_SYNC_MASK, flags),
                  timeout);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCLIENTWAITSYNC,

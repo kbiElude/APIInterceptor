@@ -21,7 +21,8 @@ const char* WGL::convert_context_attrib_list_to_raw_string(const int* in_attrib_
 
     result_sstream << "{\n";
 
-    while (*traveller_ptr != 0)
+    while (traveller_ptr != nullptr &&
+           *traveller_ptr != 0)
     {
         const auto  attribute_name          = *traveller_ptr;
         auto        attribute_name_string   = WGL::get_context_attribute_name(attribute_name);

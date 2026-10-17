@@ -36,10 +36,10 @@ void AI_APIENTRY OpenGL::aiGetNamedBufferSubData(GLuint     buffer,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32      (buffer),
-                APIInterceptor::APIFunctionArgument::create_i32      (static_cast<GLint>(offset) ),
-                APIInterceptor::APIFunctionArgument::create_i32      (static_cast<GLint>(size) ),
-                APIInterceptor::APIFunctionArgument::create_void_ptr (data),
+                APIInterceptor::APIFunctionArgument::create_u32     (buffer),
+                APIInterceptor::APIFunctionArgument::create_i64     (static_cast<int64_t>(offset) ),
+                APIInterceptor::APIFunctionArgument::create_i64     (static_cast<int64_t>(size) ),
+                APIInterceptor::APIFunctionArgument::create_void_ptr(data),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETNAMEDBUFFERSUBDATA,
@@ -70,10 +70,10 @@ void AI_APIENTRY OpenGL::aiGetNamedBufferSubData(GLuint     buffer,
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_u32           (buffer),
-            APIInterceptor::APIFunctionArgument::create_i32           (static_cast<GLint>(offset) ),
-            APIInterceptor::APIFunctionArgument::create_i32           (static_cast<GLint>(size) ),
-            APIInterceptor::APIFunctionArgument::create_data_chunk_id (data_chunk_id),
+            APIInterceptor::APIFunctionArgument::create_u32          (buffer),
+            APIInterceptor::APIFunctionArgument::create_i64          (static_cast<int64_t>(offset) ),
+            APIInterceptor::APIFunctionArgument::create_i64          (static_cast<int64_t>(size) ),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(data_chunk_id),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETNAMEDBUFFERSUBDATA,

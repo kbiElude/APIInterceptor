@@ -79,12 +79,12 @@ void AI_APIENTRY OpenGL::aiGetTextureImage(GLuint  texture,
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_u32           (texture),
-            APIInterceptor::APIFunctionArgument::create_i32           (level),
-            APIInterceptor::APIFunctionArgument::create_u32_glenum    (format),
-            APIInterceptor::APIFunctionArgument::create_u32_glenum    (type),
-            APIInterceptor::APIFunctionArgument::create_i32           (bufSize),
-            APIInterceptor::APIFunctionArgument::create_data_chunk_id (pixels_chunk_id),
+            APIInterceptor::APIFunctionArgument::create_u32          (texture),
+            APIInterceptor::APIFunctionArgument::create_i32          (level),
+            APIInterceptor::APIFunctionArgument::create_u32_glenum   (format),
+            APIInterceptor::APIFunctionArgument::create_u32_glenum   (type),
+            APIInterceptor::APIFunctionArgument::create_i32          (bufSize),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(pixels_chunk_id),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETTEXTUREIMAGE,

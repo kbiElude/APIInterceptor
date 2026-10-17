@@ -8,6 +8,7 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL1.0/gl_pixel_storei.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/state_tracker.h"
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
@@ -87,6 +88,12 @@ void AI_APIENTRY OpenGL::aiPixelStorei(GLenum pname,
     {
         reinterpret_cast<PFNGLPIXELSTOREIPROC>(g_cached_gl_pixel_storei)(pname,
                                                                          param);
+    }
+
+    if (tracker.is_top_level_api_call() )
+    {
+        OpenGL::get_context_state().pixel_store_manager.on_pixel_store(pname,
+                                                                       param);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLPIXELSTOREI,

@@ -8,6 +8,8 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL3.0/gl_bind_buffer_range.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/state_tracker.h"
+#include "OpenGL/utils.h"
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
@@ -42,8 +44,8 @@ void AI_APIENTRY OpenGL::aiBindBufferRange(GLenum     target,
                 APIInterceptor::APIFunctionArgument::create_u32_glenum(target),
                 APIInterceptor::APIFunctionArgument::create_u32       (index),
                 APIInterceptor::APIFunctionArgument::create_u32       (buffer),
-                APIInterceptor::APIFunctionArgument::create_i32       (static_cast<int32_t>(offset) ),
-                APIInterceptor::APIFunctionArgument::create_i32       (static_cast<int32_t>(size) ),
+                APIInterceptor::APIFunctionArgument::create_i64       (static_cast<int64_t>(offset) ),
+                APIInterceptor::APIFunctionArgument::create_i64       (static_cast<int64_t>(size) ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLBINDBUFFERRANGE,
@@ -65,6 +67,18 @@ void AI_APIENTRY OpenGL::aiBindBufferRange(GLenum     target,
                                                                                           size);
     }
 
+    if (tracker.is_top_level_api_call() )
+    {
+        OpenGL::BufferBindingTarget binding_target;
+
+        if (OpenGL::Utils::get_buffer_binding_target_for_gl_enum(target,
+                                                                &binding_target) )
+        {
+            OpenGL::get_context_state().buffer_manager.on_buffer_bound(binding_target,
+                                                                       buffer);
+        }
+    }
+
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBINDBUFFERRANGE,
                                                       &post_callback_func_ptr,
                                                       &post_callback_func_arg) )
@@ -76,8 +90,8 @@ void AI_APIENTRY OpenGL::aiBindBufferRange(GLenum     target,
             APIInterceptor::APIFunctionArgument::create_u32_glenum(target),
             APIInterceptor::APIFunctionArgument::create_u32       (index),
             APIInterceptor::APIFunctionArgument::create_u32       (buffer),
-            APIInterceptor::APIFunctionArgument::create_i32       (static_cast<int32_t>(offset) ),
-            APIInterceptor::APIFunctionArgument::create_i32       (static_cast<int32_t>(size) ),
+            APIInterceptor::APIFunctionArgument::create_i64       (static_cast<int64_t>(offset) ),
+            APIInterceptor::APIFunctionArgument::create_i64       (static_cast<int64_t>(size) ),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLBINDBUFFERRANGE,

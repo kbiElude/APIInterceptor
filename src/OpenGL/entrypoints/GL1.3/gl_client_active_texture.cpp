@@ -8,6 +8,7 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL1.3/gl_client_active_texture.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/state_tracker.h"
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
@@ -47,6 +48,13 @@ void AI_APIENTRY OpenGL::aiClientActiveTexture(GLenum texture)
     if (should_pass_through)
     {
         reinterpret_cast<PFNGLCLIENTACTIVETEXTUREPROC>(OpenGL::g_cached_gl_client_active_texture)(texture);
+    }
+
+    if (tracker.is_top_level_api_call() )
+    {
+        auto& context = OpenGL::get_context_state();
+
+        context.client_array_manager.set_client_active_texture(texture - GL_TEXTURE0);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCLIENTACTIVETEXTURE,

@@ -10,10 +10,10 @@
 #include "OpenGL/globals.h"
 #include "WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiProgramUniform2i(GLuint  program,
-                                            GLint   location,
-                                            GLint   v0,
-                                            GLint   v1)
+void AI_APIENTRY OpenGL::aiProgramUniform2i(GLuint program,
+                                            GLint  location,
+                                            GLint  v0,
+                                            GLint  v1)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;

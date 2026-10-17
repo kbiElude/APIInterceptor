@@ -5,9 +5,11 @@
 #include "Common/callbacks.h"
 #include "Common/logger.h"
 #include "Common/macros.h"
+#include "Common/memory_chunk.h"
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL1.1/gl_call_lists.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/param_counts.h"
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
@@ -15,6 +17,9 @@ void AI_APIENTRY OpenGL::aiCallLists(GLsizei       n,
                                      GLenum        type,
                                      const GLvoid* lists)
 {
+    APIInterceptor::MemoryChunk             lists_chunk(lists,
+                                                        n,
+                                                        OpenGL::Utils::get_n_call_lists_type_bytes(type));
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
@@ -35,9 +40,9 @@ void AI_APIENTRY OpenGL::aiCallLists(GLsizei       n,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_i32       (n),
-                APIInterceptor::APIFunctionArgument::create_u32_glenum(type),
-                APIInterceptor::APIFunctionArgument::create_void_ptr  (lists),
+                APIInterceptor::APIFunctionArgument::create_i32          (n),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum   (type),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(lists_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLCALLLISTS,
@@ -65,9 +70,9 @@ void AI_APIENTRY OpenGL::aiCallLists(GLsizei       n,
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_i32       (n),
-            APIInterceptor::APIFunctionArgument::create_u32_glenum(type),
-            APIInterceptor::APIFunctionArgument::create_void_ptr  (lists),
+            APIInterceptor::APIFunctionArgument::create_i32          (n),
+            APIInterceptor::APIFunctionArgument::create_u32_glenum   (type),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(lists_chunk.get_id() ),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLCALLLISTS,

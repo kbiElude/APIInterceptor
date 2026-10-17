@@ -3,6 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "Common/callbacks.h"
+#include "Common/gate_scope.h"
 #include "Common/globals.h"
 #include "Common/logger.h"
 #include "Common/macros.h"
@@ -14,6 +15,7 @@ BOOL WINAPI User32::adjust_window_rect_ex(LPRECT in_rect_ptr,
                                           BOOL   in_menu,
                                           DWORD  in_ex_style)
 {
+    APIInterceptor::GateScope               gate_scope;
     void*                                   post_callback_func_arg  = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr  = nullptr;
     void*                                   pre_callback_func_arg   = nullptr;

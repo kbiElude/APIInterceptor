@@ -8,6 +8,7 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL4.0/gl_draw_elements_indirect.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/indirect_command_chunk.h"
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
@@ -15,6 +16,7 @@ void AI_APIENTRY OpenGL::aiDrawElementsIndirect(GLenum      mode,
                                                 GLenum      type,
                                                 const void* indirect)
 {
+    OpenGL::IndirectCommandChunk            indirect_chunk;
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
@@ -29,6 +31,10 @@ void AI_APIENTRY OpenGL::aiDrawElementsIndirect(GLenum      mode,
                  OpenGL::Utils::get_raw_string_for_gl_enum(type),
                  indirect);
 
+        indirect_chunk = OpenGL::IndirectCommandChunk::create_for_draw_elements(indirect,
+                                                                                1,
+                                                                                0);
+
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDRAWELEMENTSINDIRECT,
                                                          &pre_callback_func_ptr,
                                                          &pre_callback_func_arg) )
@@ -37,7 +43,7 @@ void AI_APIENTRY OpenGL::aiDrawElementsIndirect(GLenum      mode,
             {
                 APIInterceptor::APIFunctionArgument::create_u32_glenum(mode),
                 APIInterceptor::APIFunctionArgument::create_u32_glenum(type),
-                APIInterceptor::APIFunctionArgument::create_void_ptr  (indirect),
+                indirect_chunk.get_arg(),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLDRAWELEMENTSINDIRECT,
@@ -67,7 +73,7 @@ void AI_APIENTRY OpenGL::aiDrawElementsIndirect(GLenum      mode,
         {
             APIInterceptor::APIFunctionArgument::create_u32_glenum(mode),
             APIInterceptor::APIFunctionArgument::create_u32_glenum(type),
-            APIInterceptor::APIFunctionArgument::create_void_ptr  (indirect),
+            indirect_chunk.get_arg(),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLDRAWELEMENTSINDIRECT,

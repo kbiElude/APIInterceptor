@@ -5,6 +5,7 @@
 #include "Common/callbacks.h"
 #include "Common/logger.h"
 #include "Common/macros.h"
+#include "Common/memory_chunk.h"
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL4.4/gl_bind_buffers_base.h"
 #include "OpenGL/globals.h"
@@ -16,6 +17,9 @@ void AI_APIENTRY OpenGL::aiBindBuffersBase(GLenum        target,
                                            GLsizei       count,
                                            const GLuint* buffers)
 {
+    APIInterceptor::MemoryChunk             buffers_chunk(buffers,
+                                                          count,
+                                                          sizeof(GLuint));
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
@@ -37,10 +41,10 @@ void AI_APIENTRY OpenGL::aiBindBuffersBase(GLenum        target,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32_glenum(target),
-                APIInterceptor::APIFunctionArgument::create_u32       (first),
-                APIInterceptor::APIFunctionArgument::create_i32       (count),
-                APIInterceptor::APIFunctionArgument::create_u32_ptr   (buffers),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum   (target),
+                APIInterceptor::APIFunctionArgument::create_u32          (first),
+                APIInterceptor::APIFunctionArgument::create_i32          (count),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(buffers_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLBINDBUFFERSBASE,
@@ -69,10 +73,10 @@ void AI_APIENTRY OpenGL::aiBindBuffersBase(GLenum        target,
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_u32_glenum(target),
-            APIInterceptor::APIFunctionArgument::create_u32       (first),
-            APIInterceptor::APIFunctionArgument::create_i32       (count),
-            APIInterceptor::APIFunctionArgument::create_u32_ptr   (buffers),
+            APIInterceptor::APIFunctionArgument::create_u32_glenum   (target),
+            APIInterceptor::APIFunctionArgument::create_u32          (first),
+            APIInterceptor::APIFunctionArgument::create_i32          (count),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(buffers_chunk.get_id() ),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLBINDBUFFERSBASE,

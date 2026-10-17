@@ -71,10 +71,10 @@ void AI_APIENTRY OpenGL::aiGetnCompressedTexImage(GLenum  target,
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_u32_glenum    (target),
-            APIInterceptor::APIFunctionArgument::create_i32           (lod),
-            APIInterceptor::APIFunctionArgument::create_i32           (bufSize),
-            APIInterceptor::APIFunctionArgument::create_data_chunk_id (pixels_chunk_id),
+            APIInterceptor::APIFunctionArgument::create_u32_glenum   (target),
+            APIInterceptor::APIFunctionArgument::create_i32          (lod),
+            APIInterceptor::APIFunctionArgument::create_i32          (bufSize),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(pixels_chunk_id),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETNCOMPRESSEDTEXIMAGE,

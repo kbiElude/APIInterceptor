@@ -18,7 +18,7 @@ bool APIDumperLauncher::get_target_architecture(const char*         in_filename_
     uint32_t          pe_signature = 0;
     bool              result       = false;
 
-    *out_architecture_ptr = TargetArchitecture::Unknown;
+    *out_architecture_ptr = TargetArchitecture::UNKNOWN;
 
     if (file_handle == nullptr)
     {
@@ -341,7 +341,7 @@ int main(int   in_argc,
     {
         char                                  dll_dir_raw_i8vec260    [MAX_PATH] = {};
         std::string                           target_architecture_error;
-        APIDumperLauncher::TargetArchitecture target_architecture       = APIDumperLauncher::TargetArchitecture::Unknown;
+        APIDumperLauncher::TargetArchitecture target_architecture       = APIDumperLauncher::TargetArchitecture::UNKNOWN;
         char                                  working_dir_raw_i8vec260[MAX_PATH] = {};
 
         if (!APIDumperLauncher::get_target_architecture(filename_ptr,

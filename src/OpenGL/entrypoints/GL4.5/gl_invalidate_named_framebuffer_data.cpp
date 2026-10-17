@@ -5,6 +5,7 @@
 #include "Common/callbacks.h"
 #include "Common/logger.h"
 #include "Common/macros.h"
+#include "Common/memory_chunk.h"
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL4.5/gl_invalidate_named_framebuffer_data.h"
 #include "OpenGL/globals.h"
@@ -14,6 +15,9 @@ void AI_APIENTRY OpenGL::aiInvalidateNamedFramebufferData(GLuint        framebuf
                                                           GLsizei       numAttachments,
                                                           const GLenum* attachments)
 {
+    APIInterceptor::MemoryChunk             attachments_chunk(attachments,
+                                                              numAttachments,
+                                                              sizeof(GLenum));
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
@@ -34,9 +38,9 @@ void AI_APIENTRY OpenGL::aiInvalidateNamedFramebufferData(GLuint        framebuf
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32    (framebuffer),
-                APIInterceptor::APIFunctionArgument::create_i32    (numAttachments),
-                APIInterceptor::APIFunctionArgument::create_u32_ptr(attachments),
+                APIInterceptor::APIFunctionArgument::create_u32          (framebuffer),
+                APIInterceptor::APIFunctionArgument::create_i32          (numAttachments),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(attachments_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLINVALIDATENAMEDFRAMEBUFFERDATA,
@@ -64,9 +68,9 @@ void AI_APIENTRY OpenGL::aiInvalidateNamedFramebufferData(GLuint        framebuf
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_u32    (framebuffer),
-            APIInterceptor::APIFunctionArgument::create_i32    (numAttachments),
-            APIInterceptor::APIFunctionArgument::create_u32_ptr(attachments),
+            APIInterceptor::APIFunctionArgument::create_u32          (framebuffer),
+            APIInterceptor::APIFunctionArgument::create_i32          (numAttachments),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(attachments_chunk.get_id() ),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLINVALIDATENAMEDFRAMEBUFFERDATA,

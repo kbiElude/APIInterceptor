@@ -8,6 +8,7 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL3.1/gl_get_uniform_block_index.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/string_chunk.h"
 #include "WGL/globals.h"
 
 GLuint AI_APIENTRY OpenGL::aiGetUniformBlockIndex(GLuint        program,
@@ -20,6 +21,7 @@ GLuint AI_APIENTRY OpenGL::aiGetUniformBlockIndex(GLuint        program,
     GLuint                                  result                 = GL_INVALID_INDEX;
     bool                                    should_pass_through    = true;
     APIInterceptor::Tracker                 tracker;
+    OpenGL::StringChunk                     uniform_block_name_chunk(uniformBlockName);
 
     if (tracker.is_top_level_api_call() )
     {
@@ -33,8 +35,8 @@ GLuint AI_APIENTRY OpenGL::aiGetUniformBlockIndex(GLuint        program,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32      (program),
-                APIInterceptor::APIFunctionArgument::create_void_ptr (uniformBlockName),
+                APIInterceptor::APIFunctionArgument::create_u32          (program),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(uniform_block_name_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETUNIFORMBLOCKINDEX,

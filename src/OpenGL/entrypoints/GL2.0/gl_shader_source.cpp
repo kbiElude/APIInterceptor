@@ -8,6 +8,7 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL2.0/gl_shader_source.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/string_array_chunk.h"
 #include "WGL/globals.h"
 
 void AI_APIENTRY OpenGL::aiShaderSource(GLuint               shader,
@@ -20,6 +21,9 @@ void AI_APIENTRY OpenGL::aiShaderSource(GLuint               shader,
     void*                                   pre_callback_func_arg  = nullptr;
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
+    OpenGL::StringArrayChunk                strings_chunk(string,
+                                                          count,
+                                                          length);
     APIInterceptor::Tracker                 tracker;
 
     if (tracker.is_top_level_api_call() )
@@ -36,10 +40,10 @@ void AI_APIENTRY OpenGL::aiShaderSource(GLuint               shader,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32     (shader),
-                APIInterceptor::APIFunctionArgument::create_i32     (count),
-                APIInterceptor::APIFunctionArgument::create_void_ptr(string),
-                APIInterceptor::APIFunctionArgument::create_void_ptr(length),
+                APIInterceptor::APIFunctionArgument::create_u32          (shader),
+                APIInterceptor::APIFunctionArgument::create_i32          (count),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(strings_chunk.get_id() ),
+                APIInterceptor::APIFunctionArgument::create_void_ptr     (length),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLSHADERSOURCE,
@@ -68,10 +72,10 @@ void AI_APIENTRY OpenGL::aiShaderSource(GLuint               shader,
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_u32     (shader),
-            APIInterceptor::APIFunctionArgument::create_i32     (count),
-            APIInterceptor::APIFunctionArgument::create_void_ptr(string),
-            APIInterceptor::APIFunctionArgument::create_void_ptr(length),
+            APIInterceptor::APIFunctionArgument::create_u32          (shader),
+            APIInterceptor::APIFunctionArgument::create_i32          (count),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(strings_chunk.get_id() ),
+            APIInterceptor::APIFunctionArgument::create_void_ptr     (length),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLSHADERSOURCE,

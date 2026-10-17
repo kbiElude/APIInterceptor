@@ -10,11 +10,11 @@
 #include "OpenGL/globals.h"
 #include "WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiScissorIndexed(GLuint   index,
-                                          GLint    left,
-                                          GLint    bottom,
-                                          GLsizei  width,
-                                          GLsizei  height)
+void AI_APIENTRY OpenGL::aiScissorIndexed(GLuint  index,
+                                          GLint   left,
+                                          GLint   bottom,
+                                          GLsizei width,
+                                          GLsizei height)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;

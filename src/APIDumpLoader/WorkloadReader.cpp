@@ -3,6 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "APIDumpLoader/WorkloadReader.h"
+#include "Common/workload_format.h"
 #include <algorithm>
 #include <string.h>
 
@@ -17,7 +18,9 @@ APIDumpLoader::WorkloadReader::WorkloadReader()
      m_file_handle       (nullptr),
      m_is_finished       (false),
      m_is_truncated      (false),
-     m_n_data_chunks_read(0)
+     m_n_data_chunks_read(0),
+     m_pointer_n_bytes   (0),
+     m_qpc_frequency     (0)
 {
     /* The padding keeps parsing code from reading outside the buffer when a file ends early. */
     m_buffer_u8_vec.resize(BUFFER_N_BYTES + MAX_PEEK_N_BYTES);
@@ -31,19 +34,100 @@ APIDumpLoader::WorkloadReader::~WorkloadReader()
     }
 }
 
-APIDumpLoader::WorkloadReaderUniquePtr APIDumpLoader::WorkloadReader::create(const char* in_filename_ptr)
+bool APIDumpLoader::WorkloadReader::contains_api_group(const APIGroup& in_group)
 {
-    WorkloadReaderUniquePtr result_ptr(new WorkloadReader() );
+    bool     result = false;
+    Workload workload;
+
+    while (result == false &&
+           read_next_segment(&workload) )
+    {
+        for (const auto& call : *workload.dumped_api_call_vec_ptr)
+        {
+            if (get_api_group(call.func) == in_group)
+            {
+                result = true;
+
+                break;
+            }
+        }
+    }
+
+    return result;
+}
+
+APIDumpLoader::WorkloadReaderUniquePtr APIDumpLoader::WorkloadReader::create(const char*  in_filename_ptr,
+                                                                             std::string* out_error_ptr)
+{
+    std::string                                        error;
+    APIInterceptor::WorkloadFormat::WorkloadFileHeader header;
+    WorkloadReaderUniquePtr                            result_ptr(new WorkloadReader() );
 
     result_ptr->m_file_handle = ::fopen(in_filename_ptr,
                                         "rb");
 
     if (result_ptr->m_file_handle == nullptr)
     {
-        result_ptr.reset();
+        error = "The file cannot be opened.";
+
+        goto fail;
     }
 
+    if (::fread(&header,
+                sizeof(header),
+                1,
+                result_ptr->m_file_handle) != 1)
+    {
+        error = "This is not a workload file, or it was captured by an older version. Capture it again.";
+
+        goto fail;
+    }
+
+    if (::memcmp(header.magic_i8vec8,
+                 APIInterceptor::WorkloadFormat::MAGIC,
+                 sizeof(header.magic_i8vec8) ) != 0)
+    {
+        error = "This is not a workload file, or it was captured by an older version. Capture it again.";
+
+        goto fail;
+    }
+
+    if (header.version != APIInterceptor::WorkloadFormat::FILE_VERSION)
+    {
+        error = "The workload file has an unsupported version (" + std::to_string(header.version) +
+                ", expected "                                    + std::to_string(APIInterceptor::WorkloadFormat::FILE_VERSION) +
+                "). Capture it again.";
+
+        goto fail;
+    }
+
+    if (header.pointer_n_bytes != sizeof(uint32_t) &&
+        header.pointer_n_bytes != sizeof(uint64_t) )
+    {
+        error = "The workload file header is corrupt.";
+
+        goto fail;
+    }
+
+    result_ptr->m_pointer_n_bytes = header.pointer_n_bytes;
+    result_ptr->m_qpc_frequency   = header.qpc_frequency;
+
+    goto end;
+
+fail:
+    if (out_error_ptr != nullptr)
+    {
+        *out_error_ptr = error;
+    }
+
+    result_ptr.reset();
+end:
     return result_ptr;
+}
+
+uint32_t APIDumpLoader::WorkloadReader::get_pointer_n_bytes() const
+{
+    return m_pointer_n_bytes;
 }
 
 bool APIDumpLoader::WorkloadReader::is_truncated() const
@@ -79,7 +163,7 @@ size_t APIDumpLoader::WorkloadReader::peek(const size_t& in_n_bytes)
 
 bool APIDumpLoader::WorkloadReader::read_api_call(DumpedAPICall* out_api_call_ptr)
 {
-    constexpr size_t   HEADER_N_BYTES           = sizeof(APIInterceptor::APIFunction) + 2 * sizeof(uint32_t); /* function, n in args, n out args */
+    constexpr size_t   HEADER_N_BYTES           = APIInterceptor::WorkloadFormat::CALL_HEADER_N_BYTES;
     constexpr size_t   MAX_ARGUMENT_N_BYTES     = 16;                                                         /* type and the widest payload */
     constexpr uint32_t MAX_N_ARGUMENTS_PER_CALL = 64;
 
@@ -126,6 +210,12 @@ bool APIDumpLoader::WorkloadReader::read_api_call(DumpedAPICall* out_api_call_pt
     memcpy(&n_out_arguments,
            header_u8_ptr + sizeof(APIInterceptor::APIFunction) + sizeof(uint32_t),
            sizeof(uint32_t) );
+    memcpy(&out_api_call_ptr->thread_id,
+           header_u8_ptr + sizeof(APIInterceptor::APIFunction) + 2 * sizeof(uint32_t),
+           sizeof(uint32_t) );
+    memcpy(&out_api_call_ptr->timestamp_qpc,
+           header_u8_ptr + sizeof(APIInterceptor::APIFunction) + 3 * sizeof(uint32_t),
+           sizeof(uint64_t) );
 
     m_buffer_start += HEADER_N_BYTES;
 
@@ -280,6 +370,8 @@ bool APIDumpLoader::WorkloadReader::read_next_segment(Workload* out_workload_ptr
     out_workload_ptr->dumped_api_call_vec_ptr.reset(new DumpedAPICallVector() );
     out_workload_ptr->dumped_surface_vec_ptr.reset (new DumpedSurfaceVector() );
     out_workload_ptr->first_data_chunk_id = m_n_data_chunks_read;
+    out_workload_ptr->pointer_n_bytes     = m_pointer_n_bytes;
+    out_workload_ptr->qpc_frequency       = m_qpc_frequency;
 
     result = true;
 

@@ -85,7 +85,8 @@ void AI_APIENTRY OpenGL::aiDeleteBuffers(GLsizei       n,
                      n_buffer < n;
                    ++n_buffer)
         {
-            context.buffer_object_id_to_buffer_props_ptr_map.erase(buffers[n_buffer]);
+            context.buffer_manager.on_buffer_deleted(buffers[n_buffer]);
+            context.buffer_mapping_manager.on_buffer_deleted(buffers[n_buffer]);
         }
     }
 }

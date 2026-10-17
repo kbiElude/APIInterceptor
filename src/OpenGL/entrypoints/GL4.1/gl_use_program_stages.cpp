@@ -10,9 +10,9 @@
 #include "OpenGL/globals.h"
 #include "WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiUseProgramStages(GLuint      pipeline,
-                                            GLbitfield  stages,
-                                            GLuint      program)
+void AI_APIENTRY OpenGL::aiUseProgramStages(GLuint     pipeline,
+                                            GLbitfield stages,
+                                            GLuint     program)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;

@@ -4,6 +4,7 @@
  */
 #include <Windows.h>
 #include "Common/callbacks.h"
+#include "Common/workload_format.h"
 #include "GL/gl.h"
 #include "Kernel32/callbacks.h"
 #include "OpenGL/types.h"
@@ -12,25 +13,14 @@
 #include <algorithm>
 #include <cassert>
 #include <mutex>
+#include <string.h>
 
-static std::mutex g_mutex;
-
-/* Used by the constructor's initializer list. */
+/* Used by the constructor. */
 static constexpr uint64_t DEFAULT_N_BYTES_BEFORE_SPILL = 128ull * 1024 * 1024;
 
 APIDumper::APIDumper()
-    :m_chunk_scan_cursor        (0),
-     m_dump_swapchain_on_present(false),
-     m_is_workload_written      (false),
-     m_n_bytes_before_spill     (DEFAULT_N_BYTES_BEFORE_SPILL),
-     m_n_chunk_bytes_counted    (0),
-     m_n_data_chunks_written    (0),
-     m_n_frames_dumped          (0),
-     m_n_frames_to_dump         (UINT32_MAX),
-     m_n_surface_bytes          (0),
-     m_workload_file_handle     (nullptr)
 {
-    /* Stub */
+    m_settings.n_bytes_before_spill = DEFAULT_N_BYTES_BEFORE_SPILL;
 }
 
 APIDumper::~APIDumper()
@@ -54,27 +44,48 @@ APIDumperUniquePtr APIDumper::create()
     return result_ptr;
 }
 
+void APIDumper::cut_segment(const bool& in_is_last)
+{
+    /* Another thread presenting at the same time need not cut as well. The last segment is not optional, though. */
+    if (in_is_last)
+    {
+        std::lock_guard<std::mutex> cut_guard(m_cut.mutex);
+
+        perform_cut(true); /* in_is_last */
+    }
+    else
+    {
+        std::unique_lock<std::mutex> cut_lock(m_cut.mutex,
+                                              std::try_to_lock);
+
+        if (cut_lock.owns_lock() )
+        {
+            perform_cut(false); /* in_is_last */
+        }
+    }
+}
+
 uint64_t APIDumper::get_n_unwritten_bytes()
 {
     const uint32_t n_data_chunks = APIInterceptor::get_n_data_chunks();
 
     /* Data chunks are counted once, as they show up. */
     for (;
-         m_chunk_scan_cursor < n_data_chunks;
-         m_chunk_scan_cursor++)
+         m_recorded.chunk_scan_cursor < n_data_chunks;
+         m_recorded.chunk_scan_cursor++)
     {
         const void* data_chunk_ptr  = nullptr;
         uint32_t    data_chunk_size = 0;
 
-        if (APIInterceptor::get_data_chunk(m_chunk_scan_cursor,
+        if (APIInterceptor::get_data_chunk(m_recorded.chunk_scan_cursor,
                                           &data_chunk_ptr,
                                           &data_chunk_size) )
         {
-            m_n_chunk_bytes_counted += data_chunk_size;
+            m_recorded.n_chunk_bytes_counted += data_chunk_size;
         }
     }
 
-    return m_dumped_api_call_deque.size() * sizeof(DumpedAPICall) + m_n_chunk_bytes_counted + m_n_surface_bytes;
+    return m_recorded.api_call_deque.size() * sizeof(DumpedAPICall) + m_recorded.n_chunk_bytes_counted + m_recorded.n_surface_bytes;
 }
 
 bool APIDumper::init()
@@ -106,9 +117,9 @@ bool APIDumper::init()
             goto end;
         }
 
-        m_n_frames_to_dump          = *reinterpret_cast<const uint32_t*>(settings_data_raw_u8vec12 + 0 * sizeof(uint32_t) );
-        m_dump_swapchain_on_present = *reinterpret_cast<const uint32_t*>(settings_data_raw_u8vec12 + 1 * sizeof(uint32_t) ) != 0;
-        m_n_bytes_before_spill      = static_cast<uint64_t>(*reinterpret_cast<const uint32_t*>(settings_data_raw_u8vec12 + 2 * sizeof(uint32_t) ) ) * N_BYTES_PER_MB;
+        m_settings.n_frames_to_dump          = *reinterpret_cast<const uint32_t*>(settings_data_raw_u8vec12 + 0 * sizeof(uint32_t) );
+        m_settings.dump_swapchain_on_present = *reinterpret_cast<const uint32_t*>(settings_data_raw_u8vec12 + 1 * sizeof(uint32_t) ) != 0;
+        m_settings.n_bytes_before_spill      = static_cast<uint64_t>(*reinterpret_cast<const uint32_t*>(settings_data_raw_u8vec12 + 2 * sizeof(uint32_t) ) ) * N_BYTES_PER_MB;
 
         ::fclose(settings_file_handle);
     }
@@ -127,14 +138,40 @@ bool APIDumper::init()
     }
 
     /* Segments are appended to the workload file as the dump grows. */
-    m_workload_file_handle = ::fopen("result_dump.workload",
+    m_recorded.file_handle = ::fopen("result_dump.workload",
                                      "wb");
 
-    if (m_workload_file_handle == nullptr)
+    if (m_recorded.file_handle == nullptr)
     {
-        assert(m_workload_file_handle != nullptr);
+        assert(m_recorded.file_handle != nullptr);
 
         goto end;
+    }
+
+    /* The file starts with a header which says how to read the rest. */
+    {
+        APIInterceptor::WorkloadFormat::WorkloadFileHeader header = {};
+        LARGE_INTEGER                                      qpc_frequency;
+
+        ::QueryPerformanceFrequency(&qpc_frequency);
+
+        ::memcpy(header.magic_i8vec8,
+                 APIInterceptor::WorkloadFormat::MAGIC,
+                 sizeof(header.magic_i8vec8) );
+
+        header.pointer_n_bytes = static_cast<uint32_t>(sizeof(void*) );
+        header.qpc_frequency   = static_cast<uint64_t>(qpc_frequency.QuadPart);
+        header.version         = APIInterceptor::WorkloadFormat::FILE_VERSION;
+
+        if (::fwrite(&header,
+                     sizeof(header),
+                     1,
+                     m_recorded.file_handle) != 1)
+        {
+            assert(false);
+
+            goto end;
+        }
     }
 
     /* The writer thread would not survive the process being taken down, so the app's exit gives it time to finish. */
@@ -146,66 +183,77 @@ end:
     return result;
 }
 
+void APIDumper::on_frame_presented()
+{
+    bool is_dump_complete = false;
+    bool should_spill     = false;
+
+    {
+        std::lock_guard<std::mutex> guard(m_recorded.mutex);
+
+        is_dump_complete = (m_recorded.n_frames_dumped >= m_settings.n_frames_to_dump);
+        should_spill     = (get_n_unwritten_bytes() >= m_settings.n_bytes_before_spill);
+    }
+
+    /* The dump is complete: write it now, so the process need not exit gracefully. Otherwise, frame boundaries are
+     * the one place where no call is half-recorded, so the dump can be cut there.
+     */
+    if (is_dump_complete)
+    {
+        cut_segment(true); /* in_is_last */
+    }
+    else
+    if (should_spill)
+    {
+        cut_segment(false); /* in_is_last */
+    }
+}
+
 void APIDumper::on_post_callback(APIInterceptor::APIFunction                in_api_func,
                                  void*                                      in_user_arg_ptr,
                                  uint32_t                                   in_n_args_out,
                                  const APIInterceptor::APIFunctionArgument* in_args_out_ptr,
                                  const APIInterceptor::APIFunctionArgument* in_returned_value_ptr)
 {
-    {
-        std::lock_guard<std::mutex> guard(g_mutex);
+    bool       is_frame_presented = false;
+    APIDumper* this_ptr           = reinterpret_cast<APIDumper*>(in_user_arg_ptr);
 
-        DumpedAPICall* api_call_item_ptr = nullptr;
-        APIDumper*     this_ptr          = reinterpret_cast<APIDumper*>(in_user_arg_ptr);
+    {
+        std::lock_guard<std::mutex> guard(this_ptr->m_recorded.mutex);
 
         /* Ignore this callback if we've already dumped sufficient number of frames! */
-        if (this_ptr->m_n_frames_dumped < this_ptr->m_n_frames_to_dump)
+        if (this_ptr->m_recorded.n_frames_dumped < this_ptr->m_settings.n_frames_to_dump)
         {
-            /* Update the last cached API call's returned value.
+            /* Update the cached API call's out args and returned value.
              *
              * In cases where OS DLL implementing the API function calls intercepted API functions, the relevant item
-             * may be a few items back.
+             * may be a few items back. Calls from other threads may be in between, too, so look for the latest call of
+             * this function made by this thread which is still waiting for its results.
              *
-             * NOTE: This will totally break for multi-context apps!
+             * A call which is not there was recorded before the dump was completed, and is already written.
              */
-            assert(this_ptr->m_dumped_api_call_deque.size() > 0);
+            const auto this_thread_id = static_cast<uint32_t>(::GetCurrentThreadId() );
 
-            api_call_item_ptr = &this_ptr->m_dumped_api_call_deque.back();
+            auto deque_iterator = std::find_if(this_ptr->m_recorded.api_call_deque.rbegin(),
+                                               this_ptr->m_recorded.api_call_deque.rend  (),
+                                               [&](const DumpedAPICall& in_api_call)
+                                               {
+                                                  return (in_api_call.api_func     == in_api_func)    &&
+                                                         (in_api_call.thread_id    == this_thread_id) &&
+                                                         (in_api_call.is_completed == false);
+                                               });
 
-            if (this_ptr->m_dumped_api_call_deque.back().api_func != in_api_func)
+            if (deque_iterator != this_ptr->m_recorded.api_call_deque.rend() )
             {
-                const auto this_thread_id = std::this_thread::get_id();
-
-                auto deque_iterator = std::find_if(this_ptr->m_dumped_api_call_deque.rbegin(),
-                                                   this_ptr->m_dumped_api_call_deque.rend  (),
-                                                   [&](const DumpedAPICall& in_api_call)
-                                                   {
-                                                      return (in_api_call.api_func  == in_api_func)    &&
-                                                             (in_api_call.thread_id == this_thread_id);
-                                                   });
-
-                assert(deque_iterator != this_ptr->m_dumped_api_call_deque.rend() );
-                if (deque_iterator != this_ptr->m_dumped_api_call_deque.rend() )
-                {
-                    api_call_item_ptr = &(*deque_iterator);
-                }
-                else
-                {
-                    api_call_item_ptr = nullptr;
-                }
-            }
-
-            assert(api_call_item_ptr != nullptr);
-            if (api_call_item_ptr != nullptr)
-            {
-                api_call_item_ptr->n_args_out     =  in_n_args_out;
-                api_call_item_ptr->returned_value = *in_returned_value_ptr;
+                deque_iterator->is_completed   = true;
+                deque_iterator->n_args_out     = in_n_args_out;
+                deque_iterator->returned_value = *in_returned_value_ptr;
 
                 for (uint32_t n_arg = 0;
                               n_arg < in_n_args_out;
                             ++n_arg)
                 {
-                    api_call_item_ptr->args_out[n_arg] = in_args_out_ptr[n_arg];
+                    deque_iterator->args_out[n_arg] = in_args_out_ptr[n_arg];
                 }
             }
         }
@@ -217,20 +265,15 @@ void APIDumper::on_post_callback(APIInterceptor::APIFunction                in_a
         if (in_api_func == APIInterceptor::APIFUNCTION_GDI32_SWAPBUFFERS           ||
             in_api_func == APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_PRESENT)
         {
-            this_ptr->m_n_frames_dumped++;
+            this_ptr->m_recorded.n_frames_dumped++;
 
-            /* Frame boundaries are the one place where no call is half-recorded. */
-            if (this_ptr->get_n_unwritten_bytes() >= this_ptr->m_n_bytes_before_spill)
-            {
-                this_ptr->submit_segment(false); /* in_is_last */
-            }
-
-            /* The dump is complete: write it now, so the process need not exit gracefully. */
-            if (this_ptr->m_n_frames_dumped >= this_ptr->m_n_frames_to_dump)
-            {
-                this_ptr->write_workload();
-            }
+            is_frame_presented = true;
         }
+    }
+
+    if (is_frame_presented)
+    {
+        this_ptr->on_frame_presented();
     }
 }
 
@@ -245,8 +288,8 @@ void APIDumper::on_pre_callback(APIInterceptor::APIFunction                in_ap
     assert(sizeof(DumpedAPICall::args_in) / sizeof(DumpedAPICall::args_in[0]) >= in_n_args_in);
 
     if (in_api_func                 == APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_PRESENT &&
-        this_ptr->m_n_frames_dumped <  this_ptr->m_n_frames_to_dump                              &&
-        this_ptr->m_dump_swapchain_on_present)
+        this_ptr->m_recorded.n_frames_dumped <  this_ptr->m_settings.n_frames_to_dump                              &&
+        this_ptr->m_settings.dump_swapchain_on_present)
     {
         DumpedSurface new_surface;
         auto          rgba_u8_vec_ptr = std::unique_ptr<std::vector<uint8_t> >(new std::vector<uint8_t>() );
@@ -259,18 +302,18 @@ void APIDumper::on_pre_callback(APIInterceptor::APIFunction                in_ap
             new_surface.u8_vec_ptr = std::move(rgba_u8_vec_ptr);
 
             {
-                std::lock_guard<std::mutex> guard(g_mutex);
+                std::lock_guard<std::mutex> guard(this_ptr->m_recorded.mutex);
 
-                this_ptr->m_n_surface_bytes += new_surface.u8_vec_ptr->size();
+                this_ptr->m_recorded.n_surface_bytes += new_surface.u8_vec_ptr->size();
 
-                this_ptr->m_dumped_surface_vec.emplace_back(std::move(new_surface) );
+                this_ptr->m_recorded.surface_vec.emplace_back(std::move(new_surface) );
             }
         }
     }
 
     if (in_api_func                           == APIInterceptor::APIFUNCTION_GDI32_SWAPBUFFERS &&
-        this_ptr->m_n_frames_dumped           <  this_ptr->m_n_frames_to_dump                  &&
-        this_ptr->m_dump_swapchain_on_present)
+        this_ptr->m_recorded.n_frames_dumped           <  this_ptr->m_settings.n_frames_to_dump                  &&
+        this_ptr->m_settings.dump_swapchain_on_present)
     {
         std::unique_ptr<std::vector<uint8_t> > swapchain_data_u8_vec_ptr;
         std::array<uint32_t, 2>                swapchain_extents_u32vec2 = {640, 480};
@@ -299,22 +342,22 @@ void APIDumper::on_pre_callback(APIInterceptor::APIFunction                in_ap
 
         /* Store for later use */
         {
-            std::lock_guard<std::mutex> guard      (g_mutex);
+            std::lock_guard<std::mutex> guard      (this_ptr->m_recorded.mutex);
             DumpedSurface               new_surface;
 
             new_surface.extents_u32vec2 = swapchain_extents_u32vec2;
             new_surface.u8_vec_ptr      = std::move(swapchain_data_u8_vec_ptr);
 
-            this_ptr->m_n_surface_bytes += new_surface.u8_vec_ptr->size();
+            this_ptr->m_recorded.n_surface_bytes += new_surface.u8_vec_ptr->size();
 
-            this_ptr->m_dumped_surface_vec.emplace_back(
+            this_ptr->m_recorded.surface_vec.emplace_back(
                 std::move(new_surface)
             );
         }
     }
 
     /* Do NOT dump the API call if we've already dumped sufficient number of frames! */
-    if (this_ptr->m_n_frames_dumped < this_ptr->m_n_frames_to_dump)
+    if (this_ptr->m_recorded.n_frames_dumped < this_ptr->m_settings.n_frames_to_dump)
     {
         /* Cache API call's properties.
          *
@@ -324,10 +367,14 @@ void APIDumper::on_pre_callback(APIInterceptor::APIFunction                in_ap
          */
         {
             DumpedAPICall new_item;
+            LARGE_INTEGER qpc_timestamp;
 
-            new_item.api_func  = in_api_func;
-            new_item.n_args_in = in_n_args_in;
-            new_item.thread_id = std::this_thread::get_id();
+            ::QueryPerformanceCounter(&qpc_timestamp);
+
+            new_item.api_func      = in_api_func;
+            new_item.n_args_in     = in_n_args_in;
+            new_item.thread_id     = static_cast<uint32_t>(::GetCurrentThreadId() );
+            new_item.timestamp_qpc = static_cast<uint64_t>(qpc_timestamp.QuadPart);
 
             for (uint32_t n_arg = 0;
                           n_arg < in_n_args_in;
@@ -337,9 +384,9 @@ void APIDumper::on_pre_callback(APIInterceptor::APIFunction                in_ap
             }
 
             {
-                std::lock_guard<std::mutex> guard(g_mutex);
+                std::lock_guard<std::mutex> guard(this_ptr->m_recorded.mutex);
 
-                this_ptr->m_dumped_api_call_deque.emplace_back(new_item);
+                this_ptr->m_recorded.api_call_deque.emplace_back(new_item);
             }
         }
     }
@@ -352,14 +399,58 @@ void APIDumper::on_process_exiting(void* in_user_arg_ptr)
 {
     APIDumper* this_ptr = reinterpret_cast<APIDumper*>(in_user_arg_ptr);
 
-    /* The process is about to be taken down, and a running writer thread with it. Hand over what is left, and wait. */
+    /* The process is about to be taken down, and a running writer thread with it. Hand over what is left, and wait.
+     * A cut which is under way finishes first.
+     */
     {
-        std::lock_guard<std::mutex> guard(g_mutex);
+        std::lock_guard<std::mutex> cut_guard(this_ptr->m_cut.mutex);
+        std::lock_guard<std::mutex> guard    (this_ptr->m_recorded.mutex);
 
         this_ptr->write_workload();
     }
 
     this_ptr->wait_for_writer();
+}
+
+void APIDumper::perform_cut(const bool& in_is_last)
+{
+    /* How long to wait for other threads to leave their API calls, before giving up on this cut. */
+    constexpr uint32_t QUIESCE_TIMEOUT_MS = 100;
+
+    bool is_quiescent = false;
+
+    /* Waiting for the previous segment to be written must not hold back the other threads. */
+    wait_for_writer();
+
+    is_quiescent = APIInterceptor::try_quiesce_api_calls(QUIESCE_TIMEOUT_MS);
+
+    /* Some thread is stuck in a call. A spill can wait for the next frame, but the last segment cannot. */
+    if (is_quiescent == false &&
+        in_is_last    == false)
+    {
+        goto end;
+    }
+
+    {
+        std::lock_guard<std::mutex> guard(m_recorded.mutex);
+
+        if (in_is_last)
+        {
+            write_workload();
+        }
+        else
+        {
+            submit_segment(false); /* in_is_last */
+        }
+    }
+
+    if (is_quiescent)
+    {
+        APIInterceptor::resume_api_calls();
+    }
+
+end:
+    ;
 }
 
 void APIDumper::submit_segment(const bool& in_is_last)
@@ -370,40 +461,40 @@ void APIDumper::submit_segment(const bool& in_is_last)
     wait_for_writer();
 
     {
-        const uint32_t first_data_chunk = m_n_data_chunks_written;
+        const uint32_t first_data_chunk = m_recorded.n_data_chunks_written;
         const uint32_t n_data_chunks    = APIInterceptor::get_n_data_chunks() - first_data_chunk;
 
         /* The render thread only moves the data around; serializing and writing it is up to the writer. */
-        job_ptr->api_call_deque.swap(m_dumped_api_call_deque);
-        job_ptr->file_handle       = m_workload_file_handle;
+        job_ptr->api_call_deque.swap(m_recorded.api_call_deque);
+        job_ptr->file_handle       = m_recorded.file_handle;
         job_ptr->should_close_file = in_is_last;
-        job_ptr->surface_vec.swap(m_dumped_surface_vec);
+        job_ptr->surface_vec.swap(m_recorded.surface_vec);
 
         APIInterceptor::take_data_chunks(first_data_chunk,
                                          n_data_chunks,
                                         &job_ptr->data_chunk_vec);
 
-        m_chunk_scan_cursor     = first_data_chunk + n_data_chunks;
-        m_n_chunk_bytes_counted = 0;
-        m_n_data_chunks_written = first_data_chunk + n_data_chunks;
-        m_n_surface_bytes       = 0;
+        m_recorded.chunk_scan_cursor     = first_data_chunk + n_data_chunks;
+        m_recorded.n_chunk_bytes_counted = 0;
+        m_recorded.n_data_chunks_written = first_data_chunk + n_data_chunks;
+        m_recorded.n_surface_bytes       = 0;
     }
 
     /* The writer owns the file from now on. */
     if (in_is_last)
     {
-        m_workload_file_handle = nullptr;
+        m_recorded.file_handle = nullptr;
     }
 
-    m_writer_thread = std::thread(&APIDumper::write_segment,
+    m_cut.writer_thread = std::thread(&APIDumper::write_segment,
                                   std::move(job_ptr) );
 }
 
 void APIDumper::wait_for_writer()
 {
-    if (m_writer_thread.joinable() )
+    if (m_cut.writer_thread.joinable() )
     {
-        m_writer_thread.join();
+        m_cut.writer_thread.join();
     }
 }
 
@@ -458,7 +549,7 @@ void APIDumper::write_segment(SegmentJobUniquePtr in_job_ptr)
             uint8_t*   helper_u8_ptr          =  nullptr;
             const auto helper_u8_vec_pre_size =  helper_u8_vec.size();
 
-            helper_u8_vec.resize(helper_u8_vec_pre_size + sizeof(APIInterceptor::APIFunction) + sizeof(uint32_t) * 2);
+            helper_u8_vec.resize(helper_u8_vec_pre_size + APIInterceptor::WorkloadFormat::CALL_HEADER_N_BYTES);
 
             helper_u8_ptr = &helper_u8_vec.at(helper_u8_vec_pre_size);
 
@@ -469,6 +560,12 @@ void APIDumper::write_segment(SegmentJobUniquePtr in_job_ptr)
              helper_u8_ptr                              += sizeof(uint32_t);
             *reinterpret_cast<uint32_t*>(helper_u8_ptr)  = current_api_call.n_args_out;
              helper_u8_ptr                              += sizeof(uint32_t);
+            *reinterpret_cast<uint32_t*>(helper_u8_ptr)  = current_api_call.thread_id;
+             helper_u8_ptr                              += sizeof(uint32_t);
+
+            memcpy(helper_u8_ptr,
+                  &current_api_call.timestamp_qpc,
+                   sizeof(uint64_t) );
 
             for (uint32_t n_api_call_arg = 0;
                           n_api_call_arg < current_api_call.n_args_in;
@@ -538,9 +635,9 @@ void APIDumper::write_segment(SegmentJobUniquePtr in_job_ptr)
 void APIDumper::write_workload()
 {
     /* The last segment is written once, even if both the frame limit and the process exit ask for it. */
-    if (m_is_workload_written == false)
+    if (m_recorded.is_workload_written == false)
     {
-        m_is_workload_written = true;
+        m_recorded.is_workload_written = true;
 
         /* The writer closes the file once it is done with the last segment. */
         submit_segment(true); /* in_is_last */

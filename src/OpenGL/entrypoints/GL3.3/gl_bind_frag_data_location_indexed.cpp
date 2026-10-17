@@ -8,6 +8,7 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL3.3/gl_bind_frag_data_location_indexed.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/string_chunk.h"
 #include "WGL/globals.h"
 
 void AI_APIENTRY OpenGL::aiBindFragDataLocationIndexed(GLuint        program,
@@ -15,6 +16,7 @@ void AI_APIENTRY OpenGL::aiBindFragDataLocationIndexed(GLuint        program,
                                                        GLuint        index,
                                                        const GLchar* name)
 {
+    OpenGL::StringChunk                     name_chunk(name);
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
@@ -36,10 +38,10 @@ void AI_APIENTRY OpenGL::aiBindFragDataLocationIndexed(GLuint        program,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32  (program),
-                APIInterceptor::APIFunctionArgument::create_u32  (colorNumber),
-                APIInterceptor::APIFunctionArgument::create_u32  (index),
-                APIInterceptor::APIFunctionArgument::create_i8_ptr(name),
+                APIInterceptor::APIFunctionArgument::create_u32          (program),
+                APIInterceptor::APIFunctionArgument::create_u32          (colorNumber),
+                APIInterceptor::APIFunctionArgument::create_u32          (index),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(name_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLBINDFRAGDATALOCATIONINDEXED,
@@ -68,10 +70,10 @@ void AI_APIENTRY OpenGL::aiBindFragDataLocationIndexed(GLuint        program,
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_u32  (program),
-            APIInterceptor::APIFunctionArgument::create_u32  (colorNumber),
-            APIInterceptor::APIFunctionArgument::create_u32  (index),
-            APIInterceptor::APIFunctionArgument::create_i8_ptr(name),
+            APIInterceptor::APIFunctionArgument::create_u32          (program),
+            APIInterceptor::APIFunctionArgument::create_u32          (colorNumber),
+            APIInterceptor::APIFunctionArgument::create_u32          (index),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(name_chunk.get_id() ),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLBINDFRAGDATALOCATIONINDEXED,

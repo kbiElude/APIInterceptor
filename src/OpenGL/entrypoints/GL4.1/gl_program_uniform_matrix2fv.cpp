@@ -5,6 +5,7 @@
 #include "Common/callbacks.h"
 #include "Common/logger.h"
 #include "Common/macros.h"
+#include "Common/memory_chunk.h"
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL4.1/gl_program_uniform_matrix2fv.h"
 #include "OpenGL/globals.h"
@@ -22,6 +23,9 @@ void AI_APIENTRY OpenGL::aiProgramUniformMatrix2fv(GLuint         program,
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
     APIInterceptor::Tracker                 tracker;
+    APIInterceptor::MemoryChunk             value_chunk(value,
+                                                        count * 4,
+                                                        sizeof(GLfloat));
 
     if (tracker.is_top_level_api_call() )
     {
@@ -38,11 +42,11 @@ void AI_APIENTRY OpenGL::aiProgramUniformMatrix2fv(GLuint         program,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32      (program),
-                APIInterceptor::APIFunctionArgument::create_i32      (location),
-                APIInterceptor::APIFunctionArgument::create_i32      (count),
-                APIInterceptor::APIFunctionArgument::create_u8       (transpose),
-                APIInterceptor::APIFunctionArgument::create_fp32_ptr (value),
+                APIInterceptor::APIFunctionArgument::create_u32          (program),
+                APIInterceptor::APIFunctionArgument::create_i32          (location),
+                APIInterceptor::APIFunctionArgument::create_i32          (count),
+                APIInterceptor::APIFunctionArgument::create_u8           (transpose),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(value_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLPROGRAMUNIFORMMATRIX2FV,
@@ -72,11 +76,11 @@ void AI_APIENTRY OpenGL::aiProgramUniformMatrix2fv(GLuint         program,
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_u32      (program),
-            APIInterceptor::APIFunctionArgument::create_i32      (location),
-            APIInterceptor::APIFunctionArgument::create_i32      (count),
-            APIInterceptor::APIFunctionArgument::create_u8       (transpose),
-            APIInterceptor::APIFunctionArgument::create_fp32_ptr (value),
+            APIInterceptor::APIFunctionArgument::create_u32          (program),
+            APIInterceptor::APIFunctionArgument::create_i32          (location),
+            APIInterceptor::APIFunctionArgument::create_i32          (count),
+            APIInterceptor::APIFunctionArgument::create_u8           (transpose),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(value_chunk.get_id() ),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLPROGRAMUNIFORMMATRIX2FV,

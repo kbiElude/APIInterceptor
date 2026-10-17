@@ -192,6 +192,8 @@ rem    build_x64\bin\<Config>\APIDumperDLL.dll -> build_final\APIDumperDLL_x64.d
 rem    build_x86\bin\<Config>\APIDumperDLL.dll -> build_final\APIDumperDLL_x86.dll
 rem    build_x64\bin\<Config>\APIDumper.exe    -> build_final\APIDumper_x64.exe
 rem    build_x86\bin\<Config>\APIDumper.exe    -> build_final\APIDumper_x86.exe
+rem    build_x86in<Config>APIDumpPlayer_x86.exe, APIDumpReplayer_x86.dll -> build_final (names are built in)
+rem    build_x86\bin\<Config>\APIDumpPlayer_x86.exe and APIDumpReplayer_x86.dll are copied as-is.
 rem  All other x64 outputs (incl. APIDumpPrinter.exe, which reads dumps from
 rem  either architecture) are copied as-is.
 
@@ -247,6 +249,19 @@ copy /y "%BUILD_X86_DIR%\bin\%BUILD_CONFIG%\APIDumperDLL.dll" "%BUILD_FINAL_DIR%
 if %errorlevel% neq 0 (
     echo [!] Failed to copy x86 APIDumperDLL.dll to build_final\APIDumperDLL_x86.dll.
     exit /b 1
+)
+
+rem Copy the 32-bit player and its DLL; the 64-bit player hands D3D8 workloads over to them.
+for %%F in (APIDumpPlayer_x86.exe APIDumpReplayer_x86.dll) do (
+    if not exist "%BUILD_X86_DIR%\bin\%BUILD_CONFIG%\%%F" (
+        echo [!] x86 %%F not found at build_x86\bin\%BUILD_CONFIG%\%%F.
+        exit /b 1
+    )
+    copy /y "%BUILD_X86_DIR%\bin\%BUILD_CONFIG%\%%F" "%BUILD_FINAL_DIR%\%%F" >nul
+    if errorlevel 1 (
+        echo [!] Failed to copy x86 %%F to build_final\%%F.
+        exit /b 1
+    )
 )
 
 echo [*] Binaries are ready in: %BUILD_FINAL_DIR%

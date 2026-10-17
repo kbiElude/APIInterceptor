@@ -5,6 +5,7 @@
 #include "Common/callbacks.h"
 #include "Common/logger.h"
 #include "Common/macros.h"
+#include "Common/memory_chunk.h"
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL4.1/gl_vertex_attrib_l3dv.h"
 #include "OpenGL/globals.h"
@@ -19,6 +20,9 @@ void AI_APIENTRY OpenGL::aiVertexAttribL3dv(GLuint          index,
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
     APIInterceptor::Tracker                 tracker;
+    APIInterceptor::MemoryChunk             v_chunk(v,
+                                                    3,
+                                                    sizeof(GLdouble));
 
     if (tracker.is_top_level_api_call() )
     {
@@ -32,8 +36,8 @@ void AI_APIENTRY OpenGL::aiVertexAttribL3dv(GLuint          index,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32      (index),
-                APIInterceptor::APIFunctionArgument::create_fp64_ptr (v),
+                APIInterceptor::APIFunctionArgument::create_u32          (index),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(v_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLVERTEXATTRIBL3DV,
@@ -60,8 +64,8 @@ void AI_APIENTRY OpenGL::aiVertexAttribL3dv(GLuint          index,
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_u32      (index),
-            APIInterceptor::APIFunctionArgument::create_fp64_ptr (v),
+            APIInterceptor::APIFunctionArgument::create_u32          (index),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(v_chunk.get_id() ),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLVERTEXATTRIBL3DV,

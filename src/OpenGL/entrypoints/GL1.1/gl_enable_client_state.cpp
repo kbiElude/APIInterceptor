@@ -8,6 +8,7 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL1.1/gl_enable_client_state.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/state_tracker.h"
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
@@ -47,6 +48,23 @@ void AI_APIENTRY OpenGL::aiEnableClientState(GLenum array)
     if (should_pass_through)
     {
         reinterpret_cast<PFNGLENABLECLIENTSTATEPROC>(OpenGL::g_cached_gl_enable_client_state)(array);
+    }
+
+    if (tracker.is_top_level_api_call() )
+    {
+        OpenGL::ClientArrayKind kind;
+        auto&                   context = OpenGL::get_context_state();
+
+        if (OpenGL::ClientArrayManager::get_kind_for_array_enum(array,
+                                                             &kind) )
+        {
+            const uint32_t index = (kind == OpenGL::ClientArrayKind::TEX_COORD) ? context.client_array_manager.get_client_active_texture()
+                                                                                : 0;
+
+            context.client_array_manager.set_enabled(kind,
+                                                   index,
+                                                   true);  /* in_is_enabled */
+        }
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLENABLECLIENTSTATE,

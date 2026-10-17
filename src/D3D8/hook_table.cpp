@@ -8,7 +8,7 @@
 
 D3D8::HookTable::HookTable()
 {
-    m_hook_entry_vec_vec.resize(static_cast<uint32_t>(Interface::Count) );
+    m_hook_entry_vec_vec.resize(static_cast<uint32_t>(Interface::COUNT) );
 
     #define D3D8_METHOD(INTERFACE_TAG, interface_name, METHOD_TAG, method_name, vtable_index, return_type, parameters) \
         m_hook_entry_vec_vec.at(static_cast<uint32_t>(Interface::INTERFACE_TAG) ).push_back( \
@@ -21,14 +21,7 @@ D3D8::HookTable::HookTable()
     #undef D3D8_METHOD
 }
 
-D3D8::HookTable* D3D8::HookTable::get_ptr()
-{
-    static HookTable instance;
-
-    return &instance;
-}
-
-void D3D8::HookTable::get_hook_entries(const Interface& in_interface,
+void D3D8::HookTable::get_hook_entries(const Interface&  in_interface,
                                        const HookEntry** out_hook_entry_array_ptr_ptr,
                                        uint32_t*         out_n_hook_entries_ptr) const
 {
@@ -44,6 +37,13 @@ void D3D8::HookTable::get_hook_entries(const Interface& in_interface,
         *out_hook_entry_array_ptr_ptr = hook_entry_vec.data();
         *out_n_hook_entries_ptr       = static_cast<uint32_t>(hook_entry_vec.size() );
     }
+}
+
+D3D8::HookTable* D3D8::HookTable::get_ptr()
+{
+    static HookTable instance;
+
+    return &instance;
 }
 
 void D3D8::HookTable::patch_object(const Interface& in_interface,

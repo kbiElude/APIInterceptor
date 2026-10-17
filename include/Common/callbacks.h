@@ -50,8 +50,25 @@ namespace APIInterceptor
                           const uint32_t&                     in_n_data_chunks,
                           std::vector<std::vector<uint8_t> >* out_data_chunk_vec_ptr);
 
+    /* The dumper cuts the workload into segments, and a cut must not fall between the moment a call registers its data
+     * chunks and the moment the call is recorded. For that, it closes a gate which every thread passes when it enters
+     * an intercepted API call (see Tracker and GateScope), and waits for the threads which are inside one to leave.
+     *
+     * Must be called from within an intercepted API call (e.g. from a callback). Returns false, and leaves the gate
+     * open, if other threads are still inside intercepted calls after in_timeout_ms. Otherwise, other threads are held
+     * back from entering intercepted calls until resume_api_calls() is called.
+     */
+    void resume_api_calls     ();
+    bool try_quiesce_api_calls(const uint32_t& in_timeout_ms);
+
     void on_api_call_interception_finished();
     bool on_api_call_interception_started ();
+
+    /* Used by Tracker and GateScope: the thread counts as being inside an intercepted API call from the first scope it
+     * enters to the last one it leaves.
+     */
+    void on_gate_scope_entered();
+    void on_gate_scope_left   ();
 }
 
 #endif /* COMMON_CALLBACKS_H */

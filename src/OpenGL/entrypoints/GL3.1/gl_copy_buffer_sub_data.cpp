@@ -41,9 +41,9 @@ void AI_APIENTRY OpenGL::aiCopyBufferSubData(GLenum     readTarget,
             {
                 APIInterceptor::APIFunctionArgument::create_u32_glenum(readTarget),
                 APIInterceptor::APIFunctionArgument::create_u32_glenum(writeTarget),
-                APIInterceptor::APIFunctionArgument::create_i32       (static_cast<int32_t>(readOffset) ),
-                APIInterceptor::APIFunctionArgument::create_i32       (static_cast<int32_t>(writeOffset) ),
-                APIInterceptor::APIFunctionArgument::create_i32       (static_cast<int32_t>(size) ),
+                APIInterceptor::APIFunctionArgument::create_i64       (static_cast<int64_t>(readOffset) ),
+                APIInterceptor::APIFunctionArgument::create_i64       (static_cast<int64_t>(writeOffset) ),
+                APIInterceptor::APIFunctionArgument::create_i64       (static_cast<int64_t>(size) ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLCOPYBUFFERSUBDATA,
@@ -75,9 +75,9 @@ void AI_APIENTRY OpenGL::aiCopyBufferSubData(GLenum     readTarget,
         {
             APIInterceptor::APIFunctionArgument::create_u32_glenum(readTarget),
             APIInterceptor::APIFunctionArgument::create_u32_glenum(writeTarget),
-            APIInterceptor::APIFunctionArgument::create_i32       (static_cast<int32_t>(readOffset) ),
-            APIInterceptor::APIFunctionArgument::create_i32       (static_cast<int32_t>(writeOffset) ),
-            APIInterceptor::APIFunctionArgument::create_i32       (static_cast<int32_t>(size) ),
+            APIInterceptor::APIFunctionArgument::create_i64       (static_cast<int64_t>(readOffset) ),
+            APIInterceptor::APIFunctionArgument::create_i64       (static_cast<int64_t>(writeOffset) ),
+            APIInterceptor::APIFunctionArgument::create_i64       (static_cast<int64_t>(size) ),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLCOPYBUFFERSUBDATA,

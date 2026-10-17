@@ -279,13 +279,13 @@ std::string APIDumpPrinter::D3D8Decoder::format_resource_properties(const uint32
                                                                     const uint32_t& in_usage,
                                                                     const uint32_t& in_pool)
 {
-    const std::string format_name = format_enum(D3D8::ValueKind::Format,
+    const std::string format_name = format_enum(D3D8::ValueKind::FORMAT,
                                                 in_format);
-    const std::string pool_name   = format_enum(D3D8::ValueKind::Pool,
+    const std::string pool_name   = format_enum(D3D8::ValueKind::POOL,
                                                 in_pool);
-    const std::string type_name   = format_enum(D3D8::ValueKind::ResourceType,
+    const std::string type_name   = format_enum(D3D8::ValueKind::RESOURCE_TYPE,
                                                 in_type);
-    const std::string usage_names = format_flags(D3D8::ValueKind::UsageFlags,
+    const std::string usage_names = format_flags(D3D8::ValueKind::USAGE_FLAGS,
                                                  in_usage);
 
     return "Format=" + format_name + " Type=" + type_name + " Usage=" + usage_names + " Pool=" + pool_name;
@@ -298,21 +298,21 @@ std::string APIDumpPrinter::D3D8Decoder::format_state_value(const StateValueInfo
 
     switch (in_info.format)
     {
-        case StateValueFormat::Boolean:
+        case StateValueFormat::BOOLEAN:
         {
             result = format_boolean(static_cast<int32_t>(in_value) );
 
             break;
         }
 
-        case StateValueFormat::Color:
+        case StateValueFormat::COLOR:
         {
             result = format_color(in_value);
 
             break;
         }
 
-        case StateValueFormat::Float:
+        case StateValueFormat::FLOAT:
         {
             float              value_fp32 = 0.0f;
             std::ostringstream stream;
@@ -328,14 +328,14 @@ std::string APIDumpPrinter::D3D8Decoder::format_state_value(const StateValueInfo
             break;
         }
 
-        case StateValueFormat::Hex:
+        case StateValueFormat::HEX:
         {
             result = format_hex(in_value);
 
             break;
         }
 
-        case StateValueFormat::Name:
+        case StateValueFormat::NAME:
         {
             for (uint32_t n_entry = 0;
                           n_entry < in_info.n_entries;
@@ -352,7 +352,7 @@ std::string APIDumpPrinter::D3D8Decoder::format_state_value(const StateValueInfo
             break;
         }
 
-        case StateValueFormat::TexCoordIndex:
+        case StateValueFormat::TEX_COORD_INDEX:
         {
             const uint32_t mode = in_value & D3D8::D3DTSS_TCI_MODE_MASK;
 
@@ -391,7 +391,7 @@ std::string APIDumpPrinter::D3D8Decoder::format_state_value(const StateValueInfo
             break;
         }
 
-        case StateValueFormat::TextureArgument:
+        case StateValueFormat::TEXTURE_ARGUMENT:
         {
             result = format_hex(in_value);
 
@@ -412,7 +412,7 @@ std::string APIDumpPrinter::D3D8Decoder::format_state_value(const StateValueInfo
             break;
         }
 
-        case StateValueFormat::TextureTransformFlags:
+        case StateValueFormat::TEXTURE_TRANSFORM_FLAGS:
         {
             const uint32_t n_coordinates = in_value & D3D8::D3DTTFF_COUNT_MASK;
 
@@ -487,7 +487,7 @@ bool APIDumpPrinter::D3D8Decoder::format_struct(const D3D8::ValueKind&      in_k
 
     switch (in_kind)
     {
-        case D3D8::ValueKind::AdapterIdentifier:
+        case D3D8::ValueKind::ADAPTER_IDENTIFIER:
         {
             D3D8::D3DADAPTER_IDENTIFIER8 value;
 
@@ -517,7 +517,7 @@ bool APIDumpPrinter::D3D8Decoder::format_struct(const D3D8::ValueKind&      in_k
             break;
         }
 
-        case D3D8::ValueKind::Box:
+        case D3D8::ValueKind::BOX:
         {
             D3D8::D3DBOX value;
 
@@ -533,7 +533,76 @@ bool APIDumpPrinter::D3D8Decoder::format_struct(const D3D8::ValueKind&      in_k
             break;
         }
 
-        case D3D8::ValueKind::ClipStatus:
+        case D3D8::ValueKind::CAPS:
+        {
+            D3D8::D3DCAPS8 value;
+
+            if (read_func(&value,
+                          sizeof(value) ))
+            {
+                stream << "{DeviceType=" << format_enum(D3D8::ValueKind::DEVICE_TYPE,
+                                                       static_cast<uint32_t>(value.DeviceType) )
+                       << " AdapterOrdinal=" << value.AdapterOrdinal
+                       << " Caps=" << format_hex(value.Caps)
+                       << " Caps2=" << format_hex(value.Caps2)
+                       << " Caps3=" << format_hex(value.Caps3)
+                       << " PresentationIntervals=" << format_hex(value.PresentationIntervals)
+                       << " CursorCaps=" << format_hex(value.CursorCaps)
+                       << " DevCaps=" << format_hex(value.DevCaps)
+                       << " PrimitiveMiscCaps=" << format_hex(value.PrimitiveMiscCaps)
+                       << " RasterCaps=" << format_hex(value.RasterCaps)
+                       << " ZCmpCaps=" << format_hex(value.ZCmpCaps)
+                       << " SrcBlendCaps=" << format_hex(value.SrcBlendCaps)
+                       << " DestBlendCaps=" << format_hex(value.DestBlendCaps)
+                       << " AlphaCmpCaps=" << format_hex(value.AlphaCmpCaps)
+                       << " ShadeCaps=" << format_hex(value.ShadeCaps)
+                       << " TextureCaps=" << format_hex(value.TextureCaps)
+                       << " TextureFilterCaps=" << format_hex(value.TextureFilterCaps)
+                       << " CubeTextureFilterCaps=" << format_hex(value.CubeTextureFilterCaps)
+                       << " VolumeTextureFilterCaps=" << format_hex(value.VolumeTextureFilterCaps)
+                       << " TextureAddressCaps=" << format_hex(value.TextureAddressCaps)
+                       << " VolumeTextureAddressCaps=" << format_hex(value.VolumeTextureAddressCaps)
+                       << " LineCaps=" << format_hex(value.LineCaps)
+                       << " MaxTextureWidth=" << value.MaxTextureWidth
+                       << " MaxTextureHeight=" << value.MaxTextureHeight
+                       << " MaxVolumeExtent=" << value.MaxVolumeExtent
+                       << " MaxTextureRepeat=" << value.MaxTextureRepeat
+                       << " MaxTextureAspectRatio=" << value.MaxTextureAspectRatio
+                       << " MaxAnisotropy=" << value.MaxAnisotropy
+                       << " MaxVertexW=" << value.MaxVertexW
+                       << " GuardBandLeft=" << value.GuardBandLeft
+                       << " GuardBandTop=" << value.GuardBandTop
+                       << " GuardBandRight=" << value.GuardBandRight
+                       << " GuardBandBottom=" << value.GuardBandBottom
+                       << " ExtentsAdjust=" << value.ExtentsAdjust
+                       << " StencilCaps=" << format_hex(value.StencilCaps)
+                       << " FVFCaps=" << format_hex(value.FVFCaps)
+                       << " TextureOpCaps=" << format_hex(value.TextureOpCaps)
+                       << " MaxTextureBlendStages=" << value.MaxTextureBlendStages
+                       << " MaxSimultaneousTextures=" << value.MaxSimultaneousTextures
+                       << " VertexProcessingCaps=" << format_hex(value.VertexProcessingCaps)
+                       << " MaxActiveLights=" << value.MaxActiveLights
+                       << " MaxUserClipPlanes=" << value.MaxUserClipPlanes
+                       << " MaxVertexBlendMatrices=" << value.MaxVertexBlendMatrices
+                       << " MaxVertexBlendMatrixIndex=" << value.MaxVertexBlendMatrixIndex
+                       << " MaxPointSize=" << value.MaxPointSize
+                       << " MaxPrimitiveCount=" << value.MaxPrimitiveCount
+                       << " MaxVertexIndex=" << value.MaxVertexIndex
+                       << " MaxStreams=" << value.MaxStreams
+                       << " MaxStreamStride=" << value.MaxStreamStride
+                       << " VertexShaderVersion=" << format_hex(value.VertexShaderVersion)
+                       << " MaxVertexShaderConst=" << value.MaxVertexShaderConst
+                       << " PixelShaderVersion=" << format_hex(value.PixelShaderVersion)
+                       << " MaxPixelShaderValue=" << value.MaxPixelShaderValue
+                       << "}";
+
+                result = true;
+            }
+
+            break;
+        }
+
+        case D3D8::ValueKind::CLIP_STATUS:
         {
             D3D8::D3DCLIPSTATUS8 value;
 
@@ -548,7 +617,7 @@ bool APIDumpPrinter::D3D8Decoder::format_struct(const D3D8::ValueKind&      in_k
             break;
         }
 
-        case D3D8::ValueKind::CreationParameters:
+        case D3D8::ValueKind::CREATION_PARAMETERS:
         {
             /* The layout depends on the pointer size of the dumped process. */
             const size_t pointer_size = (in_chunk_u8_vec.size() == CREATION_PARAMETERS_N_BYTES_32) ? POINTER_N_BYTES_32
@@ -558,9 +627,9 @@ bool APIDumpPrinter::D3D8Decoder::format_struct(const D3D8::ValueKind&      in_k
                 in_chunk_u8_vec.size() == CREATION_PARAMETERS_N_BYTES_64)
             {
                 stream << "{AdapterOrdinal=" << read_u32_func(0 * sizeof(uint32_t))
-                       << " DeviceType=" << format_enum(D3D8::ValueKind::DeviceType,
+                       << " DeviceType=" << format_enum(D3D8::ValueKind::DEVICE_TYPE,
                                                         read_u32_func(1 * sizeof(uint32_t)) )
-                       << " BehaviorFlags=" << format_flags(D3D8::ValueKind::CreateFlags,
+                       << " BehaviorFlags=" << format_flags(D3D8::ValueKind::CREATE_FLAGS,
                                                             read_u32_func(CREATION_PARAMETERS_HEAD_N_BYTES + pointer_size) ) << "}";
 
                 result = true;
@@ -569,7 +638,7 @@ bool APIDumpPrinter::D3D8Decoder::format_struct(const D3D8::ValueKind&      in_k
             break;
         }
 
-        case D3D8::ValueKind::DisplayMode:
+        case D3D8::ValueKind::DISPLAY_MODE:
         {
             D3D8::D3DDISPLAYMODE value;
 
@@ -577,7 +646,7 @@ bool APIDumpPrinter::D3D8Decoder::format_struct(const D3D8::ValueKind&      in_k
                           sizeof(value) ))
             {
                 stream << "{Width=" << value.Width << " Height=" << value.Height << " RefreshRate=" << value.RefreshRate
-                       << " Format=" << format_enum(D3D8::ValueKind::Format,
+                       << " Format=" << format_enum(D3D8::ValueKind::FORMAT,
                                                     value.Format) << "}";
 
                 result = true;
@@ -586,7 +655,36 @@ bool APIDumpPrinter::D3D8Decoder::format_struct(const D3D8::ValueKind&      in_k
             break;
         }
 
-        case D3D8::ValueKind::GammaRamp:
+        case D3D8::ValueKind::FLOAT_ARRAY:
+        {
+            if (in_chunk_u8_vec.size() % sizeof(float) == 0)
+            {
+                const size_t n_floats = in_chunk_u8_vec.size() / sizeof(float);
+
+                stream << "[";
+
+                for (size_t n_float = 0;
+                            n_float < n_floats && n_float < MAX_N_DISPLAYED_ITEMS;
+                          ++n_float)
+                {
+                    float value;
+
+                    ::memcpy(&value,
+                             in_chunk_u8_vec.data() + n_float * sizeof(float),
+                             sizeof(float) );
+
+                    stream << ((n_float == 0) ? "" : " ") << value;
+                }
+
+                stream << ((n_floats > MAX_N_DISPLAYED_ITEMS) ? " ..." : "") << "]";
+
+                result = true;
+            }
+
+            break;
+        }
+
+        case D3D8::ValueKind::GAMMA_RAMP:
         {
             D3D8::D3DGAMMARAMP value;
 
@@ -605,7 +703,7 @@ bool APIDumpPrinter::D3D8Decoder::format_struct(const D3D8::ValueKind&      in_k
             break;
         }
 
-        case D3D8::ValueKind::Guid:
+        case D3D8::ValueKind::GUID:
         {
             GUID value;
 
@@ -637,7 +735,7 @@ bool APIDumpPrinter::D3D8Decoder::format_struct(const D3D8::ValueKind&      in_k
             break;
         }
 
-        case D3D8::ValueKind::IndexBufferDesc:
+        case D3D8::ValueKind::INDEX_BUFFER_DESC:
         {
             D3D8::D3DINDEXBUFFER_DESC value;
 
@@ -656,14 +754,14 @@ bool APIDumpPrinter::D3D8Decoder::format_struct(const D3D8::ValueKind&      in_k
             break;
         }
 
-        case D3D8::ValueKind::Light:
+        case D3D8::ValueKind::LIGHT:
         {
             D3D8::D3DLIGHT8 value;
 
             if (read_func(&value,
                           sizeof(value) ))
             {
-                stream << "{Type=" << format_enum(D3D8::ValueKind::LightType,
+                stream << "{Type=" << format_enum(D3D8::ValueKind::LIGHT_TYPE,
                                                   value.Type)
                        << " Diffuse=" << format_color_value(value.Diffuse)
                        << " Specular=" << format_color_value(value.Specular)
@@ -682,7 +780,7 @@ bool APIDumpPrinter::D3D8Decoder::format_struct(const D3D8::ValueKind&      in_k
             break;
         }
 
-        case D3D8::ValueKind::LockedBox:
+        case D3D8::ValueKind::LOCKED_BOX:
         {
             /* The layout depends on the pointer size of the dumped process. */
             if (in_chunk_u8_vec.size() == LOCKED_BOX_N_BYTES_32 ||
@@ -704,7 +802,7 @@ bool APIDumpPrinter::D3D8Decoder::format_struct(const D3D8::ValueKind&      in_k
             break;
         }
 
-        case D3D8::ValueKind::LockedRect:
+        case D3D8::ValueKind::LOCKED_RECT:
         {
             /* The layout depends on the pointer size of the dumped process. */
             if (in_chunk_u8_vec.size() == LOCKED_RECT_N_BYTES_32 ||
@@ -727,7 +825,7 @@ bool APIDumpPrinter::D3D8Decoder::format_struct(const D3D8::ValueKind&      in_k
             break;
         }
 
-        case D3D8::ValueKind::Material:
+        case D3D8::ValueKind::MATERIAL:
         {
             D3D8::D3DMATERIAL8 value;
 
@@ -746,7 +844,7 @@ bool APIDumpPrinter::D3D8Decoder::format_struct(const D3D8::ValueKind&      in_k
             break;
         }
 
-        case D3D8::ValueKind::Matrix:
+        case D3D8::ValueKind::MATRIX:
         {
             D3D8::D3DMATRIX value;
 
@@ -771,7 +869,7 @@ bool APIDumpPrinter::D3D8Decoder::format_struct(const D3D8::ValueKind&      in_k
             break;
         }
 
-        case D3D8::ValueKind::PointArray:
+        case D3D8::ValueKind::POINT_ARRAY:
         {
             if (in_chunk_u8_vec.size() % sizeof(POINT) == 0)
             {
@@ -796,7 +894,7 @@ bool APIDumpPrinter::D3D8Decoder::format_struct(const D3D8::ValueKind&      in_k
             break;
         }
 
-        case D3D8::ValueKind::PresentParameters:
+        case D3D8::ValueKind::PRESENT_PARAMETERS:
         {
             /* The layout depends on the pointer size of the dumped process. */
             const size_t pointer_size = (in_chunk_u8_vec.size() == PRESENT_PARAMETERS_N_BYTES_32) ? POINTER_N_BYTES_32
@@ -809,16 +907,16 @@ bool APIDumpPrinter::D3D8Decoder::format_struct(const D3D8::ValueKind&      in_k
 
                 stream << "{BackBufferWidth=" << read_u32_func(0 * sizeof(uint32_t))
                        << " BackBufferHeight=" << read_u32_func(1 * sizeof(uint32_t))
-                       << " BackBufferFormat=" << format_enum(D3D8::ValueKind::Format,
+                       << " BackBufferFormat=" << format_enum(D3D8::ValueKind::FORMAT,
                                                               read_u32_func(2 * sizeof(uint32_t)) )
                        << " BackBufferCount=" << read_u32_func(3 * sizeof(uint32_t))
-                       << " MultiSampleType=" << format_enum(D3D8::ValueKind::MultiSampleType,
+                       << " MultiSampleType=" << format_enum(D3D8::ValueKind::MULTI_SAMPLE_TYPE,
                                                              read_u32_func(4 * sizeof(uint32_t)) )
-                       << " SwapEffect=" << format_enum(D3D8::ValueKind::SwapEffect,
+                       << " SwapEffect=" << format_enum(D3D8::ValueKind::SWAP_EFFECT,
                                                         read_u32_func(5 * sizeof(uint32_t)) )
                        << " Windowed=" << format_boolean(static_cast<int32_t>(read_u32_func(tail_offset + 0 * sizeof(uint32_t)) ))
                        << " EnableAutoDepthStencil=" << format_boolean(static_cast<int32_t>(read_u32_func(tail_offset + 1 * sizeof(uint32_t)) ))
-                       << " AutoDepthStencilFormat=" << format_enum(D3D8::ValueKind::Format,
+                       << " AutoDepthStencilFormat=" << format_enum(D3D8::ValueKind::FORMAT,
                                                                     read_u32_func(tail_offset + 2 * sizeof(uint32_t)) )
                        << " Flags=" << format_hex(read_u32_func(tail_offset + 3 * sizeof(uint32_t)) )
                        << " FullScreen_RefreshRateInHz=" << read_u32_func(tail_offset + 4 * sizeof(uint32_t))
@@ -830,7 +928,7 @@ bool APIDumpPrinter::D3D8Decoder::format_struct(const D3D8::ValueKind&      in_k
             break;
         }
 
-        case D3D8::ValueKind::RasterStatus:
+        case D3D8::ValueKind::RASTER_STATUS:
         {
             D3D8::D3DRASTER_STATUS value;
 
@@ -845,7 +943,7 @@ bool APIDumpPrinter::D3D8Decoder::format_struct(const D3D8::ValueKind&      in_k
             break;
         }
 
-        case D3D8::ValueKind::Rect:
+        case D3D8::ValueKind::RECT:
         {
             RECT value;
 
@@ -860,7 +958,7 @@ bool APIDumpPrinter::D3D8Decoder::format_struct(const D3D8::ValueKind&      in_k
             break;
         }
 
-        case D3D8::ValueKind::RectArray:
+        case D3D8::ValueKind::RECT_ARRAY:
         {
             /* D3DRECT and RECT are both four 32-bit integers. */
             if (in_chunk_u8_vec.size() % sizeof(RECT) == 0)
@@ -888,7 +986,30 @@ bool APIDumpPrinter::D3D8Decoder::format_struct(const D3D8::ValueKind&      in_k
             break;
         }
 
-        case D3D8::ValueKind::SurfaceDesc:
+        case D3D8::ValueKind::RECT_PATCH_INFO:
+        {
+            D3D8::D3DRECTPATCH_INFO value;
+
+            if (read_func(&value,
+                          sizeof(value) ))
+            {
+                stream << "{StartVertexOffsetWidth=" << value.StartVertexOffsetWidth
+                       << " StartVertexOffsetHeight=" << value.StartVertexOffsetHeight
+                       << " Width=" << value.Width
+                       << " Height=" << value.Height
+                       << " Stride=" << value.Stride
+                       << " Basis=" << format_enum(D3D8::ValueKind::BASIS_TYPE,
+                                                   value.Basis)
+                       << " Order=" << format_enum(D3D8::ValueKind::ORDER_TYPE,
+                                                   value.Order) << "}";
+
+                result = true;
+            }
+
+            break;
+        }
+
+        case D3D8::ValueKind::SURFACE_DESC:
         {
             D3D8::D3DSURFACE_DESC value;
 
@@ -900,7 +1021,7 @@ bool APIDumpPrinter::D3D8Decoder::format_struct(const D3D8::ValueKind&      in_k
                                                             value.Usage,
                                                             value.Pool)
                        << " Size=" << value.Size
-                       << " MultiSampleType=" << format_enum(D3D8::ValueKind::MultiSampleType,
+                       << " MultiSampleType=" << format_enum(D3D8::ValueKind::MULTI_SAMPLE_TYPE,
                                                              value.MultiSampleType)
                        << " Width=" << value.Width
                        << " Height=" << value.Height << "}";
@@ -911,7 +1032,27 @@ bool APIDumpPrinter::D3D8Decoder::format_struct(const D3D8::ValueKind&      in_k
             break;
         }
 
-        case D3D8::ValueKind::VertexBufferDesc:
+        case D3D8::ValueKind::TRI_PATCH_INFO:
+        {
+            D3D8::D3DTRIPATCH_INFO value;
+
+            if (read_func(&value,
+                          sizeof(value) ))
+            {
+                stream << "{StartVertexOffset=" << value.StartVertexOffset
+                       << " NumVertices=" << value.NumVertices
+                       << " Basis=" << format_enum(D3D8::ValueKind::BASIS_TYPE,
+                                                   value.Basis)
+                       << " Order=" << format_enum(D3D8::ValueKind::ORDER_TYPE,
+                                                   value.Order) << "}";
+
+                result = true;
+            }
+
+            break;
+        }
+
+        case D3D8::ValueKind::VERTEX_BUFFER_DESC:
         {
             D3D8::D3DVERTEXBUFFER_DESC value;
 
@@ -931,7 +1072,7 @@ bool APIDumpPrinter::D3D8Decoder::format_struct(const D3D8::ValueKind&      in_k
             break;
         }
 
-        case D3D8::ValueKind::Viewport:
+        case D3D8::ValueKind::VIEWPORT:
         {
             D3D8::D3DVIEWPORT8 value;
 
@@ -947,7 +1088,7 @@ bool APIDumpPrinter::D3D8Decoder::format_struct(const D3D8::ValueKind&      in_k
             break;
         }
 
-        case D3D8::ValueKind::VolumeDesc:
+        case D3D8::ValueKind::VOLUME_DESC:
         {
             D3D8::D3DVOLUME_DESC value;
 
@@ -1036,7 +1177,7 @@ bool APIDumpPrinter::D3D8Decoder::print_argument(FILE*                          
 
     switch (info.kind)
     {
-        case D3D8::ValueKind::Boolean:
+        case D3D8::ValueKind::BOOLEAN:
         {
             if (in_argument.type != APIInterceptor::ARGTYPE_I32)
             {
@@ -1049,19 +1190,19 @@ bool APIDumpPrinter::D3D8Decoder::print_argument(FILE*                          
             break;
         }
 
-        case D3D8::ValueKind::BackBufferType:
-        case D3D8::ValueKind::CubeMapFace:
-        case D3D8::ValueKind::DeviceType:
-        case D3D8::ValueKind::Format:
-        case D3D8::ValueKind::MultiSampleType:
-        case D3D8::ValueKind::Pool:
-        case D3D8::ValueKind::PrimitiveType:
-        case D3D8::ValueKind::RenderStateType:
-        case D3D8::ValueKind::ResourceType:
-        case D3D8::ValueKind::StateBlockType:
-        case D3D8::ValueKind::SwapEffect:
-        case D3D8::ValueKind::TextureStageStateType:
-        case D3D8::ValueKind::TransformStateType:
+        case D3D8::ValueKind::BACK_BUFFER_TYPE:
+        case D3D8::ValueKind::CUBE_MAP_FACE:
+        case D3D8::ValueKind::DEVICE_TYPE:
+        case D3D8::ValueKind::FORMAT:
+        case D3D8::ValueKind::MULTI_SAMPLE_TYPE:
+        case D3D8::ValueKind::POOL:
+        case D3D8::ValueKind::PRIMITIVE_TYPE:
+        case D3D8::ValueKind::RENDER_STATE_TYPE:
+        case D3D8::ValueKind::RESOURCE_TYPE:
+        case D3D8::ValueKind::STATE_BLOCK_TYPE:
+        case D3D8::ValueKind::SWAP_EFFECT:
+        case D3D8::ValueKind::TEXTURE_STAGE_STATE_TYPE:
+        case D3D8::ValueKind::TRANSFORM_STATE_TYPE:
         {
             if (in_argument.type != APIInterceptor::ARGTYPE_U32)
             {
@@ -1075,10 +1216,10 @@ bool APIDumpPrinter::D3D8Decoder::print_argument(FILE*                          
             break;
         }
 
-        case D3D8::ValueKind::ClearFlags:
-        case D3D8::ValueKind::CreateFlags:
-        case D3D8::ValueKind::LockFlags:
-        case D3D8::ValueKind::UsageFlags:
+        case D3D8::ValueKind::CLEAR_FLAGS:
+        case D3D8::ValueKind::CREATE_FLAGS:
+        case D3D8::ValueKind::LOCK_FLAGS:
+        case D3D8::ValueKind::USAGE_FLAGS:
         {
             if (in_argument.type != APIInterceptor::ARGTYPE_U32)
             {
@@ -1092,7 +1233,7 @@ bool APIDumpPrinter::D3D8Decoder::print_argument(FILE*                          
             break;
         }
 
-        case D3D8::ValueKind::Color:
+        case D3D8::ValueKind::COLOR:
         {
             if (in_argument.type != APIInterceptor::ARGTYPE_U32)
             {
@@ -1105,7 +1246,7 @@ bool APIDumpPrinter::D3D8Decoder::print_argument(FILE*                          
             break;
         }
 
-        case D3D8::ValueKind::FvfFlags:
+        case D3D8::ValueKind::FVF_FLAGS:
         {
             if (in_argument.type != APIInterceptor::ARGTYPE_U32)
             {
@@ -1118,7 +1259,7 @@ bool APIDumpPrinter::D3D8Decoder::print_argument(FILE*                          
             break;
         }
 
-        case D3D8::ValueKind::Hresult:
+        case D3D8::ValueKind::HRESULT:
         {
             if (in_argument.type != APIInterceptor::ARGTYPE_I32)
             {
@@ -1131,7 +1272,7 @@ bool APIDumpPrinter::D3D8Decoder::print_argument(FILE*                          
             break;
         }
 
-        case D3D8::ValueKind::Object:
+        case D3D8::ValueKind::OBJECT:
         {
             if (in_argument.type != APIInterceptor::ARGTYPE_VOID_PTR)
             {
@@ -1145,7 +1286,7 @@ bool APIDumpPrinter::D3D8Decoder::print_argument(FILE*                          
             break;
         }
 
-        case D3D8::ValueKind::ObjectOut:
+        case D3D8::ValueKind::OBJECT_OUT:
         {
             if (in_argument.type != APIInterceptor::ARGTYPE_VOID_PTR)
             {
@@ -1165,8 +1306,8 @@ bool APIDumpPrinter::D3D8Decoder::print_argument(FILE*                          
             break;
         }
 
-        case D3D8::ValueKind::RenderStateValue:
-        case D3D8::ValueKind::TextureStageStateValue:
+        case D3D8::ValueKind::RENDER_STATE_VALUE:
+        case D3D8::ValueKind::TEXTURE_STAGE_STATE_VALUE:
         {
             if (in_argument.type != APIInterceptor::ARGTYPE_U32)
             {
@@ -1182,7 +1323,7 @@ bool APIDumpPrinter::D3D8Decoder::print_argument(FILE*                          
             StateValueInfo value_info;
             const uint32_t state = in_call.arg_in_vec.at(in_n_argument - 1).get_u32();
 
-            if (info.kind == D3D8::ValueKind::RenderStateValue)
+            if (info.kind == D3D8::ValueKind::RENDER_STATE_VALUE)
             {
                 get_render_state_value_info(state,
                                            &value_info);
@@ -1200,7 +1341,7 @@ bool APIDumpPrinter::D3D8Decoder::print_argument(FILE*                          
             break;
         }
 
-        case D3D8::ValueKind::Plain:
+        case D3D8::ValueKind::PLAIN:
         {
             break;
         }
@@ -1272,21 +1413,21 @@ bool APIDumpPrinter::D3D8Decoder::print_returned_value(FILE*                    
             goto end;
         }
 
-        if (info.kind              == D3D8::ValueKind::Hresult &&
+        if (info.kind              == D3D8::ValueKind::HRESULT &&
             in_returned_value.type == APIInterceptor::ARGTYPE_I32)
         {
             text   = format_hresult(in_returned_value.get_i32() );
             result = true;
         }
         else
-        if (info.kind              == D3D8::ValueKind::Boolean &&
+        if (info.kind              == D3D8::ValueKind::BOOLEAN &&
             in_returned_value.type == APIInterceptor::ARGTYPE_I32)
         {
             text   = format_boolean(in_returned_value.get_i32() );
             result = true;
         }
         else
-        if (info.kind              == D3D8::ValueKind::ResourceType &&
+        if (info.kind              == D3D8::ValueKind::RESOURCE_TYPE &&
             in_returned_value.type == APIInterceptor::ARGTYPE_U32)
         {
             text   = format_enum(info.kind,
@@ -1361,7 +1502,7 @@ void APIDumpPrinter::D3D8Decoder::register_created_objects(const APIDumpLoader::
                 continue;
             }
 
-            if (info.kind                               == D3D8::ValueKind::ObjectOut &&
+            if (info.kind                               == D3D8::ValueKind::OBJECT_OUT &&
                 in_call.arg_out_vec.at(n_argument).type == APIInterceptor::ARGTYPE_VOID_PTR)
             {
                 register_func(in_call.arg_out_vec.at(n_argument).get_ptr(),

@@ -10,10 +10,10 @@
 #include "OpenGL/globals.h"
 #include "WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetProgramPipelineInfoLog(GLuint    pipeline,
-                                                     GLsizei   bufSize,
-                                                     GLsizei*  length,
-                                                     GLchar*   infoLog)
+void AI_APIENTRY OpenGL::aiGetProgramPipelineInfoLog(GLuint   pipeline,
+                                                     GLsizei  bufSize,
+                                                     GLsizei* length,
+                                                     GLchar*  infoLog)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;

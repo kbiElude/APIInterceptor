@@ -8,6 +8,7 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL4.3/gl_get_program_resource_location_index.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/string_chunk.h"
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
@@ -15,6 +16,7 @@ GLint AI_APIENTRY OpenGL::aiGetProgramResourceLocationIndex(GLuint        progra
                                                             GLenum        programInterface,
                                                             const GLchar* name)
 {
+    OpenGL::StringChunk                     name_chunk(name);
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
@@ -36,9 +38,9 @@ GLint AI_APIENTRY OpenGL::aiGetProgramResourceLocationIndex(GLuint        progra
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32       (program),
-                APIInterceptor::APIFunctionArgument::create_u32_glenum(programInterface),
-                APIInterceptor::APIFunctionArgument::create_i8_ptr    (name),
+                APIInterceptor::APIFunctionArgument::create_u32          (program),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum   (programInterface),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(name_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETPROGRAMRESOURCELOCATIONINDEX,

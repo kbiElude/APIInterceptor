@@ -41,7 +41,7 @@ void AI_APIENTRY OpenGL::aiVertexArrayVertexBuffer(GLuint   vaobj,
                 APIInterceptor::APIFunctionArgument::create_u32(vaobj),
                 APIInterceptor::APIFunctionArgument::create_u32(bindingindex),
                 APIInterceptor::APIFunctionArgument::create_u32(buffer),
-                APIInterceptor::APIFunctionArgument::create_i32(static_cast<GLint>(offset) ),
+                APIInterceptor::APIFunctionArgument::create_i64(static_cast<int64_t>(offset) ),
                 APIInterceptor::APIFunctionArgument::create_i32(stride),
             };
 
@@ -75,7 +75,7 @@ void AI_APIENTRY OpenGL::aiVertexArrayVertexBuffer(GLuint   vaobj,
             APIInterceptor::APIFunctionArgument::create_u32(vaobj),
             APIInterceptor::APIFunctionArgument::create_u32(bindingindex),
             APIInterceptor::APIFunctionArgument::create_u32(buffer),
-            APIInterceptor::APIFunctionArgument::create_i32(static_cast<GLint>(offset) ),
+            APIInterceptor::APIFunctionArgument::create_i64(static_cast<int64_t>(offset) ),
             APIInterceptor::APIFunctionArgument::create_i32(stride),
         };
 

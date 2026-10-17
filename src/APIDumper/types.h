@@ -12,7 +12,7 @@ namespace APIDumperLauncher
         X86,
         X64,
 
-        Unknown
+        UNKNOWN
     };
 }
 

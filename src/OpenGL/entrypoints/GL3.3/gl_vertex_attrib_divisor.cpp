@@ -8,6 +8,7 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL3.3/gl_vertex_attrib_divisor.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/state_tracker.h"
 #include "WGL/globals.h"
 
 void AI_APIENTRY OpenGL::aiVertexAttribDivisor(GLuint index,
@@ -50,6 +51,14 @@ void AI_APIENTRY OpenGL::aiVertexAttribDivisor(GLuint index,
     {
         reinterpret_cast<PFNGLVERTEXATTRIBDIVISORPROC>(OpenGL::g_cached_gl_vertex_attrib_divisor)(index,
                                                                                                    divisor);
+    }
+
+    if (tracker.is_top_level_api_call() )
+    {
+        auto& context = OpenGL::get_context_state();
+
+        context.client_array_manager.set_divisor(index,
+                                               divisor);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLVERTEXATTRIBDIVISOR,

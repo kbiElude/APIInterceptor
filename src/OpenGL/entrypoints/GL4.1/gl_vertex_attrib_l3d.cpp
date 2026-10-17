@@ -10,10 +10,10 @@
 #include "OpenGL/globals.h"
 #include "WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiVertexAttribL3d(GLuint    index,
-                                           GLdouble  x,
-                                           GLdouble  y,
-                                           GLdouble  z)
+void AI_APIENTRY OpenGL::aiVertexAttribL3d(GLuint   index,
+                                           GLdouble x,
+                                           GLdouble y,
+                                           GLdouble z)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;

@@ -26,7 +26,7 @@ GLsync AI_APIENTRY OpenGL::aiFenceSync(GLenum     condition,
     {
         AI_TRACE("glFenceSync(condition=[%s] flags=[%s])",
                  OpenGL::Utils::get_raw_string_for_gl_enum(condition),
-                 OpenGL::Utils::get_raw_string_for_gl_bitfield(OpenGL::BitfieldType::Sync_Condition_Mask, flags) );
+                 OpenGL::Utils::get_raw_string_for_gl_bitfield(OpenGL::BitfieldType::SYNC_CONDITION_MASK, flags) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLFENCESYNC,
                                                          &pre_callback_func_ptr,

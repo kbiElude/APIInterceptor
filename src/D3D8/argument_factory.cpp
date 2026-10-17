@@ -6,7 +6,7 @@
 #include "D3D8/argument_factory.h"
 
 APIInterceptor::APIFunctionArgument D3D8::ArgumentFactory::create_chunk(const void*     in_data_ptr,
-                                                                               const uint32_t& in_n_bytes)
+                                                                        const uint32_t& in_n_bytes)
 {
     const uint32_t n_bytes = (in_data_ptr != nullptr) ? in_n_bytes
                                                       : 0;

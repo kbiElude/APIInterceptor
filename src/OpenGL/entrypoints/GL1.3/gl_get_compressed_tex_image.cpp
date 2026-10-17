@@ -72,8 +72,8 @@ void AI_APIENTRY OpenGL::aiGetCompressedTexImage(GLenum target,
                                                              &binding_target) )
             {
                 const auto& context     = get_context_state              ();
-                const auto  texture_id  = context.bound_textures         [static_cast<size_t>(binding_target)];
-                const auto  level_props = context.get_texture_level_props(texture_id,
+                const auto  texture_id  = context.texture_manager.get_bound_texture(binding_target);
+                const auto  level_props = context.texture_manager.get_level_props(texture_id,
                                                                           level);
 
                 AI_ASSERT(level_props.compressed_size_bytes != 0);

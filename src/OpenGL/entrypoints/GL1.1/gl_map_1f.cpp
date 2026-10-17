@@ -5,9 +5,11 @@
 #include "Common/callbacks.h"
 #include "Common/logger.h"
 #include "Common/macros.h"
+#include "Common/memory_chunk.h"
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL1.1/gl_map_1f.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/param_counts.h"
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
@@ -18,6 +20,11 @@ void AI_APIENTRY OpenGL::aiMap1f(GLenum         target,
                                  GLint          order,
                                  const GLfloat* points)
 {
+    APIInterceptor::MemoryChunk             points_chunk(points,
+                                                         OpenGL::Utils::get_n_map1_values(target,
+                                                                                          stride,
+                                                                                          order),
+                                                         sizeof(GLfloat) );
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
@@ -41,12 +48,12 @@ void AI_APIENTRY OpenGL::aiMap1f(GLenum         target,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32_glenum(target),
-                APIInterceptor::APIFunctionArgument::create_fp32      (u1),
-                APIInterceptor::APIFunctionArgument::create_fp32      (u2),
-                APIInterceptor::APIFunctionArgument::create_i32       (stride),
-                APIInterceptor::APIFunctionArgument::create_i32       (order),
-                APIInterceptor::APIFunctionArgument::create_void_ptr  (points),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum   (target),
+                APIInterceptor::APIFunctionArgument::create_fp32         (u1),
+                APIInterceptor::APIFunctionArgument::create_fp32         (u2),
+                APIInterceptor::APIFunctionArgument::create_i32          (stride),
+                APIInterceptor::APIFunctionArgument::create_i32          (order),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(points_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLMAP1F,
@@ -77,12 +84,12 @@ void AI_APIENTRY OpenGL::aiMap1f(GLenum         target,
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_u32_glenum(target),
-            APIInterceptor::APIFunctionArgument::create_fp32      (u1),
-            APIInterceptor::APIFunctionArgument::create_fp32      (u2),
-            APIInterceptor::APIFunctionArgument::create_i32       (stride),
-            APIInterceptor::APIFunctionArgument::create_i32       (order),
-            APIInterceptor::APIFunctionArgument::create_void_ptr  (points),
+            APIInterceptor::APIFunctionArgument::create_u32_glenum   (target),
+            APIInterceptor::APIFunctionArgument::create_fp32         (u1),
+            APIInterceptor::APIFunctionArgument::create_fp32         (u2),
+            APIInterceptor::APIFunctionArgument::create_i32          (stride),
+            APIInterceptor::APIFunctionArgument::create_i32          (order),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(points_chunk.get_id() ),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLMAP1F,

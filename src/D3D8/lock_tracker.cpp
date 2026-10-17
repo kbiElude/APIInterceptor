@@ -4,13 +4,6 @@
  */
 #include "D3D8/lock_tracker.h"
 
-D3D8::LockTracker* D3D8::LockTracker::get_ptr()
-{
-    static LockTracker instance;
-
-    return &instance;
-}
-
 bool D3D8::LockTracker::get_lock(const void*     in_object_ptr,
                                  const uint32_t& in_level,
                                  LockRecord*     out_lock_record_ptr)
@@ -31,6 +24,13 @@ bool D3D8::LockTracker::get_lock(const void*     in_object_ptr,
     }
 
     return result;
+}
+
+D3D8::LockTracker* D3D8::LockTracker::get_ptr()
+{
+    static LockTracker instance;
+
+    return &instance;
 }
 
 void D3D8::LockTracker::on_locked(const void*       in_object_ptr,

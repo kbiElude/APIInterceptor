@@ -64,7 +64,8 @@ void AI_APIENTRY OpenGL::aiBindBuffer(GLenum target,
         {
             auto& context = OpenGL::get_context_state();
 
-            context.bound_buffers[static_cast<size_t>(binding_target)] = buffer;
+            context.buffer_manager.on_buffer_bound(binding_target,
+                                                   buffer);
         }
     }
 

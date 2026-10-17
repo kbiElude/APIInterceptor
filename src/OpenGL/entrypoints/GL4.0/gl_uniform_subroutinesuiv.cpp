@@ -5,6 +5,7 @@
 #include "Common/callbacks.h"
 #include "Common/logger.h"
 #include "Common/macros.h"
+#include "Common/memory_chunk.h"
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL4.0/gl_uniform_subroutinesuiv.h"
 #include "OpenGL/globals.h"
@@ -15,6 +16,9 @@ void AI_APIENTRY OpenGL::aiUniformSubroutinesuiv(GLenum        shadertype,
                                                  GLsizei       count,
                                                  const GLuint* indices)
 {
+    APIInterceptor::MemoryChunk             indices_chunk(indices,
+                                                          count,
+                                                          sizeof(GLuint));
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
@@ -35,9 +39,9 @@ void AI_APIENTRY OpenGL::aiUniformSubroutinesuiv(GLenum        shadertype,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32_glenum(shadertype),
-                APIInterceptor::APIFunctionArgument::create_i32       (count),
-                APIInterceptor::APIFunctionArgument::create_u32_ptr   (indices),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum   (shadertype),
+                APIInterceptor::APIFunctionArgument::create_i32          (count),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(indices_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLUNIFORMSUBROUTINESUIV,
@@ -65,9 +69,9 @@ void AI_APIENTRY OpenGL::aiUniformSubroutinesuiv(GLenum        shadertype,
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_u32_glenum(shadertype),
-            APIInterceptor::APIFunctionArgument::create_i32       (count),
-            APIInterceptor::APIFunctionArgument::create_u32_ptr   (indices),
+            APIInterceptor::APIFunctionArgument::create_u32_glenum   (shadertype),
+            APIInterceptor::APIFunctionArgument::create_i32          (count),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(indices_chunk.get_id() ),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLUNIFORMSUBROUTINESUIV,

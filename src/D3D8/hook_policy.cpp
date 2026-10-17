@@ -27,7 +27,7 @@ void D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DCUBETEXTURE8_LOC
                                                          static_cast<uint32_t>(sizeof(RECT) ));
 }
 
-void D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DCUBETEXTURE8_LOCKRECT>::on_call_finished(const bool&           in_is_success,
+void D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DCUBETEXTURE8_LOCKRECT>::on_call_finished(const bool&            in_is_success,
                                                                                                          IDirect3DCubeTexture8* in_self,
                                                                                                          D3DCUBEMAP_FACES       in_face,
                                                                                                          UINT                   in_level,
@@ -37,16 +37,16 @@ void D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DCUBETEXTURE8_LOC
 {
     if (in_is_success)
     {
-        D3DSURFACE_DESC description     = {};
-        const auto      get_description = reinterpret_cast<PFN_IDIRECT3DCUBETEXTURE8_GETLEVELDESC>(
-                                       VTableRegistry::get_ptr()->get_original_function_ptr(in_self,
-                                                                                            VTABLE_INDEX_IDIRECT3DCUBETEXTURE8_GETLEVELDESC) );
+        D3DSURFACE_DESC description              = {};
+        const auto      get_description_func_ptr = reinterpret_cast<PFN_IDIRECT3DCUBETEXTURE8_GETLEVELDESC>(
+                                                VTableRegistry::get_ptr()->get_original_function_ptr(in_self,
+                                                                                                     VTABLE_INDEX_IDIRECT3DCUBETEXTURE8_GETLEVELDESC) );
 
-        if (get_description != nullptr)
+        if (get_description_func_ptr != nullptr)
         {
-            get_description(in_self,
-                            in_level,
-                           &description);
+            get_description_func_ptr(in_self,
+                                     in_level,
+                                    &description);
         }
 
         HookPolicyHelper::on_rect_locked(in_self,
@@ -69,7 +69,7 @@ void D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DCUBETEXTURE8_UNL
                                                                                                            in_level) );
 }
 
-void D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DCUBETEXTURE8_UNLOCKRECT>::on_call_finished(const bool&           in_is_success,
+void D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DCUBETEXTURE8_UNLOCKRECT>::on_call_finished(const bool&            in_is_success,
                                                                                                            IDirect3DCubeTexture8* in_self,
                                                                                                            D3DCUBEMAP_FACES       in_face,
                                                                                                            UINT                   in_level)
@@ -158,15 +158,15 @@ void D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_CREATEVE
 }
 
 void D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_DRAWINDEXEDPRIMITIVEUP>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
-                                                                                                                         IDirect3DDevice8*                    in_self,
-                                                                                                                         D3DPRIMITIVETYPE                     in_primitive_type,
-                                                                                                                         UINT                                 in_min_vertex_index,
-                                                                                                                         UINT                                 in_n_vertex_indices,
-                                                                                                                         UINT                                 in_primitive_count,
-                                                                                                                         const void*                          in_index_data_ptr,
-                                                                                                                         D3DFORMAT                            in_index_data_format,
-                                                                                                                         const void*                          in_vertex_data_ptr,
-                                                                                                                         UINT                                 in_vertex_stride)
+                                                                                                                        IDirect3DDevice8*                    in_self,
+                                                                                                                        D3DPRIMITIVETYPE                     in_primitive_type,
+                                                                                                                        UINT                                 in_min_vertex_index,
+                                                                                                                        UINT                                 in_n_vertex_indices,
+                                                                                                                        UINT                                 in_primitive_count,
+                                                                                                                        const void*                          in_index_data_ptr,
+                                                                                                                        D3DFORMAT                            in_index_data_format,
+                                                                                                                        const void*                          in_vertex_data_ptr,
+                                                                                                                        UINT                                 in_vertex_stride)
 {
     const uint32_t index_stride = (in_index_data_format == D3DFMT_INDEX32) ? sizeof(uint32_t)
                                                                            : sizeof(uint16_t);
@@ -181,11 +181,11 @@ void D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_DRAWINDE
 }
 
 void D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_DRAWPRIMITIVEUP>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
-                                                                                                                  IDirect3DDevice8*                    in_self,
-                                                                                                                  D3DPRIMITIVETYPE                     in_primitive_type,
-                                                                                                                  UINT                                 in_primitive_count,
-                                                                                                                  const void*                          in_vertex_data_ptr,
-                                                                                                                  UINT                                 in_vertex_stride)
+                                                                                                                 IDirect3DDevice8*                    in_self,
+                                                                                                                 D3DPRIMITIVETYPE                     in_primitive_type,
+                                                                                                                 UINT                                 in_primitive_count,
+                                                                                                                 const void*                          in_vertex_data_ptr,
+                                                                                                                 UINT                                 in_vertex_stride)
 {
     (void) in_self;
 
@@ -194,10 +194,56 @@ void D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_DRAWPRIM
                                                                                           in_primitive_count) * in_vertex_stride);
 }
 
+void D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_DRAWRECTPATCH>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
+                                                                                                               IDirect3DDevice8*                    in_self,
+                                                                                                               UINT                                 in_handle,
+                                                                                                               const float*                         in_n_segments_ptr,
+                                                                                                               const D3DRECTPATCH_INFO*             in_rect_patch_info_ptr)
+{
+    constexpr uint32_t N_SEGMENT_COUNTS = 4; /* one per edge */
+
+    (void) in_self;
+    (void) in_handle;
+    (void) in_rect_patch_info_ptr;
+
+    out_arguments_ptr[0] = ArgumentFactory::create_chunk(in_n_segments_ptr,
+                                                         N_SEGMENT_COUNTS * sizeof(float) );
+}
+
+void D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_DRAWTRIPATCH>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
+                                                                                                              IDirect3DDevice8*                    in_self,
+                                                                                                              UINT                                 in_handle,
+                                                                                                              const float*                         in_n_segments_ptr,
+                                                                                                              const D3DTRIPATCH_INFO*              in_tri_patch_info_ptr)
+{
+    constexpr uint32_t N_SEGMENT_COUNTS = 3; /* one per edge */
+
+    (void) in_self;
+    (void) in_handle;
+    (void) in_tri_patch_info_ptr;
+
+    out_arguments_ptr[0] = ArgumentFactory::create_chunk(in_n_segments_ptr,
+                                                         N_SEGMENT_COUNTS * sizeof(float) );
+}
+
+void D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETCLIPPLANE>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
+                                                                                                               IDirect3DDevice8*                    in_self,
+                                                                                                               DWORD                                in_index,
+                                                                                                               const float*                         in_plane_ptr)
+{
+    constexpr uint32_t N_PLANE_COMPONENTS = 4;
+
+    (void) in_self;
+    (void) in_index;
+
+    out_arguments_ptr[0] = ArgumentFactory::create_chunk(in_plane_ptr,
+                                                         N_PLANE_COMPONENTS * static_cast<uint32_t>(sizeof(float) ));
+}
+
 void D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETPALETTEENTRIES>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
-                                                                                                                  IDirect3DDevice8*                    in_self,
-                                                                                                                  UINT                                 in_palette_number,
-                                                                                                                  const PALETTEENTRY*                  in_entries_ptr)
+                                                                                                                   IDirect3DDevice8*                    in_self,
+                                                                                                                   UINT                                 in_palette_number,
+                                                                                                                   const PALETTEENTRY*                  in_entries_ptr)
 {
     constexpr uint32_t PALETTE_N_ENTRIES = 256; /* a palette always has this many entries */
 
@@ -209,10 +255,10 @@ void D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETPALET
 }
 
 void D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETPIXELSHADERCONSTANT>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
-                                                                                                                         IDirect3DDevice8*                    in_self,
-                                                                                                                         DWORD                                in_register,
-                                                                                                                         const void*                          in_constant_data_ptr,
-                                                                                                                         DWORD                                in_constant_count)
+                                                                                                                        IDirect3DDevice8*                    in_self,
+                                                                                                                        DWORD                                in_register,
+                                                                                                                        const void*                          in_constant_data_ptr,
+                                                                                                                        DWORD                                in_constant_count)
 {
     constexpr uint32_t N_FLOATS_PER_CONSTANT = 4; /* a constant is a float4 */
 
@@ -224,10 +270,10 @@ void D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETPIXEL
 }
 
 void D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETVERTEXSHADERCONSTANT>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
-                                                                                                                          IDirect3DDevice8*                    in_self,
-                                                                                                                          DWORD                                in_register,
-                                                                                                                          const void*                          in_constant_data_ptr,
-                                                                                                                          DWORD                                in_constant_count)
+                                                                                                                         IDirect3DDevice8*                    in_self,
+                                                                                                                         DWORD                                in_register,
+                                                                                                                         const void*                          in_constant_data_ptr,
+                                                                                                                         DWORD                                in_constant_count)
 {
     constexpr uint32_t N_FLOATS_PER_CONSTANT = 4; /* a constant is a float4 */
 
@@ -247,15 +293,15 @@ void D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DINDEXBUFFER8_LOC
 {
     if (in_is_success)
     {
-        D3DINDEXBUFFER_DESC description     = {};
-        const auto          get_description = reinterpret_cast<PFN_IDIRECT3DINDEXBUFFER8_GETDESC>(
-                                           VTableRegistry::get_ptr()->get_original_function_ptr(in_self,
-                                                                                                VTABLE_INDEX_IDIRECT3DINDEXBUFFER8_GETDESC) );
+        D3DINDEXBUFFER_DESC description              = {};
+        const auto          get_description_func_ptr = reinterpret_cast<PFN_IDIRECT3DINDEXBUFFER8_GETDESC>(
+                                                    VTableRegistry::get_ptr()->get_original_function_ptr(in_self,
+                                                                                                         VTABLE_INDEX_IDIRECT3DINDEXBUFFER8_GETDESC) );
 
-        if (get_description != nullptr)
+        if (get_description_func_ptr != nullptr)
         {
-            get_description(in_self,
-                           &description);
+            get_description_func_ptr(in_self,
+                                    &description);
         }
 
         HookPolicyHelper::on_buffer_locked(in_self,
@@ -305,15 +351,15 @@ void D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DSURFACE8_LOCKREC
 {
     if (in_is_success)
     {
-        D3DSURFACE_DESC description     = {};
-        const auto      get_description = reinterpret_cast<PFN_IDIRECT3DSURFACE8_GETDESC>(
-                                       VTableRegistry::get_ptr()->get_original_function_ptr(in_self,
-                                                                                            VTABLE_INDEX_IDIRECT3DSURFACE8_GETDESC) );
+        D3DSURFACE_DESC description              = {};
+        const auto      get_description_func_ptr = reinterpret_cast<PFN_IDIRECT3DSURFACE8_GETDESC>(
+                                                VTableRegistry::get_ptr()->get_original_function_ptr(in_self,
+                                                                                                     VTABLE_INDEX_IDIRECT3DSURFACE8_GETDESC) );
 
-        if (get_description != nullptr)
+        if (get_description_func_ptr != nullptr)
         {
-            get_description(in_self,
-                           &description);
+            get_description_func_ptr(in_self,
+                                    &description);
         }
 
         HookPolicyHelper::on_rect_locked(in_self,
@@ -366,16 +412,16 @@ void D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DTEXTURE8_LOCKREC
 {
     if (in_is_success)
     {
-        D3DSURFACE_DESC description     = {};
-        const auto      get_description = reinterpret_cast<PFN_IDIRECT3DTEXTURE8_GETLEVELDESC>(
-                                       VTableRegistry::get_ptr()->get_original_function_ptr(in_self,
-                                                                                            VTABLE_INDEX_IDIRECT3DTEXTURE8_GETLEVELDESC) );
+        D3DSURFACE_DESC description              = {};
+        const auto      get_description_func_ptr = reinterpret_cast<PFN_IDIRECT3DTEXTURE8_GETLEVELDESC>(
+                                                VTableRegistry::get_ptr()->get_original_function_ptr(in_self,
+                                                                                                     VTABLE_INDEX_IDIRECT3DTEXTURE8_GETLEVELDESC) );
 
-        if (get_description != nullptr)
+        if (get_description_func_ptr != nullptr)
         {
-            get_description(in_self,
-                            in_level,
-                           &description);
+            get_description_func_ptr(in_self,
+                                     in_level,
+                                    &description);
         }
 
         HookPolicyHelper::on_rect_locked(in_self,
@@ -414,15 +460,15 @@ void D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DVERTEXBUFFER8_LO
 {
     if (in_is_success)
     {
-        D3DVERTEXBUFFER_DESC description     = {};
-        const auto           get_description = reinterpret_cast<PFN_IDIRECT3DVERTEXBUFFER8_GETDESC>(
-                                            VTableRegistry::get_ptr()->get_original_function_ptr(in_self,
-                                                                                                 VTABLE_INDEX_IDIRECT3DVERTEXBUFFER8_GETDESC) );
+        D3DVERTEXBUFFER_DESC description              = {};
+        const auto           get_description_func_ptr = reinterpret_cast<PFN_IDIRECT3DVERTEXBUFFER8_GETDESC>(
+                                                     VTableRegistry::get_ptr()->get_original_function_ptr(in_self,
+                                                                                                          VTABLE_INDEX_IDIRECT3DVERTEXBUFFER8_GETDESC) );
 
-        if (get_description != nullptr)
+        if (get_description_func_ptr != nullptr)
         {
-            get_description(in_self,
-                           &description);
+            get_description_func_ptr(in_self,
+                                    &description);
         }
 
         HookPolicyHelper::on_buffer_locked(in_self,
@@ -451,22 +497,22 @@ void D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DVERTEXBUFFER8_UN
 }
 
 void D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DVOLUME8_LOCKBOX>::on_call_finished(const bool&       in_is_success,
-                                                                                                  IDirect3DVolume8* in_self,
-                                                                                                  D3DLOCKED_BOX*    in_locked_box_ptr,
-                                                                                                  const D3DBOX*     in_box_ptr,
-                                                                                                  DWORD             in_flags)
+                                                                                                   IDirect3DVolume8* in_self,
+                                                                                                   D3DLOCKED_BOX*    in_locked_box_ptr,
+                                                                                                   const D3DBOX*     in_box_ptr,
+                                                                                                   DWORD             in_flags)
 {
     if (in_is_success)
     {
-        D3DVOLUME_DESC description     = {};
-        const auto     get_description = reinterpret_cast<PFN_IDIRECT3DVOLUME8_GETDESC>(
-                                      VTableRegistry::get_ptr()->get_original_function_ptr(in_self,
-                                                                                           VTABLE_INDEX_IDIRECT3DVOLUME8_GETDESC) );
+        D3DVOLUME_DESC description              = {};
+        const auto     get_description_func_ptr = reinterpret_cast<PFN_IDIRECT3DVOLUME8_GETDESC>(
+                                               VTableRegistry::get_ptr()->get_original_function_ptr(in_self,
+                                                                                                    VTABLE_INDEX_IDIRECT3DVOLUME8_GETDESC) );
 
-        if (get_description != nullptr)
+        if (get_description_func_ptr != nullptr)
         {
-            get_description(in_self,
-                           &description);
+            get_description_func_ptr(in_self,
+                                    &description);
         }
 
         HookPolicyHelper::on_box_locked(in_self,
@@ -503,16 +549,16 @@ void D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DVOLUMETEXTURE8_L
 {
     if (in_is_success)
     {
-        D3DVOLUME_DESC description     = {};
-        const auto     get_description = reinterpret_cast<PFN_IDIRECT3DVOLUMETEXTURE8_GETLEVELDESC>(
-                                      VTableRegistry::get_ptr()->get_original_function_ptr(in_self,
-                                                                                           VTABLE_INDEX_IDIRECT3DVOLUMETEXTURE8_GETLEVELDESC) );
+        D3DVOLUME_DESC description              = {};
+        const auto     get_description_func_ptr = reinterpret_cast<PFN_IDIRECT3DVOLUMETEXTURE8_GETLEVELDESC>(
+                                               VTableRegistry::get_ptr()->get_original_function_ptr(in_self,
+                                                                                                    VTABLE_INDEX_IDIRECT3DVOLUMETEXTURE8_GETLEVELDESC) );
 
-        if (get_description != nullptr)
+        if (get_description_func_ptr != nullptr)
         {
-            get_description(in_self,
-                            in_level,
-                           &description);
+            get_description_func_ptr(in_self,
+                                     in_level,
+                                    &description);
         }
 
         HookPolicyHelper::on_box_locked(in_self,

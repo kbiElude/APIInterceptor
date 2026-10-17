@@ -8,6 +8,7 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL3.0/gl_delete_vertex_arrays.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/state_tracker.h"
 #include "WGL/globals.h"
 
 void AI_APIENTRY OpenGL::aiDeleteVertexArrays(GLsizei       n,
@@ -54,6 +55,25 @@ void AI_APIENTRY OpenGL::aiDeleteVertexArrays(GLsizei       n,
     {
         reinterpret_cast<PFNGLDELETEVERTEXARRAYSPROC>(OpenGL::g_cached_gl_delete_vertex_arrays)(n,
                                                                                                 arrays);
+    }
+
+    if (tracker.is_top_level_api_call() )
+    {
+        auto& context = OpenGL::get_context_state();
+
+        for (GLsizei n_array = 0;
+                     n_array < n;
+                   ++n_array)
+        {
+            if (arrays != nullptr)
+            {
+                /* Deleting the bound vertex array binds the default one. */
+                if (arrays[n_array] == context.client_array_manager.get_bound_vertex_array() )
+                {
+                    context.client_array_manager.set_bound_vertex_array(0);
+                }
+            }
+        }
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDELETEVERTEXARRAYS,

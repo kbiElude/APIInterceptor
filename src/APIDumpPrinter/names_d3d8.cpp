@@ -67,28 +67,28 @@ bool APIDumpPrinter::get_flag_name_table(const D3D8::ValueKind& in_kind,
 
     switch (in_kind)
     {
-        case D3D8::ValueKind::ClearFlags:
+        case D3D8::ValueKind::CLEAR_FLAGS:
         {
             set_table_func(D3D8_TABLE(clear_flag_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::CreateFlags:
+        case D3D8::ValueKind::CREATE_FLAGS:
         {
             set_table_func(D3D8_TABLE(create_flag_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::LockFlags:
+        case D3D8::ValueKind::LOCK_FLAGS:
         {
             set_table_func(D3D8_TABLE(lock_flag_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::UsageFlags:
+        case D3D8::ValueKind::USAGE_FLAGS:
         {
             set_table_func(D3D8_TABLE(usage_flag_name_array) );
 
@@ -217,7 +217,7 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
     {
         case D3D8::D3DRS_ZENABLE:
         {
-            set_info_func(StateValueFormat::Name,
+            set_info_func(StateValueFormat::NAME,
                           D3D8_TABLE(z_buffer_type_name_array) );
 
             break;
@@ -225,7 +225,7 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
 
         case D3D8::D3DRS_FILLMODE:
         {
-            set_info_func(StateValueFormat::Name,
+            set_info_func(StateValueFormat::NAME,
                           D3D8_TABLE(fill_mode_name_array) );
 
             break;
@@ -233,7 +233,7 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
 
         case D3D8::D3DRS_SHADEMODE:
         {
-            set_info_func(StateValueFormat::Name,
+            set_info_func(StateValueFormat::NAME,
                           D3D8_TABLE(shade_mode_name_array) );
 
             break;
@@ -242,7 +242,7 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
         case D3D8::D3DRS_SRCBLEND:
         case D3D8::D3DRS_DESTBLEND:
         {
-            set_info_func(StateValueFormat::Name,
+            set_info_func(StateValueFormat::NAME,
                           D3D8_TABLE(blend_name_array) );
 
             break;
@@ -250,7 +250,7 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
 
         case D3D8::D3DRS_CULLMODE:
         {
-            set_info_func(StateValueFormat::Name,
+            set_info_func(StateValueFormat::NAME,
                           D3D8_TABLE(cull_name_array) );
 
             break;
@@ -260,7 +260,7 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
         case D3D8::D3DRS_ALPHAFUNC:
         case D3D8::D3DRS_STENCILFUNC:
         {
-            set_info_func(StateValueFormat::Name,
+            set_info_func(StateValueFormat::NAME,
                           D3D8_TABLE(cmp_func_name_array) );
 
             break;
@@ -270,7 +270,7 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
         case D3D8::D3DRS_STENCILZFAIL:
         case D3D8::D3DRS_STENCILPASS:
         {
-            set_info_func(StateValueFormat::Name,
+            set_info_func(StateValueFormat::NAME,
                           D3D8_TABLE(stencil_op_name_array) );
 
             break;
@@ -279,7 +279,7 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
         case D3D8::D3DRS_FOGTABLEMODE:
         case D3D8::D3DRS_FOGVERTEXMODE:
         {
-            set_info_func(StateValueFormat::Name,
+            set_info_func(StateValueFormat::NAME,
                           D3D8_TABLE(fog_mode_name_array) );
 
             break;
@@ -290,7 +290,7 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
         case D3D8::D3DRS_AMBIENTMATERIALSOURCE:
         case D3D8::D3DRS_EMISSIVEMATERIALSOURCE:
         {
-            set_info_func(StateValueFormat::Name,
+            set_info_func(StateValueFormat::NAME,
                           D3D8_TABLE(material_color_source_name_array) );
 
             break;
@@ -298,7 +298,7 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
 
         case D3D8::D3DRS_BLENDOP:
         {
-            set_info_func(StateValueFormat::Name,
+            set_info_func(StateValueFormat::NAME,
                           D3D8_TABLE(blend_op_name_array) );
 
             break;
@@ -326,7 +326,7 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
         case D3D8::D3DRS_ZVISIBLE:
         case D3D8::D3DRS_ZWRITEENABLE:
         {
-            set_info_func(StateValueFormat::Boolean,
+            set_info_func(StateValueFormat::BOOLEAN,
                           nullptr,
                           0);
 
@@ -337,7 +337,7 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
         case D3D8::D3DRS_FOGCOLOR:
         case D3D8::D3DRS_TEXTUREFACTOR:
         {
-            set_info_func(StateValueFormat::Color,
+            set_info_func(StateValueFormat::COLOR,
                           nullptr,
                           0);
 
@@ -356,7 +356,7 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
         case D3D8::D3DRS_POINTSIZE_MIN:
         case D3D8::D3DRS_TWEENFACTOR:
         {
-            set_info_func(StateValueFormat::Float,
+            set_info_func(StateValueFormat::FLOAT,
                           nullptr,
                           0);
 
@@ -377,7 +377,7 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
         case D3D8::D3DRS_WRAP6:
         case D3D8::D3DRS_WRAP7:
         {
-            set_info_func(StateValueFormat::Hex,
+            set_info_func(StateValueFormat::HEX,
                           nullptr,
                           0);
 
@@ -386,7 +386,7 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
 
         default:
         {
-            set_info_func(StateValueFormat::Raw,
+            set_info_func(StateValueFormat::RAW,
                           nullptr,
                           0);
 
@@ -477,7 +477,7 @@ bool APIDumpPrinter::get_texture_stage_state_value_info(const uint32_t& in_textu
         case D3D8::D3DTSS_COLOROP:
         case D3D8::D3DTSS_ALPHAOP:
         {
-            set_info_func(StateValueFormat::Name,
+            set_info_func(StateValueFormat::NAME,
                           D3D8_TABLE(texture_op_name_array) );
 
             break;
@@ -491,7 +491,7 @@ bool APIDumpPrinter::get_texture_stage_state_value_info(const uint32_t& in_textu
         case D3D8::D3DTSS_ALPHAARG2:
         case D3D8::D3DTSS_RESULTARG:
         {
-            set_info_func(StateValueFormat::TextureArgument,
+            set_info_func(StateValueFormat::TEXTURE_ARGUMENT,
                           D3D8_TABLE(texture_argument_name_array) );
 
             break;
@@ -501,7 +501,7 @@ bool APIDumpPrinter::get_texture_stage_state_value_info(const uint32_t& in_textu
         case D3D8::D3DTSS_ADDRESSV:
         case D3D8::D3DTSS_ADDRESSW:
         {
-            set_info_func(StateValueFormat::Name,
+            set_info_func(StateValueFormat::NAME,
                           D3D8_TABLE(texture_address_name_array) );
 
             break;
@@ -511,7 +511,7 @@ bool APIDumpPrinter::get_texture_stage_state_value_info(const uint32_t& in_textu
         case D3D8::D3DTSS_MINFILTER:
         case D3D8::D3DTSS_MIPFILTER:
         {
-            set_info_func(StateValueFormat::Name,
+            set_info_func(StateValueFormat::NAME,
                           D3D8_TABLE(texture_filter_name_array) );
 
             break;
@@ -519,7 +519,7 @@ bool APIDumpPrinter::get_texture_stage_state_value_info(const uint32_t& in_textu
 
         case D3D8::D3DTSS_TEXCOORDINDEX:
         {
-            set_info_func(StateValueFormat::TexCoordIndex,
+            set_info_func(StateValueFormat::TEX_COORD_INDEX,
                           nullptr,
                           0);
 
@@ -528,7 +528,7 @@ bool APIDumpPrinter::get_texture_stage_state_value_info(const uint32_t& in_textu
 
         case D3D8::D3DTSS_TEXTURETRANSFORMFLAGS:
         {
-            set_info_func(StateValueFormat::TextureTransformFlags,
+            set_info_func(StateValueFormat::TEXTURE_TRANSFORM_FLAGS,
                           nullptr,
                           0);
 
@@ -537,7 +537,7 @@ bool APIDumpPrinter::get_texture_stage_state_value_info(const uint32_t& in_textu
 
         case D3D8::D3DTSS_BORDERCOLOR:
         {
-            set_info_func(StateValueFormat::Color,
+            set_info_func(StateValueFormat::COLOR,
                           nullptr,
                           0);
 
@@ -552,7 +552,7 @@ bool APIDumpPrinter::get_texture_stage_state_value_info(const uint32_t& in_textu
         case D3D8::D3DTSS_BUMPENVMAT11:
         case D3D8::D3DTSS_MIPMAPLODBIAS:
         {
-            set_info_func(StateValueFormat::Float,
+            set_info_func(StateValueFormat::FLOAT,
                           nullptr,
                           0);
 
@@ -561,7 +561,7 @@ bool APIDumpPrinter::get_texture_stage_state_value_info(const uint32_t& in_textu
 
         default:
         {
-            set_info_func(StateValueFormat::Raw,
+            set_info_func(StateValueFormat::RAW,
                           nullptr,
                           0);
 
@@ -583,6 +583,13 @@ bool APIDumpPrinter::get_value_name_table(const D3D8::ValueKind& in_kind,
         D3D8_VALUE_NAME(D3DBACKBUFFER_TYPE_MONO),
         D3D8_VALUE_NAME(D3DBACKBUFFER_TYPE_LEFT),
         D3D8_VALUE_NAME(D3DBACKBUFFER_TYPE_RIGHT),
+    };
+
+    static const ValueNameEntry basis_type_name_array[] =
+    {
+        D3D8_VALUE_NAME(D3DBASIS_BEZIER),
+        D3D8_VALUE_NAME(D3DBASIS_BSPLINE),
+        D3D8_VALUE_NAME(D3DBASIS_INTERPOLATE),
     };
 
     static const ValueNameEntry cube_map_face_name_array[] =
@@ -674,6 +681,14 @@ bool APIDumpPrinter::get_value_name_table(const D3D8::ValueKind& in_kind,
         D3D8_VALUE_NAME(D3DMULTISAMPLE_14_SAMPLES),
         D3D8_VALUE_NAME(D3DMULTISAMPLE_15_SAMPLES),
         D3D8_VALUE_NAME(D3DMULTISAMPLE_16_SAMPLES),
+    };
+
+    static const ValueNameEntry order_type_name_array[] =
+    {
+        D3D8_VALUE_NAME(D3DORDER_LINEAR),
+        D3D8_VALUE_NAME(D3DORDER_QUADRATIC),
+        D3D8_VALUE_NAME(D3DORDER_CUBIC),
+        D3D8_VALUE_NAME(D3DORDER_QUINTIC),
     };
 
     static const ValueNameEntry pool_name_array[] =
@@ -860,98 +875,112 @@ bool APIDumpPrinter::get_value_name_table(const D3D8::ValueKind& in_kind,
 
     switch (in_kind)
     {
-        case D3D8::ValueKind::BackBufferType:
+        case D3D8::ValueKind::BACK_BUFFER_TYPE:
         {
             set_table_func(D3D8_TABLE(back_buffer_type_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::CubeMapFace:
+        case D3D8::ValueKind::BASIS_TYPE:
+        {
+            set_table_func(D3D8_TABLE(basis_type_name_array) );
+
+            break;
+        }
+
+        case D3D8::ValueKind::CUBE_MAP_FACE:
         {
             set_table_func(D3D8_TABLE(cube_map_face_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::DeviceType:
+        case D3D8::ValueKind::DEVICE_TYPE:
         {
             set_table_func(D3D8_TABLE(device_type_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::Format:
+        case D3D8::ValueKind::FORMAT:
         {
             set_table_func(D3D8_TABLE(format_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::LightType:
+        case D3D8::ValueKind::LIGHT_TYPE:
         {
             set_table_func(D3D8_TABLE(light_type_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::MultiSampleType:
+        case D3D8::ValueKind::MULTI_SAMPLE_TYPE:
         {
             set_table_func(D3D8_TABLE(multisample_type_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::Pool:
+        case D3D8::ValueKind::ORDER_TYPE:
+        {
+            set_table_func(D3D8_TABLE(order_type_name_array) );
+
+            break;
+        }
+
+        case D3D8::ValueKind::POOL:
         {
             set_table_func(D3D8_TABLE(pool_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::PrimitiveType:
+        case D3D8::ValueKind::PRIMITIVE_TYPE:
         {
             set_table_func(D3D8_TABLE(primitive_type_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::RenderStateType:
+        case D3D8::ValueKind::RENDER_STATE_TYPE:
         {
             set_table_func(D3D8_TABLE(render_state_type_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::ResourceType:
+        case D3D8::ValueKind::RESOURCE_TYPE:
         {
             set_table_func(D3D8_TABLE(resource_type_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::StateBlockType:
+        case D3D8::ValueKind::STATE_BLOCK_TYPE:
         {
             set_table_func(D3D8_TABLE(state_block_type_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::SwapEffect:
+        case D3D8::ValueKind::SWAP_EFFECT:
         {
             set_table_func(D3D8_TABLE(swap_effect_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::TextureStageStateType:
+        case D3D8::ValueKind::TEXTURE_STAGE_STATE_TYPE:
         {
             set_table_func(D3D8_TABLE(texture_stage_state_type_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::TransformStateType:
+        case D3D8::ValueKind::TRANSFORM_STATE_TYPE:
         {
             set_table_func(D3D8_TABLE(transform_state_type_name_array) );
 

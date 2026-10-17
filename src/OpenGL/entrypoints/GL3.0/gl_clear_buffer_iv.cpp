@@ -5,9 +5,11 @@
 #include "Common/callbacks.h"
 #include "Common/logger.h"
 #include "Common/macros.h"
+#include "Common/memory_chunk.h"
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL3.0/gl_clear_buffer_iv.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/param_counts.h"
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
@@ -21,6 +23,9 @@ void AI_APIENTRY OpenGL::aiClearBufferiv(GLenum       buffer,
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
     APIInterceptor::Tracker                 tracker;
+    APIInterceptor::MemoryChunk             value_chunk(value,
+                                                        OpenGL::Utils::get_n_clear_buffer_values(buffer),
+                                                        sizeof(GLint));
 
     if (tracker.is_top_level_api_call() )
     {
@@ -35,9 +40,9 @@ void AI_APIENTRY OpenGL::aiClearBufferiv(GLenum       buffer,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32_glenum(buffer),
-                APIInterceptor::APIFunctionArgument::create_i32       (drawbuffer),
-                APIInterceptor::APIFunctionArgument::create_void_ptr  (value),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum   (buffer),
+                APIInterceptor::APIFunctionArgument::create_i32          (drawbuffer),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(value_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLCLEARBUFFERIV,
@@ -65,9 +70,9 @@ void AI_APIENTRY OpenGL::aiClearBufferiv(GLenum       buffer,
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_u32_glenum(buffer),
-            APIInterceptor::APIFunctionArgument::create_i32       (drawbuffer),
-            APIInterceptor::APIFunctionArgument::create_void_ptr  (value),
+            APIInterceptor::APIFunctionArgument::create_u32_glenum   (buffer),
+            APIInterceptor::APIFunctionArgument::create_i32          (drawbuffer),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(value_chunk.get_id() ),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLCLEARBUFFERIV,

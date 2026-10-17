@@ -40,7 +40,7 @@ void AI_APIENTRY OpenGL::aiBlitFramebuffer(GLint      srcX0,
                  dstY0,
                  dstX1,
                  dstY1,
-                 OpenGL::Utils::get_raw_string_for_gl_bitfield(OpenGL::BitfieldType::Blit_Mask, mask),
+                 OpenGL::Utils::get_raw_string_for_gl_bitfield(OpenGL::BitfieldType::BLIT_MASK, mask),
                  OpenGL::Utils::get_raw_string_for_gl_enum    (filter) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBLITFRAMEBUFFER,

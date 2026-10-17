@@ -23,7 +23,7 @@ void AI_APIENTRY OpenGL::aiClear(GLbitfield mask)
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glClear(mask=[%s])",
-                 OpenGL::Utils::get_raw_string_for_gl_bitfield(OpenGL::BitfieldType::Clear_Buffer_Mask, mask) );
+                 OpenGL::Utils::get_raw_string_for_gl_bitfield(OpenGL::BitfieldType::CLEAR_BUFFER_MASK, mask) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCLEAR,
                                                          &pre_callback_func_ptr,

@@ -11,10 +11,10 @@
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetProgramStageiv(GLuint  program,
-                                             GLenum  shadertype,
-                                             GLenum  pname,
-                                             GLint*  values)
+void AI_APIENTRY OpenGL::aiGetProgramStageiv(GLuint program,
+                                             GLenum shadertype,
+                                             GLenum pname,
+                                             GLint* values)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;

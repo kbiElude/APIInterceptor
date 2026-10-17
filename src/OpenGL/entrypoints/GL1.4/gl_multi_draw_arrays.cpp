@@ -6,6 +6,7 @@
 #include "Common/logger.h"
 #include "Common/macros.h"
 #include "Common/tracker.h"
+#include "OpenGL/client_array_chunk.h"
 #include "OpenGL/entrypoints/GL1.4/gl_multi_draw_arrays.h"
 #include "OpenGL/globals.h"
 #include "OpenGLUtils/utils_enum.h"
@@ -16,14 +17,19 @@ void AI_APIENTRY OpenGL::aiMultiDrawArrays(GLenum         mode,
                                            const GLsizei* count,
                                            GLsizei        drawcount)
 {
+    OpenGL::ClientArrayChunk                client_arrays_chunk;
+    uint32_t                                count_chunk_id         = 0;
+    uint32_t                                first_chunk_id         = 0;
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
     APIInterceptor::Tracker                 tracker;
-    uint32_t                                first_chunk_id         = 0;
-    uint32_t                                count_chunk_id         = 0;
+
+    client_arrays_chunk.add_multi_arrays(first,
+                                         count,
+                                         drawcount);
 
     if (tracker.is_top_level_api_call() )
     {
@@ -48,6 +54,7 @@ void AI_APIENTRY OpenGL::aiMultiDrawArrays(GLenum         mode,
                 APIInterceptor::APIFunctionArgument::create_data_chunk_id(first_chunk_id),
                 APIInterceptor::APIFunctionArgument::create_data_chunk_id(count_chunk_id),
                 APIInterceptor::APIFunctionArgument::create_i32          (drawcount),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(client_arrays_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLMULTIDRAWARRAYS,
@@ -80,6 +87,7 @@ void AI_APIENTRY OpenGL::aiMultiDrawArrays(GLenum         mode,
             APIInterceptor::APIFunctionArgument::create_data_chunk_id(first_chunk_id),
             APIInterceptor::APIFunctionArgument::create_data_chunk_id(count_chunk_id),
             APIInterceptor::APIFunctionArgument::create_i32          (drawcount),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(client_arrays_chunk.get_id() ),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLMULTIDRAWARRAYS,

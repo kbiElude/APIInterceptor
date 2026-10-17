@@ -13,12 +13,12 @@ namespace APIInterceptor
 {
     enum class LogLevel
     {
-        APIDump,
-        Error,
-        Info,
-        Warning,
+        API_DUMP,
+        ERR,
+        INFO,
+        WARNING,
 
-        Unknown
+        UNKNOWN
     };
 
     class Logger
@@ -27,15 +27,14 @@ namespace APIInterceptor
          Logger();
         ~Logger();
 
+        void disable_logging_for_this_thread();
+        void log                            (const LogLevel& in_log_level,
+                                             const char*     in_message_template,
+                                             ...);
+        void on_frame_presented             ();
+
         static void deinit();
         static void init  ();
-
-        void disable_logging_for_this_thread();
-
-        void log               (const LogLevel& in_log_level,
-                                const char*     in_message_template,
-                                ...);
-        void on_frame_presented();
 
     private:
         std::string get_frame_log_filename(const uint32_t& n_frame) const;
@@ -45,7 +44,6 @@ namespace APIInterceptor
         FILE*             m_warning_file_ptr;
         std::stringstream m_log_data_sstream;
         std::mutex        m_mutex;
-
         uint32_t m_n_current_frame;
     };
 
@@ -55,11 +53,11 @@ namespace APIInterceptor
 #define AI_LOG(level, message_template, ...) \
     APIInterceptor::g_logger_ptr->log(level, message_template, __VA_ARGS__)
 #define AI_WARN(message_template, ...) \
-    APIInterceptor::g_logger_ptr->log(APIInterceptor::LogLevel::Warning, message_template, __VA_ARGS__)
+    APIInterceptor::g_logger_ptr->log(APIInterceptor::LogLevel::WARNING, message_template, __VA_ARGS__)
 
 #if defined(APIINTERCEPTOR_DUMP_API_CALLS)
     #define AI_TRACE(message_template, ...) \
-        APIInterceptor::g_logger_ptr->log(APIInterceptor::LogLevel::APIDump, message_template, __VA_ARGS__)
+        APIInterceptor::g_logger_ptr->log(APIInterceptor::LogLevel::API_DUMP, message_template, __VA_ARGS__)
 #else
     #define AI_TRACE(message_template, ...)
 #endif

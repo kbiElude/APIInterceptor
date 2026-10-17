@@ -11,9 +11,9 @@
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiProgramParameteri(GLuint  program,
-                                             GLenum  pname,
-                                             GLint   value)
+void AI_APIENTRY OpenGL::aiProgramParameteri(GLuint program,
+                                             GLenum pname,
+                                             GLint  value)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;

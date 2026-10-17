@@ -8,11 +8,12 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL4.1/gl_create_shader_programv.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/string_array_chunk.h"
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
-GLuint AI_APIENTRY OpenGL::aiCreateShaderProgramv(GLenum              type,
-                                                  GLsizei             count,
+GLuint AI_APIENTRY OpenGL::aiCreateShaderProgramv(GLenum               type,
+                                                  GLsizei              count,
                                                   const GLchar* const* strings)
 {
     void*                                   post_callback_func_arg = nullptr;
@@ -21,6 +22,9 @@ GLuint AI_APIENTRY OpenGL::aiCreateShaderProgramv(GLenum              type,
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     GLuint                                  result                 = 0;
     bool                                    should_pass_through    = true;
+    OpenGL::StringArrayChunk                strings_chunk(strings,
+                                                          count,
+                                                          nullptr);
     APIInterceptor::Tracker                 tracker;
 
     if (tracker.is_top_level_api_call() )
@@ -36,9 +40,9 @@ GLuint AI_APIENTRY OpenGL::aiCreateShaderProgramv(GLenum              type,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32_glenum(type),
-                APIInterceptor::APIFunctionArgument::create_i32       (count),
-                APIInterceptor::APIFunctionArgument::create_void_ptr  (strings),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum   (type),
+                APIInterceptor::APIFunctionArgument::create_i32          (count),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(strings_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLCREATESHADERPROGRAMV,

@@ -41,8 +41,8 @@ void AI_APIENTRY OpenGL::aiTransformFeedbackBufferRange(GLuint     xfb,
                 APIInterceptor::APIFunctionArgument::create_u32(xfb),
                 APIInterceptor::APIFunctionArgument::create_u32(index),
                 APIInterceptor::APIFunctionArgument::create_u32(buffer),
-                APIInterceptor::APIFunctionArgument::create_i32(static_cast<GLint>(offset) ),
-                APIInterceptor::APIFunctionArgument::create_i32(static_cast<GLint>(size) ),
+                APIInterceptor::APIFunctionArgument::create_i64(static_cast<int64_t>(offset) ),
+                APIInterceptor::APIFunctionArgument::create_i64(static_cast<int64_t>(size) ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLTRANSFORMFEEDBACKBUFFERRANGE,
@@ -75,8 +75,8 @@ void AI_APIENTRY OpenGL::aiTransformFeedbackBufferRange(GLuint     xfb,
             APIInterceptor::APIFunctionArgument::create_u32(xfb),
             APIInterceptor::APIFunctionArgument::create_u32(index),
             APIInterceptor::APIFunctionArgument::create_u32(buffer),
-            APIInterceptor::APIFunctionArgument::create_i32(static_cast<GLint>(offset) ),
-            APIInterceptor::APIFunctionArgument::create_i32(static_cast<GLint>(size) ),
+            APIInterceptor::APIFunctionArgument::create_i64(static_cast<int64_t>(offset) ),
+            APIInterceptor::APIFunctionArgument::create_i64(static_cast<int64_t>(size) ),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLTRANSFORMFEEDBACKBUFFERRANGE,

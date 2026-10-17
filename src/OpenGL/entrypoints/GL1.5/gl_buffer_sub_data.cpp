@@ -42,8 +42,8 @@ void AI_APIENTRY OpenGL::aiBufferSubData(GLenum     target,
             const APIInterceptor::APIFunctionArgument args[] =
             {
                 APIInterceptor::APIFunctionArgument::create_u32_glenum   (target),
-                APIInterceptor::APIFunctionArgument::create_i32          (static_cast<int32_t>(offset) ),
-                APIInterceptor::APIFunctionArgument::create_i32          (static_cast<int32_t>(size) ),
+                APIInterceptor::APIFunctionArgument::create_i64          (static_cast<int64_t>(offset) ),
+                APIInterceptor::APIFunctionArgument::create_i64          (static_cast<int64_t>(size) ),
                 APIInterceptor::APIFunctionArgument::create_data_chunk_id(data_chunk_id),
             };
 
@@ -74,8 +74,8 @@ void AI_APIENTRY OpenGL::aiBufferSubData(GLenum     target,
         const APIInterceptor::APIFunctionArgument args[] =
         {
             APIInterceptor::APIFunctionArgument::create_u32_glenum   (target),
-            APIInterceptor::APIFunctionArgument::create_i32          (static_cast<int32_t>(offset) ),
-            APIInterceptor::APIFunctionArgument::create_i32          (static_cast<int32_t>(size) ),
+            APIInterceptor::APIFunctionArgument::create_i64          (static_cast<int64_t>(offset) ),
+            APIInterceptor::APIFunctionArgument::create_i64          (static_cast<int64_t>(size) ),
             APIInterceptor::APIFunctionArgument::create_data_chunk_id(data_chunk_id),
         };
 

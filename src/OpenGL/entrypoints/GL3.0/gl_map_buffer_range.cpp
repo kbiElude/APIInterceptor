@@ -3,33 +3,39 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "Common/callbacks.h"
+#include "Common/globals.h"
 #include "Common/logger.h"
 #include "Common/macros.h"
+#include "Common/memory_chunk.h"
 #include "Common/tracker.h"
+#include "OpenGL/buffer_mapping_manager.h"
 #include "OpenGL/entrypoints/GL3.0/gl_map_buffer_range.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/state_tracker.h"
+#include "OpenGL/utils.h"
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
-void* APIENTRY OpenGL::aiMapBufferRange(GLenum     target,
-                                        GLintptr   offset,
-                                        GLsizeiptr length,
-                                        GLbitfield access)
+void* AI_APIENTRY OpenGL::aiMapBufferRange(GLenum     target,
+                                           GLintptr   offset,
+                                           GLsizeiptr length,
+                                           GLbitfield access)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
+    void*                                   result                 = nullptr;
     bool                                    should_pass_through    = true;
     APIInterceptor::Tracker                 tracker;
 
     if (tracker.is_top_level_api_call() )
     {
-        AI_TRACE("glMapBufferRange(target=[%s] offset=[%d] length=[%d] access=[%s])",
+        AI_TRACE("glMapBufferRange(target=[%s] offset=[%lld] length=[%lld] access=[0x%x])",
                  OpenGL::Utils::get_raw_string_for_gl_enum(target),
-                 static_cast<int32_t>(offset),
-                 static_cast<int32_t>(length),
-                 OpenGL::Utils::get_raw_string_for_gl_bitfield(OpenGL::BitfieldType::Buffer_Access_Mask, access) );
+                 static_cast<long long>(offset),
+                 static_cast<long long>(length),
+                 access);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMAPBUFFERRANGE,
                                                          &pre_callback_func_ptr,
@@ -38,8 +44,8 @@ void* APIENTRY OpenGL::aiMapBufferRange(GLenum     target,
             const APIInterceptor::APIFunctionArgument args[] =
             {
                 APIInterceptor::APIFunctionArgument::create_u32_glenum(target),
-                APIInterceptor::APIFunctionArgument::create_i32       (static_cast<int32_t>(offset) ),
-                APIInterceptor::APIFunctionArgument::create_i32       (static_cast<int32_t>(length) ),
+                APIInterceptor::APIFunctionArgument::create_i64       (static_cast<int64_t>(offset) ),
+                APIInterceptor::APIFunctionArgument::create_i64       (static_cast<int64_t>(length) ),
                 APIInterceptor::APIFunctionArgument::create_u32       (access),
             };
 
@@ -53,33 +59,62 @@ void* APIENTRY OpenGL::aiMapBufferRange(GLenum     target,
 
     AI_ASSERT(should_pass_through);
 
-    void* const mapped_ptr = reinterpret_cast<PFNGLMAPBUFFERRANGEPROC>(g_cached_gl_map_buffer_range)(target,
-                                                                                                     offset,
-                                                                                                     length,
-                                                                                                     access);
+    if (should_pass_through)
+    {
+        result = reinterpret_cast<PFNGLMAPBUFFERRANGEPROC>(OpenGL::g_cached_gl_map_buffer_range)(target,
+                                                                                                 offset,
+                                                                                                 length,
+                                                                                                 access);
+    }
 
     if (tracker.is_top_level_api_call() )
     {
+        auto& context = OpenGL::get_context_state();
+
+        GLuint buffer_id = 0;
+
+        {
+            OpenGL::BufferBindingTarget binding_target;
+            const bool                  is_known_target = OpenGL::Utils::get_buffer_binding_target_for_gl_enum(target,
+                                                                                                               &binding_target);
+
+            AI_ASSERT(is_known_target);
+
+            buffer_id = context.buffer_manager.get_bound_buffer(binding_target);
+        }
+
+        context.buffer_mapping_manager.on_buffer_mapped(buffer_id,
+                                                        result,
+                                                        offset,
+                                                        length,
+                                                        access);
+
+        if (context.buffer_mapping_manager.is_persistent(buffer_id) )
+        {
+            AI_WARN("[!] Buffer [%u] is mapped persistently: writes between flushes or unmapping are not captured.",
+                    buffer_id);
+        }
+
+        const OpenGL::BufferMappingManager::Region initial_region = context.buffer_mapping_manager.get_initial_region(buffer_id);
+
         if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMAPBUFFERRANGE,
                                                           &post_callback_func_ptr,
                                                           &post_callback_func_arg) )
         {
-            const bool is_readable     = (access & GL_MAP_READ_BIT) != 0;
-            const auto map_chunk_id    = APIInterceptor::register_data_chunk((is_readable)                          ? mapped_ptr
-                                                                                                                    : nullptr,
-                                                                             (is_readable && mapped_ptr != nullptr) ? static_cast<uint32_t>(length)
-                                                                                                                    : 0u);
+            APIInterceptor::MemoryChunk initial_chunk(initial_region.data_ptr,
+                                             static_cast<int64_t>(initial_region.n_bytes),
+                                             sizeof(uint8_t) );
 
             APIInterceptor::APIFunctionArgument result_arg;
 
             const APIInterceptor::APIFunctionArgument args[] =
             {
                 APIInterceptor::APIFunctionArgument::create_u32_glenum   (target),
-                APIInterceptor::APIFunctionArgument::create_i32          (static_cast<int32_t>(offset) ),
-                APIInterceptor::APIFunctionArgument::create_i32          (static_cast<int32_t>(length) ),
+                APIInterceptor::APIFunctionArgument::create_i64          (static_cast<int64_t>(offset) ),
+                APIInterceptor::APIFunctionArgument::create_i64          (static_cast<int64_t>(length) ),
                 APIInterceptor::APIFunctionArgument::create_u32          (access),
-                APIInterceptor::APIFunctionArgument::create_void_ptr     (mapped_ptr),
-                APIInterceptor::APIFunctionArgument::create_data_chunk_id(map_chunk_id),
+                APIInterceptor::APIFunctionArgument::create_void_ptr     (result),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(initial_chunk.get_id() ),
             };
 
             post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLMAPBUFFERRANGE,
@@ -90,5 +125,5 @@ void* APIENTRY OpenGL::aiMapBufferRange(GLenum     target,
         }
     }
 
-    return mapped_ptr;
+    return result;
 }

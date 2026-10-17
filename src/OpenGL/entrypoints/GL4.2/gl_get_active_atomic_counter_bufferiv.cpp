@@ -11,10 +11,10 @@
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetActiveAtomicCounterBufferiv(GLuint  program,
-                                                          GLuint  bufferIndex,
-                                                          GLenum  pname,
-                                                          GLint*  params)
+void AI_APIENTRY OpenGL::aiGetActiveAtomicCounterBufferiv(GLuint program,
+                                                          GLuint bufferIndex,
+                                                          GLenum pname,
+                                                          GLint* params)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;

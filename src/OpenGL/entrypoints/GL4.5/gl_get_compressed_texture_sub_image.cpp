@@ -48,16 +48,16 @@ void AI_APIENTRY OpenGL::aiGetCompressedTextureSubImage(GLuint  texture,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32      (texture),
-                APIInterceptor::APIFunctionArgument::create_i32      (level),
-                APIInterceptor::APIFunctionArgument::create_i32      (xoffset),
-                APIInterceptor::APIFunctionArgument::create_i32      (yoffset),
-                APIInterceptor::APIFunctionArgument::create_i32      (zoffset),
-                APIInterceptor::APIFunctionArgument::create_i32      (width),
-                APIInterceptor::APIFunctionArgument::create_i32      (height),
-                APIInterceptor::APIFunctionArgument::create_i32      (depth),
-                APIInterceptor::APIFunctionArgument::create_i32      (bufSize),
-                APIInterceptor::APIFunctionArgument::create_void_ptr (pixels),
+                APIInterceptor::APIFunctionArgument::create_u32     (texture),
+                APIInterceptor::APIFunctionArgument::create_i32     (level),
+                APIInterceptor::APIFunctionArgument::create_i32     (xoffset),
+                APIInterceptor::APIFunctionArgument::create_i32     (yoffset),
+                APIInterceptor::APIFunctionArgument::create_i32     (zoffset),
+                APIInterceptor::APIFunctionArgument::create_i32     (width),
+                APIInterceptor::APIFunctionArgument::create_i32     (height),
+                APIInterceptor::APIFunctionArgument::create_i32     (depth),
+                APIInterceptor::APIFunctionArgument::create_i32     (bufSize),
+                APIInterceptor::APIFunctionArgument::create_void_ptr(pixels),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETCOMPRESSEDTEXTURESUBIMAGE,
@@ -94,16 +94,16 @@ void AI_APIENTRY OpenGL::aiGetCompressedTextureSubImage(GLuint  texture,
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_u32           (texture),
-            APIInterceptor::APIFunctionArgument::create_i32           (level),
-            APIInterceptor::APIFunctionArgument::create_i32           (xoffset),
-            APIInterceptor::APIFunctionArgument::create_i32           (yoffset),
-            APIInterceptor::APIFunctionArgument::create_i32           (zoffset),
-            APIInterceptor::APIFunctionArgument::create_i32           (width),
-            APIInterceptor::APIFunctionArgument::create_i32           (height),
-            APIInterceptor::APIFunctionArgument::create_i32           (depth),
-            APIInterceptor::APIFunctionArgument::create_i32           (bufSize),
-            APIInterceptor::APIFunctionArgument::create_data_chunk_id (pixels_chunk_id),
+            APIInterceptor::APIFunctionArgument::create_u32          (texture),
+            APIInterceptor::APIFunctionArgument::create_i32          (level),
+            APIInterceptor::APIFunctionArgument::create_i32          (xoffset),
+            APIInterceptor::APIFunctionArgument::create_i32          (yoffset),
+            APIInterceptor::APIFunctionArgument::create_i32          (zoffset),
+            APIInterceptor::APIFunctionArgument::create_i32          (width),
+            APIInterceptor::APIFunctionArgument::create_i32          (height),
+            APIInterceptor::APIFunctionArgument::create_i32          (depth),
+            APIInterceptor::APIFunctionArgument::create_i32          (bufSize),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(pixels_chunk_id),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETCOMPRESSEDTEXTURESUBIMAGE,

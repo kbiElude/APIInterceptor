@@ -11,10 +11,10 @@
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetShaderPrecisionFormat(GLenum   shadertype,
-                                                    GLenum   precisiontype,
-                                                    GLint*   range,
-                                                    GLint*   precision)
+void AI_APIENTRY OpenGL::aiGetShaderPrecisionFormat(GLenum shadertype,
+                                                    GLenum precisiontype,
+                                                    GLint* range,
+                                                    GLint* precision)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;

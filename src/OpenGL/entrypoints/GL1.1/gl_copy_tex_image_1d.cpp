@@ -82,7 +82,7 @@ void AI_APIENTRY OpenGL::aiCopyTexImage1D(GLenum  target,
         {
             auto& context = get_context_state();
 
-            context.set_texture_level_props(context.bound_textures[static_cast<size_t>(binding_target)],
+            context.texture_manager.set_level_props(context.texture_manager.get_bound_texture(binding_target),
                                             level,
                                             static_cast<uint32_t>(width),
                                             1,

@@ -8,6 +8,7 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL3.1/gl_get_uniform_indices.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/string_array_chunk.h"
 #include "WGL/globals.h"
 
 void AI_APIENTRY OpenGL::aiGetUniformIndices(GLuint               program,
@@ -21,6 +22,9 @@ void AI_APIENTRY OpenGL::aiGetUniformIndices(GLuint               program,
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
     APIInterceptor::Tracker                 tracker;
+    OpenGL::StringArrayChunk                uniform_names_chunk(uniformNames,
+                                                                uniformCount,
+                                                                nullptr);
 
     if (tracker.is_top_level_api_call() )
     {
@@ -36,10 +40,10 @@ void AI_APIENTRY OpenGL::aiGetUniformIndices(GLuint               program,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32      (program),
-                APIInterceptor::APIFunctionArgument::create_i32      (uniformCount),
-                APIInterceptor::APIFunctionArgument::create_void_ptr (uniformNames),
-                APIInterceptor::APIFunctionArgument::create_void_ptr (uniformIndices),
+                APIInterceptor::APIFunctionArgument::create_u32          (program),
+                APIInterceptor::APIFunctionArgument::create_i32          (uniformCount),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(uniform_names_chunk.get_id() ),
+                APIInterceptor::APIFunctionArgument::create_void_ptr     (uniformIndices),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETUNIFORMINDICES,
@@ -66,12 +70,16 @@ void AI_APIENTRY OpenGL::aiGetUniformIndices(GLuint               program,
     {
         APIInterceptor::APIFunctionArgument result_arg;
 
+        const auto uniform_indices_chunk_id = APIInterceptor::register_data_chunk(uniformIndices,
+                                                                                  (uniformIndices != nullptr && uniformCount > 0) ? sizeof(GLuint) * static_cast<uint32_t>(uniformCount)
+                                                                                                                                  : 0);
+
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_u32      (program),
-            APIInterceptor::APIFunctionArgument::create_i32      (uniformCount),
-            APIInterceptor::APIFunctionArgument::create_void_ptr (uniformNames),
-            APIInterceptor::APIFunctionArgument::create_void_ptr (uniformIndices),
+            APIInterceptor::APIFunctionArgument::create_u32          (program),
+            APIInterceptor::APIFunctionArgument::create_i32          (uniformCount),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(uniform_names_chunk.get_id() ),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(uniform_indices_chunk_id),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETUNIFORMINDICES,

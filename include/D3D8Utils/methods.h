@@ -31,7 +31,7 @@ namespace D3D8
 
         uint32_t get_n_methods(const Interface& in_interface);
 
-        /* Returns nullptr for ObjectType::None. */
+        /* Returns nullptr for ObjectType::NONE. */
         const char* get_object_type_name_ptr(const ObjectType& in_object_type);
     }
 }

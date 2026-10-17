@@ -5,6 +5,7 @@
 #include "Common/callbacks.h"
 #include "Common/logger.h"
 #include "Common/macros.h"
+#include "Common/memory_chunk.h"
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL4.4/gl_bind_buffers_range.h"
 #include "OpenGL/globals.h"
@@ -18,11 +19,20 @@ void AI_APIENTRY OpenGL::aiBindBuffersRange(GLenum            target,
                                             const GLintptr*   offsets,
                                             const GLsizeiptr* sizes)
 {
+    APIInterceptor::MemoryChunk             buffers_chunk(buffers,
+                                                          count,
+                                                          sizeof(GLuint));
+    APIInterceptor::MemoryChunk             offsets_chunk(offsets,
+                                                          count,
+                                                          sizeof(GLintptr));
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
+    APIInterceptor::MemoryChunk             sizes_chunk(sizes,
+                                                        count,
+                                                        sizeof(GLsizeiptr));
     APIInterceptor::Tracker                 tracker;
 
     if (tracker.is_top_level_api_call() )
@@ -41,12 +51,12 @@ void AI_APIENTRY OpenGL::aiBindBuffersRange(GLenum            target,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32_glenum(target),
-                APIInterceptor::APIFunctionArgument::create_u32       (first),
-                APIInterceptor::APIFunctionArgument::create_i32       (count),
-                APIInterceptor::APIFunctionArgument::create_u32_ptr   (buffers),
-                APIInterceptor::APIFunctionArgument::create_void_ptr  (offsets),
-                APIInterceptor::APIFunctionArgument::create_void_ptr  (sizes),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum   (target),
+                APIInterceptor::APIFunctionArgument::create_u32          (first),
+                APIInterceptor::APIFunctionArgument::create_i32          (count),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(buffers_chunk.get_id() ),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(offsets_chunk.get_id() ),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(sizes_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLBINDBUFFERSRANGE,
@@ -77,12 +87,12 @@ void AI_APIENTRY OpenGL::aiBindBuffersRange(GLenum            target,
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_u32_glenum(target),
-            APIInterceptor::APIFunctionArgument::create_u32       (first),
-            APIInterceptor::APIFunctionArgument::create_i32       (count),
-            APIInterceptor::APIFunctionArgument::create_u32_ptr   (buffers),
-            APIInterceptor::APIFunctionArgument::create_void_ptr  (offsets),
-            APIInterceptor::APIFunctionArgument::create_void_ptr  (sizes),
+            APIInterceptor::APIFunctionArgument::create_u32_glenum   (target),
+            APIInterceptor::APIFunctionArgument::create_u32          (first),
+            APIInterceptor::APIFunctionArgument::create_i32          (count),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(buffers_chunk.get_id() ),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(offsets_chunk.get_id() ),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(sizes_chunk.get_id() ),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLBINDBUFFERSRANGE,

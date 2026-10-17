@@ -4,6 +4,7 @@
  */
 #include <gtest/gtest.h>
 #include "APIDumpLoader/APIDumpLoader.h"
+#include "Common/workload_format.h"
 #include "workload_file_builder.h"
 #include <stdio.h>
 
@@ -18,27 +19,49 @@ void Tests::WorkloadFileBuilder::append_bytes(std::vector<uint8_t>* inout_u8_vec
                              data_u8_ptr + in_n_bytes);
 }
 
-/* A call with one input argument, no output arguments and no returned value. */
-void Tests::WorkloadFileBuilder::append_call(std::vector<uint8_t>* inout_u8_vec_ptr,
-                                             const uint32_t&       in_u32_argument)
+void Tests::WorkloadFileBuilder::append_call(std::vector<uint8_t>*              inout_u8_vec_ptr,
+                                             const uint32_t&                    in_u32_argument,
+                                             const APIInterceptor::APIFunction& in_function)
 {
-    const auto     function          = APIInterceptor::APIFUNCTION_GL_GLACCUM;
+    append_call_with_argument(inout_u8_vec_ptr,
+                              in_function,
+                              APIInterceptor::APIFunctionArgument::create_u32(in_u32_argument),
+                              in_u32_argument);
+}
+
+/* A call with one input argument, no output arguments and no returned value. The timestamp is TIMESTAMP_BASE plus the
+ * offset.
+ */
+void Tests::WorkloadFileBuilder::append_call_with_argument(std::vector<uint8_t>*                      inout_u8_vec_ptr,
+                                                           const APIInterceptor::APIFunction&         in_function,
+                                                           const APIInterceptor::APIFunctionArgument& in_argument,
+                                                           const uint32_t&                            in_timestamp_offset)
+{
     constexpr uint32_t N_IN_ARGUMENTS    = 1;
     constexpr uint32_t N_OUT_ARGUMENTS   = 0;
-    const auto     no_value_argument = APIInterceptor::APIFunctionArgument();
-    const auto     u32_argument      = APIInterceptor::APIFunctionArgument::create_u32(in_u32_argument);
+    const auto         no_value_argument = APIInterceptor::APIFunctionArgument();
+
+    /* Copies: the class constants have no out-of-class definition (pre-C++17), so they must not be bound to a reference. */
+    const uint32_t thread_id = THREAD_ID;
+    const uint64_t timestamp = TIMESTAMP_BASE + in_timestamp_offset;
 
     append_bytes(inout_u8_vec_ptr,
-                &function,
-                 sizeof(function) );
+                &in_function,
+                 sizeof(in_function) );
     append_bytes(inout_u8_vec_ptr,
                 &N_IN_ARGUMENTS,
                  sizeof(N_IN_ARGUMENTS) );
     append_bytes(inout_u8_vec_ptr,
                 &N_OUT_ARGUMENTS,
                  sizeof(N_OUT_ARGUMENTS) );
+    append_bytes(inout_u8_vec_ptr,
+                &thread_id,
+                 sizeof(thread_id) );
+    append_bytes(inout_u8_vec_ptr,
+                &timestamp,
+                 sizeof(timestamp) );
 
-    u32_argument.serialize_to_u8_vec     (inout_u8_vec_ptr);
+    in_argument.serialize_to_u8_vec      (inout_u8_vec_ptr);
     no_value_argument.serialize_to_u8_vec(inout_u8_vec_ptr);
 }
 
@@ -53,6 +76,23 @@ void Tests::WorkloadFileBuilder::append_chunk(std::vector<uint8_t>*       inout_
     append_bytes(inout_u8_vec_ptr,
                  in_data_u8_vec.data(),
                  in_data_u8_vec.size() );
+}
+
+void Tests::WorkloadFileBuilder::append_file_header(std::vector<uint8_t>* inout_u8_vec_ptr)
+{
+    APIInterceptor::WorkloadFormat::WorkloadFileHeader header = {};
+
+    ::memcpy(header.magic_i8vec8,
+             APIInterceptor::WorkloadFormat::MAGIC,
+             sizeof(header.magic_i8vec8) );
+
+    header.pointer_n_bytes = POINTER_N_BYTES;
+    header.qpc_frequency   = QPC_FREQUENCY;
+    header.version         = APIInterceptor::WorkloadFormat::FILE_VERSION;
+
+    append_bytes(inout_u8_vec_ptr,
+                &header,
+                 sizeof(header) );
 }
 
 void Tests::WorkloadFileBuilder::append_header(std::vector<uint8_t>* inout_u8_vec_ptr,
@@ -88,9 +128,53 @@ void Tests::WorkloadFileBuilder::append_surface(std::vector<uint8_t>*       inou
                  in_data_u8_vec.size() );
 }
 
+void Tests::WorkloadFileBuilder::build_file_without_header(std::vector<uint8_t>* out_u8_vec_ptr)
+{
+    append_header(out_u8_vec_ptr,
+                  1,  /* in_n_api_calls   */
+                  0,  /* in_n_data_chunks */
+                  0); /* in_n_surfaces    */
+    append_call  (out_u8_vec_ptr,
+                  10);
+}
+
+void Tests::WorkloadFileBuilder::build_frames(std::vector<uint8_t>* out_u8_vec_ptr,
+                                              const uint32_t&       in_n_frames,
+                                              const uint32_t&       in_n_calls_per_frame)
+{
+    append_file_header(out_u8_vec_ptr);
+    append_header     (out_u8_vec_ptr,
+                       in_n_frames * (in_n_calls_per_frame + 1),
+                       0,  /* in_n_data_chunks */
+                       0); /* in_n_surfaces    */
+
+    for (uint32_t n_frame = 0;
+                  n_frame < in_n_frames;
+                ++n_frame)
+    {
+        for (uint32_t n_call = 0;
+                      n_call < in_n_calls_per_frame;
+                    ++n_call)
+        {
+            /* A call which the replay has nothing to do with. */
+            append_call(out_u8_vec_ptr,
+                        n_frame * in_n_calls_per_frame + n_call,
+                        APIInterceptor::APIFUNCTION_GDI32_GETPIXELFORMAT);
+        }
+
+        /* No window: the frame ends, whatever the replay is able to present. */
+        append_call_with_argument(out_u8_vec_ptr,
+                                  APIInterceptor::APIFUNCTION_GDI32_SWAPBUFFERS,
+                                  APIInterceptor::APIFunctionArgument::create_void_ptr(nullptr),
+                                  n_frame);
+    }
+}
+
 size_t Tests::WorkloadFileBuilder::build_two_segments(std::vector<uint8_t>* out_u8_vec_ptr)
 {
     size_t result = 0;
+
+    append_file_header(out_u8_vec_ptr);
 
     append_header(out_u8_vec_ptr,
                   2,  /* in_n_api_calls   */

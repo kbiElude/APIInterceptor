@@ -8,12 +8,14 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL2.0/gl_bind_attrib_location.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/string_chunk.h"
 #include "WGL/globals.h"
 
 void AI_APIENTRY OpenGL::aiBindAttribLocation(GLuint  program,
                                               GLuint  index,
                                               GLchar* name)
 {
+    OpenGL::StringChunk                     name_chunk(name);
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
@@ -34,9 +36,9 @@ void AI_APIENTRY OpenGL::aiBindAttribLocation(GLuint  program,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32     (program),
-                APIInterceptor::APIFunctionArgument::create_u32     (index),
-                APIInterceptor::APIFunctionArgument::create_void_ptr(name),
+                APIInterceptor::APIFunctionArgument::create_u32          (program),
+                APIInterceptor::APIFunctionArgument::create_u32          (index),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(name_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLBINDATTRIBLOCATION,
@@ -64,9 +66,9 @@ void AI_APIENTRY OpenGL::aiBindAttribLocation(GLuint  program,
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_u32     (program),
-            APIInterceptor::APIFunctionArgument::create_u32     (index),
-            APIInterceptor::APIFunctionArgument::create_void_ptr(name),
+            APIInterceptor::APIFunctionArgument::create_u32          (program),
+            APIInterceptor::APIFunctionArgument::create_u32          (index),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(name_chunk.get_id() ),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLBINDATTRIBLOCATION,

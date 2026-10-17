@@ -2,8 +2,8 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  *
- * A workload file is a sequence of segments (one per spill of the dumper's memory to disk). Each one holds three
- * uint32_t counts (API calls, data chunks, surfaces), followed by those items. Data chunk IDs count across segments.
+ * A workload file is a header, followed by a sequence of segments (one per spill of the dumper's memory to disk). Data
+ * chunk IDs count across segments. See Common/workload_format.h for the layout.
  */
 #include "APIDumpLoader/APIDumpLoader.h"
 #include "APIDumpLoader/WorkloadReader.h"
@@ -23,6 +23,9 @@ APIDumpLoader::WorkloadUniquePtr APIDumpLoader::create_workload_from_file(const 
 
         while (reader_ptr->read_next_segment(&segment) )
         {
+            result_ptr->pointer_n_bytes = segment.pointer_n_bytes;
+            result_ptr->qpc_frequency   = segment.qpc_frequency;
+
             for (auto& current_api_call : *segment.dumped_api_call_vec_ptr)
             {
                 result_ptr->dumped_api_call_vec_ptr->emplace_back(std::move(current_api_call) );

@@ -8,6 +8,7 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL1.1/gl_bitmap.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/pixel_data_chunk.h"
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
@@ -19,12 +20,20 @@ void AI_APIENTRY OpenGL::aiBitmap(GLsizei        width,
                                   GLfloat        ymove,
                                   const GLubyte* bitmapef)
 {
+    OpenGL::PixelDataChunk                  pixels_chunk;
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
     APIInterceptor::Tracker                 tracker;
+
+    if (tracker.is_top_level_api_call() )
+    {
+        pixels_chunk = OpenGL::PixelDataChunk::create_for_unpack_bitmap(bitmapef,
+                                                                        width,
+                                                                        height);
+    }
 
     if (tracker.is_top_level_api_call() )
     {
@@ -43,13 +52,13 @@ void AI_APIENTRY OpenGL::aiBitmap(GLsizei        width,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_i32     (width),
-                APIInterceptor::APIFunctionArgument::create_i32     (height),
-                APIInterceptor::APIFunctionArgument::create_fp32    (xorig),
-                APIInterceptor::APIFunctionArgument::create_fp32    (yorig),
-                APIInterceptor::APIFunctionArgument::create_fp32    (xmove),
-                APIInterceptor::APIFunctionArgument::create_fp32    (ymove),
-                APIInterceptor::APIFunctionArgument::create_void_ptr(bitmapef),
+                APIInterceptor::APIFunctionArgument::create_i32 (width),
+                APIInterceptor::APIFunctionArgument::create_i32 (height),
+                APIInterceptor::APIFunctionArgument::create_fp32(xorig),
+                APIInterceptor::APIFunctionArgument::create_fp32(yorig),
+                APIInterceptor::APIFunctionArgument::create_fp32(xmove),
+                APIInterceptor::APIFunctionArgument::create_fp32(ymove),
+                pixels_chunk.get_arg(),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLBITMAP,
@@ -81,13 +90,13 @@ void AI_APIENTRY OpenGL::aiBitmap(GLsizei        width,
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_i32     (width),
-            APIInterceptor::APIFunctionArgument::create_i32     (height),
-            APIInterceptor::APIFunctionArgument::create_fp32    (xorig),
-            APIInterceptor::APIFunctionArgument::create_fp32    (yorig),
-            APIInterceptor::APIFunctionArgument::create_fp32    (xmove),
-            APIInterceptor::APIFunctionArgument::create_fp32    (ymove),
-            APIInterceptor::APIFunctionArgument::create_void_ptr(bitmapef),
+            APIInterceptor::APIFunctionArgument::create_i32 (width),
+            APIInterceptor::APIFunctionArgument::create_i32 (height),
+            APIInterceptor::APIFunctionArgument::create_fp32(xorig),
+            APIInterceptor::APIFunctionArgument::create_fp32(yorig),
+            APIInterceptor::APIFunctionArgument::create_fp32(xmove),
+            APIInterceptor::APIFunctionArgument::create_fp32(ymove),
+            pixels_chunk.get_arg(),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLBITMAP,

@@ -15,8 +15,6 @@ namespace D3D8
     class HookTable
     {
     public:
-        static HookTable* get_ptr();
-
         /* The entries are valid for the lifetime of the process. Empty for interfaces which are not in the table. */
         void get_hook_entries(const Interface&  in_interface,
                               const HookEntry** out_hook_entry_array_ptr_ptr,
@@ -25,6 +23,8 @@ namespace D3D8
         /* Hooks all methods of the object's interface. Does nothing for a null object or an unknown interface. */
         void patch_object(const Interface& in_interface,
                           const void*      in_object_ptr);
+
+        static HookTable* get_ptr();
 
     private:
         HookTable();

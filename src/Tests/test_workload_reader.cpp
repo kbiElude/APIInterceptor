@@ -10,6 +10,7 @@
 #include "workload_file_builder.h"
 #include <stdio.h>
 #include <string.h>
+#include <string>
 
 TEST(WorkloadReader, ReadsSegmentsOneAtATime)
 {
@@ -130,4 +131,74 @@ TEST(WorkloadReader, MissingFileCannotBeOpened)
 {
     EXPECT_EQ(APIDumpLoader::WorkloadReader::create("this_file_does_not_exist.workload"),
               nullptr);
+}
+
+TEST(WorkloadReader, ExposesFileHeaderAndCallHeaderFields)
+{
+    std::vector<uint8_t>    file_u8_vec;
+    APIDumpLoader::Workload segment;
+
+    Tests::WorkloadFileBuilder::build_two_segments(&file_u8_vec);
+    Tests::WorkloadFileBuilder::write_file(file_u8_vec);
+
+    auto reader_ptr = APIDumpLoader::WorkloadReader::create(Tests::WorkloadFileBuilder::get_filename_ptr());
+
+    ASSERT_NE(reader_ptr,
+              nullptr);
+    ASSERT_TRUE(reader_ptr->read_next_segment(&segment) );
+
+    EXPECT_EQ(segment.pointer_n_bytes,
+              static_cast<uint32_t>(Tests::WorkloadFileBuilder::POINTER_N_BYTES) );
+    EXPECT_EQ(segment.qpc_frequency,
+              static_cast<uint64_t>(Tests::WorkloadFileBuilder::QPC_FREQUENCY) );
+    EXPECT_EQ(segment.dumped_api_call_vec_ptr->at(1).thread_id,
+              static_cast<uint32_t>(Tests::WorkloadFileBuilder::THREAD_ID) );
+    EXPECT_EQ(segment.dumped_api_call_vec_ptr->at(1).timestamp_qpc,
+              static_cast<uint64_t>(Tests::WorkloadFileBuilder::TIMESTAMP_BASE) + 11);
+
+    reader_ptr.reset();
+    ::remove(Tests::WorkloadFileBuilder::get_filename_ptr());
+}
+
+TEST(WorkloadReader, RejectsAFileWithoutTheHeader)
+{
+    std::string          error;
+    std::vector<uint8_t> file_u8_vec;
+
+    Tests::WorkloadFileBuilder::build_file_without_header(&file_u8_vec);
+    Tests::WorkloadFileBuilder::write_file               (file_u8_vec);
+
+    EXPECT_EQ(APIDumpLoader::WorkloadReader::create(Tests::WorkloadFileBuilder::get_filename_ptr(),
+                                                   &error),
+              nullptr);
+    EXPECT_FALSE(error.empty() );
+
+    EXPECT_EQ(APIDumpLoader::create_workload_from_file(Tests::WorkloadFileBuilder::get_filename_ptr() ),
+              nullptr);
+
+    ::remove(Tests::WorkloadFileBuilder::get_filename_ptr());
+}
+
+TEST(WorkloadReader, FindsTheCallsOfAnAPIGroup)
+{
+    std::vector<uint8_t> file_u8_vec;
+
+    Tests::WorkloadFileBuilder::build_frames(&file_u8_vec,
+                                             1,  /* in_n_frames          */
+                                             1); /* in_n_calls_per_frame */
+
+    Tests::WorkloadFileBuilder::write_file(file_u8_vec);
+
+    auto d3d8_reader_ptr  = APIDumpLoader::WorkloadReader::create(Tests::WorkloadFileBuilder::get_filename_ptr());
+    auto gdi32_reader_ptr = APIDumpLoader::WorkloadReader::create(Tests::WorkloadFileBuilder::get_filename_ptr());
+
+    ASSERT_NE(d3d8_reader_ptr,
+              nullptr);
+    ASSERT_NE(gdi32_reader_ptr,
+              nullptr);
+
+    EXPECT_EQ(d3d8_reader_ptr->get_pointer_n_bytes(),
+              Tests::WorkloadFileBuilder::POINTER_N_BYTES);
+    EXPECT_FALSE(d3d8_reader_ptr->contains_api_group(APIDumpLoader::APIGroup::D3D8) );
+    EXPECT_TRUE (gdi32_reader_ptr->contains_api_group(APIDumpLoader::APIGroup::GDI32) );
 }

@@ -74,7 +74,7 @@ void AI_APIENTRY OpenGL::aiTextureStorage2DMultisample(GLuint    texture,
         {
             auto& context = OpenGL::get_context_state();
 
-            context.set_texture_level_props(texture,
+            context.texture_manager.set_level_props(texture,
                                             0, /* multisample textures have a single implicit level */
                                             static_cast<uint32_t>(width),
                                             static_cast<uint32_t>(height),

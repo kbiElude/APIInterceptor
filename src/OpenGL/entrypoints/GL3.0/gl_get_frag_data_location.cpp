@@ -8,11 +8,13 @@
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL3.0/gl_get_frag_data_location.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/string_chunk.h"
 #include "WGL/globals.h"
 
 GLint AI_APIENTRY OpenGL::aiGetFragDataLocation(GLuint        program,
                                                 const GLchar* name)
 {
+    OpenGL::StringChunk                     name_chunk(name);
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
@@ -33,8 +35,8 @@ GLint AI_APIENTRY OpenGL::aiGetFragDataLocation(GLuint        program,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32      (program),
-                APIInterceptor::APIFunctionArgument::create_void_ptr (name),
+                APIInterceptor::APIFunctionArgument::create_u32          (program),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(name_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETFRAGDATALOCATION,

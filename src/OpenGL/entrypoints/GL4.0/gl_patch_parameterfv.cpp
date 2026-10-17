@@ -5,9 +5,11 @@
 #include "Common/callbacks.h"
 #include "Common/logger.h"
 #include "Common/macros.h"
+#include "Common/memory_chunk.h"
 #include "Common/tracker.h"
 #include "OpenGL/entrypoints/GL4.0/gl_patch_parameterfv.h"
 #include "OpenGL/globals.h"
+#include "OpenGL/param_counts.h"
 #include "OpenGLUtils/utils_enum.h"
 #include "WGL/globals.h"
 
@@ -20,6 +22,9 @@ void AI_APIENTRY OpenGL::aiPatchParameterfv(GLenum         pname,
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
     APIInterceptor::Tracker                 tracker;
+    APIInterceptor::MemoryChunk             values_chunk(values,
+                                                         OpenGL::Utils::get_n_patch_parameter_values(pname),
+                                                         sizeof(GLfloat));
 
     if (tracker.is_top_level_api_call() )
     {
@@ -33,8 +38,8 @@ void AI_APIENTRY OpenGL::aiPatchParameterfv(GLenum         pname,
         {
             const APIInterceptor::APIFunctionArgument args[] =
             {
-                APIInterceptor::APIFunctionArgument::create_u32_glenum(pname),
-                APIInterceptor::APIFunctionArgument::create_fp32_ptr  (values),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum   (pname),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(values_chunk.get_id() ),
             };
 
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLPATCHPARAMETERFV,
@@ -61,8 +66,8 @@ void AI_APIENTRY OpenGL::aiPatchParameterfv(GLenum         pname,
 
         const APIInterceptor::APIFunctionArgument args[] =
         {
-            APIInterceptor::APIFunctionArgument::create_u32_glenum(pname),
-            APIInterceptor::APIFunctionArgument::create_fp32_ptr  (values),
+            APIInterceptor::APIFunctionArgument::create_u32_glenum   (pname),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(values_chunk.get_id() ),
         };
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLPATCHPARAMETERFV,

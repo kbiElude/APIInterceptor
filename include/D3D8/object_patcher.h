@@ -13,7 +13,7 @@
 namespace D3D8
 {
     template<typename T,
-             bool     is_object_out = (Utils::ArgumentCategoryOf<T>::value == Utils::ArgumentCategory::ObjectOut)>
+             bool     is_object_out = (Utils::ArgumentCategoryOf<T>::value == Utils::ArgumentCategory::OBJECT_OUT)>
     struct ObjectPatcher
     {
         static void patch(const T& in_value);

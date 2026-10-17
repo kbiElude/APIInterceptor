@@ -55,28 +55,6 @@ bool OpenGL::Utils::get_texture_binding_target_for_gl_enum(const GLenum&        
     return result;
 }
 
-bool OpenGL::Utils::get_buffer_mapping_access_for_gl_enum(const GLenum&        in_access,
-                                                          BufferMappingAccess* out_result_ptr)
-{
-    bool result = true;
-
-    switch (in_access)
-    {
-        case GL_READ_ONLY:  *out_result_ptr = BufferMappingAccess::READ_ONLY;  break;
-        case GL_READ_WRITE: *out_result_ptr = BufferMappingAccess::READ_WRITE; break;
-        case GL_WRITE_ONLY: *out_result_ptr = BufferMappingAccess::WRITE_ONLY; break;
-
-        default:
-        {
-            assert(false);
-
-            result = false;
-        }
-    }
-
-    return result;
-}
-
 bool OpenGL::Utils::get_buffer_binding_target_for_gl_enum(const GLenum&        in_target,
                                                           BufferBindingTarget* out_result_ptr)
 {
@@ -84,8 +62,20 @@ bool OpenGL::Utils::get_buffer_binding_target_for_gl_enum(const GLenum&        i
 
     switch (in_target)
     {
-        case GL_ARRAY_BUFFER:         *out_result_ptr = BufferBindingTarget::ARRAY_BUFFER;         break;
-        case GL_ELEMENT_ARRAY_BUFFER: *out_result_ptr = BufferBindingTarget::ELEMENT_ARRAY_BUFFER; break;
+        case GL_ARRAY_BUFFER:              *out_result_ptr = BufferBindingTarget::ARRAY_BUFFER;               break;
+        case GL_ATOMIC_COUNTER_BUFFER:     *out_result_ptr = BufferBindingTarget::ATOMIC_COUNTER_BUFFER;      break;
+        case GL_COPY_READ_BUFFER:          *out_result_ptr = BufferBindingTarget::COPY_READ_BUFFER;           break;
+        case GL_COPY_WRITE_BUFFER:         *out_result_ptr = BufferBindingTarget::COPY_WRITE_BUFFER;          break;
+        case GL_DISPATCH_INDIRECT_BUFFER:  *out_result_ptr = BufferBindingTarget::DISPATCH_INDIRECT_BUFFER;   break;
+        case GL_DRAW_INDIRECT_BUFFER:      *out_result_ptr = BufferBindingTarget::DRAW_INDIRECT_BUFFER;       break;
+        case GL_ELEMENT_ARRAY_BUFFER:      *out_result_ptr = BufferBindingTarget::ELEMENT_ARRAY_BUFFER;       break;
+        case GL_PIXEL_PACK_BUFFER:         *out_result_ptr = BufferBindingTarget::PIXEL_PACK_BUFFER;          break;
+        case GL_PIXEL_UNPACK_BUFFER:       *out_result_ptr = BufferBindingTarget::PIXEL_UNPACK_BUFFER;        break;
+        case GL_QUERY_BUFFER:              *out_result_ptr = BufferBindingTarget::QUERY_BUFFER;               break;
+        case GL_SHADER_STORAGE_BUFFER:     *out_result_ptr = BufferBindingTarget::SHADER_STORAGE_BUFFER;      break;
+        case GL_TEXTURE_BUFFER:            *out_result_ptr = BufferBindingTarget::TEXTURE_BUFFER;             break;
+        case GL_TRANSFORM_FEEDBACK_BUFFER: *out_result_ptr = BufferBindingTarget::TRANSFORM_FEEDBACK_BUFFER;  break;
+        case GL_UNIFORM_BUFFER:            *out_result_ptr = BufferBindingTarget::UNIFORM_BUFFER;             break;
 
         default:
         {
@@ -209,26 +199,19 @@ uint32_t OpenGL::Utils::get_n_components_for_format(const GLenum& in_format)
     return result;
 }
 
-uint32_t OpenGL::Utils::get_n_texture_data_bytes(const uint32_t& in_width,
-                                                 const uint32_t& in_height,
-                                                 const uint32_t& in_depth,
-                                                 const GLenum&   in_format,
-                                                 const GLenum&   in_type)
+uint32_t OpenGL::Utils::get_n_texel_bytes(const GLenum& in_format,
+                                          const GLenum& in_type)
 {
-    const auto n_texels = in_width * in_height * in_depth;
-    uint32_t   n_bytes_per_texel;
+    uint32_t result = 0;
 
-    if (is_packed_pixel_type(in_type) )
+    if (OpenGL::Utils::is_packed_pixel_type(in_type) )
     {
-        n_bytes_per_texel = get_n_bytes_for_type(in_type);
+        result = OpenGL::Utils::get_n_bytes_for_type(in_type);
     }
     else
     {
-        n_bytes_per_texel = get_n_components_for_format(in_format) * get_n_bytes_for_type(in_type);
+        result = OpenGL::Utils::get_n_components_for_format(in_format) * OpenGL::Utils::get_n_bytes_for_type(in_type);
     }
 
-    const uint32_t result = n_texels * n_bytes_per_texel;
-
-    assert(result != 0);
     return result;
 }

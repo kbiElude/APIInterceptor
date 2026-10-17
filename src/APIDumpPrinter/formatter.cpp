@@ -3,6 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "formatter.h"
+#include "APIDumpLoader/api_info.h"
 #include "api_info.h"
 #include "OpenGLUtils/utils_enum.h"
 #include <assert.h>
@@ -289,7 +290,7 @@ void APIDumpPrinter::print_call(FILE*                                  in_file_h
 {
     std::vector<APIInterceptor::DataChunkID> call_chunk_id_vec;
     const bool                               is_d3d8_call = (inout_d3d8_decoder_ptr != nullptr                   &&
-                                                             get_api_group(in_call.func) == APIGroup::D3D8);
+                                                             APIDumpLoader::get_api_group(in_call.func) == APIDumpLoader::APIGroup::D3D8);
 
     /* D3D8 arguments are decoded by the decoder, if it knows them. */
     const auto print_call_argument_func = [&](const uint32_t&                            in_n_argument,

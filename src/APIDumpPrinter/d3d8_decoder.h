@@ -40,31 +40,31 @@ namespace APIDumpPrinter
         void register_created_objects(const APIDumpLoader::DumpedAPICall& in_call);
 
     private:
-        static std::string format_boolean            (const int32_t&                in_value);
-        static std::string format_color              (const uint32_t&               in_value);
-        static std::string format_color_value        (const D3D8::D3DCOLORVALUE&    in_value);
-        static std::string format_enum               (const D3D8::ValueKind&        in_kind,
-                                                      const uint32_t&               in_value);
-        static std::string format_flags              (const D3D8::ValueKind&        in_kind,
-                                                      const uint32_t&               in_value);
-        static std::string format_fvf                (const uint32_t&               in_value);
-        static std::string format_hex                (const uint32_t&               in_value);
-        static std::string format_hresult            (const int32_t&                in_value);
-        static std::string format_resource_properties(const uint32_t&               in_format,
-                                                      const uint32_t&               in_type,
-                                                      const uint32_t&               in_usage,
-                                                      const uint32_t&               in_pool);
-        static std::string format_state_value        (const StateValueInfo&         in_info,
-                                                      const uint32_t&               in_value);
-
-        /* Returns false if the structure is not decoded (e.g. the chunk has an unexpected size). */
-        static bool format_struct(const D3D8::ValueKind&     in_kind,
-                                  const std::vector<uint8_t>& in_chunk_u8_vec,
-                                  std::string*               out_text_ptr);
-
         /* Returns "<type>#<n>" if the object has been seen being created, "<type>@0x<address>" otherwise. */
         std::string get_object_name(const void* in_object_ptr,
                                     const char* in_type_name_ptr) const;
+
+        static std::string format_boolean            (const int32_t&             in_value);
+        static std::string format_color              (const uint32_t&            in_value);
+        static std::string format_color_value        (const D3D8::D3DCOLORVALUE& in_value);
+        static std::string format_enum               (const D3D8::ValueKind&     in_kind,
+                                                      const uint32_t&            in_value);
+        static std::string format_flags              (const D3D8::ValueKind&     in_kind,
+                                                      const uint32_t&            in_value);
+        static std::string format_fvf                (const uint32_t&            in_value);
+        static std::string format_hex                (const uint32_t&            in_value);
+        static std::string format_hresult            (const int32_t&             in_value);
+        static std::string format_resource_properties(const uint32_t&            in_format,
+                                                      const uint32_t&            in_type,
+                                                      const uint32_t&            in_usage,
+                                                      const uint32_t&            in_pool);
+        static std::string format_state_value        (const StateValueInfo&      in_info,
+                                                      const uint32_t&            in_value);
+
+        /* Returns false if the structure is not decoded (e.g. the chunk has an unexpected size). */
+        static bool format_struct(const D3D8::ValueKind&      in_kind,
+                                  const std::vector<uint8_t>& in_chunk_u8_vec,
+                                  std::string*                out_text_ptr);
 
         std::map<const void*, std::string> m_object_name_map;
         std::map<std::string, uint32_t>    m_n_created_objects_map; /* by type name */

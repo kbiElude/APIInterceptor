@@ -60,7 +60,7 @@ TEST(D3D8Methods, EveryInterfaceHasTheExpectedNumberOfMethods)
         total += expected_count.n_methods;
     }
 
-    EXPECT_EQ(static_cast<uint32_t>(D3D8::Interface::Count),
+    EXPECT_EQ(static_cast<uint32_t>(D3D8::Interface::COUNT),
               sizeof(expected_count_array) / sizeof(expected_count_array[0]) );
     EXPECT_EQ(total,
               static_cast<uint32_t>(APIInterceptor::APIFUNCTION_D3D8_METHODS_LAST - APIInterceptor::APIFUNCTION_D3D8_METHODS_FIRST + 1) );
@@ -176,7 +176,7 @@ TEST(D3D8Methods, VtableSlotsAreContiguousForEveryInterface)
     const D3D8::MethodInfo* methods_ptr = D3D8::Utils::get_method_info_array_ptr(&n_methods);
 
     for (uint32_t n_interface = 0;
-                  n_interface < static_cast<uint32_t>(D3D8::Interface::Count);
+                  n_interface < static_cast<uint32_t>(D3D8::Interface::COUNT);
                 ++n_interface)
     {
         const auto            interface_type = static_cast<D3D8::Interface>(n_interface);

@@ -75,7 +75,7 @@ void AI_APIENTRY OpenGL::aiTexStorage2D(GLenum  target,
                                                          &binding_target) )
         {
             auto&          context    = get_context_state();
-            const GLuint   texture_id = context.bound_textures[static_cast<size_t>(binding_target)];
+            const GLuint   texture_id = context.texture_manager.get_bound_texture(binding_target);
             uint32_t       mip_width  = static_cast<uint32_t>(width);
             uint32_t       mip_height = static_cast<uint32_t>(height);
 
@@ -83,7 +83,7 @@ void AI_APIENTRY OpenGL::aiTexStorage2D(GLenum  target,
                          level < levels;
                        ++level)
             {
-                context.set_texture_level_props(texture_id,
+                context.texture_manager.set_level_props(texture_id,
                                                 level,
                                                 mip_width,
                                                 mip_height,

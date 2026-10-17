@@ -234,6 +234,32 @@ const void* APIInterceptor::APIFunctionArgument::get_ptr() const
     return get_ptr_internal();
 }
 
+uint64_t APIInterceptor::APIFunctionArgument::get_ptr_as_u64() const
+{
+    switch (type)
+    {
+        case ARGTYPE_F32_PTR:  /* fall-back */
+        case ARGTYPE_F64_PTR:  /* fall-back */
+        case ARGTYPE_I8_PTR:   /* fall-back */
+        case ARGTYPE_I16_PTR:  /* fall-back */
+        case ARGTYPE_I32_PTR:  /* fall-back */
+        case ARGTYPE_U8_PTR:   /* fall-back */
+        case ARGTYPE_U16_PTR:  /* fall-back */
+        case ARGTYPE_U32_PTR:  /* fall-back */
+        case ARGTYPE_VOID_PTR:
+        {
+            break;
+        }
+
+        default:
+        {
+            assert(false);
+        }
+    }
+
+    return value.value_ptr_as_u64;
+}
+
 const void* APIInterceptor::APIFunctionArgument::get_ptr_internal() const
 {
     #if _WIN64

@@ -10,9 +10,9 @@
 #include "OpenGL/globals.h"
 #include "WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetUniformdv(GLuint     program,
-                                        GLint      location,
-                                        GLdouble*  params)
+void AI_APIENTRY OpenGL::aiGetUniformdv(GLuint    program,
+                                        GLint     location,
+                                        GLdouble* params)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
