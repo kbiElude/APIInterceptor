@@ -13,21 +13,33 @@ static constexpr uint32_t MAX_ITEM_N_BYTES = 1u << 30; /* 1 GiB */
 static constexpr size_t   MAX_PEEK_N_BYTES = 64;
 
 APIDumpLoader::WorkloadReader::WorkloadReader()
-    :m_buffer_end        (0),
-     m_buffer_start      (0),
-     m_file_handle       (nullptr),
-     m_is_finished       (false),
-     m_is_truncated      (false),
-     m_n_data_chunks_read(0),
-     m_pointer_n_bytes   (0),
-     m_qpc_frequency     (0)
+    :m_buffer_end         (0),
+     m_buffer_start       (0),
+     m_compressed_end     (0),
+     m_compressed_start   (0),
+     m_decompressor_ptr   (::ZSTD_createDCtx() ),
+     m_file_handle        (nullptr),
+     m_is_damaged         (false),
+     m_is_finished        (false),
+     m_is_frame_incomplete(false),
+     m_is_truncated       (false),
+     m_n_data_chunks_read (0),
+     m_pointer_n_bytes    (0),
+     m_qpc_frequency      (0)
 {
+    m_compressed_u8_vec.resize(::ZSTD_DStreamInSize() );
+
     /* The padding keeps parsing code from reading outside the buffer when a file ends early. */
     m_buffer_u8_vec.resize(BUFFER_N_BYTES + MAX_PEEK_N_BYTES);
 }
 
 APIDumpLoader::WorkloadReader::~WorkloadReader()
 {
+    if (m_decompressor_ptr != nullptr)
+    {
+        ::ZSTD_freeDCtx(m_decompressor_ptr);
+    }
+
     if (m_file_handle != nullptr)
     {
         ::fclose(m_file_handle);
@@ -62,6 +74,13 @@ APIDumpLoader::WorkloadReaderUniquePtr APIDumpLoader::WorkloadReader::create(con
     std::string                                        error;
     APIInterceptor::WorkloadFormat::WorkloadFileHeader header;
     WorkloadReaderUniquePtr                            result_ptr(new WorkloadReader() );
+
+    if (result_ptr->m_decompressor_ptr == nullptr)
+    {
+        error = "The decompressor cannot be set up.";
+
+        goto fail;
+    }
 
     result_ptr->m_file_handle = ::fopen(in_filename_ptr,
                                         "rb");
@@ -148,10 +167,8 @@ size_t APIDumpLoader::WorkloadReader::peek(const size_t& in_n_bytes)
 
         m_buffer_start = 0;
         m_buffer_end   = n_bytes_left;
-        m_buffer_end  += ::fread(m_buffer_u8_vec.data() + m_buffer_end,
-                                 1,
-                                 BUFFER_N_BYTES - m_buffer_end,
-                                 m_file_handle);
+        m_buffer_end  += read_decompressed(m_buffer_u8_vec.data() + m_buffer_end,
+                                           BUFFER_N_BYTES - m_buffer_end);
 
         memset(m_buffer_u8_vec.data() + m_buffer_end,
                0,
@@ -284,10 +301,8 @@ bool APIDumpLoader::WorkloadReader::read_bytes(void*         out_data_ptr,
     /* The rest does not go through the buffer. */
     if (n_bytes_read < in_n_bytes)
     {
-        n_bytes_read += ::fread(static_cast<uint8_t*>(out_data_ptr) + n_bytes_read,
-                                1,
-                                in_n_bytes - n_bytes_read,
-                                m_file_handle);
+        n_bytes_read += read_decompressed(static_cast<uint8_t*>(out_data_ptr) + n_bytes_read,
+                                          in_n_bytes - n_bytes_read);
     }
 
     return (n_bytes_read == in_n_bytes);
@@ -322,6 +337,58 @@ end:
     return result;
 }
 
+size_t APIDumpLoader::WorkloadReader::read_decompressed(void*         out_data_ptr,
+                                                        const size_t& in_n_bytes)
+{
+    ZSTD_outBuffer output = {out_data_ptr, in_n_bytes, 0};
+
+    while (output.pos < output.size &&
+           m_is_damaged == false)
+    {
+        ZSTD_inBuffer input;
+        size_t        n_bytes_expected = 0;
+        size_t        n_bytes_before   = 0;
+
+        if (m_compressed_start == m_compressed_end)
+        {
+            m_compressed_start = 0;
+            m_compressed_end   = ::fread(m_compressed_u8_vec.data(),
+                                         1,
+                                         m_compressed_u8_vec.size(),
+                                         m_file_handle);
+        }
+
+        /* At the end of the file, there may still be decompressed data waiting to be handed out. */
+        input          = {m_compressed_u8_vec.data(), m_compressed_end, m_compressed_start};
+        n_bytes_before  = output.pos + input.pos;
+
+        n_bytes_expected = ::ZSTD_decompressStream(m_decompressor_ptr,
+                                                  &output,
+                                                  &input);
+
+        m_compressed_start = input.pos;
+
+        if (::ZSTD_isError(n_bytes_expected) )
+        {
+            m_is_damaged          = true;
+            m_is_frame_incomplete = true;
+        }
+        else
+        if (output.pos + input.pos == n_bytes_before)
+        {
+            /* Nothing more to be had from the file. A call which got nowhere tells nothing about the frame. */
+            break;
+        }
+        else
+        {
+            /* Zero means that a frame has just ended. */
+            m_is_frame_incomplete = (n_bytes_expected != 0);
+        }
+    }
+
+    return output.pos;
+}
+
 bool APIDumpLoader::WorkloadReader::read_next_segment(Workload* out_workload_ptr)
 {
     constexpr size_t N_COUNTS = 3; /* API calls, data chunks, surfaces */
@@ -347,8 +414,16 @@ bool APIDumpLoader::WorkloadReader::read_next_segment(Workload* out_workload_ptr
 
     if (n_bytes_available == 0)
     {
-        /* Clean end of file. */
-        m_is_finished = true;
+        /* A frame which is not complete is a segment which was not written to the end. */
+        if (m_is_frame_incomplete)
+        {
+            mark_truncated_func();
+        }
+        else
+        {
+            /* Clean end of file. */
+            m_is_finished = true;
+        }
 
         goto end;
     }

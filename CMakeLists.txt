@@ -448,11 +448,23 @@ set(LIBRARY_OUTPUT_PATH ${APIInterceptor_BINARY_DIR}/bin)
 source_group ("Common include files" FILES ${CommonIncludes})
 
 if (APIINTERCEPTOR_BUILD_LIBS)
+    # Zstandard compresses the segments of workload files. Only the parts which are needed are built.
+    file(GLOB ZstdSources "${APIInterceptor_SOURCE_DIR}/deps/zstd/lib/common/*.c"
+                          "${APIInterceptor_SOURCE_DIR}/deps/zstd/lib/compress/*.c"
+                          "${APIInterceptor_SOURCE_DIR}/deps/zstd/lib/decompress/*.c")
+
+    add_library(Zstd STATIC ${ZstdSources})
+
+    target_compile_definitions(Zstd PRIVATE ZSTD_DISABLE_ASM)
+    target_include_directories(Zstd PUBLIC  "${APIInterceptor_SOURCE_DIR}/deps/zstd/lib")
+
     file(GLOB APIDumpLoaderIncludes "${APIInterceptor_SOURCE_DIR}/include/APIDumpLoader/*.h")
     file(GLOB APIDumpLoaderSources  "${APIInterceptor_SOURCE_DIR}/src/APIDumpLoader/*.cpp"
                                     "${APIInterceptor_SOURCE_DIR}/src/Common/types.cpp")
 
     add_library(APIDumpLoader STATIC ${APIDumpLoaderIncludes} ${APIDumpLoaderSources})
+
+    target_link_libraries(APIDumpLoader PUBLIC Zstd)
 
     source_group ("APIDump Loader include files"  FILES ${APIDumpLoaderIncludes})
     source_group ("APIDump Loader source files"   FILES ${APIDumpLoaderSources})
@@ -510,7 +522,7 @@ if (APIINTERCEPTOR_BUILD_TOOLS)
     add_library   (APIDumperDLL SHARED ${APIDumperDLLIncludes} ${APIDumperDLLSources})
 
     target_link_libraries(APIDumper      Detours)
-    target_link_libraries(APIDumperDLL   APIInterceptor)
+    target_link_libraries(APIDumperDLL   APIInterceptor Zstd)
     target_link_libraries(APIDumpPrinter APIDumpLoader D3D8Utils OpenGLUtils)
 
     add_dependencies(APIDumper APIDumperDLL)

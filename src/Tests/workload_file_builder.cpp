@@ -6,6 +6,7 @@
 #include "APIDumpLoader/APIDumpLoader.h"
 #include "Common/workload_format.h"
 #include "workload_file_builder.h"
+#include "zstd.h"
 #include <stdio.h>
 
 void Tests::WorkloadFileBuilder::append_bytes(std::vector<uint8_t>* inout_u8_vec_ptr,
@@ -78,6 +79,28 @@ void Tests::WorkloadFileBuilder::append_chunk(std::vector<uint8_t>*       inout_
                  in_data_u8_vec.size() );
 }
 
+void Tests::WorkloadFileBuilder::append_compressed_segment(std::vector<uint8_t>*       inout_u8_vec_ptr,
+                                                           const std::vector<uint8_t>& in_segment_u8_vec)
+{
+    constexpr int COMPRESSION_LEVEL = 1;
+
+    const size_t  file_n_bytes = inout_u8_vec_ptr->size();
+    const size_t  max_n_bytes  = ::ZSTD_compressBound(in_segment_u8_vec.size() );
+    size_t        n_bytes      = 0;
+
+    inout_u8_vec_ptr->resize(file_n_bytes + max_n_bytes);
+
+    n_bytes = ::ZSTD_compress(inout_u8_vec_ptr->data() + file_n_bytes,
+                              max_n_bytes,
+                              in_segment_u8_vec.data(),
+                              in_segment_u8_vec.size(),
+                              COMPRESSION_LEVEL);
+
+    ASSERT_FALSE(::ZSTD_isError(n_bytes) );
+
+    inout_u8_vec_ptr->resize(file_n_bytes + n_bytes);
+}
+
 void Tests::WorkloadFileBuilder::append_file_header(std::vector<uint8_t>* inout_u8_vec_ptr)
 {
     APIInterceptor::WorkloadFormat::WorkloadFileHeader header = {};
@@ -142,8 +165,10 @@ void Tests::WorkloadFileBuilder::build_frames(std::vector<uint8_t>* out_u8_vec_p
                                               const uint32_t&       in_n_frames,
                                               const uint32_t&       in_n_calls_per_frame)
 {
+    std::vector<uint8_t> segment_u8_vec;
+
     append_file_header(out_u8_vec_ptr);
-    append_header     (out_u8_vec_ptr,
+    append_header     (&segment_u8_vec,
                        in_n_frames * (in_n_calls_per_frame + 1),
                        0,  /* in_n_data_chunks */
                        0); /* in_n_surfaces    */
@@ -157,53 +182,87 @@ void Tests::WorkloadFileBuilder::build_frames(std::vector<uint8_t>* out_u8_vec_p
                     ++n_call)
         {
             /* A call which the replay has nothing to do with. */
-            append_call(out_u8_vec_ptr,
+            append_call(&segment_u8_vec,
                         n_frame * in_n_calls_per_frame + n_call,
                         APIInterceptor::APIFUNCTION_GDI32_GETPIXELFORMAT);
         }
 
         /* No window: the frame ends, whatever the replay is able to present. */
-        append_call_with_argument(out_u8_vec_ptr,
+        append_call_with_argument(&segment_u8_vec,
                                   APIInterceptor::APIFUNCTION_GDI32_SWAPBUFFERS,
                                   APIInterceptor::APIFunctionArgument::create_void_ptr(nullptr),
                                   n_frame);
     }
+
+    append_compressed_segment(out_u8_vec_ptr,
+                              segment_u8_vec);
 }
 
-size_t Tests::WorkloadFileBuilder::build_two_segments(std::vector<uint8_t>* out_u8_vec_ptr)
+void Tests::WorkloadFileBuilder::build_large_chunk(std::vector<uint8_t>* out_u8_vec_ptr)
 {
-    size_t result = 0;
+    std::vector<uint8_t> chunk_u8_vec(LARGE_CHUNK_N_BYTES);
+    std::vector<uint8_t> segment_u8_vec;
+
+    for (size_t n_byte = 0;
+                n_byte < chunk_u8_vec.size();
+              ++n_byte)
+    {
+        chunk_u8_vec.at(n_byte) = get_large_chunk_byte(n_byte);
+    }
 
     append_file_header(out_u8_vec_ptr);
 
-    append_header(out_u8_vec_ptr,
-                  2,  /* in_n_api_calls   */
-                  2,  /* in_n_data_chunks */
-                  1); /* in_n_surfaces    */
-    append_call  (out_u8_vec_ptr,
-                  10);
-    append_call  (out_u8_vec_ptr,
-                  11);
-    append_chunk (out_u8_vec_ptr,
-                  {1, 2, 3});
-    append_chunk (out_u8_vec_ptr,
-                  {});
-    append_surface(out_u8_vec_ptr,
-                   {1, 2, 3, 4, 5, 6, 7, 8});
-
-    append_header(out_u8_vec_ptr,
+    append_header(&segment_u8_vec,
                   1,  /* in_n_api_calls   */
                   1,  /* in_n_data_chunks */
                   0); /* in_n_surfaces    */
-    append_call  (out_u8_vec_ptr,
+    append_call  (&segment_u8_vec,
+                  10);
+    append_chunk (&segment_u8_vec,
+                  chunk_u8_vec);
+
+    append_compressed_segment(out_u8_vec_ptr,
+                              segment_u8_vec);
+}
+
+void Tests::WorkloadFileBuilder::build_two_segments(std::vector<uint8_t>* out_u8_vec_ptr,
+                                                    const size_t&         in_n_bytes_to_drop_from_second_segment)
+{
+    std::vector<uint8_t> first_segment_u8_vec;
+    std::vector<uint8_t> second_segment_u8_vec;
+
+    append_file_header(out_u8_vec_ptr);
+
+    append_header(&first_segment_u8_vec,
+                  2,  /* in_n_api_calls   */
+                  2,  /* in_n_data_chunks */
+                  1); /* in_n_surfaces    */
+    append_call  (&first_segment_u8_vec,
+                  10);
+    append_call  (&first_segment_u8_vec,
+                  11);
+    append_chunk (&first_segment_u8_vec,
+                  {1, 2, 3});
+    append_chunk (&first_segment_u8_vec,
+                  {});
+    append_surface(&first_segment_u8_vec,
+                   {1, 2, 3, 4, 5, 6, 7, 8});
+
+    append_header(&second_segment_u8_vec,
+                  1,  /* in_n_api_calls   */
+                  1,  /* in_n_data_chunks */
+                  0); /* in_n_surfaces    */
+    append_call  (&second_segment_u8_vec,
                   12);
+    append_chunk (&second_segment_u8_vec,
+                  {9, 9, 9, 9});
 
-    result = out_u8_vec_ptr->size();
+    second_segment_u8_vec.resize(second_segment_u8_vec.size() - in_n_bytes_to_drop_from_second_segment);
 
-    append_chunk(out_u8_vec_ptr,
-                 {9, 9, 9, 9});
-
-    return result;
+    append_compressed_segment(out_u8_vec_ptr,
+                              first_segment_u8_vec);
+    append_compressed_segment(out_u8_vec_ptr,
+                              second_segment_u8_vec);
 }
 
 const char* Tests::WorkloadFileBuilder::get_filename_ptr()
@@ -211,6 +270,15 @@ const char* Tests::WorkloadFileBuilder::get_filename_ptr()
     static constexpr const char* FILENAME_PTR = "test_workload_reader.tmp";
 
     return FILENAME_PTR;
+}
+
+/* Not much of a pattern for the compressor to find, so that the segment spans many blocks. */
+uint8_t Tests::WorkloadFileBuilder::get_large_chunk_byte(const size_t& in_n_byte)
+{
+    constexpr uint32_t MULTIPLIER = 2654435761u;
+    constexpr uint32_t SHIFT      = 24;
+
+    return static_cast<uint8_t>((in_n_byte * MULTIPLIER) >> SHIFT);
 }
 
 void Tests::WorkloadFileBuilder::write_file(const std::vector<uint8_t>& in_u8_vec)

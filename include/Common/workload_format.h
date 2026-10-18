@@ -4,7 +4,8 @@
  *
  * Layout of a workload file, shared by the dumper, the loader and the tests:
  *
- *   file    := WorkloadFileHeader segment*
+ *   file    := WorkloadFileHeader frame*
+ *   frame   := a Zstandard frame which holds one segment. The frames are decompressed as one stream.
  *   segment := 3 x uint32_t (n API calls, n data chunks, n surfaces) call* chunk* surface*
  *   call    := uint32_t function, uint32_t n in args, uint32_t n out args, uint32_t thread ID, uint64_t timestamp,
  *              in args, out args, returned value
@@ -24,7 +25,7 @@ namespace APIInterceptor
     {
         /* Size of the fixed part of a call; the arguments follow. */
         constexpr uint32_t CALL_HEADER_N_BYTES = 4 * sizeof(uint32_t) + sizeof(uint64_t);
-        constexpr uint32_t FILE_VERSION        = 2;
+        constexpr uint32_t FILE_VERSION        = 3;
         constexpr char     MAGIC[8]            = {'A', 'P', 'I', 'D', 'W', 'K', 'L', 'D'};
 
         struct WorkloadFileHeader

@@ -10,6 +10,7 @@
 #include "OpenGL/types.h"
 #include "APIDumper.h"
 #include "d3d8_swapchain_reader.h"
+#include "zstd_file_writer.h"
 #include <algorithm>
 #include <cassert>
 #include <mutex>
@@ -500,10 +501,13 @@ void APIDumper::wait_for_writer()
 
 void APIDumper::write_segment(SegmentJobUniquePtr in_job_ptr)
 {
+    /* Compression happens on the writer thread, which runs at a low priority; this level keeps up with the app. */
+    constexpr int    COMPRESSION_LEVEL       = 3;
     constexpr size_t N_SEGMENT_COUNTS        = 3; /* API calls, data chunks, surfaces */
     constexpr size_t N_SURFACE_HEADER_FIELDS = 3; /* width, height, n bytes */
 
-    FILE* const file_handle = in_job_ptr->file_handle;
+    FILE* const                           file_handle = in_job_ptr->file_handle;
+    APIDumperDLL::ZstdFileWriterUniquePtr writer_ptr;
 
     /* The writer must not disturb the app, nor be recorded. */
     ::SetThreadPriority(::GetCurrentThread(),
@@ -512,6 +516,12 @@ void APIDumper::write_segment(SegmentJobUniquePtr in_job_ptr)
     APIInterceptor::disable_callbacks_for_this_thread();
 
     if (file_handle != nullptr)
+    {
+        writer_ptr = APIDumperDLL::ZstdFileWriter::create(file_handle,
+                                                          COMPRESSION_LEVEL);
+    }
+
+    if (writer_ptr != nullptr)
     {
         const uint32_t       n_api_calls       = static_cast<uint32_t>(in_job_ptr->api_call_deque.size() );
         const uint32_t       n_data_chunks     = static_cast<uint32_t>(in_job_ptr->data_chunk_vec.size() );
@@ -523,10 +533,8 @@ void APIDumper::write_segment(SegmentJobUniquePtr in_job_ptr)
         {
             if (helper_u8_vec.empty() == false)
             {
-                ::fwrite(helper_u8_vec.data(),
-                         helper_u8_vec.size(),
-                         1,
-                         file_handle);
+                writer_ptr->write(helper_u8_vec.data(),
+                                  helper_u8_vec.size() );
 
                 helper_u8_vec.clear();
             }
@@ -599,10 +607,8 @@ void APIDumper::write_segment(SegmentJobUniquePtr in_job_ptr)
 
             if (data_chunk_size > 0)
             {
-                ::fwrite(current_data_chunk_u8_vec.data(),
-                         data_chunk_size,
-                         1,
-                         file_handle);
+                writer_ptr->write(current_data_chunk_u8_vec.data(),
+                                  data_chunk_size);
             }
         }
 
@@ -617,14 +623,18 @@ void APIDumper::write_segment(SegmentJobUniquePtr in_job_ptr)
 
             flush_func();
 
-            ::fwrite(current_surface.u8_vec_ptr->data(),
-                     current_surface.u8_vec_ptr->size(),
-                     1,
-                     file_handle);
+            writer_ptr->write(current_surface.u8_vec_ptr->data(),
+                              current_surface.u8_vec_ptr->size() );
         }
 
-        ::fflush(file_handle);
+        /* Ends the frame of the segment. */
+        writer_ptr->finish();
 
+        ::fflush(file_handle);
+    }
+
+    if (file_handle != nullptr)
+    {
         if (in_job_ptr->should_close_file)
         {
             ::fclose(file_handle);

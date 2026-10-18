@@ -18,10 +18,11 @@ namespace Tests
     class WorkloadFileBuilder
     {
     public:
-        static constexpr uint32_t POINTER_N_BYTES = 8;
-        static constexpr uint64_t QPC_FREQUENCY   = 10000000;
-        static constexpr uint32_t THREAD_ID       = 7;
-        static constexpr uint64_t TIMESTAMP_BASE  = 1000; /* a call with argument N is stamped TIMESTAMP_BASE + N */
+        static constexpr size_t   LARGE_CHUNK_N_BYTES = 3 * 1024 * 1024; /* more than the reader buffers                      */
+        static constexpr uint32_t POINTER_N_BYTES     = 8;
+        static constexpr uint64_t QPC_FREQUENCY       = 10000000;
+        static constexpr uint32_t THREAD_ID           = 7;
+        static constexpr uint64_t TIMESTAMP_BASE      = 1000;            /* a call with argument N is stamped TIMESTAMP_BASE + N */
 
         /* A file in the layout which preceded the file header: one segment, one call. */
         static void build_file_without_header(std::vector<uint8_t>* out_u8_vec_ptr);
@@ -31,11 +32,19 @@ namespace Tests
                                  const uint32_t&       in_n_frames,
                                  const uint32_t&       in_n_calls_per_frame);
 
-        /* Two segments: [2 calls, 2 chunks, 1 surface] and [1 call, 1 chunk]. Returns the offset of the second one's chunk. */
-        static size_t build_two_segments(std::vector<uint8_t>* out_u8_vec_ptr);
+        /* One segment of one call and a chunk of LARGE_CHUNK_N_BYTES bytes, which are get_large_chunk_byte(0..). */
+        static void build_large_chunk(std::vector<uint8_t>* out_u8_vec_ptr);
 
-        static const char* get_filename_ptr();
-        static void        write_file      (const std::vector<uint8_t>& in_u8_vec);
+        /* Two segments: [2 calls, 2 chunks, 1 surface] and [1 call, 1 chunk]. The last bytes of the second segment can
+         * be left out, which ends it in the middle of the chunk (the segment is compressed as it is, so the frame is
+         * complete).
+         */
+        static void build_two_segments(std::vector<uint8_t>* out_u8_vec_ptr,
+                                       const size_t&         in_n_bytes_to_drop_from_second_segment = 0);
+
+        static const char* get_filename_ptr    ();
+        static uint8_t     get_large_chunk_byte(const size_t&               in_n_byte);
+        static void        write_file          (const std::vector<uint8_t>& in_u8_vec);
 
     private:
         static void append_bytes             (std::vector<uint8_t>*                      inout_u8_vec_ptr,
@@ -50,6 +59,8 @@ namespace Tests
                                               const uint32_t&                            in_timestamp_offset);
         static void append_chunk             (std::vector<uint8_t>*                      inout_u8_vec_ptr,
                                               const std::vector<uint8_t>&                in_data_u8_vec);
+        static void append_compressed_segment(std::vector<uint8_t>*                      inout_u8_vec_ptr,
+                                              const std::vector<uint8_t>&                in_segment_u8_vec);
         static void append_file_header       (std::vector<uint8_t>*                      inout_u8_vec_ptr);
         static void append_header            (std::vector<uint8_t>*                      inout_u8_vec_ptr,
                                               const uint32_t&                            in_n_api_calls,

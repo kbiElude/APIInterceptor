@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 #include "APIDumpLoader/APIDumpLoader.h"
 #include "APIDumpLoader/WorkloadReader.h"
+#include "Common/workload_format.h"
 #include "workload_file_builder.h"
 #include <stdio.h>
 #include <string.h>
@@ -72,14 +73,12 @@ TEST(WorkloadReader, ReadsSegmentsOneAtATime)
 TEST(WorkloadReader, ReturnsWhatIsCompleteFromATruncatedFile)
 {
     std::vector<uint8_t>    file_u8_vec;
-    size_t                  second_chunk_offset = 0;
     APIDumpLoader::Workload segment;
 
-    second_chunk_offset = Tests::WorkloadFileBuilder::build_two_segments(&file_u8_vec);
-
-    /* The file ends in the middle of the last chunk. */
-    file_u8_vec.resize(second_chunk_offset + 6);
-    Tests::WorkloadFileBuilder::write_file(file_u8_vec);
+    /* The last segment ends in the middle of the last chunk. */
+    Tests::WorkloadFileBuilder::build_two_segments(&file_u8_vec,
+                                                   2); /* in_n_bytes_to_drop_from_second_segment */
+    Tests::WorkloadFileBuilder::write_file        (file_u8_vec);
 
     auto reader_ptr = APIDumpLoader::WorkloadReader::create(Tests::WorkloadFileBuilder::get_filename_ptr());
 
@@ -96,6 +95,124 @@ TEST(WorkloadReader, ReturnsWhatIsCompleteFromATruncatedFile)
               0u);
 
     EXPECT_FALSE(reader_ptr->read_next_segment(&segment) );
+
+    reader_ptr.reset();
+    ::remove(Tests::WorkloadFileBuilder::get_filename_ptr());
+}
+
+TEST(WorkloadReader, ReadsAChunkLargerThanTheBuffers)
+{
+    std::vector<uint8_t>    file_u8_vec;
+    APIDumpLoader::Workload segment;
+
+    Tests::WorkloadFileBuilder::build_large_chunk(&file_u8_vec);
+    Tests::WorkloadFileBuilder::write_file       (file_u8_vec);
+
+    auto reader_ptr = APIDumpLoader::WorkloadReader::create(Tests::WorkloadFileBuilder::get_filename_ptr());
+
+    ASSERT_NE(reader_ptr,
+              nullptr);
+    ASSERT_TRUE(reader_ptr->read_next_segment(&segment) );
+    ASSERT_EQ(segment.data_chunk_ptr_vec.size(),
+              1u);
+    ASSERT_EQ(segment.data_chunk_ptr_vec.at(0)->size(),
+              Tests::WorkloadFileBuilder::LARGE_CHUNK_N_BYTES);
+
+    for (size_t n_byte = 0;
+                n_byte < Tests::WorkloadFileBuilder::LARGE_CHUNK_N_BYTES;
+              ++n_byte)
+    {
+        ASSERT_EQ(segment.data_chunk_ptr_vec.at(0)->at(n_byte),
+                  Tests::WorkloadFileBuilder::get_large_chunk_byte(n_byte) ) << "byte " << n_byte;
+    }
+
+    EXPECT_FALSE(reader_ptr->read_next_segment(&segment) );
+    EXPECT_FALSE(reader_ptr->is_truncated() );
+
+    reader_ptr.reset();
+    ::remove(Tests::WorkloadFileBuilder::get_filename_ptr());
+}
+
+TEST(WorkloadReader, ReturnsWhatIsCompleteFromAFrameWhichEndsAbruptly)
+{
+    std::vector<uint8_t>    file_u8_vec;
+    APIDumpLoader::Workload segment;
+
+    Tests::WorkloadFileBuilder::build_large_chunk(&file_u8_vec);
+
+    /* The file ends in the middle of the frame, long after the call and before the end of the chunk. */
+    file_u8_vec.resize(file_u8_vec.size() / 2);
+    Tests::WorkloadFileBuilder::write_file(file_u8_vec);
+
+    auto reader_ptr = APIDumpLoader::WorkloadReader::create(Tests::WorkloadFileBuilder::get_filename_ptr());
+
+    ASSERT_NE(reader_ptr,
+              nullptr);
+    ASSERT_TRUE(reader_ptr->read_next_segment(&segment) );
+    EXPECT_TRUE(reader_ptr->is_truncated() );
+    EXPECT_EQ(segment.dumped_api_call_vec_ptr->size(),
+              1u);
+    EXPECT_EQ(segment.data_chunk_ptr_vec.size(),
+              0u);
+
+    EXPECT_FALSE(reader_ptr->read_next_segment(&segment) );
+
+    reader_ptr.reset();
+    ::remove(Tests::WorkloadFileBuilder::get_filename_ptr());
+}
+
+TEST(WorkloadReader, ReportsAMissingFrameAsTruncation)
+{
+    constexpr size_t N_BYTES_TO_CUT = 12;
+
+    std::vector<uint8_t>    file_u8_vec;
+    APIDumpLoader::Workload segment;
+
+    Tests::WorkloadFileBuilder::build_two_segments(&file_u8_vec);
+
+    /* Little is left of the second frame. */
+    file_u8_vec.resize(file_u8_vec.size() - N_BYTES_TO_CUT);
+    Tests::WorkloadFileBuilder::write_file(file_u8_vec);
+
+    auto reader_ptr = APIDumpLoader::WorkloadReader::create(Tests::WorkloadFileBuilder::get_filename_ptr());
+
+    ASSERT_NE(reader_ptr,
+              nullptr);
+    ASSERT_TRUE(reader_ptr->read_next_segment(&segment) );
+    EXPECT_FALSE(reader_ptr->is_truncated() );
+
+    while (reader_ptr->read_next_segment(&segment) )
+    {
+        /* Whatever is returned from the second segment, the loop must end. */
+    }
+
+    EXPECT_TRUE(reader_ptr->is_truncated() );
+
+    reader_ptr.reset();
+    ::remove(Tests::WorkloadFileBuilder::get_filename_ptr());
+}
+
+TEST(WorkloadReader, RejectsDamagedData)
+{
+    constexpr int GARBAGE_BYTE = 0xA5;
+
+    std::vector<uint8_t>    file_u8_vec;
+    APIDumpLoader::Workload segment;
+
+    Tests::WorkloadFileBuilder::build_large_chunk(&file_u8_vec);
+
+    /* Garbage in the place of the compressed data. */
+    ::memset(file_u8_vec.data() + sizeof(APIInterceptor::WorkloadFormat::WorkloadFileHeader),
+             GARBAGE_BYTE,
+             file_u8_vec.size() - sizeof(APIInterceptor::WorkloadFormat::WorkloadFileHeader) );
+    Tests::WorkloadFileBuilder::write_file(file_u8_vec);
+
+    auto reader_ptr = APIDumpLoader::WorkloadReader::create(Tests::WorkloadFileBuilder::get_filename_ptr());
+
+    ASSERT_NE(reader_ptr,
+              nullptr);
+    EXPECT_FALSE(reader_ptr->read_next_segment(&segment) );
+    EXPECT_TRUE (reader_ptr->is_truncated() );
 
     reader_ptr.reset();
     ::remove(Tests::WorkloadFileBuilder::get_filename_ptr());
