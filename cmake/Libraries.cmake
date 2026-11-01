@@ -16,6 +16,7 @@ if (APIINTERCEPTOR_BUILD_LIBS)
 
     file(GLOB APIDumpLoaderIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/APIDumpLoader/*.h")
     file(GLOB APIDumpLoaderSources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/APIDumpLoader/*.cpp"
+                                                      "${APIInterceptor_SOURCE_DIR}/src/Common/fatal_error.cpp"
                                                       "${APIInterceptor_SOURCE_DIR}/src/Common/types.cpp")
 
     add_library(APIDumpLoader STATIC ${APIDumpLoaderIncludes} ${APIDumpLoaderSources})

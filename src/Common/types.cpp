@@ -2,6 +2,7 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
+#include "Common/macros.h"
 #include "Common/types.h"
 #include <assert.h>
 
@@ -164,7 +165,7 @@ uint32_t APIInterceptor::APIFunctionArgument::get_n_arg_value_bytes() const
 
         default:
         {
-            assert(false);
+            AI_FAIL_UNSUPPORTED(type);
         }
     }
 
@@ -253,7 +254,7 @@ uint64_t APIInterceptor::APIFunctionArgument::get_ptr_as_u64() const
 
         default:
         {
-            assert(false);
+            AI_FAIL_UNSUPPORTED(type);
         }
     }
 
