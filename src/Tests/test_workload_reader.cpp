@@ -5,8 +5,8 @@
  * Checks of reading workload files segment by segment.
  */
 #include <gtest/gtest.h>
-#include "APIDumpLoader/APIDumpLoader.h"
-#include "APIDumpLoader/WorkloadReader.h"
+#include "Capture/APIDumpLoader/APIDumpLoader.h"
+#include "Capture/APIDumpLoader/WorkloadReader.h"
 #include "Common/workload_format.h"
 #include "workload_file_builder.h"
 #include <stdio.h>

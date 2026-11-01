@@ -5,7 +5,7 @@
  * Checks of the playback control of the replay engine: frame-boundary pausing, resetting and interception.
  */
 #include <gtest/gtest.h>
-#include "APIDumpReplayer/entrypoints.h"
+#include "Replay/ReplayEngineDLL/entrypoints.h"
 #include "workload_file_builder.h"
 #include <chrono>
 #include <thread>

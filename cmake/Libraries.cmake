@@ -14,8 +14,8 @@ if (APIINTERCEPTOR_BUILD_LIBS)
     target_compile_definitions(Zstd PRIVATE ZSTD_DISABLE_ASM)
     target_include_directories(Zstd PUBLIC  "${APIInterceptor_SOURCE_DIR}/deps/zstd/lib")
 
-    file(GLOB APIDumpLoaderIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/APIDumpLoader/*.h")
-    file(GLOB APIDumpLoaderSources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/APIDumpLoader/*.cpp"
+    file(GLOB APIDumpLoaderIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Capture/APIDumpLoader/*.h")
+    file(GLOB APIDumpLoaderSources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Capture/APIDumpLoader/*.cpp"
                                                       "${APIInterceptor_SOURCE_DIR}/src/Common/fatal_error.cpp"
                                                       "${APIInterceptor_SOURCE_DIR}/src/Common/types.cpp")
 

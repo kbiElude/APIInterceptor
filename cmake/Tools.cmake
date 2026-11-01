@@ -1,10 +1,10 @@
 # The dumper and the printer of a capture.
 if (APIINTERCEPTOR_BUILD_TOOLS)
-    file(GLOB APIDumperDLLIncludes CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/APIDumperDLL/*.h")
-    file(GLOB APIDumperDLLSources CONFIGURE_DEPENDS   "${APIInterceptor_SOURCE_DIR}/src/APIDumperDLL/*.cpp")
-    file(GLOB APIDumpPrinterSources CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/src/APIDumpPrinter/*.cpp")
+    file(GLOB APIDumperDLLIncludes CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/Capture/APIDumperDLL/*.h")
+    file(GLOB APIDumperDLLSources CONFIGURE_DEPENDS   "${APIInterceptor_SOURCE_DIR}/src/Capture/APIDumperDLL/*.cpp")
+    file(GLOB APIDumpPrinterSources CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/src/Capture/APIDumpPrinter/*.cpp")
 
-    add_executable(APIDumper           "${APIInterceptor_SOURCE_DIR}/src/APIDumper/main.cpp")
+    add_executable(APIDumper           "${APIInterceptor_SOURCE_DIR}/src/Capture/APIDumper/main.cpp")
     add_executable(APIDumpPrinter      ${APIDumpPrinterSources})
     add_library   (APIDumperDLL SHARED ${APIDumperDLLIncludes} ${APIDumperDLLSources})
 
@@ -18,5 +18,5 @@ if (APIINTERCEPTOR_BUILD_TOOLS)
     source_group ("APIDumperDLL source files"   FILES ${APIDumperDLLSources})
     source_group ("APIDumpPrinter source files" FILES ${APIDumpPinterSources})
 
-    include_directories("${APIInterceptor_SOURCE_DIR}/include/APIDumperDLL")
+    include_directories("${APIInterceptor_SOURCE_DIR}/include/Capture/APIDumperDLL")
 endif()
