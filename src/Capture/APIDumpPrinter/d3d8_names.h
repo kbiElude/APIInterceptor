@@ -15,16 +15,16 @@ namespace Capture
     namespace APIDumpPrinter
     {
         /* Each function returns false if the kind (or state) has no table. */
-        bool get_flag_name_table                (const Interception::Hooks::D3D8::ValueKind& in_kind,
-                                                                      const FlagNameEntry**  out_table_ptr_ptr,
-                                                                      uint32_t*              out_n_entries_ptr);
-        bool get_render_state_value_info        (const uint32_t&        in_render_state,
-                                                 StateValueInfo*        out_info_ptr);
-        bool get_texture_stage_state_value_info (const uint32_t&        in_texture_stage_state,
-                                                 StateValueInfo*        out_info_ptr);
-        bool get_value_name_table               (const Interception::Hooks::D3D8::ValueKind& in_kind,
-                                                                      const ValueNameEntry** out_table_ptr_ptr,
-                                                                      uint32_t*              out_n_entries_ptr);
+        bool get_flag_name_table               (const Interception::Hooks::D3D8::ValueKind& in_kind,
+                                                const FlagNameEntry**                       out_table_ptr_ptr,
+                                                uint32_t*                                   out_n_entries_ptr);
+        bool get_render_state_value_info       (const uint32_t&                             in_render_state,
+                                                StateValueInfo*                             out_info_ptr);
+        bool get_texture_stage_state_value_info(const uint32_t&                             in_texture_stage_state,
+                                                StateValueInfo*                             out_info_ptr);
+        bool get_value_name_table              (const Interception::Hooks::D3D8::ValueKind& in_kind,
+                                                const ValueNameEntry**                      out_table_ptr_ptr,
+                                                uint32_t*                                   out_n_entries_ptr);
     }
 }
 

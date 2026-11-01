@@ -62,7 +62,7 @@ end:
 }
 
 Capture::APIDumperDLL::ZstdFileWriterUniquePtr Capture::APIDumperDLL::ZstdFileWriter::create(FILE*      in_file_handle,
-                                                                                    const int& in_compression_level)
+                                                                                             const int& in_compression_level)
 {
     ZstdFileWriterUniquePtr result_ptr(new ZstdFileWriter() );
 

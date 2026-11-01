@@ -15,8 +15,8 @@
 
 TEST(WorkloadReader, ReadsSegmentsOneAtATime)
 {
-    std::vector<uint8_t>    file_u8_vec;
-    bool                    is_second_read_ok = false;
+    std::vector<uint8_t>             file_u8_vec;
+    bool                             is_second_read_ok = false;
     Capture::APIDumpLoader::Workload segment;
 
     Tests::WorkloadFileBuilder::build_two_segments(&file_u8_vec);
@@ -52,16 +52,16 @@ TEST(WorkloadReader, ReadsSegmentsOneAtATime)
     /* Chunk IDs count across segments; only the current segment's chunks are held. */
     EXPECT_EQ(Capture::APIDumpLoader::get_data_chunk_ptr(segment,
                                                          0),
-                       nullptr);
+              nullptr);
     ASSERT_NE(Capture::APIDumpLoader::get_data_chunk_ptr(segment,
                                                          2),
-                       nullptr);
+              nullptr);
     EXPECT_EQ(Capture::APIDumpLoader::get_data_chunk_ptr(segment,
                                                          2)->size(),
-                       4u);
+              4u);
     EXPECT_EQ(Capture::APIDumpLoader::get_data_chunk_ptr(segment,
                                                          3),
-                       nullptr);
+              nullptr);
 
     EXPECT_FALSE(reader_ptr->read_next_segment(&segment) );
     EXPECT_FALSE(reader_ptr->is_truncated() );
@@ -72,7 +72,7 @@ TEST(WorkloadReader, ReadsSegmentsOneAtATime)
 
 TEST(WorkloadReader, ReturnsWhatIsCompleteFromATruncatedFile)
 {
-    std::vector<uint8_t>    file_u8_vec;
+    std::vector<uint8_t>             file_u8_vec;
     Capture::APIDumpLoader::Workload segment;
 
     /* The last segment ends in the middle of the last chunk. */
@@ -102,7 +102,7 @@ TEST(WorkloadReader, ReturnsWhatIsCompleteFromATruncatedFile)
 
 TEST(WorkloadReader, ReadsAChunkLargerThanTheBuffers)
 {
-    std::vector<uint8_t>    file_u8_vec;
+    std::vector<uint8_t>             file_u8_vec;
     Capture::APIDumpLoader::Workload segment;
 
     Tests::WorkloadFileBuilder::build_large_chunk(&file_u8_vec);
@@ -135,7 +135,7 @@ TEST(WorkloadReader, ReadsAChunkLargerThanTheBuffers)
 
 TEST(WorkloadReader, ReturnsWhatIsCompleteFromAFrameWhichEndsAbruptly)
 {
-    std::vector<uint8_t>    file_u8_vec;
+    std::vector<uint8_t>             file_u8_vec;
     Capture::APIDumpLoader::Workload segment;
 
     Tests::WorkloadFileBuilder::build_large_chunk(&file_u8_vec);
@@ -165,7 +165,7 @@ TEST(WorkloadReader, ReportsAMissingFrameAsTruncation)
 {
     constexpr size_t N_BYTES_TO_CUT = 12;
 
-    std::vector<uint8_t>    file_u8_vec;
+    std::vector<uint8_t>             file_u8_vec;
     Capture::APIDumpLoader::Workload segment;
 
     Tests::WorkloadFileBuilder::build_two_segments(&file_u8_vec);
@@ -196,7 +196,7 @@ TEST(WorkloadReader, RejectsDamagedData)
 {
     constexpr int GARBAGE_BYTE = 0xA5;
 
-    std::vector<uint8_t>    file_u8_vec;
+    std::vector<uint8_t>             file_u8_vec;
     Capture::APIDumpLoader::Workload segment;
 
     Tests::WorkloadFileBuilder::build_large_chunk(&file_u8_vec);
@@ -239,7 +239,7 @@ TEST(WorkloadReader, WholeFileLoadingJoinsTheSegments)
               0u);
     EXPECT_EQ(Capture::APIDumpLoader::get_data_chunk_ptr(*workload_ptr,
                                                          2)->size(),
-                       4u);
+              4u);
 
     ::remove(Tests::WorkloadFileBuilder::get_filename_ptr());
 }
@@ -247,12 +247,12 @@ TEST(WorkloadReader, WholeFileLoadingJoinsTheSegments)
 TEST(WorkloadReader, MissingFileCannotBeOpened)
 {
     EXPECT_EQ(Capture::APIDumpLoader::WorkloadReader::create("this_file_does_not_exist.workload"),
-                       nullptr);
+              nullptr);
 }
 
 TEST(WorkloadReader, ExposesFileHeaderAndCallHeaderFields)
 {
-    std::vector<uint8_t>    file_u8_vec;
+    std::vector<uint8_t>             file_u8_vec;
     Capture::APIDumpLoader::Workload segment;
 
     Tests::WorkloadFileBuilder::build_two_segments(&file_u8_vec);
@@ -287,11 +287,11 @@ TEST(WorkloadReader, RejectsAFileWithoutTheHeader)
 
     EXPECT_EQ(Capture::APIDumpLoader::WorkloadReader::create(Tests::WorkloadFileBuilder::get_filename_ptr(),
                                                             &error),
-                       nullptr);
+              nullptr);
     EXPECT_FALSE(error.empty() );
 
     EXPECT_EQ(Capture::APIDumpLoader::create_workload_from_file(Tests::WorkloadFileBuilder::get_filename_ptr() ),
-                       nullptr);
+              nullptr);
 
     ::remove(Tests::WorkloadFileBuilder::get_filename_ptr());
 }

@@ -51,7 +51,7 @@ bool Capture::APIDumpLoader::WorkloadReader::contains_api_group(const APIGroup& 
     bool     result = false;
     Workload workload;
 
-    while (result == false &&
+    while (result                       == false &&
            read_next_segment(&workload) )
     {
         for (const auto& call : *workload.dumped_api_call_vec_ptr)
@@ -69,7 +69,7 @@ bool Capture::APIDumpLoader::WorkloadReader::contains_api_group(const APIGroup& 
 }
 
 Capture::APIDumpLoader::WorkloadReaderUniquePtr Capture::APIDumpLoader::WorkloadReader::create(const char*  in_filename_ptr,
-                                                                                      std::string* out_error_ptr)
+                                                                                               std::string* out_error_ptr)
 {
     std::string                                        error;
     APIInterceptor::WorkloadFormat::WorkloadFileHeader header;
@@ -113,8 +113,10 @@ Capture::APIDumpLoader::WorkloadReaderUniquePtr Capture::APIDumpLoader::Workload
 
     if (header.version != APIInterceptor::WorkloadFormat::FILE_VERSION)
     {
-        error = "The workload file has an unsupported version (" + std::to_string(header.version) +
-                ", expected "                                    + std::to_string(APIInterceptor::WorkloadFormat::FILE_VERSION) +
+        error = "The workload file has an unsupported version ("             +
+                std::to_string(header.version)                               +
+                ", expected "                                                +
+                std::to_string(APIInterceptor::WorkloadFormat::FILE_VERSION) +
                 "). Capture it again.";
 
         goto fail;
@@ -441,9 +443,10 @@ bool Capture::APIDumpLoader::WorkloadReader::read_next_segment(Workload* out_wor
 
     m_buffer_start += segment_header_n_bytes;
 
-    out_workload_ptr->data_chunk_ptr_vec.clear();
+    out_workload_ptr->data_chunk_ptr_vec.clear     ();
     out_workload_ptr->dumped_api_call_vec_ptr.reset(new DumpedAPICallVector() );
     out_workload_ptr->dumped_surface_vec_ptr.reset (new DumpedSurfaceVector() );
+
     out_workload_ptr->first_data_chunk_id = m_n_data_chunks_read;
     out_workload_ptr->pointer_n_bytes     = m_pointer_n_bytes;
     out_workload_ptr->qpc_frequency       = m_qpc_frequency;

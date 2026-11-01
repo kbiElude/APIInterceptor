@@ -36,7 +36,7 @@ APIDumperUniquePtr APIDumper::create()
 
     if (result_ptr != nullptr)
     {
-        if (!result_ptr->init() )
+        if (result_ptr->init() == false)
         {
             result_ptr.reset();
         }
@@ -193,7 +193,7 @@ void APIDumper::on_frame_presented()
         std::lock_guard<std::mutex> guard(m_recorded.mutex);
 
         is_dump_complete = (m_recorded.n_frames_dumped >= m_settings.n_frames_to_dump);
-        should_spill     = (get_n_unwritten_bytes() >= m_settings.n_bytes_before_spill);
+        should_spill     = (get_n_unwritten_bytes()    >= m_settings.n_bytes_before_spill);
     }
 
     /* The dump is complete: write it now, so the process need not exit gracefully. Otherwise, frame boundaries are
@@ -212,8 +212,8 @@ void APIDumper::on_frame_presented()
 
 void APIDumper::on_post_callback(APIInterceptor::APIFunction                in_api_func,
                                  void*                                      in_user_arg_ptr,
-                                 uint32_t                                   in_n_args_out,
-                                 const APIInterceptor::APIFunctionArgument* in_args_out_ptr,
+                                 uint32_t                                   in_n_arguments_out,
+                                 const APIInterceptor::APIFunctionArgument* in_arguments_out_ptr,
                                  const APIInterceptor::APIFunctionArgument* in_returned_value_ptr)
 {
     bool       is_frame_presented = false;
@@ -247,14 +247,14 @@ void APIDumper::on_post_callback(APIInterceptor::APIFunction                in_a
             if (deque_iterator != this_ptr->m_recorded.api_call_deque.rend() )
             {
                 deque_iterator->is_completed   = true;
-                deque_iterator->n_args_out     = in_n_args_out;
+                deque_iterator->n_arguments_out     = in_n_arguments_out;
                 deque_iterator->returned_value = *in_returned_value_ptr;
 
                 for (uint32_t n_arg = 0;
-                              n_arg < in_n_args_out;
+                              n_arg < in_n_arguments_out;
                             ++n_arg)
                 {
-                    deque_iterator->args_out[n_arg] = in_args_out_ptr[n_arg];
+                    deque_iterator->arguments_out[n_arg] = in_arguments_out_ptr[n_arg];
                 }
             }
         }
@@ -263,7 +263,7 @@ void APIDumper::on_post_callback(APIInterceptor::APIFunction                in_a
          *
          * TODO: This will break down badly for apps that do NOT use back buffer..
          */
-        if (in_api_func == APIInterceptor::APIFUNCTION_GDI32_SWAPBUFFERS           ||
+        if (in_api_func == APIInterceptor::APIFUNCTION_GDI32_SWAPBUFFERS             ||
             in_api_func == APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_PRESENT)
         {
             this_ptr->m_recorded.n_frames_dumped++;
@@ -279,24 +279,24 @@ void APIDumper::on_post_callback(APIInterceptor::APIFunction                in_a
 }
 
 void APIDumper::on_pre_callback(APIInterceptor::APIFunction                in_api_func,
-                                uint32_t                                   in_n_args_in,
-                                const APIInterceptor::APIFunctionArgument* in_args_in_ptr,
+                                uint32_t                                   in_n_arguments_in,
+                                const APIInterceptor::APIFunctionArgument* in_arguments_in_ptr,
                                 void*                                      in_user_arg_ptr,
                                 bool*                                      out_should_pass_through_ptr)
 {
     APIDumper* this_ptr(reinterpret_cast<APIDumper*>(in_user_arg_ptr) );
 
-    assert(sizeof(DumpedAPICall::args_in) / sizeof(DumpedAPICall::args_in[0]) >= in_n_args_in);
+    assert(sizeof(DumpedAPICall::arguments_in) / sizeof(DumpedAPICall::arguments_in[0]) >= in_n_arguments_in);
 
-    if (in_api_func                 == APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_PRESENT &&
-        this_ptr->m_recorded.n_frames_dumped <  this_ptr->m_settings.n_frames_to_dump                              &&
+    if (in_api_func                          == APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_PRESENT &&
+        this_ptr->m_recorded.n_frames_dumped <  this_ptr->m_settings.n_frames_to_dump                     &&
         this_ptr->m_settings.dump_swapchain_on_present)
     {
         DumpedSurface new_surface;
         auto          rgba_u8_vec_ptr = std::unique_ptr<std::vector<uint8_t> >(new std::vector<uint8_t>() );
 
         /* The device is the first argument of the call. */
-        if (Capture::APIDumperDLL::D3D8SwapchainReader::read(const_cast<void*>(in_args_in_ptr[0].get_ptr() ),
+        if (Capture::APIDumperDLL::D3D8SwapchainReader::read(const_cast<void*>(in_arguments_in_ptr[0].get_ptr() ),
                                                             &new_surface.extents_u32vec2,
                                                              rgba_u8_vec_ptr.get() ))
         {
@@ -312,14 +312,14 @@ void APIDumper::on_pre_callback(APIInterceptor::APIFunction                in_ap
         }
     }
 
-    if (in_api_func                           == APIInterceptor::APIFUNCTION_GDI32_SWAPBUFFERS &&
-        this_ptr->m_recorded.n_frames_dumped           <  this_ptr->m_settings.n_frames_to_dump                  &&
+    if (in_api_func                                    == APIInterceptor::APIFUNCTION_GDI32_SWAPBUFFERS &&
+        this_ptr->m_recorded.n_frames_dumped           <  this_ptr->m_settings.n_frames_to_dump         &&
         this_ptr->m_settings.dump_swapchain_on_present)
     {
         std::unique_ptr<std::vector<uint8_t> > swapchain_data_u8_vec_ptr;
         std::array<uint32_t, 2>                swapchain_extents_u32vec2 = {640, 480};
         RECT                                   window_client_rect        = {};
-        const auto                             window_handle             = ::WindowFromDC(reinterpret_cast<HDC>(const_cast<void*>(in_args_in_ptr[0].get_ptr() )));
+        const auto                             window_handle             = ::WindowFromDC(reinterpret_cast<HDC>(const_cast<void*>(in_arguments_in_ptr[0].get_ptr() )));
 
         ::GetClientRect(window_handle,
                        &window_client_rect);
@@ -373,15 +373,15 @@ void APIDumper::on_pre_callback(APIInterceptor::APIFunction                in_ap
             ::QueryPerformanceCounter(&qpc_timestamp);
 
             new_item.api_func      = in_api_func;
-            new_item.n_args_in     = in_n_args_in;
+            new_item.n_arguments_in     = in_n_arguments_in;
             new_item.thread_id     = static_cast<uint32_t>(::GetCurrentThreadId() );
             new_item.timestamp_qpc = static_cast<uint64_t>(qpc_timestamp.QuadPart);
 
             for (uint32_t n_arg = 0;
-                          n_arg < in_n_args_in;
+                          n_arg < in_n_arguments_in;
                         ++n_arg)
             {
-                new_item.args_in[n_arg] = in_args_in_ptr[n_arg];
+                new_item.arguments_in[n_arg] = in_arguments_in_ptr[n_arg];
             }
 
             {
@@ -405,9 +405,12 @@ void APIDumper::on_process_exiting(void* in_user_arg_ptr)
      */
     {
         std::lock_guard<std::mutex> cut_guard(this_ptr->m_cut.mutex);
-        std::lock_guard<std::mutex> guard    (this_ptr->m_recorded.mutex);
 
-        this_ptr->write_workload();
+        {
+            std::lock_guard<std::mutex> guard(this_ptr->m_recorded.mutex);
+
+            this_ptr->write_workload();
+        }
     }
 
     this_ptr->wait_for_writer();
@@ -417,8 +420,7 @@ void APIDumper::perform_cut(const bool& in_is_last)
 {
     /* How long to wait for other threads to leave their API calls, before giving up on this cut. */
     constexpr uint32_t QUIESCE_TIMEOUT_MS = 100;
-
-    bool is_quiescent = false;
+    bool               is_quiescent       = false;
 
     /* Waiting for the previous segment to be written must not hold back the other threads. */
     wait_for_writer();
@@ -467,8 +469,10 @@ void APIDumper::submit_segment(const bool& in_is_last)
 
         /* The render thread only moves the data around; serializing and writing it is up to the writer. */
         job_ptr->api_call_deque.swap(m_recorded.api_call_deque);
+
         job_ptr->file_handle       = m_recorded.file_handle;
         job_ptr->should_close_file = in_is_last;
+
         job_ptr->surface_vec.swap(m_recorded.surface_vec);
 
         APIInterceptor::take_data_chunks(first_data_chunk,
@@ -504,9 +508,9 @@ void APIDumper::write_segment(SegmentJobUniquePtr in_job_ptr)
     /* Compression happens on the writer thread, which runs at a low priority; this level keeps up with the app. */
     constexpr int    COMPRESSION_LEVEL       = 3;
     constexpr size_t N_SEGMENT_COUNTS        = 3; /* API calls, data chunks, surfaces */
-    constexpr size_t N_SURFACE_HEADER_FIELDS = 3; /* width, height, n bytes */
+    constexpr size_t N_SURFACE_HEADER_FIELDS = 3; /* width, height, n bytes           */
 
-    FILE* const                           file_handle = in_job_ptr->file_handle;
+    FILE* const                                    file_handle = in_job_ptr->file_handle;
     Capture::APIDumperDLL::ZstdFileWriterUniquePtr writer_ptr;
 
     /* The writer must not disturb the app, nor be recorded. */
@@ -564,9 +568,9 @@ void APIDumper::write_segment(SegmentJobUniquePtr in_job_ptr)
             *reinterpret_cast<APIInterceptor::APIFunction*>(helper_u8_ptr)  = current_api_call.api_func;
              helper_u8_ptr                                                 += sizeof(APIInterceptor::APIFunction);
 
-            *reinterpret_cast<uint32_t*>(helper_u8_ptr)  = current_api_call.n_args_in;
+            *reinterpret_cast<uint32_t*>(helper_u8_ptr)  = current_api_call.n_arguments_in;
              helper_u8_ptr                              += sizeof(uint32_t);
-            *reinterpret_cast<uint32_t*>(helper_u8_ptr)  = current_api_call.n_args_out;
+            *reinterpret_cast<uint32_t*>(helper_u8_ptr)  = current_api_call.n_arguments_out;
              helper_u8_ptr                              += sizeof(uint32_t);
             *reinterpret_cast<uint32_t*>(helper_u8_ptr)  = current_api_call.thread_id;
              helper_u8_ptr                              += sizeof(uint32_t);
@@ -576,17 +580,17 @@ void APIDumper::write_segment(SegmentJobUniquePtr in_job_ptr)
                    sizeof(uint64_t) );
 
             for (uint32_t n_api_call_arg = 0;
-                          n_api_call_arg < current_api_call.n_args_in;
+                          n_api_call_arg < current_api_call.n_arguments_in;
                         ++n_api_call_arg)
             {
-                current_api_call.args_in[n_api_call_arg].serialize_to_u8_vec(&helper_u8_vec);
+                current_api_call.arguments_in[n_api_call_arg].serialize_to_u8_vec(&helper_u8_vec);
             }
 
             for (uint32_t n_api_call_arg = 0;
-                          n_api_call_arg < current_api_call.n_args_out;
+                          n_api_call_arg < current_api_call.n_arguments_out;
                         ++n_api_call_arg)
             {
-                current_api_call.args_out[n_api_call_arg].serialize_to_u8_vec(&helper_u8_vec);
+                current_api_call.arguments_out[n_api_call_arg].serialize_to_u8_vec(&helper_u8_vec);
             }
 
             current_api_call.returned_value.serialize_to_u8_vec(&helper_u8_vec);

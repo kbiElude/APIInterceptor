@@ -47,7 +47,7 @@ Capture::APIDumpLoader::WorkloadUniquePtr Capture::APIDumpLoader::create_workloa
 }
 
 const Capture::APIDumpLoader::DataChunk* Capture::APIDumpLoader::get_data_chunk_ptr(const Workload& in_workload,
-                                                                           const uint32_t& in_data_chunk_id)
+                                                                                    const uint32_t& in_data_chunk_id)
 {
     const DataChunk* result = nullptr;
 

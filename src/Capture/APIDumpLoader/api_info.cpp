@@ -3,6 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "Capture/APIDumpLoader/api_info.h"
+#include "Common/macros.h"
 #include <string.h>
 
 Capture::APIDumpLoader::APIGroup Capture::APIDumpLoader::get_api_group(const APIInterceptor::APIFunction& in_function)
@@ -83,8 +84,15 @@ const char* Capture::APIDumpLoader::get_api_group_name(const APIGroup& in_group)
             break;
         }
 
+        case APIGroup::UNKNOWN:
+        {
+            break;
+        }
+
         default:
         {
+            AI_FAIL_UNSUPPORTED(in_group);
+
             break;
         }
     }
@@ -111,7 +119,7 @@ bool Capture::APIDumpLoader::is_frame_boundary(const APIInterceptor::APIFunction
     bool result = false;
 
     /* IDirect3DSwapChain8::Present is not a boundary: it presents additional swap chains. */
-    if (in_function == APIInterceptor::APIFUNCTION_GDI32_SWAPBUFFERS ||
+    if (in_function == APIInterceptor::APIFUNCTION_GDI32_SWAPBUFFERS             ||
         in_function == APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_PRESENT)
     {
         result = true;

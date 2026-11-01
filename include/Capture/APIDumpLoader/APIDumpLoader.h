@@ -51,6 +51,7 @@ namespace Capture
 
         typedef std::unique_ptr<Workload> WorkloadUniquePtr;
 
+
         /* Loads the whole file into one workload. Use WorkloadReader for dumps which are too big for that. */
         WorkloadUniquePtr create_workload_from_file(const char* in_filename_ptr);
 

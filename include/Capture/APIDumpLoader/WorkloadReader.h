@@ -24,10 +24,18 @@ namespace Capture
 
         typedef std::unique_ptr<WorkloadReader> WorkloadReaderUniquePtr;
 
+
         class WorkloadReader
         {
         public:
             ~WorkloadReader();
+
+            /* Returns nullptr if the file cannot be opened, or is not a workload this version can read. In that case,
+             * *out_error_ptr (if not null) says why.
+             */
+            static WorkloadReaderUniquePtr create(const char*  in_filename_ptr,
+                                                  std::string* out_error_ptr = nullptr);
+
 
             /* Reads on until it meets a call of the group. The segments which were read are gone, so this is for a reader
              * which has not been used for anything else. Returns false if the file has no such call.
@@ -45,12 +53,6 @@ namespace Capture
              * is_truncated() starts to return true; the next call returns false.
              */
             bool read_next_segment(Workload* out_workload_ptr);
-
-            /* Returns nullptr if the file cannot be opened, or is not a workload this version can read. In that case,
-             * *out_error_ptr (if not null) says why.
-             */
-            static WorkloadReaderUniquePtr create(const char*  in_filename_ptr,
-                                                  std::string* out_error_ptr = nullptr);
 
         private:
             WorkloadReader();
@@ -70,6 +72,7 @@ namespace Capture
             size_t read_decompressed(void*          out_data_ptr,
                                      const size_t&  in_n_bytes);
             bool   read_surface     (DumpedSurface* out_surface_ptr);
+
 
             std::vector<uint8_t> m_buffer_u8_vec;
             size_t               m_buffer_end;

@@ -3,6 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "api_info.h"
+#include "Common/macros.h"
 #include "Interception/Core/D3D8Utils/methods.h"
 
 const char* Capture::APIDumpPrinter::get_function_name(const APIInterceptor::APIFunction& in_function)
@@ -34,8 +35,15 @@ const char* Capture::APIDumpPrinter::get_function_name(const APIInterceptor::API
             break;
         }
 
+        case Capture::APIDumpLoader::APIGroup::UNKNOWN:
+        {
+            break;
+        }
+
         default:
         {
+            AI_FAIL_UNSUPPORTED(Capture::APIDumpLoader::get_api_group(in_function) );
+
             break;
         }
     }

@@ -3,6 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "d3d8_decoder.h"
+#include "Common/macros.h"
 #include "d3d8_names.h"
 #include "Interception/Core/D3D8Utils/argument_info.h"
 #include "Interception/Core/D3D8Utils/methods.h"
@@ -62,7 +63,7 @@ std::string Capture::APIDumpPrinter::D3D8Decoder::format_color_value(const Inter
 }
 
 std::string Capture::APIDumpPrinter::D3D8Decoder::format_enum(const Interception::Hooks::D3D8::ValueKind& in_kind,
-                                                                                    const uint32_t&        in_value)
+                                                               const uint32_t&                             in_value)
 {
     const ValueNameEntry* table_ptr = nullptr;
     uint32_t              n_entries = 0;
@@ -89,7 +90,7 @@ std::string Capture::APIDumpPrinter::D3D8Decoder::format_enum(const Interception
 }
 
 std::string Capture::APIDumpPrinter::D3D8Decoder::format_flags(const Interception::Hooks::D3D8::ValueKind& in_kind,
-                                                                                     const uint32_t&        in_value)
+                                                                const uint32_t&                             in_value)
 {
     const FlagNameEntry* table_ptr = nullptr;
     uint32_t             n_entries = 0;
@@ -280,13 +281,13 @@ std::string Capture::APIDumpPrinter::D3D8Decoder::format_resource_properties(con
                                                                               const uint32_t& in_pool)
 {
     const std::string format_name = format_enum(Interception::Hooks::D3D8::ValueKind::FORMAT,
-                                                                     in_format);
+                                                in_format);
     const std::string pool_name   = format_enum(Interception::Hooks::D3D8::ValueKind::POOL,
-                                                                     in_pool);
+                                                in_pool);
     const std::string type_name   = format_enum(Interception::Hooks::D3D8::ValueKind::RESOURCE_TYPE,
-                                                                     in_type);
+                                                in_type);
     const std::string usage_names = format_flags(Interception::Hooks::D3D8::ValueKind::USAGE_FLAGS,
-                                                                      in_usage);
+                                                 in_usage);
 
     return "Format=" + format_name + " Type=" + type_name + " Usage=" + usage_names + " Pool=" + pool_name;
 }
@@ -423,9 +424,16 @@ std::string Capture::APIDumpPrinter::D3D8Decoder::format_state_value(const State
             break;
         }
 
-        default:
+        case StateValueFormat::RAW:
         {
             /* Raw */
+            break;
+        }
+
+        default:
+        {
+            AI_FAIL_UNSUPPORTED(in_info.format);
+
             break;
         }
     }
@@ -433,9 +441,9 @@ std::string Capture::APIDumpPrinter::D3D8Decoder::format_state_value(const State
     return result;
 }
 
-bool Capture::APIDumpPrinter::D3D8Decoder::format_struct(const Interception::Hooks::D3D8::ValueKind&      in_kind,
-                                                                               const std::vector<uint8_t>& in_chunk_u8_vec,
-                                                                               std::string*                out_text_ptr)
+bool Capture::APIDumpPrinter::D3D8Decoder::format_struct(const Interception::Hooks::D3D8::ValueKind& in_kind,
+                                                          const std::vector<uint8_t>&                 in_chunk_u8_vec,
+                                                          std::string*                                out_text_ptr)
 {
     /* The dumped process may be 32- or 64-bit, so the layout of the structures holding pointers differs. */
     constexpr size_t POINTER_N_BYTES_32 = 4;
@@ -541,7 +549,7 @@ bool Capture::APIDumpPrinter::D3D8Decoder::format_struct(const Interception::Hoo
                           sizeof(value) ))
             {
                 stream << "{DeviceType=" << format_enum(Interception::Hooks::D3D8::ValueKind::DEVICE_TYPE,
-                                                                            static_cast<uint32_t>(value.DeviceType) )
+                                                       static_cast<uint32_t>(value.DeviceType) )
                        << " AdapterOrdinal=" << value.AdapterOrdinal
                        << " Caps=" << format_hex(value.Caps)
                        << " Caps2=" << format_hex(value.Caps2)
@@ -628,9 +636,9 @@ bool Capture::APIDumpPrinter::D3D8Decoder::format_struct(const Interception::Hoo
             {
                 stream << "{AdapterOrdinal=" << read_u32_func(0 * sizeof(uint32_t))
                        << " DeviceType=" << format_enum(Interception::Hooks::D3D8::ValueKind::DEVICE_TYPE,
-                                                                             read_u32_func(1 * sizeof(uint32_t)) )
+                                                        read_u32_func(1 * sizeof(uint32_t)) )
                        << " BehaviorFlags=" << format_flags(Interception::Hooks::D3D8::ValueKind::CREATE_FLAGS,
-                                                                                 read_u32_func(CREATION_PARAMETERS_HEAD_N_BYTES + pointer_size) ) << "}";
+                                                            read_u32_func(CREATION_PARAMETERS_HEAD_N_BYTES + pointer_size) ) << "}";
 
                 result = true;
             }
@@ -647,7 +655,7 @@ bool Capture::APIDumpPrinter::D3D8Decoder::format_struct(const Interception::Hoo
             {
                 stream << "{Width=" << value.Width << " Height=" << value.Height << " RefreshRate=" << value.RefreshRate
                        << " Format=" << format_enum(Interception::Hooks::D3D8::ValueKind::FORMAT,
-                                                                         value.Format) << "}";
+                                                    value.Format) << "}";
 
                 result = true;
             }
@@ -762,7 +770,7 @@ bool Capture::APIDumpPrinter::D3D8Decoder::format_struct(const Interception::Hoo
                           sizeof(value) ))
             {
                 stream << "{Type=" << format_enum(Interception::Hooks::D3D8::ValueKind::LIGHT_TYPE,
-                                                                       value.Type)
+                                                  value.Type)
                        << " Diffuse=" << format_color_value(value.Diffuse)
                        << " Specular=" << format_color_value(value.Specular)
                        << " Ambient=" << format_color_value(value.Ambient)
@@ -908,16 +916,16 @@ bool Capture::APIDumpPrinter::D3D8Decoder::format_struct(const Interception::Hoo
                 stream << "{BackBufferWidth=" << read_u32_func(0 * sizeof(uint32_t))
                        << " BackBufferHeight=" << read_u32_func(1 * sizeof(uint32_t))
                        << " BackBufferFormat=" << format_enum(Interception::Hooks::D3D8::ValueKind::FORMAT,
-                                                                                   read_u32_func(2 * sizeof(uint32_t)) )
+                                                              read_u32_func(2 * sizeof(uint32_t)) )
                        << " BackBufferCount=" << read_u32_func(3 * sizeof(uint32_t))
                        << " MultiSampleType=" << format_enum(Interception::Hooks::D3D8::ValueKind::MULTI_SAMPLE_TYPE,
-                                                                                  read_u32_func(4 * sizeof(uint32_t)) )
+                                                             read_u32_func(4 * sizeof(uint32_t)) )
                        << " SwapEffect=" << format_enum(Interception::Hooks::D3D8::ValueKind::SWAP_EFFECT,
-                                                                             read_u32_func(5 * sizeof(uint32_t)) )
+                                                        read_u32_func(5 * sizeof(uint32_t)) )
                        << " Windowed=" << format_boolean(static_cast<int32_t>(read_u32_func(tail_offset + 0 * sizeof(uint32_t)) ))
                        << " EnableAutoDepthStencil=" << format_boolean(static_cast<int32_t>(read_u32_func(tail_offset + 1 * sizeof(uint32_t)) ))
                        << " AutoDepthStencilFormat=" << format_enum(Interception::Hooks::D3D8::ValueKind::FORMAT,
-                                                                                         read_u32_func(tail_offset + 2 * sizeof(uint32_t)) )
+                                                                    read_u32_func(tail_offset + 2 * sizeof(uint32_t)) )
                        << " Flags=" << format_hex(read_u32_func(tail_offset + 3 * sizeof(uint32_t)) )
                        << " FullScreen_RefreshRateInHz=" << read_u32_func(tail_offset + 4 * sizeof(uint32_t))
                        << " FullScreen_PresentationInterval=" << format_hex(read_u32_func(tail_offset + 5 * sizeof(uint32_t)) ) << "}";
@@ -999,9 +1007,9 @@ bool Capture::APIDumpPrinter::D3D8Decoder::format_struct(const Interception::Hoo
                        << " Height=" << value.Height
                        << " Stride=" << value.Stride
                        << " Basis=" << format_enum(Interception::Hooks::D3D8::ValueKind::BASIS_TYPE,
-                                                                        value.Basis)
+                                                   value.Basis)
                        << " Order=" << format_enum(Interception::Hooks::D3D8::ValueKind::ORDER_TYPE,
-                                                                        value.Order) << "}";
+                                                   value.Order) << "}";
 
                 result = true;
             }
@@ -1022,7 +1030,7 @@ bool Capture::APIDumpPrinter::D3D8Decoder::format_struct(const Interception::Hoo
                                                             value.Pool)
                        << " Size=" << value.Size
                        << " MultiSampleType=" << format_enum(Interception::Hooks::D3D8::ValueKind::MULTI_SAMPLE_TYPE,
-                                                                                  value.MultiSampleType)
+                                                             value.MultiSampleType)
                        << " Width=" << value.Width
                        << " Height=" << value.Height << "}";
 
@@ -1042,9 +1050,9 @@ bool Capture::APIDumpPrinter::D3D8Decoder::format_struct(const Interception::Hoo
                 stream << "{StartVertexOffset=" << value.StartVertexOffset
                        << " NumVertices=" << value.NumVertices
                        << " Basis=" << format_enum(Interception::Hooks::D3D8::ValueKind::BASIS_TYPE,
-                                                                        value.Basis)
+                                                   value.Basis)
                        << " Order=" << format_enum(Interception::Hooks::D3D8::ValueKind::ORDER_TYPE,
-                                                                        value.Order) << "}";
+                                                   value.Order) << "}";
 
                 result = true;
             }
@@ -1157,16 +1165,16 @@ std::string Capture::APIDumpPrinter::D3D8Decoder::get_object_name(const void* in
     return result;
 }
 
-bool Capture::APIDumpPrinter::D3D8Decoder::print_argument(FILE*                                      in_file_handle,
-                                                           const Capture::APIDumpLoader::DumpedAPICall&        in_call,
-                                                           const uint32_t&                            in_n_argument,
-                                                           const bool&                                in_is_out,
-                                                           const APIInterceptor::APIFunctionArgument& in_argument,
-                                                           const Capture::APIDumpLoader::Workload&             in_workload) const
+bool Capture::APIDumpPrinter::D3D8Decoder::print_argument(FILE*                                        in_file_handle,
+                                                           const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                           const uint32_t&                              in_n_argument,
+                                                           const bool&                                  in_is_out,
+                                                           const APIInterceptor::APIFunctionArgument&   in_argument,
+                                                           const Capture::APIDumpLoader::Workload&      in_workload) const
 {
     Interception::Hooks::D3D8::ArgumentInfo info   = {};
-    bool               result = false;
-    std::string        text;
+    bool                                    result = false;
+    std::string                             text;
 
     if (Interception::Core::D3D8Utils::get_argument_info(in_call.func,
                                                          in_n_argument,
@@ -1391,13 +1399,13 @@ end:
     return result;
 }
 
-bool Capture::APIDumpPrinter::D3D8Decoder::print_returned_value(FILE*                                      in_file_handle,
-                                                                 const Capture::APIDumpLoader::DumpedAPICall&        in_call,
-                                                                 const APIInterceptor::APIFunctionArgument& in_returned_value) const
+bool Capture::APIDumpPrinter::D3D8Decoder::print_returned_value(FILE*                                        in_file_handle,
+                                                                 const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                                 const APIInterceptor::APIFunctionArgument&   in_returned_value) const
 {
     Interception::Hooks::D3D8::ArgumentInfo info   = {};
-    bool               result = false;
-    std::string        text;
+    bool                                    result = false;
+    std::string                             text;
 
     if (in_call.func == APIInterceptor::APIFUNCTION_D3D8_DIRECT3DCREATE8)
     {
@@ -1414,21 +1422,21 @@ bool Capture::APIDumpPrinter::D3D8Decoder::print_returned_value(FILE*           
         }
 
         if (info.kind              == Interception::Hooks::D3D8::ValueKind::HRESULT &&
-                                 in_returned_value.type == APIInterceptor::ARGTYPE_I32)
+            in_returned_value.type == APIInterceptor::ARGTYPE_I32)
         {
             text   = format_hresult(in_returned_value.get_i32() );
             result = true;
         }
         else
         if (info.kind              == Interception::Hooks::D3D8::ValueKind::BOOLEAN &&
-                                 in_returned_value.type == APIInterceptor::ARGTYPE_I32)
+            in_returned_value.type == APIInterceptor::ARGTYPE_I32)
         {
             text   = format_boolean(in_returned_value.get_i32() );
             result = true;
         }
         else
         if (info.kind              == Interception::Hooks::D3D8::ValueKind::RESOURCE_TYPE &&
-                                 in_returned_value.type == APIInterceptor::ARGTYPE_U32)
+            in_returned_value.type == APIInterceptor::ARGTYPE_U32)
         {
             text   = format_enum(info.kind,
                                  in_returned_value.get_u32() );
@@ -1477,37 +1485,41 @@ void Capture::APIDumpPrinter::D3D8Decoder::register_created_objects(const Captur
         }
     }
     else
-    if (in_call.returned_value_ptr != nullptr                                  &&
-        in_call.returned_value_ptr->type == APIInterceptor::ARGTYPE_I32        &&
-        in_call.returned_value_ptr->get_i32() >= 0                             &&
-        Interception::Core::D3D8Utils::get_method_info_ptr(in_call.func) != nullptr)
     {
-        /* Create* methods always return new objects; Get* ones return existing objects, which may be unknown to us. */
-        const bool is_create = (strncmp(Interception::Core::D3D8Utils::get_method_info_ptr(in_call.func)->method_name_ptr,
-                                                          "Create",
-                                                          strlen("Create") ) == 0);
+        const auto* method_info_ptr = Interception::Core::D3D8Utils::get_method_info_ptr(in_call.func);
 
-        for (uint32_t n_argument = 0;
-                      n_argument < in_call.arg_out_vec.size();
-                    ++n_argument)
+        if (in_call.returned_value_ptr        != nullptr                     &&
+            in_call.returned_value_ptr->type  == APIInterceptor::ARGTYPE_I32 &&
+            in_call.returned_value_ptr->get_i32() >= 0                       &&
+            method_info_ptr                   != nullptr)
         {
-            Interception::Hooks::D3D8::ArgumentInfo info = {};
+            /* Create* methods always return new objects; Get* ones return existing objects, which may be unknown to us. */
+            const bool is_create = (strncmp(method_info_ptr->method_name_ptr,
+                                            "Create",
+                                            strlen("Create") ) == 0);
 
-            const bool is_argument_known = Interception::Core::D3D8Utils::get_argument_info(in_call.func,
-                                                                                            n_argument,
-                                                                                           &info);
-
-            if (is_argument_known == false)
+            for (uint32_t n_argument = 0;
+                          n_argument < in_call.arg_out_vec.size();
+                        ++n_argument)
             {
-                continue;
-            }
+                Interception::Hooks::D3D8::ArgumentInfo info = {};
 
-            if (info.kind                               == Interception::Hooks::D3D8::ValueKind::OBJECT_OUT &&
-                                     in_call.arg_out_vec.at(n_argument).type == APIInterceptor::ARGTYPE_VOID_PTR)
-            {
-                register_func(in_call.arg_out_vec.at(n_argument).get_ptr(),
-                              info.object_type_name_ptr,
-                              is_create);
+                const bool is_argument_known = Interception::Core::D3D8Utils::get_argument_info(in_call.func,
+                                                                                                n_argument,
+                                                                                               &info);
+
+                if (is_argument_known == false)
+                {
+                    continue;
+                }
+
+                if (info.kind                               == Interception::Hooks::D3D8::ValueKind::OBJECT_OUT &&
+                    in_call.arg_out_vec.at(n_argument).type == APIInterceptor::ARGTYPE_VOID_PTR)
+                {
+                    register_func(in_call.arg_out_vec.at(n_argument).get_ptr(),
+                                  info.object_type_name_ptr,
+                                  is_create);
+                }
             }
         }
     }

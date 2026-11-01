@@ -40,11 +40,11 @@ private:
     struct DumpedAPICall
     {
         APIInterceptor::APIFunction         api_func          = APIInterceptor::APIFunction::APIFUNCTION_UNKNOWN;
-        APIInterceptor::APIFunctionArgument args_in [14]      {};
-        APIInterceptor::APIFunctionArgument args_out[14]      {};
+        APIInterceptor::APIFunctionArgument arguments_in [14] {};
+        APIInterceptor::APIFunctionArgument arguments_out[14] {};
         bool                                is_completed      = false; /* post-callback seen            */
-        uint32_t                            n_args_in         = 0;
-        uint32_t                            n_args_out        = 0;
+        uint32_t                            n_arguments_in    = 0;
+        uint32_t                            n_arguments_out   = 0;
         APIInterceptor::APIFunctionArgument returned_value    {};
         uint32_t                            thread_id         = 0;
         uint64_t                            timestamp_qpc     = 0;     /* when the call was intercepted */
@@ -128,14 +128,15 @@ private:
     void wait_for_writer();
     void write_workload ();
 
+
     static void on_post_callback  (APIInterceptor::APIFunction                in_api_func,
                                    void*                                      in_user_arg_ptr,
-                                   uint32_t                                   in_n_args_out,
-                                   const APIInterceptor::APIFunctionArgument* in_args_out_ptr,
+                                   uint32_t                                   in_n_arguments_out,
+                                   const APIInterceptor::APIFunctionArgument* in_arguments_out_ptr,
                                    const APIInterceptor::APIFunctionArgument* in_returned_value_ptr);
     static void on_pre_callback   (APIInterceptor::APIFunction                in_api_func,
-                                   uint32_t                                   in_n_args_in,
-                                   const APIInterceptor::APIFunctionArgument* in_args_in_ptr,
+                                   uint32_t                                   in_n_arguments_in,
+                                   const APIInterceptor::APIFunctionArgument* in_arguments_in_ptr,
                                    void*                                      in_user_arg_ptr,
                                    bool*                                      out_should_pass_through_ptr);
     static void on_process_exiting(void*                                      in_user_arg_ptr);

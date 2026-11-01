@@ -5,14 +5,14 @@
 #include "formatter.h"
 #include "Capture/APIDumpLoader/api_info.h"
 #include "api_info.h"
+#include "Common/macros.h"
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
-#include <assert.h>
 #include <algorithm>
 #include <vector>
 
 bool Capture::APIDumpPrinter::are_arguments_identical(const APIInterceptor::APIFunctionArgument& in_argument_a,
                                                        const APIInterceptor::APIFunctionArgument& in_argument_b,
-                                                       const Capture::APIDumpLoader::Workload&             in_workload)
+                                                       const Capture::APIDumpLoader::Workload&    in_workload)
 {
     std::vector<uint8_t> a_u8_vec;
     std::vector<uint8_t> b_u8_vec;
@@ -51,7 +51,7 @@ bool Capture::APIDumpPrinter::are_arguments_identical(const APIInterceptor::APIF
 
 void Capture::APIDumpPrinter::print_argument(FILE*                                      in_file_handle,
                                               const APIInterceptor::APIFunctionArgument& in_argument,
-                                              const Capture::APIDumpLoader::Workload&             in_workload)
+                                              const Capture::APIDumpLoader::Workload&    in_workload)
 {
     switch (in_argument.type)
     {
@@ -270,23 +270,17 @@ void Capture::APIDumpPrinter::print_argument(FILE*                              
 
         default:
         {
-            assert(false);
-
-            fprintf(in_file_handle,
-                    "<unknown arg type %d>",
-                    static_cast<int>(in_argument.type) );
-
-            break;
+            AI_FAIL_UNSUPPORTED(in_argument.type);
         }
     }
 }
 
-void Capture::APIDumpPrinter::print_call(FILE*                                  in_file_handle,
-                                          const Capture::APIDumpLoader::DumpedAPICall&    in_call,
-                                          const Capture::APIDumpLoader::Workload&         in_workload,
-                                          uint32_t                               in_n_hexdump_bytes,
-                                          std::set<APIInterceptor::DataChunkID>* inout_referenced_chunk_set_ptr,
-                                          D3D8Decoder*                           inout_d3d8_decoder_ptr)
+void Capture::APIDumpPrinter::print_call(FILE*                                        in_file_handle,
+                                          const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                          const Capture::APIDumpLoader::Workload&      in_workload,
+                                          uint32_t                                     in_n_hexdump_bytes,
+                                          std::set<APIInterceptor::DataChunkID>*       inout_referenced_chunk_set_ptr,
+                                          D3D8Decoder*                                 inout_d3d8_decoder_ptr)
 {
     std::vector<APIInterceptor::DataChunkID> call_chunk_id_vec;
     const bool                               is_d3d8_call = (inout_d3d8_decoder_ptr != nullptr                   &&
@@ -392,7 +386,7 @@ void Capture::APIDumpPrinter::print_call(FILE*                                  
             is_first_out_argument = false;
         }
 
-        if (!is_first_out_argument)
+        if (is_first_out_argument == false)
         {
             fprintf(in_file_handle,
                     "]");

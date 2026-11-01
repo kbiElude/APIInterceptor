@@ -14,8 +14,8 @@
 #define D3D8_TABLE(array) array, static_cast<uint32_t>(sizeof(array) / sizeof(array[0]) )
 
 bool Capture::APIDumpPrinter::get_flag_name_table(const Interception::Hooks::D3D8::ValueKind& in_kind,
-                                                                        const FlagNameEntry**  out_table_ptr_ptr,
-                                                                        uint32_t*              out_n_entries_ptr)
+                                                   const FlagNameEntry**                       out_table_ptr_ptr,
+                                                   uint32_t*                                   out_n_entries_ptr)
 {
     static const FlagNameEntry clear_flag_name_array[] =
     {
@@ -575,8 +575,8 @@ bool Capture::APIDumpPrinter::get_texture_stage_state_value_info(const uint32_t&
 }
 
 bool Capture::APIDumpPrinter::get_value_name_table(const Interception::Hooks::D3D8::ValueKind& in_kind,
-                                                                         const ValueNameEntry** out_table_ptr_ptr,
-                                                                         uint32_t*              out_n_entries_ptr)
+                                                    const ValueNameEntry**                      out_table_ptr_ptr,
+                                                    uint32_t*                                   out_n_entries_ptr)
 {
     static const ValueNameEntry back_buffer_type_name_array[] =
     {

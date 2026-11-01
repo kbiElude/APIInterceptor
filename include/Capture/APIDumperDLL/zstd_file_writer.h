@@ -34,6 +34,7 @@ namespace Capture
             bool write(const void*   in_data_ptr,
                        const size_t& in_n_bytes);
 
+
             /* The file is appended to, and stays open. Returns nullptr if the compressor cannot be set up. */
             static ZstdFileWriterUniquePtr create(FILE*      in_file_handle,
                                                   const int& in_compression_level);
