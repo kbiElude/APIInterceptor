@@ -6,8 +6,40 @@
 #include "Interception/Hooks/D3D8/hook_policy.h"
 #include "Interception/Hooks/D3D8/hook_policy_helper.h"
 #include "Interception/Hooks/D3D8/lock_tracker.h"
+#include "Interception/Hooks/D3D8/argument_modifier.h"
 #include "Interception/Hooks/D3D8/vtable_registry.h"
 #include <algorithm>
+
+void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3D8_CREATEDEVICE>::on_call_starting(IDirect3D8*            in_self,
+                                                                                                                       UINT                   in_adapter,
+                                                                                                                       D3DDEVTYPE             in_device_type,
+                                                                                                                       HWND                   in_focus_window,
+                                                                                                                       DWORD                  in_behavior_flags,
+                                                                                                                       D3DPRESENT_PARAMETERS* in_parameters_ptr,
+                                                                                                                       IDirect3DDevice8**     in_device_ptr_ptr)
+{
+    (void) in_device_type;
+    (void) in_behavior_flags;
+    (void) in_device_ptr_ptr;
+
+    if (in_parameters_ptr != nullptr)
+    {
+        tell_create_device(in_self,
+                           in_adapter,
+                           in_focus_window,
+                           in_parameters_ptr);
+    }
+}
+
+void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETVIEWPORT>::on_call_starting(IDirect3DDevice8*    in_self,
+                                                                                                                            const D3DVIEWPORT8*& inout_viewport_ptr)
+{
+    if (inout_viewport_ptr != nullptr)
+    {
+        tell_set_viewport(in_self,
+                         &inout_viewport_ptr);
+    }
+}
 
 void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DCUBETEXTURE8_LOCKRECT>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
                                                                                                                                     IDirect3DCubeTexture8*               in_self,

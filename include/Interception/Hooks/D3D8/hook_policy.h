@@ -49,6 +49,28 @@ namespace Interception
                 }
             };
 
+            /* The presentation parameters and the viewport of the application may be changed by a program which has asked to (see
+             * D3D8/argument_modifier.h).
+             */
+            template<>
+            struct HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3D8_CREATEDEVICE> : public HookPolicyBase
+            {
+                static void on_call_starting(IDirect3D8*            in_self,
+                                             UINT                   in_adapter,
+                                             D3DDEVTYPE             in_device_type,
+                                             HWND                   in_focus_window,
+                                             DWORD                  in_behavior_flags,
+                                             D3DPRESENT_PARAMETERS* in_parameters_ptr,
+                                             IDirect3DDevice8**     in_device_ptr_ptr);
+            };
+
+            template<>
+            struct HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETVIEWPORT> : public HookPolicyBase
+            {
+                static void on_call_starting(IDirect3DDevice8*    in_self,
+                                             const D3DVIEWPORT8*& inout_viewport_ptr);
+            };
+
             template<>
             struct HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DCUBETEXTURE8_LOCKRECT> : public HookPolicyBase
             {

@@ -120,7 +120,7 @@ ReturnType __stdcall Interception::Hooks::D3D8::GenericHook<ReturnType (__stdcal
         }
     }
 
-    AI_ASSERT(should_pass_through);
+    /* A callback may have the call not made; the caller of the hook gets a default result then. */
     AI_ASSERT(original_function_ptr != nullptr);
 
     /* The device's Present call ends the frame. */
@@ -132,6 +132,12 @@ ReturnType __stdcall Interception::Hooks::D3D8::GenericHook<ReturnType (__stdcal
     if (should_pass_through &&
         original_function_ptr != nullptr)
     {
+        /* What the callbacks of the interceptor call on the device is not for a modifier to change. */
+        if (tracker.is_top_level_api_call() )
+        {
+            HookPolicy<function>::on_call_starting(in_arguments...);
+        }
+
         result.call(original_function_ptr,
                     in_arguments...);
     }

@@ -26,6 +26,10 @@ namespace Interception
                 template<typename... Arguments>
                 static void on_call_finished(const bool& in_is_success,
                                              const Arguments&... in_arguments);
+
+                /* Before the original method is called, with the arguments of the application, which it may change through the pointers. */
+                template<typename... Arguments>
+                static void on_call_starting(const Arguments&... in_arguments);
             };
         }
     }
@@ -41,6 +45,12 @@ void Interception::Hooks::D3D8::HookPolicyBase::create_extra_arguments(APIInterc
 template<typename... Arguments>
 void Interception::Hooks::D3D8::HookPolicyBase::on_call_finished(const bool&,
                                                                  const Arguments&...)
+{
+    /* Stub */
+}
+
+template<typename... Arguments>
+void Interception::Hooks::D3D8::HookPolicyBase::on_call_starting(const Arguments&...)
 {
     /* Stub */
 }
