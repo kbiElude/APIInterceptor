@@ -8,27 +8,24 @@
 #include "frame_pacer.h"
 #include <chrono>
 
-namespace
+constexpr uint64_t QPC_FREQUENCY = 1000; /* a tick is a millisecond */
+
+/* Waits for n_frames frames, gap_ticks apart. Returns the milliseconds that took. */
+static double wait_for_frames(Replay::ReplayEngineDLL::FramePacer* inout_pacer_ptr,
+                              const uint32_t&                      in_n_frames,
+                              const uint64_t&                      in_gap_ticks)
 {
-    constexpr uint64_t QPC_FREQUENCY = 1000; /* a tick is a millisecond */
+    const auto start = std::chrono::steady_clock::now();
 
-    /* Waits for n_frames frames, gap_ticks apart. Returns the milliseconds that took. */
-    double wait_for_frames(Replay::ReplayEngineDLL::FramePacer* inout_pacer_ptr,
-                                   const uint32_t&              in_n_frames,
-                                   const uint64_t&              in_gap_ticks)
+    for (uint32_t n_frame = 0;
+                  n_frame < in_n_frames;
+                ++n_frame)
     {
-        const auto start = std::chrono::steady_clock::now();
-
-        for (uint32_t n_frame = 0;
-                      n_frame < in_n_frames;
-                    ++n_frame)
-        {
-            inout_pacer_ptr->wait_for_frame(n_frame * in_gap_ticks,
-                                            QPC_FREQUENCY);
-        }
-
-        return std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count();
+        inout_pacer_ptr->wait_for_frame(n_frame * in_gap_ticks,
+                                        QPC_FREQUENCY);
     }
+
+    return std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count();
 }
 
 TEST(FramePacer, FramesComeAtTheRecordedPace)

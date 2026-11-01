@@ -36,7 +36,7 @@ namespace Replay
             static uint64_t get_wall_frequency();
             static uint64_t get_wall_ticks    ();
 
-            double             m_average_gap_seconds;
+            double              m_average_gap_seconds;
             bool                m_is_anchored;
             uint64_t            m_last_timestamp_qpc;
             uint64_t            m_target_wall_ticks;

@@ -18,11 +18,17 @@ Replay::ReplayEngineDLL::FramePacer::FramePacer()
 
 uint64_t Replay::ReplayEngineDLL::FramePacer::get_wall_frequency()
 {
-    LARGE_INTEGER frequency;
+    /* It does not change while the system runs. */
+    static const uint64_t result = []
+    {
+        LARGE_INTEGER frequency;
 
-    ::QueryPerformanceFrequency(&frequency);
+        ::QueryPerformanceFrequency(&frequency);
 
-    return static_cast<uint64_t>(frequency.QuadPart);
+        return static_cast<uint64_t>(frequency.QuadPart);
+    }();
+
+    return result;
 }
 
 uint64_t Replay::ReplayEngineDLL::FramePacer::get_wall_ticks()
@@ -57,11 +63,11 @@ void Replay::ReplayEngineDLL::FramePacer::wait_for_frame(const uint64_t& in_time
 
     const uint64_t wall_frequency = get_wall_frequency();
     const double   speed          = m_speed;
-    uint64_t       now_ticks      = get_wall_ticks();
+    uint64_t       now_ticks      = get_wall_ticks    ();
 
-    if (m_is_anchored == false ||
-        in_qpc_frequency == 0  ||
-        speed <= 0.0)
+    if (m_is_anchored    == false ||
+        in_qpc_frequency == 0     ||
+        speed            <= 0.0)
     {
         m_is_anchored        = true;
         m_last_timestamp_qpc = in_timestamp_qpc;
@@ -85,7 +91,7 @@ void Replay::ReplayEngineDLL::FramePacer::wait_for_frame(const uint64_t& in_time
         }
         else
         {
-            /* The usual gap is that of the frames which were not cut. */
+            /* The average gap of the frames which were not cut. */
             m_average_gap_seconds = (m_average_gap_seconds > 0.0) ? m_average_gap_seconds * (1.0 - GAP_AVERAGE_WEIGHT) + gap_seconds * GAP_AVERAGE_WEIGHT
                                                                   : gap_seconds;
         }
@@ -93,7 +99,7 @@ void Replay::ReplayEngineDLL::FramePacer::wait_for_frame(const uint64_t& in_time
         m_last_timestamp_qpc = in_timestamp_qpc;
         m_target_wall_ticks += static_cast<uint64_t>(gap_seconds / speed * static_cast<double>(wall_frequency) );
 
-        /* Too far behind to catch up. */
+        /* Resync when too far behind. */
         if (now_ticks > m_target_wall_ticks + static_cast<uint64_t>(RESYNC_LATE_SECONDS * static_cast<double>(wall_frequency) ))
         {
             m_target_wall_ticks = now_ticks;

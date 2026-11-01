@@ -10,11 +10,11 @@
 TEST(ObjectRemapper, ZeroStandsForItself)
 {
     Replay::ReplayEngineDLL::ObjectRemapper remapper;
-    uint64_t                        live_value = 123;
+    uint64_t                                live_value = 123;
 
     EXPECT_TRUE(remapper.get(Replay::ReplayEngineDLL::ObjectKind::HWND,
-                                     0,
-                                    &live_value) );
+                             0,
+                            &live_value) );
     EXPECT_EQ  (live_value,
                 0u);
 }
@@ -22,43 +22,43 @@ TEST(ObjectRemapper, ZeroStandsForItself)
 TEST(ObjectRemapper, KindsAreMappedApart)
 {
     Replay::ReplayEngineDLL::ObjectRemapper remapper;
-    uint64_t                        live_value = 0;
+    uint64_t                                live_value = 0;
 
     remapper.add(Replay::ReplayEngineDLL::ObjectKind::HDC,
-                         10,
-                         20);
+                 10,
+                 20);
 
     EXPECT_TRUE (remapper.get(Replay::ReplayEngineDLL::ObjectKind::HDC,
-                                      10,
-                                     &live_value) );
+                              10,
+                             &live_value) );
     EXPECT_EQ   (live_value,
                  20u);
     EXPECT_FALSE(remapper.get(Replay::ReplayEngineDLL::ObjectKind::HWND,
-                                      10,
-                                     &live_value) );
+                              10,
+                             &live_value) );
 }
 
 TEST(ObjectRemapper, ARemovedOrClearedValueIsUnknown)
 {
     Replay::ReplayEngineDLL::ObjectRemapper remapper;
-    uint64_t                        live_value = 0;
+    uint64_t                                live_value = 0;
 
     remapper.add   (Replay::ReplayEngineDLL::ObjectKind::HDC,
-                            1,
-                            2);
+                    1,
+                    2);
     remapper.add   (Replay::ReplayEngineDLL::ObjectKind::HDC,
-                            3,
-                            4);
+                    3,
+                    4);
     remapper.remove(Replay::ReplayEngineDLL::ObjectKind::HDC,
-                            1);
+                    1);
 
     EXPECT_FALSE(remapper.get(Replay::ReplayEngineDLL::ObjectKind::HDC,
-                                      1,
-                                     &live_value) );
+                              1,
+                             &live_value) );
 
     remapper.clear();
 
     EXPECT_FALSE(remapper.get(Replay::ReplayEngineDLL::ObjectKind::HDC,
-                                      3,
-                                     &live_value) );
+                              3,
+                             &live_value) );
 }
