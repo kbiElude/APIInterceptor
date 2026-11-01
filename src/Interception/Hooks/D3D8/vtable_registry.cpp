@@ -10,21 +10,43 @@
 void* Interception::Hooks::D3D8::VTableRegistry::get_original_function_ptr(const void*     in_object_ptr,
                                                                            const uint32_t& in_vtable_index)
 {
+    constexpr size_t N_CACHE_ENTRIES = 64; /* a power of two */
+
+    /* A hook runs for every call of the application, from the thread of the call: the vtable is found without the lock, in a cache
+     * which the thread has to itself. The entries of the map are never erased, and their vectors never change size, so a pointer to a
+     * vector stays valid.
+     */
+    struct CacheEntry
+    {
+        const std::vector<void*>* original_function_ptr_vec_ptr;
+        void**                    vtable_ptr;
+    };
+
+    static thread_local CacheEntry cache_entry_vec[N_CACHE_ENTRIES] = {};
+
     void* result_ptr = nullptr;
 
     if (in_object_ptr != nullptr)
     {
-        void** vtable_ptr = *reinterpret_cast<void** const*>(in_object_ptr);
+        void**      vtable_ptr  = *reinterpret_cast<void** const*>(in_object_ptr);
+        CacheEntry& cache_entry = cache_entry_vec[(reinterpret_cast<uintptr_t>(vtable_ptr) >> 4) & (N_CACHE_ENTRIES - 1)];
 
+        if (cache_entry.vtable_ptr != vtable_ptr)
         {
             std::lock_guard<std::mutex> lock    (m_mutex);
             const auto                  iterator = m_patched_vtable_map.find(vtable_ptr);
 
-            if (iterator        != m_patched_vtable_map.end()                         &&
-                in_vtable_index <  iterator->second.original_function_ptr_vec.size() )
+            if (iterator != m_patched_vtable_map.end() )
             {
-                result_ptr = iterator->second.original_function_ptr_vec.at(in_vtable_index);
+                cache_entry.original_function_ptr_vec_ptr = &iterator->second.original_function_ptr_vec;
+                cache_entry.vtable_ptr                    = vtable_ptr;
             }
+        }
+
+        if (cache_entry.vtable_ptr == vtable_ptr                                         &&
+            in_vtable_index        <  cache_entry.original_function_ptr_vec_ptr->size() )
+        {
+            result_ptr = cache_entry.original_function_ptr_vec_ptr->at(in_vtable_index);
         }
     }
 
