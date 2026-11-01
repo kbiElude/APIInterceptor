@@ -37,10 +37,13 @@ endif (MSVC)
 set(CMAKE_INCLUDE_PATH             "${APIInterceptor_SOURCE_DIR}/include")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${APIInterceptor_BINARY_DIR}/bin")
 
-include_directories("${APIInterceptor_BINARY_DIR}"
-                    "${APIInterceptor_SOURCE_DIR}/deps"
-                    "${APIInterceptor_SOURCE_DIR}/include"
-                    "${APIInterceptor_SOURCE_DIR}/deps/Khronos")
+# The include directories of the projects, and (see cmake/Usage.cmake) of a project which builds this one as a subproject.
+set(APIINTERCEPTOR_INCLUDE_DIRECTORIES "${APIInterceptor_BINARY_DIR}"
+                                       "${APIInterceptor_SOURCE_DIR}/deps"
+                                       "${APIInterceptor_SOURCE_DIR}/include"
+                                       "${APIInterceptor_SOURCE_DIR}/deps/Khronos")
+
+include_directories(${APIINTERCEPTOR_INCLUDE_DIRECTORIES})
 
 file(GLOB CommonIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Common/*.h")
 file(GLOB CommonSources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Common/*.cpp")
@@ -49,5 +52,7 @@ include(cmake/Interception.cmake)
 include(cmake/Libraries.cmake)
 include(cmake/Replay.cmake)
 include(cmake/Tools.cmake)
+include(cmake/Usage.cmake)
 include(cmake/Tests.cmake)
 include(cmake/Install.cmake)
+include(cmake/Folders.cmake)

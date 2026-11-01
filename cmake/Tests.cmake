@@ -4,6 +4,15 @@ if (APIINTERCEPTOR_BUILD_TESTS)
 
     file(GLOB APIInterceptorTestsSources CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/src/Tests/*.cpp")
 
+    list(FILTER APIInterceptorTestsSources EXCLUDE REGEX ".*/fixtures\.cpp$")
+
+    # Where the data files of the tests are, and the names the tests use: shared with a project which builds on this one.
+    add_library(APIInterceptorTestSupport STATIC "${APIInterceptor_SOURCE_DIR}/src/Tests/fixtures.cpp"
+                                                 "${APIInterceptor_SOURCE_DIR}/src/Tests/fixtures.h")
+
+    target_compile_definitions(APIInterceptorTestSupport PUBLIC APIINTERCEPTOR_TESTS_DATA_DIR="${APIInterceptor_SOURCE_DIR}/src/Tests/data")
+    target_include_directories(APIInterceptorTestSupport PUBLIC "${APIInterceptor_SOURCE_DIR}/src/Tests")
+
     # Sources under test which are not part of a library.
     add_executable(APIInterceptorTests ${APIInterceptorTestsSources}
                                        "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL/call_context.cpp"
@@ -30,8 +39,7 @@ if (APIINTERCEPTOR_BUILD_TESTS)
 
     target_include_directories(APIInterceptorTests PRIVATE "${APIInterceptor_SOURCE_DIR}/src"
                                                            "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL")
-    target_compile_definitions(APIInterceptorTests PRIVATE APIINTERCEPTOR_TESTS_DATA_DIR="${APIInterceptor_SOURCE_DIR}/src/Tests/data")
-    target_link_libraries(APIInterceptorTests gtest_main APIDumpLoader ReplayEngineDLL D3D8Utils InjectionLauncher)
+    target_link_libraries(APIInterceptorTests gtest_main APIInterceptorTestSupport APIDumpLoader ReplayEngineDLL D3D8Utils InjectionLauncher)
 
     enable_testing()
     add_test(NAME APIInterceptorTests COMMAND APIInterceptorTests)
