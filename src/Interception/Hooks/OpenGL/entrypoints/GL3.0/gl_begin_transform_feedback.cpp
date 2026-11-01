@@ -11,7 +11,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiBeginTransformFeedback(GLenum primitiveMode)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiBeginTransformFeedback(GLenum primitiveMode)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -23,7 +23,7 @@ void AI_APIENTRY OpenGL::aiBeginTransformFeedback(GLenum primitiveMode)
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glBeginTransformFeedback(primitiveMode=[%s])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(primitiveMode) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(primitiveMode) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBEGINTRANSFORMFEEDBACK,
                                                          &pre_callback_func_ptr,
@@ -46,7 +46,7 @@ void AI_APIENTRY OpenGL::aiBeginTransformFeedback(GLenum primitiveMode)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLBEGINTRANSFORMFEEDBACKPROC>(OpenGL::g_cached_gl_begin_transform_feedback)(primitiveMode);
+        reinterpret_cast<PFNGLBEGINTRANSFORMFEEDBACKPROC>(Interception::Hooks::OpenGL::g_cached_gl_begin_transform_feedback)(primitiveMode);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBEGINTRANSFORMFEEDBACK,

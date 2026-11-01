@@ -10,7 +10,7 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiClearStencil(GLint s)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiClearStencil(GLint s)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -45,7 +45,7 @@ void AI_APIENTRY OpenGL::aiClearStencil(GLint s)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLCLEARSTENCILPROC>(OpenGL::g_cached_gl_clear_stencil)(s);
+        reinterpret_cast<PFNGLCLEARSTENCILPROC>(Interception::Hooks::OpenGL::g_cached_gl_clear_stencil)(s);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCLEARSTENCIL,

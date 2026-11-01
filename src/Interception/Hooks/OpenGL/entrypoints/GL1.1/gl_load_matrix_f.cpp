@@ -11,7 +11,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiLoadMatrixf(const GLfloat* m)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiLoadMatrixf(const GLfloat* m)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -50,7 +50,7 @@ void AI_APIENTRY OpenGL::aiLoadMatrixf(const GLfloat* m)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLLOADMATRIXFPROC>(OpenGL::g_cached_gl_load_matrix_f)(m);
+        reinterpret_cast<PFNGLLOADMATRIXFPROC>(Interception::Hooks::OpenGL::g_cached_gl_load_matrix_f)(m);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLLOADMATRIXF,

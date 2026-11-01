@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiFogCoordf(GLfloat coord);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiFogCoordf(GLfloat coord);
+        }
+    }
 }
 
 #endif /* AI_GL_FOG_COORD_F_H */

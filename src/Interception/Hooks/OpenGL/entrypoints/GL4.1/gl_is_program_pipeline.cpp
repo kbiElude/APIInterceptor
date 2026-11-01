@@ -10,7 +10,7 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-GLboolean AI_APIENTRY OpenGL::aiIsProgramPipeline(GLuint pipeline)
+GLboolean AI_APIENTRY Interception::Hooks::OpenGL::aiIsProgramPipeline(GLuint pipeline)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -44,7 +44,7 @@ GLboolean AI_APIENTRY OpenGL::aiIsProgramPipeline(GLuint pipeline)
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNGLISPROGRAMPIPELINEPROC>(OpenGL::g_cached_gl_is_program_pipeline)(pipeline);
+        result = reinterpret_cast<PFNGLISPROGRAMPIPELINEPROC>(Interception::Hooks::OpenGL::g_cached_gl_is_program_pipeline)(pipeline);
     }
 
     if (tracker.is_top_level_api_call() )

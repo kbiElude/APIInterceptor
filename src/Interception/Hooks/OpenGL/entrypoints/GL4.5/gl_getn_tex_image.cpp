@@ -11,12 +11,12 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetnTexImage(GLenum  target,
-                                        GLint   level,
-                                        GLenum  format,
-                                        GLenum  type,
-                                        GLsizei bufSize,
-                                        void*   pixels)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetnTexImage(GLenum  target,
+                                                             GLint   level,
+                                                             GLenum  format,
+                                                             GLenum  type,
+                                                             GLsizei bufSize,
+                                                             void*   pixels)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -28,10 +28,10 @@ void AI_APIENTRY OpenGL::aiGetnTexImage(GLenum  target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glGetnTexImage(target=[%s] level=[%d] format=[%s] type=[%s] bufSize=[%d] pixels=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  level,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(format),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(type),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(format),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type),
                  static_cast<int32_t>(bufSize),
                  pixels);
 
@@ -61,12 +61,12 @@ void AI_APIENTRY OpenGL::aiGetnTexImage(GLenum  target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETNTEXIMAGEPROC>(OpenGL::g_cached_gl_getn_tex_image)(target,
-                                                                                    level,
-                                                                                    format,
-                                                                                    type,
-                                                                                    bufSize,
-                                                                                    pixels);
+        reinterpret_cast<PFNGLGETNTEXIMAGEPROC>(Interception::Hooks::OpenGL::g_cached_gl_getn_tex_image)(target,
+                                                                                                         level,
+                                                                                                         format,
+                                                                                                         type,
+                                                                                                         bufSize,
+                                                                                                         pixels);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETNTEXIMAGE,

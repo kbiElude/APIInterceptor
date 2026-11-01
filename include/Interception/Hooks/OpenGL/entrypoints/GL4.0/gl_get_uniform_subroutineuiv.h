@@ -7,9 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetUniformSubroutineuiv(GLenum shadertype, GLint location, GLuint* params);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetUniformSubroutineuiv(GLenum  shadertype,
+                                                       GLint   location,
+                                                       GLuint* params);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_UNIFORM_SUBROUTINEUIV_H */

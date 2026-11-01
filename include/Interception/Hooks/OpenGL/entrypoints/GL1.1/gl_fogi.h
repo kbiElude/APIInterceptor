@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiFogi(GLenum pname,
-                            GLint  param);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiFogi(GLenum pname,
+                                    GLint  param);
+        }
+    }
 }
 
 #endif /* AI_GL_FOGI_H */

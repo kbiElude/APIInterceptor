@@ -10,12 +10,12 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiProgramUniform4f(GLuint  program,
-                                            GLint   location,
-                                            GLfloat v0,
-                                            GLfloat v1,
-                                            GLfloat v2,
-                                            GLfloat v3)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiProgramUniform4f(GLuint  program,
+                                                                 GLint   location,
+                                                                 GLfloat v0,
+                                                                 GLfloat v1,
+                                                                 GLfloat v2,
+                                                                 GLfloat v3)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -60,12 +60,12 @@ void AI_APIENTRY OpenGL::aiProgramUniform4f(GLuint  program,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLPROGRAMUNIFORM4FPROC>(OpenGL::g_cached_gl_program_uniform4f)(program,
-                                                                                            location,
-                                                                                            v0,
-                                                                                            v1,
-                                                                                            v2,
-                                                                                            v3);
+        reinterpret_cast<PFNGLPROGRAMUNIFORM4FPROC>(Interception::Hooks::OpenGL::g_cached_gl_program_uniform4f)(program,
+                                                                                                                 location,
+                                                                                                                 v0,
+                                                                                                                 v1,
+                                                                                                                 v2,
+                                                                                                                 v3);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLPROGRAMUNIFORM4F,

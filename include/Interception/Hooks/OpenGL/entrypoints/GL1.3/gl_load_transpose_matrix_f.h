@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiLoadTransposeMatrixf(const GLfloat* m);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiLoadTransposeMatrixf(const GLfloat* m);
+        }
+    }
 }
 
 #endif /* AI_GL_LOAD_TRANSPOSE_MATRIX_F_H */

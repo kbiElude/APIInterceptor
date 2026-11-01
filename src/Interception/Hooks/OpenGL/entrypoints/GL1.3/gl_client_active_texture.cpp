@@ -12,7 +12,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiClientActiveTexture(GLenum texture)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiClientActiveTexture(GLenum texture)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -24,7 +24,7 @@ void AI_APIENTRY OpenGL::aiClientActiveTexture(GLenum texture)
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glClientActiveTexture(texture=[%s])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(texture));
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(texture));
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCLIENTACTIVETEXTURE,
                                                          &pre_callback_func_ptr,
@@ -47,12 +47,12 @@ void AI_APIENTRY OpenGL::aiClientActiveTexture(GLenum texture)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLCLIENTACTIVETEXTUREPROC>(OpenGL::g_cached_gl_client_active_texture)(texture);
+        reinterpret_cast<PFNGLCLIENTACTIVETEXTUREPROC>(Interception::Hooks::OpenGL::g_cached_gl_client_active_texture)(texture);
     }
 
     if (tracker.is_top_level_api_call() )
     {
-        auto& context = OpenGL::get_context_state();
+        auto& context = Interception::Hooks::OpenGL::get_context_state();
 
         context.client_array_manager.set_client_active_texture(texture - GL_TEXTURE0);
     }

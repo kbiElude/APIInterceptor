@@ -7,9 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiCreateSamplers(GLsizei n, GLuint* samplers);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiCreateSamplers(GLsizei n,
+                                              GLuint* samplers);
+        }
+    }
 }
 
 #endif /* AI_GL_CREATE_SAMPLERS_H */

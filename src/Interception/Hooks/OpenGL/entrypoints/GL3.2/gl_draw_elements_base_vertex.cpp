@@ -12,19 +12,19 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDrawElementsBaseVertex(GLenum      mode,
-                                                  GLsizei     count,
-                                                  GLenum      type,
-                                                  const void* indices,
-                                                  GLint       basevertex)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDrawElementsBaseVertex(GLenum      mode,
+                                                                       GLsizei     count,
+                                                                       GLenum      type,
+                                                                       const void* indices,
+                                                                       GLint       basevertex)
 {
-    OpenGL::ClientArrayChunk                client_arrays_chunk;
-    void*                                   post_callback_func_arg = nullptr;
-    APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
-    void*                                   pre_callback_func_arg  = nullptr;
-    APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
-    bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    Interception::Hooks::OpenGL::ClientArrayChunk client_arrays_chunk;
+    void*                                         post_callback_func_arg = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC       post_callback_func_ptr = nullptr;
+    void*                                         pre_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC        pre_callback_func_ptr  = nullptr;
+    bool                                          should_pass_through    = true;
+    APIInterceptor::Tracker                       tracker;
 
     client_arrays_chunk.add_elements(count,
                                      type,
@@ -34,9 +34,9 @@ void AI_APIENTRY OpenGL::aiDrawElementsBaseVertex(GLenum      mode,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glDrawElementsBaseVertex(mode=[%s] count=[%d] type=[%s] indices=[%p] basevertex=[%d])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(mode),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(mode),
                  static_cast<int32_t>(count),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(type),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type),
                  indices,
                  basevertex);
 
@@ -66,11 +66,11 @@ void AI_APIENTRY OpenGL::aiDrawElementsBaseVertex(GLenum      mode,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDRAWELEMENTSBASEVERTEXPROC>(OpenGL::g_cached_gl_draw_elements_base_vertex)(mode,
-                                                                                                         count,
-                                                                                                         type,
-                                                                                                         indices,
-                                                                                                         basevertex);
+        reinterpret_cast<PFNGLDRAWELEMENTSBASEVERTEXPROC>(Interception::Hooks::OpenGL::g_cached_gl_draw_elements_base_vertex)(mode,
+                                                                                                                              count,
+                                                                                                                              type,
+                                                                                                                              indices,
+                                                                                                                              basevertex);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDRAWELEMENTSBASEVERTEX,

@@ -14,21 +14,21 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiMultiDrawElements(GLenum             mode,
-                                             const GLsizei*     count,
-                                             GLenum             type,
-                                             const void* const* indices,
-                                             GLsizei            drawcount)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiMultiDrawElements(GLenum             mode,
+                                                                  const GLsizei*     count,
+                                                                  GLenum             type,
+                                                                  const void* const* indices,
+                                                                  GLsizei            drawcount)
 {
-    OpenGL::ClientArrayChunk                client_arrays_chunk;
-    uint32_t                                count_chunk_id         = 0;
-    APIInterceptor::DataChunkID             indices_chunk_id;
-    void*                                   post_callback_func_arg = nullptr;
-    APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
-    void*                                   pre_callback_func_arg  = nullptr;
-    APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
-    bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    Interception::Hooks::OpenGL::ClientArrayChunk client_arrays_chunk;
+    uint32_t                                      count_chunk_id         = 0;
+    APIInterceptor::DataChunkID                   indices_chunk_id;
+    void*                                         post_callback_func_arg = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC       post_callback_func_ptr = nullptr;
+    void*                                         pre_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC        pre_callback_func_ptr  = nullptr;
+    bool                                          should_pass_through    = true;
+    APIInterceptor::Tracker                       tracker;
 
     client_arrays_chunk.add_multi_elements(count,
                                            type,
@@ -39,17 +39,17 @@ void AI_APIENTRY OpenGL::aiMultiDrawElements(GLenum             mode,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glMultiDrawElements(mode=[%s] count=[%p] type=[%s] indices=[%p] drawcount=[%d])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(mode),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(mode),
                  count,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(type),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type),
                  indices,
                  static_cast<int32_t>(drawcount) );
 
         count_chunk_id = APIInterceptor::register_data_chunk(count,
                                                              (count != nullptr) ? sizeof(GLsizei) * static_cast<uint32_t>(drawcount) : 0);
 
-        const auto& context   = OpenGL::get_context_state();
-        const auto  bound_ebo = context.buffer_manager.get_bound_buffer(OpenGL::BufferBindingTarget::ELEMENT_ARRAY_BUFFER);
+        const auto& context   = Interception::Hooks::OpenGL::get_context_state();
+        const auto  bound_ebo = context.buffer_manager.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ELEMENT_ARRAY_BUFFER);
 
         if (bound_ebo != 0)
         {

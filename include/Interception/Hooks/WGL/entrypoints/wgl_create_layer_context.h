@@ -7,10 +7,16 @@
 
 #include <windows.h>
 
-namespace WGL
+namespace Interception
 {
-    HGLRC WINAPI create_layer_context(HDC in_hdc,
-                                      int in_layer_plane_index);
+    namespace Hooks
+    {
+        namespace WGL
+        {
+            HGLRC WINAPI create_layer_context(HDC in_hdc,
+                                              int in_layer_plane_index);
+        }
+    }
 }
 
 #endif /* WGL_CREATE_LAYER_CONTEXT_H */

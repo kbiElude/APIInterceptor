@@ -13,10 +13,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiClearNamedFramebufferuiv(GLuint        framebuffer,
-                                                    GLenum        buffer,
-                                                    GLint         drawbuffer,
-                                                    const GLuint* value)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiClearNamedFramebufferuiv(GLuint        framebuffer,
+                                                                         GLenum        buffer,
+                                                                         GLint         drawbuffer,
+                                                                         const GLuint* value)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -25,14 +25,14 @@ void AI_APIENTRY OpenGL::aiClearNamedFramebufferuiv(GLuint        framebuffer,
     bool                                    should_pass_through    = true;
     APIInterceptor::Tracker                 tracker;
     APIInterceptor::MemoryChunk             value_chunk(value,
-                                                        OpenGL::Utils::get_n_clear_buffer_values(buffer),
+                                                        Interception::Hooks::OpenGL::Utils::get_n_clear_buffer_values(buffer),
                                                         sizeof(GLuint));
 
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glClearNamedFramebufferuiv(framebuffer=[%u] buffer=[%s] drawbuffer=[%d] value=[%p])",
                  framebuffer,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(buffer),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(buffer),
                  drawbuffer,
                  value);
 
@@ -60,10 +60,10 @@ void AI_APIENTRY OpenGL::aiClearNamedFramebufferuiv(GLuint        framebuffer,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLCLEARNAMEDFRAMEBUFFERUIVPROC>(OpenGL::g_cached_gl_clear_named_framebufferuiv)(framebuffer,
-                                                                                                           buffer,
-                                                                                                           drawbuffer,
-                                                                                                           value);
+        reinterpret_cast<PFNGLCLEARNAMEDFRAMEBUFFERUIVPROC>(Interception::Hooks::OpenGL::g_cached_gl_clear_named_framebufferuiv)(framebuffer,
+                                                                                                                                buffer,
+                                                                                                                                drawbuffer,
+                                                                                                                                value);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCLEARNAMEDFRAMEBUFFERUIV,

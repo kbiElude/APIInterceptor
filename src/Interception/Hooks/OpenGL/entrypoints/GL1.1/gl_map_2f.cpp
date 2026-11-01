@@ -13,23 +13,23 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiMap2f(GLenum         target,
-                                 GLfloat        u1,
-                                 GLfloat        u2,
-                                 GLint          ustride,
-                                 GLint          uorder,
-                                 GLfloat        v1,
-                                 GLfloat        v2,
-                                 GLint          vstride,
-                                 GLint          vorder,
-                                 const GLfloat* points)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiMap2f(GLenum         target,
+                                                      GLfloat        u1,
+                                                      GLfloat        u2,
+                                                      GLint          ustride,
+                                                      GLint          uorder,
+                                                      GLfloat        v1,
+                                                      GLfloat        v2,
+                                                      GLint          vstride,
+                                                      GLint          vorder,
+                                                      const GLfloat* points)
 {
     APIInterceptor::MemoryChunk             points_chunk(points,
-                                                         OpenGL::Utils::get_n_map2_values(target,
-                                                                                          ustride,
-                                                                                          uorder,
-                                                                                          vstride,
-                                                                                          vorder),
+                                                         Interception::Hooks::OpenGL::Utils::get_n_map2_values(target,
+                                                                                                               ustride,
+                                                                                                               uorder,
+                                                                                                               vstride,
+                                                                                                               vorder),
                                                          sizeof(GLfloat) );
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -41,7 +41,7 @@ void AI_APIENTRY OpenGL::aiMap2f(GLenum         target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glMap2f(target=[%s], u1=[%f], u2=[%f], ustride=[%d], uorder=[%d], v1=[%f], v2=[%f], vstride=[%d], vorder=[%d], points=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  u1,
                  u2,
                  ustride,
@@ -82,16 +82,16 @@ void AI_APIENTRY OpenGL::aiMap2f(GLenum         target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLMAP2FPROC>(OpenGL::g_cached_gl_map_2f)(target,
-                                                                     u1,
-                                                                     u2,
-                                                                     ustride,
-                                                                     uorder,
-                                                                     v1,
-                                                                     v2,
-                                                                     vstride,
-                                                                     vorder,
-                                                                     points);
+        reinterpret_cast<PFNGLMAP2FPROC>(Interception::Hooks::OpenGL::g_cached_gl_map_2f)(target,
+                                                                                          u1,
+                                                                                          u2,
+                                                                                          ustride,
+                                                                                          uorder,
+                                                                                          v1,
+                                                                                          v2,
+                                                                                          vstride,
+                                                                                          vorder,
+                                                                                          points);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMAP2F,

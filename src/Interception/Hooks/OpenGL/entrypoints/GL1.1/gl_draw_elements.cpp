@@ -14,19 +14,19 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDrawElements(GLenum      mode,
-                                        GLsizei     count,
-                                        GLenum      type,
-                                        const void* indices)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDrawElements(GLenum      mode,
+                                                             GLsizei     count,
+                                                             GLenum      type,
+                                                             const void* indices)
 {
-    OpenGL::ClientArrayChunk                client_arrays_chunk;
-    APIInterceptor::APIFunctionArgument     indices_arg;
-    void*                                   post_callback_func_arg = nullptr;
-    APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
-    void*                                   pre_callback_func_arg  = nullptr;
-    APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
-    bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    Interception::Hooks::OpenGL::ClientArrayChunk client_arrays_chunk;
+    APIInterceptor::APIFunctionArgument           indices_arg;
+    void*                                         post_callback_func_arg = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC       post_callback_func_ptr = nullptr;
+    void*                                         pre_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC        pre_callback_func_ptr  = nullptr;
+    bool                                          should_pass_through    = true;
+    APIInterceptor::Tracker                       tracker;
 
     client_arrays_chunk.add_elements(count,
                                      type,
@@ -36,14 +36,14 @@ void AI_APIENTRY OpenGL::aiDrawElements(GLenum      mode,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glDrawElements(mode=[%s] count=[%d] type=[%s] indices=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(mode),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(mode),
                  static_cast<int32_t>(count),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(type),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type),
                  indices);
 
         {
-            const auto& context   = OpenGL::get_context_state();
-            const auto  bound_ebo = context.buffer_manager.get_bound_buffer(OpenGL::BufferBindingTarget::ELEMENT_ARRAY_BUFFER);
+            const auto& context   = Interception::Hooks::OpenGL::get_context_state();
+            const auto  bound_ebo = context.buffer_manager.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ELEMENT_ARRAY_BUFFER);
 
             if (bound_ebo != 0)
             {
@@ -89,10 +89,10 @@ void AI_APIENTRY OpenGL::aiDrawElements(GLenum      mode,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDRAWELEMENTSPROC>(OpenGL::g_cached_gl_draw_elements)(mode,
-                                                                                   count,
-                                                                                   type,
-                                                                                   indices);
+        reinterpret_cast<PFNGLDRAWELEMENTSPROC>(Interception::Hooks::OpenGL::g_cached_gl_draw_elements)(mode,
+                                                                                                        count,
+                                                                                                        type,
+                                                                                                        indices);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDRAWELEMENTS,

@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiStencilFunc(GLenum func,
-                                       GLint  ref,
-                                       GLuint mask)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiStencilFunc(GLenum func,
+                                                            GLint  ref,
+                                                            GLuint mask)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -25,7 +25,7 @@ void AI_APIENTRY OpenGL::aiStencilFunc(GLenum func,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glStencilFunc(func=[%s] ref=[%d] mask=[%u])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(func),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(func),
                  ref,
                  mask);
 

@@ -7,12 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiVertex4f(GLfloat x,
-                                GLfloat y,
-                                GLfloat z,
-                                GLfloat w);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiVertex4f(GLfloat x,
+                                        GLfloat y,
+                                        GLfloat z,
+                                        GLfloat w);
+        }
+    }
 }
 
 #endif /* AI_GL_VERTEX_4F_H */

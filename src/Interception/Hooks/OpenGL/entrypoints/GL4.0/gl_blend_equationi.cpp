@@ -11,8 +11,8 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiBlendEquationi(GLuint buf,
-                                          GLenum mode)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiBlendEquationi(GLuint buf,
+                                                               GLenum mode)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -25,7 +25,7 @@ void AI_APIENTRY OpenGL::aiBlendEquationi(GLuint buf,
     {
         AI_TRACE("glBlendEquationi(buf=[%u] mode=[%s])",
                  buf,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(mode) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(mode) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBLENDEQUATIONI,
                                                          &pre_callback_func_ptr,
@@ -49,8 +49,8 @@ void AI_APIENTRY OpenGL::aiBlendEquationi(GLuint buf,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLBLENDEQUATIONIPROC>(OpenGL::g_cached_gl_blend_equationi)(buf,
-                                                                                       mode);
+        reinterpret_cast<PFNGLBLENDEQUATIONIPROC>(Interception::Hooks::OpenGL::g_cached_gl_blend_equationi)(buf,
+                                                                                                            mode);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBLENDEQUATIONI,

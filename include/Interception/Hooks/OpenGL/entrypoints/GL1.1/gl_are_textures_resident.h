@@ -7,11 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    GLboolean AI_APIENTRY aiAreTexturesResident(GLsizei       n,
-                                                const GLuint* textures,
-                                                GLboolean*    residences);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            GLboolean AI_APIENTRY aiAreTexturesResident(GLsizei       n,
+                                                        const GLuint* textures,
+                                                        GLboolean*    residences);
+        }
+    }
 }
 
 #endif /* AI_GL_ARE_TEXTURES_RESIDENT_H */

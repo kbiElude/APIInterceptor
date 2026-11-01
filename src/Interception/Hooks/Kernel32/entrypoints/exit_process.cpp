@@ -6,7 +6,7 @@
 #include "Interception/Hooks/Kernel32/entrypoints.h"
 #include "Interception/Hooks/Kernel32/globals.h"
 
-DECLSPEC_NORETURN void WINAPI Kernel32::aiExitProcess(UINT uExitCode)
+DECLSPEC_NORETURN void WINAPI Interception::Hooks::Kernel32::aiExitProcess(UINT uExitCode)
 {
     notify_process_exiting();
 

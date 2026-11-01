@@ -10,10 +10,10 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiUniformMatrix3fv(GLint          location,
-                                            GLsizei        count,
-                                            GLboolean      transpose,
-                                            const GLfloat* value)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiUniformMatrix3fv(GLint          location,
+                                                                 GLsizei        count,
+                                                                 GLboolean      transpose,
+                                                                 const GLfloat* value)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -58,10 +58,10 @@ void AI_APIENTRY OpenGL::aiUniformMatrix3fv(GLint          location,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLUNIFORMMATRIX3FVPROC>(OpenGL::g_cached_gl_uniform_matrix_3fv)(location,
-                                                                                            count,
-                                                                                            transpose,
-                                                                                            value);
+        reinterpret_cast<PFNGLUNIFORMMATRIX3FVPROC>(Interception::Hooks::OpenGL::g_cached_gl_uniform_matrix_3fv)(location,
+                                                                                                                 count,
+                                                                                                                 transpose,
+                                                                                                                 value);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLUNIFORMMATRIX3FV,

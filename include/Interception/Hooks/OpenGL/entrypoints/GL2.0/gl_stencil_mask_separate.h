@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiStencilMaskSeparate(GLenum face,
-                                           GLuint mask);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiStencilMaskSeparate(GLenum face,
+                                                   GLuint mask);
+        }
+    }
 }
 
 #endif /* AI_GL_STENCIL_MASK_SEPARATE_H */

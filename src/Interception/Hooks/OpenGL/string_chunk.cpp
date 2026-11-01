@@ -5,7 +5,7 @@
 #include "Interception/Hooks/OpenGL/string_chunk.h"
 #include <string.h>
 
-OpenGL::StringChunk::StringChunk(const char* in_string_ptr)
+Interception::Hooks::OpenGL::StringChunk::StringChunk(const char* in_string_ptr)
     :m_id           (0),
      m_is_registered(false),
      m_string_ptr   (in_string_ptr)
@@ -13,7 +13,7 @@ OpenGL::StringChunk::StringChunk(const char* in_string_ptr)
     /* Stub */
 }
 
-APIInterceptor::DataChunkID OpenGL::StringChunk::get_id()
+APIInterceptor::DataChunkID Interception::Hooks::OpenGL::StringChunk::get_id()
 {
     if (m_is_registered == false)
     {

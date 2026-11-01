@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiClearStencil(GLint s);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiClearStencil(GLint s);
+        }
+    }
 }
 
 #endif /* AI_GL_CLEAR_STENCIL_H */

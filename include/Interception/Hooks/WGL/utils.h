@@ -7,14 +7,20 @@
 
 #include <cstdint>
 
-namespace WGL
+namespace Interception
 {
-    namespace Utils
+    namespace Hooks
     {
-        /* Number of ints in an attribute list of wglCreateContextAttribsARB(): the name and value pairs, and the zero
-         * which ends the list. A null list has none.
-         */
-        uint32_t get_n_context_attrib_list_ints(const int* in_attrib_list_ptr);
+        namespace WGL
+        {
+            namespace Utils
+            {
+                /* Number of ints in an attribute list of wglCreateContextAttribsARB(): the name and value pairs, and the zero
+                 * which ends the list. A null list has none.
+                 */
+                uint32_t get_n_context_attrib_list_ints(const int* in_attrib_list_ptr);
+            }
+        }
     }
 }
 

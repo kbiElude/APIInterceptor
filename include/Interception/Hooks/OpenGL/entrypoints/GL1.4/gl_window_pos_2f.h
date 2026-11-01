@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiWindowPos2f(GLfloat x,
-                                   GLfloat y);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiWindowPos2f(GLfloat x,
+                                           GLfloat y);
+        }
+    }
 }
 
 #endif /* AI_GL_WINDOW_POS_2F_H */

@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetDoublev(GLenum    pname,
-                                  GLdouble* data);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetDoublev(GLenum    pname,
+                                          GLdouble* data);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_DOUBLEV_H */

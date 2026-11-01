@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetTextureLevelParameterfv(GLuint   texture,
-                                                      GLint    level,
-                                                      GLenum   pname,
-                                                      GLfloat* params)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetTextureLevelParameterfv(GLuint   texture,
+                                                                           GLint    level,
+                                                                           GLenum   pname,
+                                                                           GLfloat* params)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -28,7 +28,7 @@ void AI_APIENTRY OpenGL::aiGetTextureLevelParameterfv(GLuint   texture,
         AI_TRACE("glGetTextureLevelParameterfv(texture=[%u] level=[%d] pname=[%s] params=[%p])",
                  texture,
                  level,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  params);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETTEXTURELEVELPARAMETERFV,
@@ -55,10 +55,10 @@ void AI_APIENTRY OpenGL::aiGetTextureLevelParameterfv(GLuint   texture,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETTEXTURELEVELPARAMETERFVPROC>(OpenGL::g_cached_gl_get_texture_level_parameterfv)(texture,
-                                                                                                                 level,
-                                                                                                                 pname,
-                                                                                                                 params);
+        reinterpret_cast<PFNGLGETTEXTURELEVELPARAMETERFVPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_texture_level_parameterfv)(texture,
+                                                                                                                                      level,
+                                                                                                                                      pname,
+                                                                                                                                      params);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETTEXTURELEVELPARAMETERFV,

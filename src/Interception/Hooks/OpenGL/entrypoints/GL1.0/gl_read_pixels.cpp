@@ -13,13 +13,13 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiReadPixels(GLint   x,
-                                      GLint   y,
-                                      GLsizei width,
-                                      GLsizei height,
-                                      GLenum  format,
-                                      GLenum  type,
-                                      void*   pixels)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiReadPixels(GLint   x,
+                                                           GLint   y,
+                                                           GLsizei width,
+                                                           GLsizei height,
+                                                           GLenum  format,
+                                                           GLenum  type,
+                                                           void*   pixels)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -35,8 +35,8 @@ void AI_APIENTRY OpenGL::aiReadPixels(GLint   x,
                  y,
                  static_cast<int32_t>(width),
                  static_cast<int32_t>(height),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(format),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(type),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(format),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type),
                  pixels);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLREADPIXELS,
@@ -79,12 +79,12 @@ void AI_APIENTRY OpenGL::aiReadPixels(GLint   x,
                                                       &post_callback_func_ptr,
                                                       &post_callback_func_arg) )
     {
-        OpenGL::PixelDataChunk pixels_chunk = OpenGL::PixelDataChunk::create_for_pack(pixels,
-                                                                                      width,
-                                                                                      height,
-                                                                                      1,
-                                                                                      format,
-                                                                                      type);
+        Interception::Hooks::OpenGL::PixelDataChunk pixels_chunk = Interception::Hooks::OpenGL::PixelDataChunk::create_for_pack(pixels,
+                                                                                                                                width,
+                                                                                                                                height,
+                                                                                                                                1,
+                                                                                                                                format,
+                                                                                                                                type);
 
         APIInterceptor::APIFunctionArgument result_arg;
 

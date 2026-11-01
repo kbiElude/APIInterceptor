@@ -14,10 +14,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiNamedBufferData(GLuint      buffer,
-                                           GLsizeiptr  size,
-                                           const void* data,
-                                           GLenum      usage)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiNamedBufferData(GLuint      buffer,
+                                                                GLsizeiptr  size,
+                                                                const void* data,
+                                                                GLenum      usage)
 {
     APIInterceptor::MemoryChunk             data_chunk(data,
                                                        size,
@@ -35,7 +35,7 @@ void AI_APIENTRY OpenGL::aiNamedBufferData(GLuint      buffer,
                  buffer,
                  static_cast<int32_t>(size),
                  data,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(usage) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(usage) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLNAMEDBUFFERDATA,
                                                          &pre_callback_func_ptr,
@@ -61,14 +61,14 @@ void AI_APIENTRY OpenGL::aiNamedBufferData(GLuint      buffer,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLNAMEDBUFFERDATAPROC>(OpenGL::g_cached_gl_named_buffer_data)(buffer,
-                                                                                          size,
-                                                                                          data,
-                                                                                          usage);
+        reinterpret_cast<PFNGLNAMEDBUFFERDATAPROC>(Interception::Hooks::OpenGL::g_cached_gl_named_buffer_data)(buffer,
+                                                                                                               size,
+                                                                                                               data,
+                                                                                                               usage);
 
         if (tracker.is_top_level_api_call() )
         {
-            auto& context          = OpenGL::get_context_state();
+            auto& context          = Interception::Hooks::OpenGL::get_context_state();
 
             context.buffer_manager.set_size(buffer,
                                             static_cast<uint64_t>(size) );

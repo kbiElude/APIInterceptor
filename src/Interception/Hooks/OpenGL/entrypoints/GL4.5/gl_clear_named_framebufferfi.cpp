@@ -11,11 +11,11 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiClearNamedFramebufferfi(GLuint  framebuffer,
-                                                   GLenum  buffer,
-                                                   GLint   drawbuffer,
-                                                   GLfloat depth,
-                                                   GLint   stencil)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiClearNamedFramebufferfi(GLuint  framebuffer,
+                                                                        GLenum  buffer,
+                                                                        GLint   drawbuffer,
+                                                                        GLfloat depth,
+                                                                        GLint   stencil)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -28,7 +28,7 @@ void AI_APIENTRY OpenGL::aiClearNamedFramebufferfi(GLuint  framebuffer,
     {
         AI_TRACE("glClearNamedFramebufferfi(framebuffer=[%u] buffer=[%s] drawbuffer=[%d] depth=[%f] stencil=[%d])",
                  framebuffer,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(buffer),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(buffer),
                  drawbuffer,
                  depth,
                  stencil);
@@ -58,11 +58,11 @@ void AI_APIENTRY OpenGL::aiClearNamedFramebufferfi(GLuint  framebuffer,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLCLEARNAMEDFRAMEBUFFERFIPROC>(OpenGL::g_cached_gl_clear_named_framebufferfi)(framebuffer,
-                                                                                                         buffer,
-                                                                                                         drawbuffer,
-                                                                                                         depth,
-                                                                                                         stencil);
+        reinterpret_cast<PFNGLCLEARNAMEDFRAMEBUFFERFIPROC>(Interception::Hooks::OpenGL::g_cached_gl_clear_named_framebufferfi)(framebuffer,
+                                                                                                                              buffer,
+                                                                                                                              drawbuffer,
+                                                                                                                              depth,
+                                                                                                                              stencil);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCLEARNAMEDFRAMEBUFFERFI,

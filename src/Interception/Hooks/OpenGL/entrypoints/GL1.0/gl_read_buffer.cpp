@@ -11,7 +11,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiReadBuffer(GLenum src)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiReadBuffer(GLenum src)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -23,7 +23,7 @@ void AI_APIENTRY OpenGL::aiReadBuffer(GLenum src)
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glReadBuffer(src=[%s])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(src) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(src) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLREADBUFFER,
                                                          &pre_callback_func_ptr,

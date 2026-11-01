@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiRectfv(const GLfloat* v1,
-                              const GLfloat* v2);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiRectfv(const GLfloat* v1,
+                                      const GLfloat* v2);
+        }
+    }
 }
 
 #endif /* AI_GL_RECT_FV_H */

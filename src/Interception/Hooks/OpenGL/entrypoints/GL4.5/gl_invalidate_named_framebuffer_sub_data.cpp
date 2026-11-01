@@ -11,13 +11,13 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiInvalidateNamedFramebufferSubData(GLuint        framebuffer,
-                                                             GLsizei       numAttachments,
-                                                             const GLenum* attachments,
-                                                             GLint         x,
-                                                             GLint         y,
-                                                             GLsizei       width,
-                                                             GLsizei       height)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiInvalidateNamedFramebufferSubData(GLuint        framebuffer,
+                                                                                  GLsizei       numAttachments,
+                                                                                  const GLenum* attachments,
+                                                                                  GLint         x,
+                                                                                  GLint         y,
+                                                                                  GLsizei       width,
+                                                                                  GLsizei       height)
 {
     APIInterceptor::MemoryChunk             attachments_chunk(attachments,
                                                               numAttachments,
@@ -67,13 +67,13 @@ void AI_APIENTRY OpenGL::aiInvalidateNamedFramebufferSubData(GLuint        frame
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLINVALIDATENAMEDFRAMEBUFFERSUBDATAPROC>(OpenGL::g_cached_gl_invalidate_named_framebuffer_sub_data)(framebuffer,
-                                                                                                                               numAttachments,
-                                                                                                                               attachments,
-                                                                                                                               x,
-                                                                                                                               y,
-                                                                                                                               width,
-                                                                                                                               height);
+        reinterpret_cast<PFNGLINVALIDATENAMEDFRAMEBUFFERSUBDATAPROC>(Interception::Hooks::OpenGL::g_cached_gl_invalidate_named_framebuffer_sub_data)(framebuffer,
+                                                                                                                                                    numAttachments,
+                                                                                                                                                    attachments,
+                                                                                                                                                    x,
+                                                                                                                                                    y,
+                                                                                                                                                    width,
+                                                                                                                                                    height);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLINVALIDATENAMEDFRAMEBUFFERSUBDATA,

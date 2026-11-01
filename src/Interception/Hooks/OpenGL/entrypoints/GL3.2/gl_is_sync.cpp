@@ -10,7 +10,7 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-GLboolean AI_APIENTRY OpenGL::aiIsSync(GLsync sync)
+GLboolean AI_APIENTRY Interception::Hooks::OpenGL::aiIsSync(GLsync sync)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -44,7 +44,7 @@ GLboolean AI_APIENTRY OpenGL::aiIsSync(GLsync sync)
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNGLISSYNCPROC>(OpenGL::g_cached_gl_is_sync)(sync);
+        result = reinterpret_cast<PFNGLISSYNCPROC>(Interception::Hooks::OpenGL::g_cached_gl_is_sync)(sync);
     }
 
     if (tracker.is_top_level_api_call() )
@@ -57,8 +57,8 @@ GLboolean AI_APIENTRY OpenGL::aiIsSync(GLsync sync)
 
             post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLISSYNC,
                                    post_callback_func_arg,
-                                   0,       /* in_n_args_out   */
-                                   nullptr, /* in_args_out_ptr */
+                                   0,       /* in_n_arguments_out   */
+                                   nullptr, /* in_arguments_out_ptr */
                                   &result_arg);
         }
     }

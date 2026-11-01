@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiSelectBuffer(GLsizei size,
-                                    GLuint* buffer);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiSelectBuffer(GLsizei size,
+                                            GLuint* buffer);
+        }
+    }
 }
 
 #endif /* AI_GL_SELECT_BUFFER_H */

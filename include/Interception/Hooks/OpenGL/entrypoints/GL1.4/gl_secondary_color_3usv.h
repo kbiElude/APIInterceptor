@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiSecondaryColor3usv(const GLushort* v);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiSecondaryColor3usv(const GLushort* v);
+        }
+    }
 }
 
 #endif /* AI_GL_SECONDARY_COLOR_3USV_H */

@@ -10,7 +10,7 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiPrimitiveRestartIndex(GLuint index)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiPrimitiveRestartIndex(GLuint index)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;

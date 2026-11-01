@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiSampleCoverage(GLfloat   value,
-                                      GLboolean invert);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiSampleCoverage(GLfloat   value,
+                                              GLboolean invert);
+        }
+    }
 }
 
 #endif /* AI_GL_ACTIVE_TEXTURE_H */

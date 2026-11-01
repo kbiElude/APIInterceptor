@@ -10,8 +10,8 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiInvalidateTexImage(GLuint texture,
-                                              GLint  level)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiInvalidateTexImage(GLuint texture,
+                                                                   GLint  level)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -48,8 +48,8 @@ void AI_APIENTRY OpenGL::aiInvalidateTexImage(GLuint texture,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLINVALIDATETEXIMAGEPROC>(OpenGL::g_cached_gl_invalidate_tex_image)(texture,
-                                                                                                 level);
+        reinterpret_cast<PFNGLINVALIDATETEXIMAGEPROC>(Interception::Hooks::OpenGL::g_cached_gl_invalidate_tex_image)(texture,
+                                                                                                                      level);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLINVALIDATETEXIMAGEPROC,

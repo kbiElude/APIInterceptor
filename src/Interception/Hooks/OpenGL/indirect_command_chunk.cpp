@@ -5,14 +5,14 @@
 #include "Interception/Hooks/OpenGL/indirect_command_chunk.h"
 #include "Interception/Hooks/OpenGL/state_tracker.h"
 
-OpenGL::IndirectCommandChunk::IndirectCommandChunk()
+Interception::Hooks::OpenGL::IndirectCommandChunk::IndirectCommandChunk()
 {
     /* Stub */
 }
 
-OpenGL::IndirectCommandChunk::IndirectCommandChunk(const void*     in_indirect_ptr,
-                                                   const uint64_t& in_n_bytes,
-                                                   const bool&     in_is_buffer_offset)
+Interception::Hooks::OpenGL::IndirectCommandChunk::IndirectCommandChunk(const void*     in_indirect_ptr,
+                                                                        const uint64_t& in_n_bytes,
+                                                                        const bool&     in_is_buffer_offset)
     :BufferOffsetOrMemoryChunk(in_indirect_ptr,
                                in_n_bytes,
                                in_is_buffer_offset)
@@ -20,10 +20,10 @@ OpenGL::IndirectCommandChunk::IndirectCommandChunk(const void*     in_indirect_p
     /* Stub */
 }
 
-OpenGL::IndirectCommandChunk OpenGL::IndirectCommandChunk::create(const void*     in_indirect_ptr,
-                                                                  const int64_t&  in_n_commands,
-                                                                  const uint32_t& in_stride,
-                                                                  const uint32_t& in_command_n_bytes)
+Interception::Hooks::OpenGL::IndirectCommandChunk Interception::Hooks::OpenGL::IndirectCommandChunk::create(const void*     in_indirect_ptr,
+                                                                                                            const int64_t&  in_n_commands,
+                                                                                                            const uint32_t& in_stride,
+                                                                                                            const uint32_t& in_command_n_bytes)
 {
     const auto&    context = get_context_state();
     uint64_t       n_bytes = 0;
@@ -40,9 +40,9 @@ OpenGL::IndirectCommandChunk OpenGL::IndirectCommandChunk::create(const void*   
                                 context.buffer_manager.get_bound_buffer(BufferBindingTarget::DRAW_INDIRECT_BUFFER) != 0);
 }
 
-OpenGL::IndirectCommandChunk OpenGL::IndirectCommandChunk::create_for_draw_arrays(const void*     in_indirect_ptr,
-                                                                                  const int64_t&  in_n_commands,
-                                                                                  const uint32_t& in_stride)
+Interception::Hooks::OpenGL::IndirectCommandChunk Interception::Hooks::OpenGL::IndirectCommandChunk::create_for_draw_arrays(const void*     in_indirect_ptr,
+                                                                                                                            const int64_t&  in_n_commands,
+                                                                                                                            const uint32_t& in_stride)
 {
     /* DrawArraysIndirectCommand: count, instanceCount, first, baseInstance. */
     constexpr uint32_t N_FIELDS = 4;
@@ -53,9 +53,9 @@ OpenGL::IndirectCommandChunk OpenGL::IndirectCommandChunk::create_for_draw_array
                   N_FIELDS * sizeof(uint32_t) );
 }
 
-OpenGL::IndirectCommandChunk OpenGL::IndirectCommandChunk::create_for_draw_elements(const void*     in_indirect_ptr,
-                                                                                    const int64_t&  in_n_commands,
-                                                                                    const uint32_t& in_stride)
+Interception::Hooks::OpenGL::IndirectCommandChunk Interception::Hooks::OpenGL::IndirectCommandChunk::create_for_draw_elements(const void*     in_indirect_ptr,
+                                                                                                                              const int64_t&  in_n_commands,
+                                                                                                                              const uint32_t& in_stride)
 {
     /* DrawElementsIndirectCommand: count, instanceCount, firstIndex, baseVertex, baseInstance. */
     constexpr uint32_t N_FIELDS = 5;

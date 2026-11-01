@@ -7,9 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiNamedFramebufferDrawBuffers(GLuint framebuffer, GLsizei n, const GLenum* bufs);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiNamedFramebufferDrawBuffers(GLuint        framebuffer,
+                                                           GLsizei       n,
+                                                           const GLenum* bufs);
+        }
+    }
 }
 
 #endif /* AI_GL_NAMED_FRAMEBUFFER_DRAW_BUFFERS_H */

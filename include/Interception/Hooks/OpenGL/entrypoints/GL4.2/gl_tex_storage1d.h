@@ -7,12 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiTexStorage1D(GLenum  target,
-                                    GLsizei levels,
-                                    GLenum  internalformat,
-                                    GLsizei width);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiTexStorage1D(GLenum  target,
+                                            GLsizei levels,
+                                            GLenum  internalformat,
+                                            GLsizei width);
+        }
+    }
 }
 
 #endif /* AI_GL_TEX_STORAGE1D_H */

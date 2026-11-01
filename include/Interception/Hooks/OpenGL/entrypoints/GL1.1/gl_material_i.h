@@ -7,11 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiMateriali(GLenum face,
-                                 GLenum pname,
-                                 GLint  param);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiMateriali(GLenum face,
+                                         GLenum pname,
+                                         GLint  param);
+        }
+    }
 }
 
 #endif /* AI_GL_MATERIAL_I_H */

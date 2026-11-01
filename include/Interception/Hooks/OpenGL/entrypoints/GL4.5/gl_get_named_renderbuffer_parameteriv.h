@@ -7,9 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetNamedRenderbufferParameteriv(GLuint renderbuffer, GLenum pname, GLint* params);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetNamedRenderbufferParameteriv(GLuint renderbuffer,
+                                                               GLenum pname,
+                                                               GLint* params);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_NAMED_RENDERBUFFER_PARAMETERIV_H */

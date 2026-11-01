@@ -8,8 +8,8 @@
 #include "Interception/Core/D3D8Utils/surface_layout.h"
 #include <algorithm>
 
-APIInterceptor::APIFunctionArgument D3D8::HookPolicyHelper::create_locked_data_argument(const void*     in_object_ptr,
-                                                                                        const uint32_t& in_level)
+APIInterceptor::APIFunctionArgument Interception::Hooks::D3D8::HookPolicyHelper::create_locked_data_argument(const void*     in_object_ptr,
+                                                                                                             const uint32_t& in_level)
 {
     LockRecord lock_record = {};
     bool       has_data    = LockTracker::get_ptr()->get_lock(in_object_ptr,
@@ -29,10 +29,10 @@ APIInterceptor::APIFunctionArgument D3D8::HookPolicyHelper::create_locked_data_a
                                                   : 0);
 }
 
-void D3D8::HookPolicyHelper::create_present_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
-                                                      const RECT*                          in_source_rect_ptr,
-                                                      const RECT*                          in_dest_rect_ptr,
-                                                      const RGNDATA*                       in_dirty_region_ptr)
+void Interception::Hooks::D3D8::HookPolicyHelper::create_present_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
+                                                                           const RECT*                          in_source_rect_ptr,
+                                                                           const RECT*                          in_dest_rect_ptr,
+                                                                           const RGNDATA*                       in_dirty_region_ptr)
 {
     constexpr uint32_t MAX_N_RECTS = 4096; /* sanity limit */
 
@@ -54,15 +54,15 @@ void D3D8::HookPolicyHelper::create_present_arguments(APIInterceptor::APIFunctio
                                                          n_dirty_rects * static_cast<uint32_t>(sizeof(RECT) ));
 }
 
-uint32_t D3D8::HookPolicyHelper::get_cube_face_level_key(const D3DCUBEMAP_FACES& in_face,
-                                                         const uint32_t&         in_level)
+uint32_t Interception::Hooks::D3D8::HookPolicyHelper::get_cube_face_level_key(const D3DCUBEMAP_FACES& in_face,
+                                                                              const uint32_t&         in_level)
 {
     constexpr uint32_t MAX_N_LEVELS_PER_FACE = 64; /* far more than a texture can have */
 
     return static_cast<uint32_t>(in_face) * MAX_N_LEVELS_PER_FACE + in_level;
 }
 
-uint32_t D3D8::HookPolicyHelper::get_n_shader_function_tokens(const DWORD* in_function_ptr)
+uint32_t Interception::Hooks::D3D8::HookPolicyHelper::get_n_shader_function_tokens(const DWORD* in_function_ptr)
 {
     constexpr uint32_t D3DSI_COMMENTSIZE_MASK  = 0x7fff0000;
     constexpr uint32_t D3DSI_COMMENTSIZE_SHIFT = 16;
@@ -104,7 +104,7 @@ uint32_t D3D8::HookPolicyHelper::get_n_shader_function_tokens(const DWORD* in_fu
                               MAX_N_TOKENS);
 }
 
-uint32_t D3D8::HookPolicyHelper::get_n_vertex_declaration_tokens(const DWORD* in_declaration_ptr)
+uint32_t Interception::Hooks::D3D8::HookPolicyHelper::get_n_vertex_declaration_tokens(const DWORD* in_declaration_ptr)
 {
     constexpr uint32_t D3DVSD_CONSTCOUNT_MASK  = 0x1e000000;
     constexpr uint32_t D3DVSD_CONSTCOUNT_SHIFT = 25;
@@ -139,8 +139,8 @@ uint32_t D3D8::HookPolicyHelper::get_n_vertex_declaration_tokens(const DWORD* in
                               MAX_N_TOKENS);
 }
 
-uint32_t D3D8::HookPolicyHelper::get_n_vertices(const D3DPRIMITIVETYPE& in_primitive_type,
-                                                const uint32_t&         in_primitive_count)
+uint32_t Interception::Hooks::D3D8::HookPolicyHelper::get_n_vertices(const D3DPRIMITIVETYPE& in_primitive_type,
+                                                                     const uint32_t&         in_primitive_count)
 {
     constexpr uint32_t LINE_N_VERTICES                = 2;
     constexpr uint32_t LINE_STRIP_N_EXTRA_VERTICES    = 1; /* strips and fans share vertices between primitives */
@@ -196,16 +196,16 @@ uint32_t D3D8::HookPolicyHelper::get_n_vertices(const D3DPRIMITIVETYPE& in_primi
     return result;
 }
 
-uint32_t D3D8::HookPolicyHelper::get_surface_region_n_bytes(const D3DFORMAT& in_format,
-                                                            const uint32_t&  in_width,
-                                                            const uint32_t&  in_height,
-                                                            const uint32_t&  in_pitch)
+uint32_t Interception::Hooks::D3D8::HookPolicyHelper::get_surface_region_n_bytes(const D3DFORMAT& in_format,
+                                                                                 const uint32_t&  in_width,
+                                                                                 const uint32_t&  in_height,
+                                                                                 const uint32_t&  in_pitch)
 {
     uint32_t n_row_bytes = 0;
     uint32_t n_rows      = 0;
     uint32_t result      = 0;
 
-    Utils::get_surface_region_layout(in_format,
+    Interception::Core::D3D8Utils::get_surface_region_layout(in_format,
                                      in_width,
                                      in_height,
                                     &n_rows,
@@ -220,12 +220,12 @@ uint32_t D3D8::HookPolicyHelper::get_surface_region_n_bytes(const D3DFORMAT& in_
     return result;
 }
 
-void D3D8::HookPolicyHelper::on_box_locked(const void*           in_object_ptr,
-                                           const uint32_t&       in_level,
-                                           const D3DVOLUME_DESC& in_description,
-                                           const D3DLOCKED_BOX*  in_locked_box_ptr,
-                                           const D3DBOX*         in_box_ptr,
-                                           const DWORD&          in_flags)
+void Interception::Hooks::D3D8::HookPolicyHelper::on_box_locked(const void*           in_object_ptr,
+                                                                const uint32_t&       in_level,
+                                                                const D3DVOLUME_DESC& in_description,
+                                                                const D3DLOCKED_BOX*  in_locked_box_ptr,
+                                                                const D3DBOX*         in_box_ptr,
+                                                                const DWORD&          in_flags)
 {
     const bool is_box_set  = (in_box_ptr != nullptr);
     LockRecord lock_record = {};
@@ -252,12 +252,12 @@ void D3D8::HookPolicyHelper::on_box_locked(const void*           in_object_ptr,
                                       lock_record);
 }
 
-void D3D8::HookPolicyHelper::on_buffer_locked(const void*     in_object_ptr,
-                                              const uint32_t& in_buffer_n_bytes,
-                                              const UINT&     in_offset_to_lock,
-                                              const UINT&     in_size_to_lock,
-                                              BYTE* const*    in_data_ptr_ptr,
-                                              const DWORD&    in_flags)
+void Interception::Hooks::D3D8::HookPolicyHelper::on_buffer_locked(const void*     in_object_ptr,
+                                                                   const uint32_t& in_buffer_n_bytes,
+                                                                   const UINT&     in_offset_to_lock,
+                                                                   const UINT&     in_size_to_lock,
+                                                                   BYTE* const*    in_data_ptr_ptr,
+                                                                   const DWORD&    in_flags)
 {
     LockRecord     lock_record    = {};
     const uint32_t n_bytes_to_end = (in_buffer_n_bytes > in_offset_to_lock) ? in_buffer_n_bytes - in_offset_to_lock
@@ -273,12 +273,12 @@ void D3D8::HookPolicyHelper::on_buffer_locked(const void*     in_object_ptr,
                                       lock_record);
 }
 
-void D3D8::HookPolicyHelper::on_rect_locked(const void*            in_object_ptr,
-                                            const uint32_t&        in_level,
-                                            const D3DSURFACE_DESC& in_description,
-                                            const D3DLOCKED_RECT*  in_locked_rect_ptr,
-                                            const RECT*            in_rect_ptr,
-                                            const DWORD&           in_flags)
+void Interception::Hooks::D3D8::HookPolicyHelper::on_rect_locked(const void*            in_object_ptr,
+                                                                 const uint32_t&        in_level,
+                                                                 const D3DSURFACE_DESC& in_description,
+                                                                 const D3DLOCKED_RECT*  in_locked_rect_ptr,
+                                                                 const RECT*            in_rect_ptr,
+                                                                 const DWORD&           in_flags)
 {
     const bool is_rect_set = (in_rect_ptr != nullptr);
     LockRecord lock_record = {};

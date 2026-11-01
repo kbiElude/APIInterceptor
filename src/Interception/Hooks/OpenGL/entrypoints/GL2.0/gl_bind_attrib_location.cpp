@@ -11,11 +11,11 @@
 #include "Interception/Hooks/OpenGL/string_chunk.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiBindAttribLocation(GLuint  program,
-                                              GLuint  index,
-                                              GLchar* name)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiBindAttribLocation(GLuint  program,
+                                                                   GLuint  index,
+                                                                   GLchar* name)
 {
-    OpenGL::StringChunk                     name_chunk(name);
+    Interception::Hooks::OpenGL::StringChunk                     name_chunk(name);
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
@@ -53,9 +53,9 @@ void AI_APIENTRY OpenGL::aiBindAttribLocation(GLuint  program,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLBINDATTRIBLOCATIONPROC>(OpenGL::g_cached_gl_bind_attrib_location)(program,
-                                                                                                index,
-                                                                                                name);
+        reinterpret_cast<PFNGLBINDATTRIBLOCATIONPROC>(Interception::Hooks::OpenGL::g_cached_gl_bind_attrib_location)(program,
+                                                                                                                     index,
+                                                                                                                     name);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBINDATTRIBLOCATION,

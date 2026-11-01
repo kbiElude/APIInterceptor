@@ -7,9 +7,18 @@
 
 #include <windows.h>
 
-namespace User32
+namespace Interception
 {
-    HDC WINAPI create_dc_w(LPCWSTR, LPCWSTR, LPCWSTR, const DEVMODEW* pdm);
+    namespace Hooks
+    {
+        namespace User32
+        {
+            HDC WINAPI create_dc_w(LPCWSTR,
+                                   LPCWSTR,
+                                   LPCWSTR,
+                                   const DEVMODEW* pdm);
+        }
+    }
 }
 
 #endif /* AI_CREATE_DC_W_H */

@@ -11,19 +11,19 @@
 #include "Interception/Hooks/OpenGL/string_array_chunk.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiShaderSource(GLuint               shader,
-                                        GLsizei              count,
-                                        const GLchar* const* string,
-                                        const GLint*         length)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiShaderSource(GLuint               shader,
+                                                             GLsizei              count,
+                                                             const GLchar* const* string,
+                                                             const GLint*         length)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
-    OpenGL::StringArrayChunk                strings_chunk(string,
-                                                          count,
-                                                          length);
+    Interception::Hooks::OpenGL::StringArrayChunk                strings_chunk(string,
+                                                                               count,
+                                                                               length);
     APIInterceptor::Tracker                 tracker;
 
     if (tracker.is_top_level_api_call() )
@@ -58,10 +58,10 @@ void AI_APIENTRY OpenGL::aiShaderSource(GLuint               shader,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLSHADERSOURCEPROC>(OpenGL::g_cached_gl_shader_source)(shader,
-                                                                                   count,
-                                                                                   string,
-                                                                                   length);
+        reinterpret_cast<PFNGLSHADERSOURCEPROC>(Interception::Hooks::OpenGL::g_cached_gl_shader_source)(shader,
+                                                                                                        count,
+                                                                                                        string,
+                                                                                                        length);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLSHADERSOURCE,

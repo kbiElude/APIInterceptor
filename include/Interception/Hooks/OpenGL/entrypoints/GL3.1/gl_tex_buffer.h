@@ -7,11 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiTexBuffer(GLenum target,
-                                 GLenum internalformat,
-                                 GLuint buffer);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiTexBuffer(GLenum target,
+                                         GLenum internalformat,
+                                         GLuint buffer);
+        }
+    }
 }
 
 #endif /* AI_GL_TEX_BUFFER_H */

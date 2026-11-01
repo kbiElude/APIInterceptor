@@ -7,9 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiProgramBinary(GLuint program, GLenum binaryFormat, const void* binary, GLsizei length);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiProgramBinary(GLuint      program,
+                                             GLenum      binaryFormat,
+                                             const void* binary,
+                                             GLsizei     length);
+        }
+    }
 }
 
 #endif /* AI_GL_PROGRAM_BINARY_H */

@@ -10,16 +10,16 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetCompressedTextureSubImage(GLuint  texture,
-                                                        GLint   level,
-                                                        GLint   xoffset,
-                                                        GLint   yoffset,
-                                                        GLint   zoffset,
-                                                        GLsizei width,
-                                                        GLsizei height,
-                                                        GLsizei depth,
-                                                        GLsizei bufSize,
-                                                        void*   pixels)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetCompressedTextureSubImage(GLuint  texture,
+                                                                             GLint   level,
+                                                                             GLint   xoffset,
+                                                                             GLint   yoffset,
+                                                                             GLint   zoffset,
+                                                                             GLsizei width,
+                                                                             GLsizei height,
+                                                                             GLsizei depth,
+                                                                             GLsizei bufSize,
+                                                                             void*   pixels)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -72,16 +72,16 @@ void AI_APIENTRY OpenGL::aiGetCompressedTextureSubImage(GLuint  texture,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETCOMPRESSEDTEXTURESUBIMAGEPROC>(OpenGL::g_cached_gl_get_compressed_texture_sub_image)(texture,
-                                                                                                                      level,
-                                                                                                                      xoffset,
-                                                                                                                      yoffset,
-                                                                                                                      zoffset,
-                                                                                                                      width,
-                                                                                                                      height,
-                                                                                                                      depth,
-                                                                                                                      bufSize,
-                                                                                                                      pixels);
+        reinterpret_cast<PFNGLGETCOMPRESSEDTEXTURESUBIMAGEPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_compressed_texture_sub_image)(texture,
+                                                                                                                                           level,
+                                                                                                                                           xoffset,
+                                                                                                                                           yoffset,
+                                                                                                                                           zoffset,
+                                                                                                                                           width,
+                                                                                                                                           height,
+                                                                                                                                           depth,
+                                                                                                                                           bufSize,
+                                                                                                                                           pixels);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETCOMPRESSEDTEXTURESUBIMAGE,

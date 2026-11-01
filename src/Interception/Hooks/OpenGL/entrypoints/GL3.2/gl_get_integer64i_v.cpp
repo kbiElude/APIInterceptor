@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetInteger64i_v(GLenum   target,
-                                           GLuint   index,
-                                           GLint64* data)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetInteger64i_v(GLenum   target,
+                                                                GLuint   index,
+                                                                GLint64* data)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -25,7 +25,7 @@ void AI_APIENTRY OpenGL::aiGetInteger64i_v(GLenum   target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glGetInteger64i_v(target=[%s] index=[%u] data=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  index,
                  data);
 
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiGetInteger64i_v(GLenum   target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETINTEGER64I_VPROC>(OpenGL::g_cached_gl_get_integer64i_v)(target,
-                                                                                          index,
-                                                                                          data);
+        reinterpret_cast<PFNGLGETINTEGER64I_VPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_integer64i_v)(target,
+                                                                                                               index,
+                                                                                                               data);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETINTEGER64I_V,

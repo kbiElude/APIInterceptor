@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiIndexi(GLint c);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiIndexi(GLint c);
+        }
+    }
 }
 
 #endif /* AI_GL_INDEX_I_H */

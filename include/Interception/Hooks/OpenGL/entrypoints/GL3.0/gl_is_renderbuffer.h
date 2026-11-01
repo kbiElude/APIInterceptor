@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    GLboolean AI_APIENTRY aiIsRenderbuffer(GLuint renderbuffer);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            GLboolean AI_APIENTRY aiIsRenderbuffer(GLuint renderbuffer);
+        }
+    }
 }
 
 #endif /* AI_GL_IS_RENDERBUFFER_H */

@@ -7,9 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetQueryBufferObjectuiv(GLuint id, GLuint buffer, GLenum pname, GLintptr offset);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetQueryBufferObjectuiv(GLuint   id,
+                                                       GLuint   buffer,
+                                                       GLenum   pname,
+                                                       GLintptr offset);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_QUERY_BUFFER_OBJECTUIV_H */

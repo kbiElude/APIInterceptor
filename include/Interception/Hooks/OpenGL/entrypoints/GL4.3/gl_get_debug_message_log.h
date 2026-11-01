@@ -7,9 +7,22 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    GLuint AI_APIENTRY aiGetDebugMessageLog(GLuint count, GLsizei bufSize, GLenum* sources, GLenum* types, GLuint* ids, GLenum* severities, GLsizei* lengths, GLchar* messageLog);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            GLuint AI_APIENTRY aiGetDebugMessageLog(GLuint   count,
+                                                    GLsizei  bufSize,
+                                                    GLenum*  sources,
+                                                    GLenum*  types,
+                                                    GLuint*  ids,
+                                                    GLenum*  severities,
+                                                    GLsizei* lengths,
+                                                    GLchar*  messageLog);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_DEBUG_MESSAGE_LOG_H */

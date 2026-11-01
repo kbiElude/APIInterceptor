@@ -5,7 +5,7 @@
 #include "Common/macros.h"
 #include "Interception/Hooks/OpenGL/types.h"
 
-OpenGL::DispatchTable::DispatchTable()
+Interception::Hooks::OpenGL::DispatchTable::DispatchTable()
 {
     memset(this,
            0,

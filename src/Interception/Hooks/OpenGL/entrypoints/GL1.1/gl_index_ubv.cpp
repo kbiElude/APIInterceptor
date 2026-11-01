@@ -11,7 +11,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiIndexubv(const GLubyte* c)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiIndexubv(const GLubyte* c)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -50,7 +50,7 @@ void AI_APIENTRY OpenGL::aiIndexubv(const GLubyte* c)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLINDEXUBVPROC>(OpenGL::g_cached_gl_index_ubv)(c);
+        reinterpret_cast<PFNGLINDEXUBVPROC>(Interception::Hooks::OpenGL::g_cached_gl_index_ubv)(c);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLINDEXUBV,

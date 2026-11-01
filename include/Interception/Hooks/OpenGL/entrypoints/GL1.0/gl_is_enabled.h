@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    GLboolean AI_APIENTRY aiIsEnabled(GLenum cap);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            GLboolean AI_APIENTRY aiIsEnabled(GLenum cap);
+        }
+    }
 }
 
 #endif /* AI_GL_IS_ENABLED_H */

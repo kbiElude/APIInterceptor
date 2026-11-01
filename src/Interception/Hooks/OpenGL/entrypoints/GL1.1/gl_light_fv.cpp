@@ -13,12 +13,12 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiLightfv(GLenum         light,
-                                   GLenum         pname,
-                                   const GLfloat* params)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiLightfv(GLenum         light,
+                                                        GLenum         pname,
+                                                        const GLfloat* params)
 {
     APIInterceptor::MemoryChunk             params_chunk(params,
-                                                         OpenGL::Utils::get_n_light_params(pname),
+                                                         Interception::Hooks::OpenGL::Utils::get_n_light_params(pname),
                                                          sizeof(GLfloat));
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -30,8 +30,8 @@ void AI_APIENTRY OpenGL::aiLightfv(GLenum         light,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glLightfv(light=[%s], pname=[%s], params=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(light),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(light),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  params);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLLIGHTFV,
@@ -57,9 +57,9 @@ void AI_APIENTRY OpenGL::aiLightfv(GLenum         light,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLLIGHTFVPROC>(OpenGL::g_cached_gl_light_fv)(light,
-                                                                         pname,
-                                                                         params);
+        reinterpret_cast<PFNGLLIGHTFVPROC>(Interception::Hooks::OpenGL::g_cached_gl_light_fv)(light,
+                                                                                              pname,
+                                                                                              params);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLLIGHTFV,

@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiColor4fv(const GLfloat* v);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiColor4fv(const GLfloat* v);
+        }
+    }
 }
 
 #endif /* AI_GL_COLOR_4FV_H */

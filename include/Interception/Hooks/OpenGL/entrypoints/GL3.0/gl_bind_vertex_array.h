@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiBindVertexArray(GLuint array);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiBindVertexArray(GLuint array);
+        }
+    }
 }
 
 #endif /* AI_GL_BIND_VERTEX_ARRAY_H */

@@ -7,9 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiCreateTextures(GLenum target, GLsizei n, GLuint* textures);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiCreateTextures(GLenum  target,
+                                              GLsizei n,
+                                              GLuint* textures);
+        }
+    }
 }
 
 #endif /* AI_GL_CREATE_TEXTURES_H */

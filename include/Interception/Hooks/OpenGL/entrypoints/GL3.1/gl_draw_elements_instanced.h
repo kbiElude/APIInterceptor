@@ -7,13 +7,19 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiDrawElementsInstanced(GLenum      mode,
-                                             GLsizei     count,
-                                             GLenum      type,
-                                             const void* indices,
-                                             GLsizei     instancecount);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiDrawElementsInstanced(GLenum      mode,
+                                                     GLsizei     count,
+                                                     GLenum      type,
+                                                     const void* indices,
+                                                     GLsizei     instancecount);
+        }
+    }
 }
 
 #endif /* AI_GL_DRAW_ELEMENTS_INSTANCED_H */

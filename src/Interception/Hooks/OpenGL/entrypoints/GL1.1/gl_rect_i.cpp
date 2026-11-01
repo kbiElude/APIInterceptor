@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiRecti(GLint x1,
-                                 GLint y1,
-                                 GLint x2,
-                                 GLint y2)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiRecti(GLint x1,
+                                                      GLint y1,
+                                                      GLint x2,
+                                                      GLint y2)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -55,10 +55,10 @@ void AI_APIENTRY OpenGL::aiRecti(GLint x1,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLRECTIPROC>(OpenGL::g_cached_gl_rect_i)(x1,
-                                                                     y1,
-                                                                     x2,
-                                                                     y2);
+        reinterpret_cast<PFNGLRECTIPROC>(Interception::Hooks::OpenGL::g_cached_gl_rect_i)(x1,
+                                                                                          y1,
+                                                                                          x2,
+                                                                                          y2);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLRECTI,

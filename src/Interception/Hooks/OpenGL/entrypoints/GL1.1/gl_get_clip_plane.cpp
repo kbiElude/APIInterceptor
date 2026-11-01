@@ -11,8 +11,8 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetClipPlane(GLenum    plane,
-                                        GLdouble* equation)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetClipPlane(GLenum    plane,
+                                                             GLdouble* equation)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -24,7 +24,7 @@ void AI_APIENTRY OpenGL::aiGetClipPlane(GLenum    plane,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("gGetClipPlane(plane=[%s], equation=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(plane),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(plane),
                  equation);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETCLIPPLANE,
@@ -49,8 +49,8 @@ void AI_APIENTRY OpenGL::aiGetClipPlane(GLenum    plane,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETCLIPPLANEPROC>(OpenGL::g_cached_gl_get_clip_plane)(plane,
-                                                                                    equation);
+        reinterpret_cast<PFNGLGETCLIPPLANEPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_clip_plane)(plane,
+                                                                                                         equation);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETCLIPPLANE,

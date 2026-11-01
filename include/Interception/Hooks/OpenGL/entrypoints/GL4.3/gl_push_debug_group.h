@@ -7,9 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiPushDebugGroup(GLenum source, GLuint id, GLsizei length, const GLchar* message);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiPushDebugGroup(GLenum        source,
+                                              GLuint        id,
+                                              GLsizei       length,
+                                              const GLchar* message);
+        }
+    }
 }
 
 #endif /* AI_GL_PUSH_DEBUG_GROUP_H */

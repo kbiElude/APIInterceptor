@@ -7,13 +7,19 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetInternalformativ(GLenum  target,
-                                           GLenum  internalformat,
-                                           GLenum  pname,
-                                           GLsizei bufSize,
-                                           GLint*  params);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetInternalformativ(GLenum  target,
+                                                   GLenum  internalformat,
+                                                   GLenum  pname,
+                                                   GLsizei bufSize,
+                                                   GLint*  params);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_INTERNALFORMATIV_H */

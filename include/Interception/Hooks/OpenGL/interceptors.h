@@ -10,10 +10,16 @@
 #include <unordered_map>
 #include <vector>
 
-namespace OpenGL
+namespace Interception
 {
-    extern std::vector<APIInterceptor::FunctionInterceptor> get_function_interceptors    ();
-    extern std::unordered_map<std::string, void*>           get_func_name_to_func_ptr_map();
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            extern std::vector<APIInterceptor::FunctionInterceptor> get_function_interceptors    ();
+            extern std::unordered_map<std::string, void*>           get_func_name_to_func_ptr_map();
+        }
+    }
 }
 
 #endif /* OPENGL_INTERCEPTORS_H */

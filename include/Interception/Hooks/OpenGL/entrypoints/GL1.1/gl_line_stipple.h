@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiLineStipple(GLint    factor,
-                                   GLushort pattern);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiLineStipple(GLint    factor,
+                                           GLushort pattern);
+        }
+    }
 }
 
 #endif /* AI_GL_LINE_STIPPLE_H */

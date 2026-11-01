@@ -10,7 +10,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-GLboolean AI_APIENTRY OpenGL::aiIsEnabled(GLenum cap)
+GLboolean AI_APIENTRY Interception::Hooks::OpenGL::aiIsEnabled(GLenum cap)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -23,7 +23,7 @@ GLboolean AI_APIENTRY OpenGL::aiIsEnabled(GLenum cap)
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glIsEnabled(cap=[%s])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(cap) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(cap) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLISENABLED,
                                                          &pre_callback_func_ptr,
@@ -44,7 +44,7 @@ GLboolean AI_APIENTRY OpenGL::aiIsEnabled(GLenum cap)
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNGLISENABLEDPROC>(OpenGL::g_cached_gl_is_enabled)(cap);
+        result = reinterpret_cast<PFNGLISENABLEDPROC>(Interception::Hooks::OpenGL::g_cached_gl_is_enabled)(cap);
     }
 
     if (tracker.is_top_level_api_call() )
@@ -57,8 +57,8 @@ GLboolean AI_APIENTRY OpenGL::aiIsEnabled(GLenum cap)
 
             post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLISENABLED,
                                    post_callback_func_arg,
-                                   0,       /* in_n_args_out   */
-                                   nullptr, /* in_args_out_ptr */
+                                   0,       /* in_n_arguments_out   */
+                                   nullptr, /* in_arguments_out_ptr */
                                   &result_arg);
         }
     }

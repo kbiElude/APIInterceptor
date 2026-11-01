@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiNamedFramebufferParameteri(GLuint framebuffer,
-                                                      GLenum pname,
-                                                      GLint  param)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiNamedFramebufferParameteri(GLuint framebuffer,
+                                                                           GLenum pname,
+                                                                           GLint  param)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -26,7 +26,7 @@ void AI_APIENTRY OpenGL::aiNamedFramebufferParameteri(GLuint framebuffer,
     {
         AI_TRACE("glNamedFramebufferParameteri(framebuffer=[%u] pname=[%s] param=[%d])",
                  framebuffer,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  param);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLNAMEDFRAMEBUFFERPARAMETERI,
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiNamedFramebufferParameteri(GLuint framebuffer,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLNAMEDFRAMEBUFFERPARAMETERIPROC>(OpenGL::g_cached_gl_named_framebuffer_parameteri)(framebuffer,
-                                                                                                               pname,
-                                                                                                               param);
+        reinterpret_cast<PFNGLNAMEDFRAMEBUFFERPARAMETERIPROC>(Interception::Hooks::OpenGL::g_cached_gl_named_framebuffer_parameteri)(framebuffer,
+                                                                                                                                    pname,
+                                                                                                                                    param);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLNAMEDFRAMEBUFFERPARAMETERI,

@@ -10,7 +10,7 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiClearDepthf(GLfloat d)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiClearDepthf(GLfloat d)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -45,7 +45,7 @@ void AI_APIENTRY OpenGL::aiClearDepthf(GLfloat d)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLCLEARDEPTHFPROC>(OpenGL::g_cached_gl_clear_depthf)(d);
+        reinterpret_cast<PFNGLCLEARDEPTHFPROC>(Interception::Hooks::OpenGL::g_cached_gl_clear_depthf)(d);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCLEARDEPTHF,

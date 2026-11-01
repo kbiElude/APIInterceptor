@@ -7,9 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetShaderPrecisionFormat(GLenum shadertype, GLenum precisiontype, GLint* range, GLint* precision);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetShaderPrecisionFormat(GLenum shadertype,
+                                                        GLenum precisiontype,
+                                                        GLint* range,
+                                                        GLint* precision);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_SHADER_PRECISION_FORMAT_H */

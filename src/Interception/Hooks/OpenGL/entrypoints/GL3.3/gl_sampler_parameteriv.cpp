@@ -13,12 +13,12 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiSamplerParameteriv(GLuint       sampler,
-                                              GLenum       pname,
-                                              const GLint* param)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiSamplerParameteriv(GLuint       sampler,
+                                                                   GLenum       pname,
+                                                                   const GLint* param)
 {
     APIInterceptor::MemoryChunk             param_chunk(param,
-                                                        OpenGL::Utils::get_n_texture_parameter_params(pname),
+                                                        Interception::Hooks::OpenGL::Utils::get_n_texture_parameter_params(pname),
                                                         sizeof(GLint));
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -31,7 +31,7 @@ void AI_APIENTRY OpenGL::aiSamplerParameteriv(GLuint       sampler,
     {
         AI_TRACE("glSamplerParameteriv(sampler=[%u] pname=[%s] param=[%p])",
                  sampler,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  param);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLSAMPLERPARAMETERIV,
@@ -57,9 +57,9 @@ void AI_APIENTRY OpenGL::aiSamplerParameteriv(GLuint       sampler,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLSAMPLERPARAMETERIVPROC>(OpenGL::g_cached_gl_sampler_parameteriv)(sampler,
-                                                                                               pname,
-                                                                                               param);
+        reinterpret_cast<PFNGLSAMPLERPARAMETERIVPROC>(Interception::Hooks::OpenGL::g_cached_gl_sampler_parameteriv)(sampler,
+                                                                                                                    pname,
+                                                                                                                    param);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLSAMPLERPARAMETERIV,

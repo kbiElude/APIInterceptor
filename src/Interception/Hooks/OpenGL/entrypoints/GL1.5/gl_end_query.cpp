@@ -11,7 +11,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiEndQuery(GLenum target)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiEndQuery(GLenum target)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -23,7 +23,7 @@ void AI_APIENTRY OpenGL::aiEndQuery(GLenum target)
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glEndQuery(target=[%s])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLENDQUERY,
                                                          &pre_callback_func_ptr,
@@ -46,7 +46,7 @@ void AI_APIENTRY OpenGL::aiEndQuery(GLenum target)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLENDQUERYPROC>(OpenGL::g_cached_gl_end_query)(target);
+        reinterpret_cast<PFNGLENDQUERYPROC>(Interception::Hooks::OpenGL::g_cached_gl_end_query)(target);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLENDQUERY,

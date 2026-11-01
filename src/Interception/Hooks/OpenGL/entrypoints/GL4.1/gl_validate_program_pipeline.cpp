@@ -10,7 +10,7 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiValidateProgramPipeline(GLuint pipeline)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiValidateProgramPipeline(GLuint pipeline)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -45,7 +45,7 @@ void AI_APIENTRY OpenGL::aiValidateProgramPipeline(GLuint pipeline)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLVALIDATEPROGRAMPIPELINEPROC>(OpenGL::g_cached_gl_validate_program_pipeline)(pipeline);
+        reinterpret_cast<PFNGLVALIDATEPROGRAMPIPELINEPROC>(Interception::Hooks::OpenGL::g_cached_gl_validate_program_pipeline)(pipeline);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLVALIDATEPROGRAMPIPELINE,

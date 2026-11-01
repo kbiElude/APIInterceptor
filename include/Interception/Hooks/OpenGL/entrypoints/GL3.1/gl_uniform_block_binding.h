@@ -7,11 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiUniformBlockBinding(GLuint program,
-                                           GLuint uniformBlockIndex,
-                                           GLuint uniformBlockBinding);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiUniformBlockBinding(GLuint program,
+                                                   GLuint uniformBlockIndex,
+                                                   GLuint uniformBlockBinding);
+        }
+    }
 }
 
 #endif /* AI_GL_UNIFORM_BLOCK_BINDING_H */

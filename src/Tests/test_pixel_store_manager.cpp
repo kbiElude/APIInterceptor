@@ -11,7 +11,7 @@
 
 TEST(PixelStoreManager, RowsArePaddedToTheDefaultAlignment)
 {
-    OpenGL::PixelStoreManager manager;
+    Interception::Hooks::OpenGL::PixelStoreManager manager;
 
     /* 3 RGB pixels are 9 bytes, padded to 12 for the first row; the last row is not padded. */
     EXPECT_EQ(manager.get_n_unpack_bytes(3, 2, 1, GL_RGB, GL_UNSIGNED_BYTE),
@@ -20,7 +20,7 @@ TEST(PixelStoreManager, RowsArePaddedToTheDefaultAlignment)
 
 TEST(PixelStoreManager, TightlyPackedRowsWithAlignmentOfOne)
 {
-    OpenGL::PixelStoreManager manager;
+    Interception::Hooks::OpenGL::PixelStoreManager manager;
 
     manager.on_pixel_store(GL_UNPACK_ALIGNMENT,
                            1);
@@ -31,7 +31,7 @@ TEST(PixelStoreManager, TightlyPackedRowsWithAlignmentOfOne)
 
 TEST(PixelStoreManager, RowLengthSetsTheDistanceBetweenRows)
 {
-    OpenGL::PixelStoreManager manager;
+    Interception::Hooks::OpenGL::PixelStoreManager manager;
 
     manager.on_pixel_store(GL_UNPACK_ROW_LENGTH,
                            8);
@@ -43,7 +43,7 @@ TEST(PixelStoreManager, RowLengthSetsTheDistanceBetweenRows)
 
 TEST(PixelStoreManager, SkippedPixelsAndRowsCountToo)
 {
-    OpenGL::PixelStoreManager manager;
+    Interception::Hooks::OpenGL::PixelStoreManager manager;
 
     manager.on_pixel_store(GL_UNPACK_SKIP_PIXELS,
                            1);
@@ -57,7 +57,7 @@ TEST(PixelStoreManager, SkippedPixelsAndRowsCountToo)
 
 TEST(PixelStoreManager, ImagesOfAVolumeUseImageHeightAndSkipImages)
 {
-    OpenGL::PixelStoreManager manager;
+    Interception::Hooks::OpenGL::PixelStoreManager manager;
 
     manager.on_pixel_store(GL_UNPACK_IMAGE_HEIGHT,
                            4);
@@ -71,7 +71,7 @@ TEST(PixelStoreManager, ImagesOfAVolumeUseImageHeightAndSkipImages)
 
 TEST(PixelStoreManager, PackedTypesAreOneElement)
 {
-    OpenGL::PixelStoreManager manager;
+    Interception::Hooks::OpenGL::PixelStoreManager manager;
 
     /* 3 pixels of 2 bytes are 6 bytes, padded to 8. */
     EXPECT_EQ(manager.get_n_unpack_bytes(3, 2, 1, GL_RGB, GL_UNSIGNED_SHORT_5_6_5),
@@ -80,7 +80,7 @@ TEST(PixelStoreManager, PackedTypesAreOneElement)
 
 TEST(PixelStoreManager, PackAndUnpackModesAreIndependent)
 {
-    OpenGL::PixelStoreManager manager;
+    Interception::Hooks::OpenGL::PixelStoreManager manager;
 
     manager.on_pixel_store(GL_PACK_ALIGNMENT,
                            1);
@@ -93,7 +93,7 @@ TEST(PixelStoreManager, PackAndUnpackModesAreIndependent)
 
 TEST(PixelStoreManager, EmptyImagesHaveNoBytes)
 {
-    OpenGL::PixelStoreManager manager;
+    Interception::Hooks::OpenGL::PixelStoreManager manager;
 
     EXPECT_EQ(manager.get_n_unpack_bytes(0, 4, 1, GL_RGBA, GL_UNSIGNED_BYTE),
               0u);
@@ -105,7 +105,7 @@ TEST(PixelStoreManager, EmptyImagesHaveNoBytes)
 
 TEST(PixelStoreManager, NegativeValuesAreIgnored)
 {
-    OpenGL::PixelStoreManager manager;
+    Interception::Hooks::OpenGL::PixelStoreManager manager;
 
     manager.on_pixel_store(GL_UNPACK_ALIGNMENT,
                            -1);
@@ -116,7 +116,7 @@ TEST(PixelStoreManager, NegativeValuesAreIgnored)
 
 TEST(PixelStoreManager, BitmapsHaveOneBitPerPixel)
 {
-    OpenGL::PixelStoreManager manager;
+    Interception::Hooks::OpenGL::PixelStoreManager manager;
 
     /* 10 pixels are 2 bytes, padded to 4 for the first row. */
     EXPECT_EQ(manager.get_n_unpack_bitmap_bytes(10, 2),

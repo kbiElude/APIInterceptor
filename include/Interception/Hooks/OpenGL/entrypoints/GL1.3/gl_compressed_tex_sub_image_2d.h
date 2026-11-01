@@ -7,17 +7,23 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiCompressedTexSubImage2D(GLenum      target,
-                                               GLint       level,
-                                               GLint       xoffset,
-                                               GLint       yoffset,
-                                               GLsizei     width,
-                                               GLsizei     height,
-                                               GLenum      format,
-                                               GLsizei     imageSize,
-                                               const void* data);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiCompressedTexSubImage2D(GLenum      target,
+                                                       GLint       level,
+                                                       GLint       xoffset,
+                                                       GLint       yoffset,
+                                                       GLsizei     width,
+                                                       GLsizei     height,
+                                                       GLenum      format,
+                                                       GLsizei     imageSize,
+                                                       const void* data);
+        }
+    }
 }
 
 #endif /* AI_GL_COMPRESSED_TEX_SUB_IMAGE_2D_H */

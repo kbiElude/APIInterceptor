@@ -11,26 +11,29 @@
 #include "Interception/Core/D3D8Utils/methods.h"
 #include <vector>
 
-namespace D3D8
+namespace Interception
 {
-    namespace Utils
+    namespace Core
     {
-        template<typename FunctionPtr>
-        struct SignatureInfo;
-
-        template<typename ReturnType, typename... Arguments>
-        struct SignatureInfo<ReturnType (__stdcall*)(Arguments...)>
+        namespace D3D8Utils
         {
-            static const std::vector<ArgumentInfo>& get_argument_info_vec();
-            static ArgumentInfo                     get_return_info();
-        };
+            template<typename FunctionPtr>
+            struct SignatureInfo;
+
+            template<typename ReturnType, typename... Arguments>
+            struct SignatureInfo<ReturnType (__stdcall*)(Arguments...)>
+            {
+                static const std::vector<Interception::Hooks::D3D8::ArgumentInfo>& get_argument_info_vec();
+                static Interception::Hooks::D3D8::ArgumentInfo                     get_return_info      ();
+            };
+        }
     }
 }
 
 template<typename ReturnType, typename... Arguments>
-const std::vector<D3D8::ArgumentInfo>& D3D8::Utils::SignatureInfo<ReturnType (__stdcall*)(Arguments...)>::get_argument_info_vec()
+const std::vector<Interception::Hooks::D3D8::ArgumentInfo>& Interception::Core::D3D8Utils::SignatureInfo<ReturnType (__stdcall*)(Arguments...)>::get_argument_info_vec()
 {
-    static const std::vector<ArgumentInfo> result_vec =
+    static const std::vector<Interception::Hooks::D3D8::ArgumentInfo> result_vec =
     {
         {ArgumentTraits<Arguments>::kind,
          get_object_type_name_ptr(static_cast<ObjectType>(ArgumentTraits<Arguments>::object_type) )}...
@@ -40,7 +43,7 @@ const std::vector<D3D8::ArgumentInfo>& D3D8::Utils::SignatureInfo<ReturnType (__
 }
 
 template<typename ReturnType, typename... Arguments>
-D3D8::ArgumentInfo D3D8::Utils::SignatureInfo<ReturnType (__stdcall*)(Arguments...)>::get_return_info()
+Interception::Hooks::D3D8::ArgumentInfo Interception::Core::D3D8Utils::SignatureInfo<ReturnType (__stdcall*)(Arguments...)>::get_return_info()
 {
     return {ArgumentTraits<ReturnType>::kind,
             get_object_type_name_ptr(static_cast<ObjectType>(ArgumentTraits<ReturnType>::object_type) )};

@@ -7,12 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetActiveAtomicCounterBufferiv(GLuint  program,
-                                                      GLuint  bufferIndex,
-                                                      GLenum  pname,
-                                                      GLint*  params);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetActiveAtomicCounterBufferiv(GLuint program,
+                                                              GLuint bufferIndex,
+                                                              GLenum pname,
+                                                              GLint* params);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_ACTIVE_ATOMIC_COUNTER_BUFFERIV_H */

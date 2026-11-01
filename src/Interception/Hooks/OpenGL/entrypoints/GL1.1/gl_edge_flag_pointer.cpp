@@ -12,8 +12,8 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiEdgeFlagPointer(GLsizei       stride,
-                                           const GLvoid* pointer)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiEdgeFlagPointer(GLsizei       stride,
+                                                                const GLvoid* pointer)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -50,21 +50,21 @@ void AI_APIENTRY OpenGL::aiEdgeFlagPointer(GLsizei       stride,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLEDGEFLAGPOINTERPROC>(OpenGL::g_cached_gl_edge_flag_pointer)(stride,
-                                                                                          pointer);
+        reinterpret_cast<PFNGLEDGEFLAGPOINTERPROC>(Interception::Hooks::OpenGL::g_cached_gl_edge_flag_pointer)(stride,
+                                                                                                               pointer);
     }
 
     if (tracker.is_top_level_api_call() )
     {
-        auto& context = OpenGL::get_context_state();
+        auto& context = Interception::Hooks::OpenGL::get_context_state();
 
-        context.client_array_manager.set_pointer(OpenGL::ClientArrayKind::EDGE_FLAG,
+        context.client_array_manager.set_pointer(Interception::Hooks::OpenGL::ClientArrayKind::EDGE_FLAG,
                                                0,
                                                1,
                                                GL_UNSIGNED_BYTE,
                                                stride,
                                                pointer,
-                                               context.buffer_manager.get_bound_buffer(OpenGL::BufferBindingTarget::ARRAY_BUFFER),
+                                               context.buffer_manager.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ARRAY_BUFFER),
                                                false,  /* in_is_integer    */
                                                false,  /* in_is_long       */
                                                false); /* in_is_normalized */

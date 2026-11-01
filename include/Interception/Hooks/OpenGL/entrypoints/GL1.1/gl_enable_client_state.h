@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiEnableClientState(GLenum array);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiEnableClientState(GLenum array);
+        }
+    }
 }
 
 #endif /* AI_GL_ENABLE_CLIENT_STATE_H */

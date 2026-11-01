@@ -11,11 +11,11 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiBlendFuncSeparatei(GLuint buf,
-                                              GLenum srcRGB,
-                                              GLenum dstRGB,
-                                              GLenum srcAlpha,
-                                              GLenum dstAlpha)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiBlendFuncSeparatei(GLuint buf,
+                                                                   GLenum srcRGB,
+                                                                   GLenum dstRGB,
+                                                                   GLenum srcAlpha,
+                                                                   GLenum dstAlpha)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -28,10 +28,10 @@ void AI_APIENTRY OpenGL::aiBlendFuncSeparatei(GLuint buf,
     {
         AI_TRACE("glBlendFuncSeparatei(buf=[%u] srcRGB=[%s] dstRGB=[%s] srcAlpha=[%s] dstAlpha=[%s])",
                  buf,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(srcRGB),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(dstRGB),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(srcAlpha),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(dstAlpha) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(srcRGB),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(dstRGB),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(srcAlpha),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(dstAlpha) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBLENDFUNCSEPARATEI,
                                                          &pre_callback_func_ptr,
@@ -58,11 +58,11 @@ void AI_APIENTRY OpenGL::aiBlendFuncSeparatei(GLuint buf,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLBLENDFUNCSEPARATEIPROC>(OpenGL::g_cached_gl_blend_func_separatei)(buf,
-                                                                                                srcRGB,
-                                                                                                dstRGB,
-                                                                                                srcAlpha,
-                                                                                                dstAlpha);
+        reinterpret_cast<PFNGLBLENDFUNCSEPARATEIPROC>(Interception::Hooks::OpenGL::g_cached_gl_blend_func_separatei)(buf,
+                                                                                                                     srcRGB,
+                                                                                                                     dstRGB,
+                                                                                                                     srcAlpha,
+                                                                                                                     dstAlpha);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBLENDFUNCSEPARATEI,

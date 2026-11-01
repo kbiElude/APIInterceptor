@@ -11,9 +11,9 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiNamedFramebufferDrawBuffers(GLuint        framebuffer,
-                                                       GLsizei       n,
-                                                       const GLenum* bufs)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiNamedFramebufferDrawBuffers(GLuint        framebuffer,
+                                                                            GLsizei       n,
+                                                                            const GLenum* bufs)
 {
     APIInterceptor::MemoryChunk             bufs_chunk(bufs,
                                                        n,
@@ -55,9 +55,9 @@ void AI_APIENTRY OpenGL::aiNamedFramebufferDrawBuffers(GLuint        framebuffer
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLNAMEDFRAMEBUFFERDRAWBUFFERSPROC>(OpenGL::g_cached_gl_named_framebuffer_draw_buffers)(framebuffer,
-                                                                                                                   n,
-                                                                                                                   bufs);
+        reinterpret_cast<PFNGLNAMEDFRAMEBUFFERDRAWBUFFERSPROC>(Interception::Hooks::OpenGL::g_cached_gl_named_framebuffer_draw_buffers)(framebuffer,
+                                                                                                                                        n,
+                                                                                                                                        bufs);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLNAMEDFRAMEBUFFERDRAWBUFFERS,

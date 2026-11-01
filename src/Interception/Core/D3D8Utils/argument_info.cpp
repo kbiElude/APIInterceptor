@@ -5,53 +5,53 @@
 #include "Interception/Core/D3D8Utils/argument_info.h"
 #include "Interception/Core/D3D8Utils/signature_info.h"
 
-bool D3D8::Utils::get_argument_info(const APIInterceptor::APIFunction& in_function,
-                                    const uint32_t&                    in_n_argument,
-                                    ArgumentInfo*                      out_argument_info_ptr)
+bool Interception::Core::D3D8Utils::get_argument_info(const APIInterceptor::APIFunction&       in_function,
+                                                      const uint32_t&                          in_n_argument,
+                                                      Interception::Hooks::D3D8::ArgumentInfo* out_argument_info_ptr)
 {
     /* DWORD arguments which hold flags or a color, or whose meaning depends on another argument. */
-    static const ArgumentOverride argument_override_array[] =
+    static const Interception::Hooks::D3D8::ArgumentOverride argument_override_array[] =
     {
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3D8_CHECKDEVICEFORMAT,          ValueKind::USAGE_FLAGS,               4},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3D8_CREATEDEVICE,               ValueKind::CREATE_FLAGS,              4},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DCUBETEXTURE8_LOCKRECT,        ValueKind::LOCK_FLAGS,                5},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DCUBETEXTURE8_LOCKRECT,        ValueKind::RECT,                      6},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_CLEAR,                ValueKind::CLEAR_FLAGS,               3},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_CLEAR,                ValueKind::COLOR,                     4},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_CLEAR,                ValueKind::RECT_ARRAY,                7},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_COPYRECTS,            ValueKind::RECT_ARRAY,                6},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_COPYRECTS,            ValueKind::POINT_ARRAY,               7},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_CREATECUBETEXTURE,    ValueKind::USAGE_FLAGS,               3},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_CREATEINDEXBUFFER,    ValueKind::USAGE_FLAGS,               2},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_CREATETEXTURE,        ValueKind::USAGE_FLAGS,               4},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_CREATEVERTEXBUFFER,   ValueKind::USAGE_FLAGS,               2},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_CREATEVERTEXBUFFER,   ValueKind::FVF_FLAGS,                 3},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_CREATEVOLUMETEXTURE,  ValueKind::USAGE_FLAGS,               5},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_DRAWRECTPATCH,        ValueKind::FLOAT_ARRAY,               4},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_DRAWTRIPATCH,         ValueKind::FLOAT_ARRAY,               4},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_PRESENT,              ValueKind::RECT,                      5},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_PRESENT,              ValueKind::RECT,                      6},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_PRESENT,              ValueKind::RECT_ARRAY,                7},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETCLIPPLANE,         ValueKind::FLOAT_ARRAY,               3},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETRENDERSTATE,       ValueKind::RENDER_STATE_VALUE,        2},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETTEXTURESTAGESTATE, ValueKind::TEXTURE_STAGE_STATE_VALUE, 3},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETVERTEXSHADER,      ValueKind::FVF_FLAGS,                 1},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DINDEXBUFFER8_LOCK,            ValueKind::LOCK_FLAGS,                4},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DSURFACE8_LOCKRECT,            ValueKind::LOCK_FLAGS,                3},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DSURFACE8_LOCKRECT,            ValueKind::RECT,                      4},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DSWAPCHAIN8_PRESENT,           ValueKind::RECT,                      5},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DSWAPCHAIN8_PRESENT,           ValueKind::RECT,                      6},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DSWAPCHAIN8_PRESENT,           ValueKind::RECT_ARRAY,                7},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DTEXTURE8_LOCKRECT,            ValueKind::LOCK_FLAGS,                4},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DTEXTURE8_LOCKRECT,            ValueKind::RECT,                      5},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DVERTEXBUFFER8_LOCK,           ValueKind::LOCK_FLAGS,                4},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DVOLUME8_LOCKBOX,              ValueKind::LOCK_FLAGS,                3},
-        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DVOLUMETEXTURE8_LOCKBOX,       ValueKind::LOCK_FLAGS,                4},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3D8_CHECKDEVICEFORMAT,          Interception::Hooks::D3D8::ValueKind::USAGE_FLAGS,               4},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3D8_CREATEDEVICE,               Interception::Hooks::D3D8::ValueKind::CREATE_FLAGS,              4},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DCUBETEXTURE8_LOCKRECT,        Interception::Hooks::D3D8::ValueKind::LOCK_FLAGS,                5},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DCUBETEXTURE8_LOCKRECT,        Interception::Hooks::D3D8::ValueKind::RECT,                      6},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_CLEAR,                Interception::Hooks::D3D8::ValueKind::CLEAR_FLAGS,               3},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_CLEAR,                Interception::Hooks::D3D8::ValueKind::COLOR,                     4},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_CLEAR,                Interception::Hooks::D3D8::ValueKind::RECT_ARRAY,                7},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_COPYRECTS,            Interception::Hooks::D3D8::ValueKind::RECT_ARRAY,                6},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_COPYRECTS,            Interception::Hooks::D3D8::ValueKind::POINT_ARRAY,               7},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_CREATECUBETEXTURE,    Interception::Hooks::D3D8::ValueKind::USAGE_FLAGS,               3},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_CREATEINDEXBUFFER,    Interception::Hooks::D3D8::ValueKind::USAGE_FLAGS,               2},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_CREATETEXTURE,        Interception::Hooks::D3D8::ValueKind::USAGE_FLAGS,               4},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_CREATEVERTEXBUFFER,   Interception::Hooks::D3D8::ValueKind::USAGE_FLAGS,               2},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_CREATEVERTEXBUFFER,   Interception::Hooks::D3D8::ValueKind::FVF_FLAGS,                 3},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_CREATEVOLUMETEXTURE,  Interception::Hooks::D3D8::ValueKind::USAGE_FLAGS,               5},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_DRAWRECTPATCH,        Interception::Hooks::D3D8::ValueKind::FLOAT_ARRAY,               4},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_DRAWTRIPATCH,         Interception::Hooks::D3D8::ValueKind::FLOAT_ARRAY,               4},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_PRESENT,              Interception::Hooks::D3D8::ValueKind::RECT,                      5},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_PRESENT,              Interception::Hooks::D3D8::ValueKind::RECT,                      6},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_PRESENT,              Interception::Hooks::D3D8::ValueKind::RECT_ARRAY,                7},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETCLIPPLANE,         Interception::Hooks::D3D8::ValueKind::FLOAT_ARRAY,               3},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETRENDERSTATE,       Interception::Hooks::D3D8::ValueKind::RENDER_STATE_VALUE,        2},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETTEXTURESTAGESTATE, Interception::Hooks::D3D8::ValueKind::TEXTURE_STAGE_STATE_VALUE, 3},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETVERTEXSHADER,      Interception::Hooks::D3D8::ValueKind::FVF_FLAGS,                 1},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DINDEXBUFFER8_LOCK,            Interception::Hooks::D3D8::ValueKind::LOCK_FLAGS,                4},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DSURFACE8_LOCKRECT,            Interception::Hooks::D3D8::ValueKind::LOCK_FLAGS,                3},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DSURFACE8_LOCKRECT,            Interception::Hooks::D3D8::ValueKind::RECT,                      4},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DSWAPCHAIN8_PRESENT,           Interception::Hooks::D3D8::ValueKind::RECT,                      5},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DSWAPCHAIN8_PRESENT,           Interception::Hooks::D3D8::ValueKind::RECT,                      6},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DSWAPCHAIN8_PRESENT,           Interception::Hooks::D3D8::ValueKind::RECT_ARRAY,                7},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DTEXTURE8_LOCKRECT,            Interception::Hooks::D3D8::ValueKind::LOCK_FLAGS,                4},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DTEXTURE8_LOCKRECT,            Interception::Hooks::D3D8::ValueKind::RECT,                      5},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DVERTEXBUFFER8_LOCK,           Interception::Hooks::D3D8::ValueKind::LOCK_FLAGS,                4},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DVOLUME8_LOCKBOX,              Interception::Hooks::D3D8::ValueKind::LOCK_FLAGS,                3},
+        {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DVOLUMETEXTURE8_LOCKBOX,       Interception::Hooks::D3D8::ValueKind::LOCK_FLAGS,                4},
     };
 
-    const ArgumentOverride* override_ptr    = nullptr;
+    const Interception::Hooks::D3D8::ArgumentOverride* override_ptr    = nullptr;
     bool                    result          = false;
-    const SignatureEntry*   signature_entry = get_signature_entry_ptr(in_function);
+    const Interception::Hooks::D3D8::SignatureEntry*   signature_entry = get_signature_entry_ptr(in_function);
 
     for (const auto& current_override : argument_override_array)
     {
@@ -93,9 +93,9 @@ bool D3D8::Utils::get_argument_info(const APIInterceptor::APIFunction& in_functi
     return result;
 }
 
-uint32_t D3D8::Utils::get_n_arguments(const APIInterceptor::APIFunction& in_function)
+uint32_t Interception::Core::D3D8Utils::get_n_arguments(const APIInterceptor::APIFunction& in_function)
 {
-    const SignatureEntry* signature_entry = get_signature_entry_ptr(in_function);
+    const Interception::Hooks::D3D8::SignatureEntry* signature_entry = get_signature_entry_ptr(in_function);
     uint32_t              result          = 0;
 
     if (signature_entry != nullptr)
@@ -106,10 +106,10 @@ uint32_t D3D8::Utils::get_n_arguments(const APIInterceptor::APIFunction& in_func
     return result;
 }
 
-bool D3D8::Utils::get_return_info(const APIInterceptor::APIFunction& in_function,
-                                  ArgumentInfo*                      out_return_info_ptr)
+bool Interception::Core::D3D8Utils::get_return_info(const APIInterceptor::APIFunction&       in_function,
+                                                    Interception::Hooks::D3D8::ArgumentInfo* out_return_info_ptr)
 {
-    const SignatureEntry* signature_entry = get_signature_entry_ptr(in_function);
+    const Interception::Hooks::D3D8::SignatureEntry* signature_entry = get_signature_entry_ptr(in_function);
     bool                  result          = false;
 
     if (signature_entry != nullptr)
@@ -122,18 +122,18 @@ bool D3D8::Utils::get_return_info(const APIInterceptor::APIFunction& in_function
     return result;
 }
 
-const D3D8::SignatureEntry* D3D8::Utils::get_signature_entry_ptr(const APIInterceptor::APIFunction& in_function)
+const Interception::Hooks::D3D8::SignatureEntry* Interception::Core::D3D8Utils::get_signature_entry_ptr(const APIInterceptor::APIFunction& in_function)
 {
-    static const SignatureEntry signature_entry_array[] =
+    static const Interception::Hooks::D3D8::SignatureEntry signature_entry_array[] =
     {
         #define D3D8_METHOD(INTERFACE_TAG, interface_name, METHOD_TAG, method_name, vtable_index, return_type, parameters) \
-            {&SignatureInfo<PFN_##INTERFACE_TAG##_##METHOD_TAG>::get_argument_info_vec, \
-             &SignatureInfo<PFN_##INTERFACE_TAG##_##METHOD_TAG>::get_return_info},
+            {&SignatureInfo<Interception::Hooks::D3D8::PFN_##INTERFACE_TAG##_##METHOD_TAG>::get_argument_info_vec, \
+             &SignatureInfo<Interception::Hooks::D3D8::PFN_##INTERFACE_TAG##_##METHOD_TAG>::get_return_info},
         #include "Interception/Hooks/D3D8/d3d8_methods.inl"
         #undef D3D8_METHOD
     };
 
-    const SignatureEntry* result = nullptr;
+    const Interception::Hooks::D3D8::SignatureEntry* result = nullptr;
 
     if (in_function >= APIInterceptor::APIFUNCTION_D3D8_METHODS_FIRST &&
         in_function <= APIInterceptor::APIFUNCTION_D3D8_METHODS_LAST)

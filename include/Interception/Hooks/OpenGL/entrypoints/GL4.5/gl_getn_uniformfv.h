@@ -7,9 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetnUniformfv(GLuint program, GLint location, GLsizei bufSize, GLfloat* params);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetnUniformfv(GLuint   program,
+                                             GLint    location,
+                                             GLsizei  bufSize,
+                                             GLfloat* params);
+        }
+    }
 }
 
 #endif /* AI_GL_GETN_UNIFORMFV_H */

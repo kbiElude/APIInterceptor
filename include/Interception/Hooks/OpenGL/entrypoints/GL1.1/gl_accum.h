@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiAccum(GLenum op,
-                             GLfloat value);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiAccum(GLenum  op,
+                                     GLfloat value);
+        }
+    }
 }
 
 #endif /* AI_GL_ACCUM_H */

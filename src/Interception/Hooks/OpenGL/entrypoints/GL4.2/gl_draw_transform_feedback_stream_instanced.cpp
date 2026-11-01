@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDrawTransformFeedbackStreamInstanced(GLenum  mode,
-                                                                GLuint  id,
-                                                                GLuint  stream,
-                                                                GLsizei instancecount)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDrawTransformFeedbackStreamInstanced(GLenum  mode,
+                                                                                     GLuint  id,
+                                                                                     GLuint  stream,
+                                                                                     GLsizei instancecount)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -26,7 +26,7 @@ void AI_APIENTRY OpenGL::aiDrawTransformFeedbackStreamInstanced(GLenum  mode,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glDrawTransformFeedbackStreamInstanced(mode=[%s] id=[%u] stream=[%u] instancecount=[%d])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(mode),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(mode),
                  id,
                  stream,
                  static_cast<int32_t>(instancecount) );
@@ -55,10 +55,10 @@ void AI_APIENTRY OpenGL::aiDrawTransformFeedbackStreamInstanced(GLenum  mode,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDRAWTRANSFORMFEEDBACKSTREAMINSTANCEDPROC>(OpenGL::g_cached_gl_draw_transform_feedback_stream_instanced)(mode,
-                                                                                                                                      id,
-                                                                                                                                      stream,
-                                                                                                                                      instancecount);
+        reinterpret_cast<PFNGLDRAWTRANSFORMFEEDBACKSTREAMINSTANCEDPROC>(Interception::Hooks::OpenGL::g_cached_gl_draw_transform_feedback_stream_instanced)(mode,
+                                                                                                                                                           id,
+                                                                                                                                                           stream,
+                                                                                                                                                           instancecount);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDRAWTRANSFORMFEEDBACKSTREAMINSTANCED,

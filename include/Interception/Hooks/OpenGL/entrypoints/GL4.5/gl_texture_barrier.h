@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiTextureBarrier(void);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiTextureBarrier(void);
+        }
+    }
 }
 
 #endif /* AI_GL_TEXTURE_BARRIER_H */

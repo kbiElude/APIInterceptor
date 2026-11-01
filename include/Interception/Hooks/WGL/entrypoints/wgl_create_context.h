@@ -7,9 +7,15 @@
 
 #include <windows.h>
 
-namespace WGL
+namespace Interception
 {
-    HGLRC WINAPI create_context(HDC in_hdc);
+    namespace Hooks
+    {
+        namespace WGL
+        {
+            HGLRC WINAPI create_context(HDC in_hdc);
+        }
+    }
 }
 
 #endif /* WGL_CREATE_CONTEXT_H */

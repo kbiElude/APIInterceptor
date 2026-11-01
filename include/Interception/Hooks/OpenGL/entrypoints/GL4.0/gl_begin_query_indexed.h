@@ -7,9 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiBeginQueryIndexed(GLenum target, GLuint index, GLuint id);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiBeginQueryIndexed(GLenum target,
+                                                 GLuint index,
+                                                 GLuint id);
+        }
+    }
 }
 
 #endif /* AI_GL_BEGIN_QUERY_INDEXED_H */

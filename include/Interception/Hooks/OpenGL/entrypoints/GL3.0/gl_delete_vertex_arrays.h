@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiDeleteVertexArrays(GLsizei       n,
-                                          const GLuint* arrays);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiDeleteVertexArrays(GLsizei       n,
+                                                  const GLuint* arrays);
+        }
+    }
 }
 
 #endif /* AI_GL_DELETE_VERTEX_ARRAYS_H */

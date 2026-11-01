@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGenRenderbuffers(GLsizei n,
-                                        GLuint* renderbuffers);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGenRenderbuffers(GLsizei n,
+                                                GLuint* renderbuffers);
+        }
+    }
 }
 
 #endif /* AI_GL_GEN_RENDERBUFFERS_H */

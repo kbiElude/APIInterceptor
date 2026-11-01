@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiDeleteTextures(GLsizei       n,
-                                      const GLuint* textures);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiDeleteTextures(GLsizei       n,
+                                              const GLuint* textures);
+        }
+    }
 }
 
 #endif /* AI_GL_DELETE_TEXTURES_H */

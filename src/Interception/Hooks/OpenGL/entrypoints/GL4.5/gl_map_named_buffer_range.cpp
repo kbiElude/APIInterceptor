@@ -16,10 +16,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void* AI_APIENTRY OpenGL::aiMapNamedBufferRange(GLuint     buffer,
-                                                GLintptr   offset,
-                                                GLsizeiptr length,
-                                                GLbitfield access)
+void* AI_APIENTRY Interception::Hooks::OpenGL::aiMapNamedBufferRange(GLuint     buffer,
+                                                                     GLintptr   offset,
+                                                                     GLsizeiptr length,
+                                                                     GLbitfield access)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -61,15 +61,15 @@ void* AI_APIENTRY OpenGL::aiMapNamedBufferRange(GLuint     buffer,
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNGLMAPNAMEDBUFFERRANGEPROC>(OpenGL::g_cached_gl_map_named_buffer_range)(buffer,
-                                                                                                            offset,
-                                                                                                            length,
-                                                                                                            access);
+        result = reinterpret_cast<PFNGLMAPNAMEDBUFFERRANGEPROC>(Interception::Hooks::OpenGL::g_cached_gl_map_named_buffer_range)(buffer,
+                                                                                                                                 offset,
+                                                                                                                                 length,
+                                                                                                                                 access);
     }
 
     if (tracker.is_top_level_api_call() )
     {
-        auto& context = OpenGL::get_context_state();
+        auto& context = Interception::Hooks::OpenGL::get_context_state();
 
         context.buffer_mapping_manager.on_buffer_mapped(buffer,
                                                         result,
@@ -83,7 +83,7 @@ void* AI_APIENTRY OpenGL::aiMapNamedBufferRange(GLuint     buffer,
                     buffer);
         }
 
-        const OpenGL::BufferMappingManager::Region initial_region = context.buffer_mapping_manager.get_initial_region(buffer);
+        const Interception::Hooks::OpenGL::BufferMappingManager::Region initial_region = context.buffer_mapping_manager.get_initial_region(buffer);
 
         if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMAPNAMEDBUFFERRANGE,
                                                           &post_callback_func_ptr,

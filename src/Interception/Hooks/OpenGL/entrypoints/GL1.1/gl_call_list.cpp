@@ -11,7 +11,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiCallList(GLuint list)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiCallList(GLuint list)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -46,7 +46,7 @@ void AI_APIENTRY OpenGL::aiCallList(GLuint list)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLCALLLISTPROC>(OpenGL::g_cached_gl_call_list)(list);
+        reinterpret_cast<PFNGLCALLLISTPROC>(Interception::Hooks::OpenGL::g_cached_gl_call_list)(list);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCALLLIST,

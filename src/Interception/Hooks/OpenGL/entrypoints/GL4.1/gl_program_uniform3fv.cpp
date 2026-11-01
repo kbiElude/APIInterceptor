@@ -11,10 +11,10 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiProgramUniform3fv(GLuint         program,
-                                             GLint          location,
-                                             GLsizei        count,
-                                             const GLfloat* value)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiProgramUniform3fv(GLuint         program,
+                                                                  GLint          location,
+                                                                  GLsizei        count,
+                                                                  const GLfloat* value)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -58,10 +58,10 @@ void AI_APIENTRY OpenGL::aiProgramUniform3fv(GLuint         program,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLPROGRAMUNIFORM3FVPROC>(OpenGL::g_cached_gl_program_uniform3fv)(program,
-                                                                                              location,
-                                                                                              count,
-                                                                                              value);
+        reinterpret_cast<PFNGLPROGRAMUNIFORM3FVPROC>(Interception::Hooks::OpenGL::g_cached_gl_program_uniform3fv)(program,
+                                                                                                                   location,
+                                                                                                                   count,
+                                                                                                                   value);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLPROGRAMUNIFORM3FV,

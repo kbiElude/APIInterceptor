@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiWindowPos3f(GLfloat x,
-                                       GLfloat y,
-                                       GLfloat z)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiWindowPos3f(GLfloat x,
+                                                            GLfloat y,
+                                                            GLfloat z)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiWindowPos3f(GLfloat x,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLWINDOWPOS3FPROC>(OpenGL::g_cached_gl_window_pos_3f)(x,
-                                                                                   y,
-                                                                                   z);
+        reinterpret_cast<PFNGLWINDOWPOS3FPROC>(Interception::Hooks::OpenGL::g_cached_gl_window_pos_3f)(x,
+                                                                                                        y,
+                                                                                                        z);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLWINDOWPOS3F,

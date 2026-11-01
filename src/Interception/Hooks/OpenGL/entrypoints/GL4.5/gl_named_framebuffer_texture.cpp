@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiNamedFramebufferTexture(GLuint framebuffer,
-                                                   GLenum attachment,
-                                                   GLuint texture,
-                                                   GLint  level)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiNamedFramebufferTexture(GLuint framebuffer,
+                                                                        GLenum attachment,
+                                                                        GLuint texture,
+                                                                        GLint  level)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -27,7 +27,7 @@ void AI_APIENTRY OpenGL::aiNamedFramebufferTexture(GLuint framebuffer,
     {
         AI_TRACE("glNamedFramebufferTexture(framebuffer=[%u] attachment=[%s] texture=[%u] level=[%d])",
                  framebuffer,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(attachment),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(attachment),
                  texture,
                  level);
 
@@ -55,10 +55,10 @@ void AI_APIENTRY OpenGL::aiNamedFramebufferTexture(GLuint framebuffer,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLNAMEDFRAMEBUFFERTEXTUREPROC>(OpenGL::g_cached_gl_named_framebuffer_texture)(framebuffer,
-                                                                                                         attachment,
-                                                                                                         texture,
-                                                                                                         level);
+        reinterpret_cast<PFNGLNAMEDFRAMEBUFFERTEXTUREPROC>(Interception::Hooks::OpenGL::g_cached_gl_named_framebuffer_texture)(framebuffer,
+                                                                                                                              attachment,
+                                                                                                                              texture,
+                                                                                                                              level);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLNAMEDFRAMEBUFFERTEXTURE,

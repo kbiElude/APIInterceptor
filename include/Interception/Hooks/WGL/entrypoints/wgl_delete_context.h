@@ -7,9 +7,15 @@
 
 #include <windows.h>
 
-namespace WGL
+namespace Interception
 {
-    BOOL WINAPI delete_context(HGLRC in_hglrc);
+    namespace Hooks
+    {
+        namespace WGL
+        {
+            BOOL WINAPI delete_context(HGLRC in_hglrc);
+        }
+    }
 }
 
 #endif /* WGL_DELETE_CONTEXT_H */

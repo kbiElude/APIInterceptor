@@ -7,12 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetAttachedShaders(GLuint   program,
-                                          GLsizei  maxCount,
-                                          GLsizei* count,
-                                          GLuint*  shaders);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetAttachedShaders(GLuint   program,
+                                                  GLsizei  maxCount,
+                                                  GLsizei* count,
+                                                  GLuint*  shaders);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_ATTACHED_SHADERS_H */

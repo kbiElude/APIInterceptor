@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiPushMatrix();
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiPushMatrix();
+        }
+    }
 }
 
 #endif /* AI_GL_PUSH_MATRIX_H */

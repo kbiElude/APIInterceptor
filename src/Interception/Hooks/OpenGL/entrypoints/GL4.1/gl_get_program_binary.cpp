@@ -11,11 +11,11 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetProgramBinary(GLuint   program,
-                                            GLsizei  bufSize,
-                                            GLsizei* length,
-                                            GLenum*  binaryFormat,
-                                            void*    binary)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetProgramBinary(GLuint   program,
+                                                                 GLsizei  bufSize,
+                                                                 GLsizei* length,
+                                                                 GLenum*  binaryFormat,
+                                                                 void*    binary)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -58,11 +58,11 @@ void AI_APIENTRY OpenGL::aiGetProgramBinary(GLuint   program,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETPROGRAMBINARYPROC>(OpenGL::g_cached_gl_get_program_binary)(program,
-                                                                                             bufSize,
-                                                                                             length,
-                                                                                             binaryFormat,
-                                                                                             binary);
+        reinterpret_cast<PFNGLGETPROGRAMBINARYPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_program_binary)(program,
+                                                                                                                  bufSize,
+                                                                                                                  length,
+                                                                                                                  binaryFormat,
+                                                                                                                  binary);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETPROGRAMBINARY,

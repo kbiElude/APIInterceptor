@@ -11,7 +11,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiLogicOp(GLenum opcode)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiLogicOp(GLenum opcode)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -23,7 +23,7 @@ void AI_APIENTRY OpenGL::aiLogicOp(GLenum opcode)
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glLogicOp(opcode=[%s])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(opcode) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(opcode) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLLOGICOP,
                                                          &pre_callback_func_ptr,
@@ -46,7 +46,7 @@ void AI_APIENTRY OpenGL::aiLogicOp(GLenum opcode)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLLOGICOPPROC>(OpenGL::g_cached_gl_logic_op)(opcode);
+        reinterpret_cast<PFNGLLOGICOPPROC>(Interception::Hooks::OpenGL::g_cached_gl_logic_op)(opcode);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLLOGICOP,

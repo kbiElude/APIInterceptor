@@ -10,8 +10,8 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiBindTextureUnit(GLuint unit,
-                                           GLuint texture)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiBindTextureUnit(GLuint unit,
+                                                                GLuint texture)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -48,8 +48,8 @@ void AI_APIENTRY OpenGL::aiBindTextureUnit(GLuint unit,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLBINDTEXTUREUNITPROC>(OpenGL::g_cached_gl_bind_texture_unit)(unit,
-                                                                                          texture);
+        reinterpret_cast<PFNGLBINDTEXTUREUNITPROC>(Interception::Hooks::OpenGL::g_cached_gl_bind_texture_unit)(unit,
+                                                                                                               texture);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBINDTEXTUREUNIT,

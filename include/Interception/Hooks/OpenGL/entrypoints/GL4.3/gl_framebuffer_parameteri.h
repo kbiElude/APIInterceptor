@@ -7,9 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiFramebufferParameteri(GLenum target, GLenum pname, GLint param);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiFramebufferParameteri(GLenum target,
+                                                     GLenum pname,
+                                                     GLint  param);
+        }
+    }
 }
 
 #endif /* AI_GL_FRAMEBUFFER_PARAMETERI_H */

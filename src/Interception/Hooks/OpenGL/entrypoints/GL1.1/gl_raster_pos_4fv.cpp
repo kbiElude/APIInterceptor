@@ -11,7 +11,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiRasterPos4fv(const GLfloat* v)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiRasterPos4fv(const GLfloat* v)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -50,7 +50,7 @@ void AI_APIENTRY OpenGL::aiRasterPos4fv(const GLfloat* v)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLRASTERPOS4FVPROC>(OpenGL::g_cached_gl_raster_pos_4fv)(v);
+        reinterpret_cast<PFNGLRASTERPOS4FVPROC>(Interception::Hooks::OpenGL::g_cached_gl_raster_pos_4fv)(v);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLRASTERPOS4FV,

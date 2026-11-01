@@ -7,11 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiNormal3d(GLdouble nx,
-                                GLdouble ny,
-                                GLdouble nz);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiNormal3d(GLdouble nx,
+                                        GLdouble ny,
+                                        GLdouble nz);
+        }
+    }
 }
 
 #endif /* AI_GL_NORMAL_3D_H */

@@ -7,9 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiViewportArrayv(GLuint first, GLsizei count, const GLfloat* v);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiViewportArrayv(GLuint         first,
+                                              GLsizei        count,
+                                              const GLfloat* v);
+        }
+    }
 }
 
 #endif /* AI_GL_VIEWPORT_ARRAYV_H */

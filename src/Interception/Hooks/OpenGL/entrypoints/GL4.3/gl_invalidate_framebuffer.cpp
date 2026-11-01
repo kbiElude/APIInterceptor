@@ -12,9 +12,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiInvalidateFramebuffer(GLenum        target,
-                                                 GLsizei       numAttachments,
-                                                 const GLenum* attachments)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiInvalidateFramebuffer(GLenum        target,
+                                                                      GLsizei       numAttachments,
+                                                                      const GLenum* attachments)
 {
     APIInterceptor::MemoryChunk             attachments_chunk(attachments,
                                                               numAttachments,
@@ -29,7 +29,7 @@ void AI_APIENTRY OpenGL::aiInvalidateFramebuffer(GLenum        target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glInvalidateFramebuffer(target=[%s] numAttachments=[%d] attachments=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  static_cast<int32_t>(numAttachments),
                  attachments);
 
@@ -56,9 +56,9 @@ void AI_APIENTRY OpenGL::aiInvalidateFramebuffer(GLenum        target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLINVALIDATEFRAMEBUFFERPROC>(OpenGL::g_cached_gl_invalidate_framebuffer)(target,
-                                                                                                      numAttachments,
-                                                                                                      attachments);
+        reinterpret_cast<PFNGLINVALIDATEFRAMEBUFFERPROC>(Interception::Hooks::OpenGL::g_cached_gl_invalidate_framebuffer)(target,
+                                                                                                                           numAttachments,
+                                                                                                                           attachments);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLINVALIDATEFRAMEBUFFER,

@@ -9,23 +9,26 @@
 
 #include "Interception/Hooks/D3D8/types.h"
 
-namespace D3D8
+namespace Interception
 {
-    namespace Utils
+    namespace Core
     {
-        /* Returns false for functions which are not D3D8 methods, or for an argument which does not exist. */
-        bool get_argument_info(const APIInterceptor::APIFunction& in_function,
-                               const uint32_t&                    in_n_argument,
-                               ArgumentInfo*                      out_argument_info_ptr);
+        namespace D3D8Utils
+        {
+            /* Returns false for functions which are not D3D8 methods, or for an argument which does not exist. */
+            bool get_argument_info(const APIInterceptor::APIFunction&       in_function,
+                                   const uint32_t&                          in_n_argument,
+                                   Interception::Hooks::D3D8::ArgumentInfo* out_argument_info_ptr);
 
-        /* Returns 0 for functions which are not D3D8 methods. */
-        uint32_t get_n_arguments(const APIInterceptor::APIFunction& in_function);
+            /* Returns 0 for functions which are not D3D8 methods. */
+            uint32_t get_n_arguments(const APIInterceptor::APIFunction& in_function);
 
-        bool get_return_info(const APIInterceptor::APIFunction& in_function,
-                             ArgumentInfo*                      out_return_info_ptr);
+            bool get_return_info(const APIInterceptor::APIFunction&       in_function,
+                                 Interception::Hooks::D3D8::ArgumentInfo* out_return_info_ptr);
 
-        /* Returns nullptr for functions which are not D3D8 methods. */
-        const SignatureEntry* get_signature_entry_ptr(const APIInterceptor::APIFunction& in_function);
+            /* Returns nullptr for functions which are not D3D8 methods. */
+            const Interception::Hooks::D3D8::SignatureEntry* get_signature_entry_ptr(const APIInterceptor::APIFunction& in_function);
+        }
     }
 }
 

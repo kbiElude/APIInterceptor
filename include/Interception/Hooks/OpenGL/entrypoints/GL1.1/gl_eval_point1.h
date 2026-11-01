@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiEvalPoint1(GLint i);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiEvalPoint1(GLint i);
+        }
+    }
 }
 
 #endif /* AI_GL_EVAL_POINT1_H */

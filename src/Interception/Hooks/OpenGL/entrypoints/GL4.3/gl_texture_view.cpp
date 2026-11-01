@@ -11,14 +11,14 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiTextureView(GLuint texture,
-                                       GLenum target,
-                                       GLuint origtexture,
-                                       GLenum internalformat,
-                                       GLuint minlevel,
-                                       GLuint numlevels,
-                                       GLuint minlayer,
-                                       GLuint numlayers)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiTextureView(GLuint texture,
+                                                            GLenum target,
+                                                            GLuint origtexture,
+                                                            GLenum internalformat,
+                                                            GLuint minlevel,
+                                                            GLuint numlevels,
+                                                            GLuint minlayer,
+                                                            GLuint numlayers)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -31,9 +31,9 @@ void AI_APIENTRY OpenGL::aiTextureView(GLuint texture,
     {
         AI_TRACE("glTextureView(texture=[%u] target=[%s] origtexture=[%u] internalformat=[%s] minlevel=[%u] numlevels=[%u] minlayer=[%u] numlayers=[%u])",
                  texture,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  origtexture,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(internalformat),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(internalformat),
                  minlevel,
                  numlevels,
                  minlayer,
@@ -67,14 +67,14 @@ void AI_APIENTRY OpenGL::aiTextureView(GLuint texture,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLTEXTUREVIEWPROC>(OpenGL::g_cached_gl_texture_view)(texture,
-                                                                                  target,
-                                                                                  origtexture,
-                                                                                  internalformat,
-                                                                                  minlevel,
-                                                                                  numlevels,
-                                                                                  minlayer,
-                                                                                  numlayers);
+        reinterpret_cast<PFNGLTEXTUREVIEWPROC>(Interception::Hooks::OpenGL::g_cached_gl_texture_view)(texture,
+                                                                                                       target,
+                                                                                                       origtexture,
+                                                                                                       internalformat,
+                                                                                                       minlevel,
+                                                                                                       numlevels,
+                                                                                                       minlayer,
+                                                                                                       numlayers);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTEXTUREVIEW,

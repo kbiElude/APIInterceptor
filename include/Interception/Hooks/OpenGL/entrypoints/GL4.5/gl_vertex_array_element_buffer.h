@@ -7,9 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiVertexArrayElementBuffer(GLuint vaobj, GLuint buffer);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiVertexArrayElementBuffer(GLuint vaobj,
+                                                        GLuint buffer);
+        }
+    }
 }
 
 #endif /* AI_GL_VERTEX_ARRAY_ELEMENT_BUFFER_H */

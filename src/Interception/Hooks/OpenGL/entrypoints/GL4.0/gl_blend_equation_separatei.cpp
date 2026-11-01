@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiBlendEquationSeparatei(GLuint buf,
-                                                  GLenum modeRGB,
-                                                  GLenum modeAlpha)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiBlendEquationSeparatei(GLuint buf,
+                                                                       GLenum modeRGB,
+                                                                       GLenum modeAlpha)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -26,8 +26,8 @@ void AI_APIENTRY OpenGL::aiBlendEquationSeparatei(GLuint buf,
     {
         AI_TRACE("glBlendEquationSeparatei(buf=[%u] modeRGB=[%s] modeAlpha=[%s])",
                  buf,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(modeRGB),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(modeAlpha) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(modeRGB),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(modeAlpha) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBLENDEQUATIONSEPARATEI,
                                                          &pre_callback_func_ptr,
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiBlendEquationSeparatei(GLuint buf,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLBLENDEQUATIONSEPARATEIPROC>(OpenGL::g_cached_gl_blend_equation_separatei)(buf,
-                                                                                                        modeRGB,
-                                                                                                        modeAlpha);
+        reinterpret_cast<PFNGLBLENDEQUATIONSEPARATEIPROC>(Interception::Hooks::OpenGL::g_cached_gl_blend_equation_separatei)(buf,
+                                                                                                                             modeRGB,
+                                                                                                                             modeAlpha);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBLENDEQUATIONSEPARATEI,

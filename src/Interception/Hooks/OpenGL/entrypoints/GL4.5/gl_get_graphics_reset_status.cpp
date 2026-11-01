@@ -11,7 +11,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-GLenum AI_APIENTRY OpenGL::aiGetGraphicsResetStatus(void)
+GLenum AI_APIENTRY Interception::Hooks::OpenGL::aiGetGraphicsResetStatus(void)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -39,7 +39,7 @@ GLenum AI_APIENTRY OpenGL::aiGetGraphicsResetStatus(void)
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNGLGETGRAPHICSRESETSTATUSPROC>(OpenGL::g_cached_gl_get_graphics_reset_status)();
+        result = reinterpret_cast<PFNGLGETGRAPHICSRESETSTATUSPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_graphics_reset_status)();
     }
 
     if (tracker.is_top_level_api_call() )

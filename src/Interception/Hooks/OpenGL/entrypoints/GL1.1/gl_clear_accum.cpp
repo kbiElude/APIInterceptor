@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiClearAccum(GLfloat red,
-                                      GLfloat green,
-                                      GLfloat blue,
-                                      GLfloat alpha)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiClearAccum(GLfloat red,
+                                                           GLfloat green,
+                                                           GLfloat blue,
+                                                           GLfloat alpha)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -55,10 +55,10 @@ void AI_APIENTRY OpenGL::aiClearAccum(GLfloat red,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLCLEARACCUMPROC>(OpenGL::g_cached_gl_clear_accum)(red,
-                                                                               green,
-                                                                               blue,
-                                                                               alpha);
+        reinterpret_cast<PFNGLCLEARACCUMPROC>(Interception::Hooks::OpenGL::g_cached_gl_clear_accum)(red,
+                                                                                                    green,
+                                                                                                    blue,
+                                                                                                    alpha);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCLEARACCUM,

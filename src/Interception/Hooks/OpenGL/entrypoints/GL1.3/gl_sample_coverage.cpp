@@ -11,8 +11,8 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiSampleCoverage(GLfloat   value,
-                                          GLboolean invert)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiSampleCoverage(GLfloat   value,
+                                                               GLboolean invert)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;

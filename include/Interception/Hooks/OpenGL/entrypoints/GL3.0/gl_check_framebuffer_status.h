@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    GLenum AI_APIENTRY aiCheckFramebufferStatus(GLenum target);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            GLenum AI_APIENTRY aiCheckFramebufferStatus(GLenum target);
+        }
+    }
 }
 
 #endif /* AI_GL_CHECK_FRAMEBUFFER_STATUS_H */

@@ -11,13 +11,13 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiBindImageTexture(GLuint    unit,
-                                            GLuint    texture,
-                                            GLint     level,
-                                            GLboolean layered,
-                                            GLint     layer,
-                                            GLenum    access,
-                                            GLenum    format)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiBindImageTexture(GLuint    unit,
+                                                                 GLuint    texture,
+                                                                 GLint     level,
+                                                                 GLboolean layered,
+                                                                 GLint     layer,
+                                                                 GLenum    access,
+                                                                 GLenum    format)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -34,8 +34,8 @@ void AI_APIENTRY OpenGL::aiBindImageTexture(GLuint    unit,
                  level,
                  static_cast<uint32_t>(layered),
                  layer,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(access),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(format) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(access),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(format) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBINDIMAGETEXTURE,
                                                          &pre_callback_func_ptr,
@@ -64,13 +64,13 @@ void AI_APIENTRY OpenGL::aiBindImageTexture(GLuint    unit,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLBINDIMAGETEXTUREPROC>(OpenGL::g_cached_gl_bind_image_texture)(unit,
-                                                                                             texture,
-                                                                                             level,
-                                                                                             layered,
-                                                                                             layer,
-                                                                                             access,
-                                                                                             format);
+        reinterpret_cast<PFNGLBINDIMAGETEXTUREPROC>(Interception::Hooks::OpenGL::g_cached_gl_bind_image_texture)(unit,
+                                                                                                                  texture,
+                                                                                                                  level,
+                                                                                                                  layered,
+                                                                                                                  layer,
+                                                                                                                  access,
+                                                                                                                  format);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBINDIMAGETEXTURE,

@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetTransformFeedbacki64_v(GLuint   xfb,
-                                                     GLenum   pname,
-                                                     GLuint   index,
-                                                     GLint64* param)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetTransformFeedbacki64_v(GLuint   xfb,
+                                                                          GLenum   pname,
+                                                                          GLuint   index,
+                                                                          GLint64* param)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -27,7 +27,7 @@ void AI_APIENTRY OpenGL::aiGetTransformFeedbacki64_v(GLuint   xfb,
     {
         AI_TRACE("glGetTransformFeedbacki64_v(xfb=[%u] pname=[%s] index=[%u] param=[%p])",
                  xfb,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  index,
                  param);
 
@@ -55,10 +55,10 @@ void AI_APIENTRY OpenGL::aiGetTransformFeedbacki64_v(GLuint   xfb,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETTRANSFORMFEEDBACKI64_VPROC>(OpenGL::g_cached_gl_get_transform_feedbacki64_v)(xfb,
-                                                                                                              pname,
-                                                                                                              index,
-                                                                                                              param);
+        reinterpret_cast<PFNGLGETTRANSFORMFEEDBACKI64_VPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_transform_feedbacki64_v)(xfb,
+                                                                                                                                   pname,
+                                                                                                                                   index,
+                                                                                                                                   param);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETTRANSFORMFEEDBACKI64_V,

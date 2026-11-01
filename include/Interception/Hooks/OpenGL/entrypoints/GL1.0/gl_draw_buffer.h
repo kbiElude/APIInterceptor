@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiDrawBuffer(GLenum buf);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiDrawBuffer(GLenum buf);
+        }
+    }
 }
 
 #endif /* AI_GL_DRAW_BUFFER_H */

@@ -7,9 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiVertexArrayBindingDivisor(GLuint vaobj, GLuint bindingindex, GLuint divisor);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiVertexArrayBindingDivisor(GLuint vaobj,
+                                                         GLuint bindingindex,
+                                                         GLuint divisor);
+        }
+    }
 }
 
 #endif /* AI_GL_VERTEX_ARRAY_BINDING_DIVISOR_H */

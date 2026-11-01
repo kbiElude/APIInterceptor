@@ -128,7 +128,7 @@ namespace APIDumpReplayer
                                     std::string*       out_error_ptr,
                                     std::index_sequence<Indices...>)
             {
-                std::tuple<D3D8Restore::ArgumentRestorer<Arguments, D3D8::Utils::ArgumentCategoryOf<Arguments>::value>...> restorers;
+                std::tuple<D3D8Restore::ArgumentRestorer<Arguments, Interception::Core::D3D8Utils::ArgumentCategoryOf<Arguments>::value>...> restorers;
                 bool                                                                                                    is_ok  = true;
                 ReturnHolder<ReturnType>                                                                                holder;
                 bool                                                                                                    result = false;

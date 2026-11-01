@@ -10,9 +10,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetBufferPointerv(GLenum target,
-                                             GLenum pname,
-                                             void** params)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetBufferPointerv(GLenum target,
+                                                                  GLenum pname,
+                                                                  void** params)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -27,8 +27,8 @@ void AI_APIENTRY OpenGL::aiGetBufferPointerv(GLenum target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glGetBufferPointerv(target=[%s] pname=[%s] params=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  params);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETBUFFERPOINTERV,
@@ -54,9 +54,9 @@ void AI_APIENTRY OpenGL::aiGetBufferPointerv(GLenum target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETBUFFERPOINTERVPROC>(OpenGL::g_cached_gl_get_buffer_pointerv)(target,
-                                                                                              pname,
-                                                                                              params);
+        reinterpret_cast<PFNGLGETBUFFERPOINTERVPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_buffer_pointerv)(target,
+                                                                                                                   pname,
+                                                                                                                   params);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETBUFFERPOINTERV,

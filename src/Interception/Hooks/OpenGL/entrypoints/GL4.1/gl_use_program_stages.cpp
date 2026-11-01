@@ -10,9 +10,9 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiUseProgramStages(GLuint     pipeline,
-                                            GLbitfield stages,
-                                            GLuint     program)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiUseProgramStages(GLuint     pipeline,
+                                                                 GLbitfield stages,
+                                                                 GLuint     program)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -51,9 +51,9 @@ void AI_APIENTRY OpenGL::aiUseProgramStages(GLuint     pipeline,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLUSEPROGRAMSTAGESPROC>(OpenGL::g_cached_gl_use_program_stages)(pipeline,
-                                                                                             stages,
-                                                                                             program);
+        reinterpret_cast<PFNGLUSEPROGRAMSTAGESPROC>(Interception::Hooks::OpenGL::g_cached_gl_use_program_stages)(pipeline,
+                                                                                                                  stages,
+                                                                                                                  program);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLUSEPROGRAMSTAGES,

@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiTexCoord4i(GLint s,
-                                      GLint t,
-                                      GLint r,
-                                      GLint q)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiTexCoord4i(GLint s,
+                                                           GLint t,
+                                                           GLint r,
+                                                           GLint q)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -55,10 +55,10 @@ void AI_APIENTRY OpenGL::aiTexCoord4i(GLint s,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLTEXCOORD4IPROC>(OpenGL::g_cached_gl_tex_coord_4i)(s,
-                                                                                t,
-                                                                                r,
-                                                                                q);
+        reinterpret_cast<PFNGLTEXCOORD4IPROC>(Interception::Hooks::OpenGL::g_cached_gl_tex_coord_4i)(s,
+                                                                                                     t,
+                                                                                                     r,
+                                                                                                     q);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTEXCOORD4I,

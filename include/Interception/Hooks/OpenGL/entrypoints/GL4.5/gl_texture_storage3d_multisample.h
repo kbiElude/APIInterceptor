@@ -7,9 +7,21 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiTextureStorage3DMultisample(GLuint texture, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLboolean fixedsamplelocations);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiTextureStorage3DMultisample(GLuint    texture,
+                                                           GLsizei   samples,
+                                                           GLenum    internalformat,
+                                                           GLsizei   width,
+                                                           GLsizei   height,
+                                                           GLsizei   depth,
+                                                           GLboolean fixedsamplelocations);
+        }
+    }
 }
 
 #endif /* AI_GL_TEXTURE_STORAGE3D_MULTISAMPLE_H */

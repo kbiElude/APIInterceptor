@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiNormal3iv(const GLint* v);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiNormal3iv(const GLint* v);
+        }
+    }
 }
 
 #endif /* AI_GL_NORMAL_3IV_H */

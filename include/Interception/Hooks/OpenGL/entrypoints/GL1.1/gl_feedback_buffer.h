@@ -7,11 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiFeedbackBuffer(GLsizei  size,
-                                      GLenum   type,
-                                      GLfloat* buffer);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiFeedbackBuffer(GLsizei  size,
+                                              GLenum   type,
+                                              GLfloat* buffer);
+        }
+    }
 }
 
 #endif /* AI_GL_FEEDBACK_BUFFER_H */

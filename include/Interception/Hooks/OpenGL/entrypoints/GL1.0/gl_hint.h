@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiHint(GLenum target,
-                            GLenum mode);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiHint(GLenum target,
+                                    GLenum mode);
+        }
+    }
 }
 
 #endif /* AI_GL_HINT_H */

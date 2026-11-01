@@ -7,9 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiInvalidateTexImage(GLuint texture, GLint level);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiInvalidateTexImage(GLuint texture,
+                                                  GLint  level);
+        }
+    }
 }
 
 #endif /* AI_GL_INVALIDATE_TEX_IMAGE_H */

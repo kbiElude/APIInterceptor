@@ -7,10 +7,16 @@
 
 #include <windows.h>
 
-namespace WGL
+namespace Interception
 {
-    BOOL WINAPI make_current(HDC   in_hdc,
-                             HGLRC in_hglrc);
+    namespace Hooks
+    {
+        namespace WGL
+        {
+            BOOL WINAPI make_current(HDC   in_hdc,
+                                     HGLRC in_hglrc);
+        }
+    }
 }
 
 #endif /* WGL_MAKE_CURRENT_H */

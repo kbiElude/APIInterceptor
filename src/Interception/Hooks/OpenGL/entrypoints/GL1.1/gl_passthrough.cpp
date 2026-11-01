@@ -11,7 +11,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiPassthrough(GLfloat token)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiPassthrough(GLfloat token)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -46,7 +46,7 @@ void AI_APIENTRY OpenGL::aiPassthrough(GLfloat token)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLPASSTHROUGHPROC>(OpenGL::g_cached_gl_passthrough)(token);
+        reinterpret_cast<PFNGLPASSTHROUGHPROC>(Interception::Hooks::OpenGL::g_cached_gl_passthrough)(token);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLPASSTHROUGH,

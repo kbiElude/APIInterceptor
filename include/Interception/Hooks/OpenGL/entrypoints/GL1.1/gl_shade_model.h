@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiShadeModel(GLenum mode);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiShadeModel(GLenum mode);
+        }
+    }
 }
 
 #endif /* AI_GL_SHADE_MODEL_H */

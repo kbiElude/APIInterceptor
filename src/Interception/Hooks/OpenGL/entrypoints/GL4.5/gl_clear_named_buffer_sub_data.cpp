@@ -12,36 +12,36 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiClearNamedBufferSubData(GLuint      buffer,
-                                                   GLenum      internalformat,
-                                                   GLintptr    offset,
-                                                   GLsizeiptr  size,
-                                                   GLenum      format,
-                                                   GLenum      type,
-                                                   const void* data)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiClearNamedBufferSubData(GLuint      buffer,
+                                                                        GLenum      internalformat,
+                                                                        GLintptr    offset,
+                                                                        GLsizeiptr  size,
+                                                                        GLenum      format,
+                                                                        GLenum      type,
+                                                                        const void* data)
 {
-    OpenGL::PixelDataChunk                  data_chunk;
-    void*                                   post_callback_func_arg = nullptr;
-    APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
-    void*                                   pre_callback_func_arg  = nullptr;
-    APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
-    bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    Interception::Hooks::OpenGL::PixelDataChunk data_chunk;
+    void*                                       post_callback_func_arg = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC     post_callback_func_ptr = nullptr;
+    void*                                       pre_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC      pre_callback_func_ptr  = nullptr;
+    bool                                        should_pass_through    = true;
+    APIInterceptor::Tracker                     tracker;
 
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glClearNamedBufferSubData(buffer=[%u] internalformat=[%s] offset=[%d] size=[%d] format=[%s] type=[%s] data=[%p])",
                  buffer,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(internalformat),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(internalformat),
                  static_cast<int32_t>(offset),
                  static_cast<int32_t>(size),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(format),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(type),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(format),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type),
                  data);
 
-        data_chunk = OpenGL::PixelDataChunk::create_for_texel(data,
-                                                              format,
-                                                              type);
+        data_chunk = Interception::Hooks::OpenGL::PixelDataChunk::create_for_texel(data,
+                                                                                   format,
+                                                                                   type);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCLEARNAMEDBUFFERSUBDATA,
                                                          &pre_callback_func_ptr,
@@ -70,13 +70,13 @@ void AI_APIENTRY OpenGL::aiClearNamedBufferSubData(GLuint      buffer,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLCLEARNAMEDBUFFERSUBDATAPROC>(OpenGL::g_cached_gl_clear_named_buffer_sub_data)(buffer,
-                                                                                                            internalformat,
-                                                                                                            offset,
-                                                                                                            size,
-                                                                                                            format,
-                                                                                                            type,
-                                                                                                            data);
+        reinterpret_cast<PFNGLCLEARNAMEDBUFFERSUBDATAPROC>(Interception::Hooks::OpenGL::g_cached_gl_clear_named_buffer_sub_data)(buffer,
+                                                                                                                                 internalformat,
+                                                                                                                                 offset,
+                                                                                                                                 size,
+                                                                                                                                 format,
+                                                                                                                                 type,
+                                                                                                                                 data);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCLEARNAMEDBUFFERSUBDATA,

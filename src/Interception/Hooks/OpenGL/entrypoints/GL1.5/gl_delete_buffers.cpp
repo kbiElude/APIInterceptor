@@ -12,8 +12,8 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDeleteBuffers(GLsizei       n,
-                                         const GLuint* buffers)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDeleteBuffers(GLsizei       n,
+                                                              const GLuint* buffers)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -54,8 +54,8 @@ void AI_APIENTRY OpenGL::aiDeleteBuffers(GLsizei       n,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDELETEBUFFERSPROC>(OpenGL::g_cached_gl_delete_buffers)(n,
-                                                                                     buffers);
+        reinterpret_cast<PFNGLDELETEBUFFERSPROC>(Interception::Hooks::OpenGL::g_cached_gl_delete_buffers)(n,
+                                                                                                          buffers);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDELETEBUFFERS,
@@ -77,16 +77,21 @@ void AI_APIENTRY OpenGL::aiDeleteBuffers(GLsizei       n,
                               &result_arg);
     }
 
-    if (tracker.is_top_level_api_call() && buffers != nullptr)
-    {
-        auto& context = OpenGL::get_context_state();
+    const bool is_top_level = tracker.is_top_level_api_call();
 
-        for (GLsizei n_buffer = 0;
-                     n_buffer < n;
-                   ++n_buffer)
+    if (is_top_level)
+    {
+        if (buffers != nullptr)
         {
-            context.buffer_manager.on_buffer_deleted(buffers[n_buffer]);
-            context.buffer_mapping_manager.on_buffer_deleted(buffers[n_buffer]);
+            auto& context = Interception::Hooks::OpenGL::get_context_state();
+
+            for (GLsizei n_buffer = 0;
+                         n_buffer < n;
+                       ++n_buffer)
+            {
+                context.buffer_manager.on_buffer_deleted(buffers[n_buffer]);
+                context.buffer_mapping_manager.on_buffer_deleted(buffers[n_buffer]);
+            }
         }
     }
 }

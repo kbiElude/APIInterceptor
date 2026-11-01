@@ -7,9 +7,29 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiCopyImageSubData(GLuint srcName, GLenum srcTarget, GLint srcLevel, GLint srcX, GLint srcY, GLint srcZ, GLuint dstName, GLenum dstTarget, GLint dstLevel, GLint dstX, GLint dstY, GLint dstZ, GLsizei srcWidth, GLsizei srcHeight, GLsizei srcDepth);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiCopyImageSubData(GLuint  srcName,
+                                                GLenum  srcTarget,
+                                                GLint   srcLevel,
+                                                GLint   srcX,
+                                                GLint   srcY,
+                                                GLint   srcZ,
+                                                GLuint  dstName,
+                                                GLenum  dstTarget,
+                                                GLint   dstLevel,
+                                                GLint   dstX,
+                                                GLint   dstY,
+                                                GLint   dstZ,
+                                                GLsizei srcWidth,
+                                                GLsizei srcHeight,
+                                                GLsizei srcDepth);
+        }
+    }
 }
 
 #endif /* AI_GL_COPY_IMAGE_SUB_DATA_H */

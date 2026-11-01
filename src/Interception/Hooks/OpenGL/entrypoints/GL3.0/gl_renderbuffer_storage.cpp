@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiRenderbufferStorage(GLenum  target,
-                                               GLenum  internalformat,
-                                               GLsizei width,
-                                               GLsizei height)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiRenderbufferStorage(GLenum  target,
+                                                                    GLenum  internalformat,
+                                                                    GLsizei width,
+                                                                    GLsizei height)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -26,8 +26,8 @@ void AI_APIENTRY OpenGL::aiRenderbufferStorage(GLenum  target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glRenderbufferStorage(target=[%s] internalformat=[%s] width=[%d] height=[%d])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(internalformat),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(internalformat),
                  static_cast<int32_t>(width),
                  static_cast<int32_t>(height) );
 

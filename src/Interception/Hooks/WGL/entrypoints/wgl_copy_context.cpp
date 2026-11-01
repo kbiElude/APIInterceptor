@@ -9,9 +9,9 @@
 #include "Interception/Hooks/WGL/globals.h"
 #include "Interception/Hooks/WGL/entrypoints/wgl_copy_context.h"
 
-BOOL WINAPI WGL::copy_context(HGLRC in_hglrc_source,
-                              HGLRC in_hglrc_destination,
-                              UINT  in_mask)
+BOOL WINAPI Interception::Hooks::WGL::copy_context(HGLRC in_hglrc_source,
+                                                   HGLRC in_hglrc_destination,
+                                                   UINT  in_mask)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -49,9 +49,9 @@ BOOL WINAPI WGL::copy_context(HGLRC in_hglrc_source,
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNWGLCOPYCONTEXTPROC>(WGL::g_cached_copy_context_func_ptr)(in_hglrc_source,
-                                                                                              in_hglrc_destination,
-                                                                                              in_mask);
+        result = reinterpret_cast<PFNWGLCOPYCONTEXTPROC>(Interception::Hooks::WGL::g_cached_copy_context_func_ptr)(in_hglrc_source,
+                                                                                                                   in_hglrc_destination,
+                                                                                                                   in_mask);
     }
 
     if (tracker.is_top_level_api_call() )
@@ -64,8 +64,8 @@ BOOL WINAPI WGL::copy_context(HGLRC in_hglrc_source,
 
             post_callback_func_ptr(APIInterceptor::APIFUNCTION_WGL_WGLCOPYCONTEXT,
                                    post_callback_func_arg,
-                                   0,       /* in_n_args_out   */
-                               nullptr, /* in_args_out_ptr */
+                                   0,       /* in_n_arguments_out   */
+                               nullptr, /* in_arguments_out_ptr */
                                   &result_arg);
         }
     }

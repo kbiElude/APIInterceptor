@@ -11,7 +11,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiPushName(GLuint name)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiPushName(GLuint name)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -46,7 +46,7 @@ void AI_APIENTRY OpenGL::aiPushName(GLuint name)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLPUSHNAMEPROC>(OpenGL::g_cached_gl_push_name)(name);
+        reinterpret_cast<PFNGLPUSHNAMEPROC>(Interception::Hooks::OpenGL::g_cached_gl_push_name)(name);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLPUSHNAME,

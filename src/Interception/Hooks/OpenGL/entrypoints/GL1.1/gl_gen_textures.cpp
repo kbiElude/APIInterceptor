@@ -9,8 +9,8 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGenTextures(GLsizei n,
-                                       GLuint* textures)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGenTextures(GLsizei n,
+                                                            GLuint* textures)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -48,8 +48,8 @@ void AI_APIENTRY OpenGL::aiGenTextures(GLsizei n,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGENTEXTURESPROC>(OpenGL::g_cached_gl_gen_textures)(n,
-                                                                                 textures);
+        reinterpret_cast<PFNGLGENTEXTURESPROC>(Interception::Hooks::OpenGL::g_cached_gl_gen_textures)(n,
+                                                                                                      textures);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGENTEXTURES,

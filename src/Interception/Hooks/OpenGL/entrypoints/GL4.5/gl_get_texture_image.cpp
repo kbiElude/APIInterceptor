@@ -11,12 +11,12 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetTextureImage(GLuint  texture,
-                                           GLint   level,
-                                           GLenum  format,
-                                           GLenum  type,
-                                           GLsizei bufSize,
-                                           void*   pixels)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetTextureImage(GLuint  texture,
+                                                                GLint   level,
+                                                                GLenum  format,
+                                                                GLenum  type,
+                                                                GLsizei bufSize,
+                                                                void*   pixels)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -30,8 +30,8 @@ void AI_APIENTRY OpenGL::aiGetTextureImage(GLuint  texture,
         AI_TRACE("glGetTextureImage(texture=[%u] level=[%d] format=[%s] type=[%s] bufSize=[%d] pixels=[%p])",
                  texture,
                  level,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(format),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(type),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(format),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type),
                  static_cast<int32_t>(bufSize),
                  pixels);
 
@@ -61,12 +61,12 @@ void AI_APIENTRY OpenGL::aiGetTextureImage(GLuint  texture,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETTEXTUREIMAGEPROC>(OpenGL::g_cached_gl_get_texture_image)(texture,
-                                                                                          level,
-                                                                                          format,
-                                                                                          type,
-                                                                                          bufSize,
-                                                                                          pixels);
+        reinterpret_cast<PFNGLGETTEXTUREIMAGEPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_texture_image)(texture,
+                                                                                                               level,
+                                                                                                               format,
+                                                                                                               type,
+                                                                                                               bufSize,
+                                                                                                               pixels);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETTEXTUREIMAGE,

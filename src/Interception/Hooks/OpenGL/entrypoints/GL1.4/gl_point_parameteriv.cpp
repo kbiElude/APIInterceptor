@@ -11,8 +11,8 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiPointParameteriv(GLenum       pname,
-                                            const GLint* params)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiPointParameteriv(GLenum       pname,
+                                                                 const GLint* params)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -25,7 +25,7 @@ void AI_APIENTRY OpenGL::aiPointParameteriv(GLenum       pname,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glPointParameteriv(pname=[%s] params=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  params);
 
         AI_ASSERT(pname == GL_POINT_SIZE_MIN             ||

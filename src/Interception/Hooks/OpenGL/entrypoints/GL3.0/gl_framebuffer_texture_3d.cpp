@@ -11,12 +11,12 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiFramebufferTexture3D(GLenum target,
-                                                GLenum attachment,
-                                                GLenum textarget,
-                                                GLuint texture,
-                                                GLint  level,
-                                                GLint  zoffset)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiFramebufferTexture3D(GLenum target,
+                                                                     GLenum attachment,
+                                                                     GLenum textarget,
+                                                                     GLuint texture,
+                                                                     GLint  level,
+                                                                     GLint  zoffset)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -28,9 +28,9 @@ void AI_APIENTRY OpenGL::aiFramebufferTexture3D(GLenum target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glFramebufferTexture3D(target=[%s] attachment=[%s] textarget=[%s] texture=[%u] level=[%d] zoffset=[%d])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(attachment),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(textarget),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(attachment),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(textarget),
                  texture,
                  level,
                  zoffset);
@@ -61,12 +61,12 @@ void AI_APIENTRY OpenGL::aiFramebufferTexture3D(GLenum target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLFRAMEBUFFERTEXTURE3DPROC>(OpenGL::g_cached_gl_framebuffer_texture_3D)(target,
-                                                                                                    attachment,
-                                                                                                    textarget,
-                                                                                                    texture,
-                                                                                                    level,
-                                                                                                    zoffset);
+        reinterpret_cast<PFNGLFRAMEBUFFERTEXTURE3DPROC>(Interception::Hooks::OpenGL::g_cached_gl_framebuffer_texture_3D)(target,
+                                                                                                                         attachment,
+                                                                                                                         textarget,
+                                                                                                                         texture,
+                                                                                                                         level,
+                                                                                                                         zoffset);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLFRAMEBUFFERTEXTURE3D,

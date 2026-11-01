@@ -16,8 +16,8 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void* AI_APIENTRY OpenGL::aiMapNamedBuffer(GLuint buffer,
-                                           GLenum access)
+void* AI_APIENTRY Interception::Hooks::OpenGL::aiMapNamedBuffer(GLuint buffer,
+                                                                GLenum access)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -31,7 +31,7 @@ void* AI_APIENTRY OpenGL::aiMapNamedBuffer(GLuint buffer,
     {
         AI_TRACE("glMapNamedBuffer(buffer=[%u] access=[%s])",
                  buffer,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(access));
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(access));
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMAPNAMEDBUFFER,
                                                          &pre_callback_func_ptr,
@@ -55,13 +55,13 @@ void* AI_APIENTRY OpenGL::aiMapNamedBuffer(GLuint buffer,
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNGLMAPNAMEDBUFFERPROC>(OpenGL::g_cached_gl_map_named_buffer)(buffer,
-                                                                                                 access);
+        result = reinterpret_cast<PFNGLMAPNAMEDBUFFERPROC>(Interception::Hooks::OpenGL::g_cached_gl_map_named_buffer)(buffer,
+                                                                                                                      access);
     }
 
     if (tracker.is_top_level_api_call() )
     {
-        auto& context = OpenGL::get_context_state();
+        auto& context = Interception::Hooks::OpenGL::get_context_state();
 
         const int64_t length = static_cast<int64_t>(context.buffer_manager.get_size(buffer) );
 
@@ -69,7 +69,7 @@ void* AI_APIENTRY OpenGL::aiMapNamedBuffer(GLuint buffer,
                                                         result,
                                                         0,
                                                         length,
-                                                        OpenGL::BufferMappingManager::get_flags_for_access(access) );
+                                                        Interception::Hooks::OpenGL::BufferMappingManager::get_flags_for_access(access) );
 
         if (context.buffer_mapping_manager.is_persistent(buffer) )
         {
@@ -77,7 +77,7 @@ void* AI_APIENTRY OpenGL::aiMapNamedBuffer(GLuint buffer,
                     buffer);
         }
 
-        const OpenGL::BufferMappingManager::Region initial_region = context.buffer_mapping_manager.get_initial_region(buffer);
+        const Interception::Hooks::OpenGL::BufferMappingManager::Region initial_region = context.buffer_mapping_manager.get_initial_region(buffer);
 
         if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMAPNAMEDBUFFER,
                                                           &post_callback_func_ptr,

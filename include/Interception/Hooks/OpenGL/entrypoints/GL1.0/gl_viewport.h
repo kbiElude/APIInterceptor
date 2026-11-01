@@ -7,12 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiViewport(GLint   x,
-                                GLint   y,
-                                GLsizei width,
-                                GLsizei height);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiViewport(GLint   x,
+                                        GLint   y,
+                                        GLsizei width,
+                                        GLsizei height);
+        }
+    }
 }
 
 #endif /* AI_GL_VIEWPORT_H */

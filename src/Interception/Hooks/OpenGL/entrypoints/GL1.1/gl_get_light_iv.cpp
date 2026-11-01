@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetLightiv(GLenum light,
-                                      GLenum pname,
-                                      GLint* params)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetLightiv(GLenum light,
+                                                           GLenum pname,
+                                                           GLint* params)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -25,8 +25,8 @@ void AI_APIENTRY OpenGL::aiGetLightiv(GLenum light,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glGetLightiv(light=[%s], pname=[%s], params=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(light),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(light),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  params);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETLIGHTIV,
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiGetLightiv(GLenum light,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETLIGHTIVPROC>(OpenGL::g_cached_gl_get_light_iv)(light,
-                                                                                pname,
-                                                                                params);
+        reinterpret_cast<PFNGLGETLIGHTIVPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_light_iv)(light,
+                                                                                                     pname,
+                                                                                                     params);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETLIGHTIV,

@@ -9,13 +9,19 @@
 
 #include "Interception/Hooks/D3D8/argument_capture_selector.h"
 
-namespace D3D8
+namespace Interception
 {
-    template<typename T>
-    struct ArgumentCapture : public ArgumentCaptureSelector<T, Utils::ArgumentCategoryOf<T>::value>
+    namespace Hooks
     {
-        /* Stub */
-    };
+        namespace D3D8
+        {
+            template<typename T>
+            struct ArgumentCapture : public ArgumentCaptureSelector<T, Interception::Core::D3D8Utils::ArgumentCategoryOf<T>::value>
+            {
+                /* Stub */
+            };
+        }
+    }
 }
 
 #endif /* D3D8_ARGUMENT_CAPTURE_H */

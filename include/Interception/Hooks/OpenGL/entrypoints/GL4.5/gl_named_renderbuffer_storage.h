@@ -7,9 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiNamedRenderbufferStorage(GLuint renderbuffer, GLenum internalformat, GLsizei width, GLsizei height);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiNamedRenderbufferStorage(GLuint  renderbuffer,
+                                                        GLenum  internalformat,
+                                                        GLsizei width,
+                                                        GLsizei height);
+        }
+    }
 }
 
 #endif /* AI_GL_NAMED_RENDERBUFFER_STORAGE_H */

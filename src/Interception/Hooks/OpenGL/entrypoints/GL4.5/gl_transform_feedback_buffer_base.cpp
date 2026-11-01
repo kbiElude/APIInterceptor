@@ -10,9 +10,9 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiTransformFeedbackBufferBase(GLuint xfb,
-                                                       GLuint index,
-                                                       GLuint buffer)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiTransformFeedbackBufferBase(GLuint xfb,
+                                                                            GLuint index,
+                                                                            GLuint buffer)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -51,9 +51,9 @@ void AI_APIENTRY OpenGL::aiTransformFeedbackBufferBase(GLuint xfb,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLTRANSFORMFEEDBACKBUFFERBASEPROC>(OpenGL::g_cached_gl_transform_feedback_buffer_base)(xfb,
-                                                                                                                   index,
-                                                                                                                   buffer);
+        reinterpret_cast<PFNGLTRANSFORMFEEDBACKBUFFERBASEPROC>(Interception::Hooks::OpenGL::g_cached_gl_transform_feedback_buffer_base)(xfb,
+                                                                                                                                        index,
+                                                                                                                                        buffer);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTRANSFORMFEEDBACKBUFFERBASE,

@@ -10,7 +10,7 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDeleteShader(GLuint shader)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDeleteShader(GLuint shader)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -45,7 +45,7 @@ void AI_APIENTRY OpenGL::aiDeleteShader(GLuint shader)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDELETESHADERPROC>(OpenGL::g_cached_gl_delete_shader)(shader);
+        reinterpret_cast<PFNGLDELETESHADERPROC>(Interception::Hooks::OpenGL::g_cached_gl_delete_shader)(shader);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDELETESHADER,

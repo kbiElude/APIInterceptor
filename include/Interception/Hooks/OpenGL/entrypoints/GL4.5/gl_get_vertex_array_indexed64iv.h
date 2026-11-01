@@ -7,9 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetVertexArrayIndexed64iv(GLuint vaobj, GLuint index, GLenum pname, GLint64* param);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetVertexArrayIndexed64iv(GLuint   vaobj,
+                                                         GLuint   index,
+                                                         GLenum   pname,
+                                                         GLint64* param);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_VERTEX_ARRAY_INDEXED64IV_H */

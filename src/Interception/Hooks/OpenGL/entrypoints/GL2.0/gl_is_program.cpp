@@ -10,7 +10,7 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-GLboolean AI_APIENTRY OpenGL::aiIsProgram(GLuint program)
+GLboolean AI_APIENTRY Interception::Hooks::OpenGL::aiIsProgram(GLuint program)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -46,7 +46,7 @@ GLboolean AI_APIENTRY OpenGL::aiIsProgram(GLuint program)
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNGLISPROGRAMPROC>(OpenGL::g_cached_gl_is_program)(program);
+        result = reinterpret_cast<PFNGLISPROGRAMPROC>(Interception::Hooks::OpenGL::g_cached_gl_is_program)(program);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLISPROGRAM,

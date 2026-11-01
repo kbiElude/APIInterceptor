@@ -5,20 +5,20 @@
 #include "Common/macros.h"
 #include "Interception/Hooks/OpenGL/namespace.h"
 
-OpenGL::Namespace::Namespace(const GLuint& in_start_id)
+Interception::Hooks::OpenGL::Namespace::Namespace(const GLuint& in_start_id)
     :m_n_allocated_ids(0),
      m_start_id       (in_start_id)
 {
     /* Stub */
 }
 
-OpenGL::Namespace::~Namespace()
+Interception::Hooks::OpenGL::Namespace::~Namespace()
 {
     /* Stub */
 }
 
-void OpenGL::Namespace::allocate(const uint32_t& in_n_ids,
-                                 GLuint*         out_ids_ptr)
+void Interception::Hooks::OpenGL::Namespace::allocate(const uint32_t& in_n_ids,
+                                                      GLuint*         out_ids_ptr)
 {
     uint32_t n_allocated_ids = 0;
 
@@ -48,8 +48,8 @@ void OpenGL::Namespace::allocate(const uint32_t& in_n_ids,
     }
 }
 
-void OpenGL::Namespace::release(const uint32_t& in_n_ids,
-                                const GLuint*   in_ids_ptr)
+void Interception::Hooks::OpenGL::Namespace::release(const uint32_t& in_n_ids,
+                                                     const GLuint*   in_ids_ptr)
 {
     for (uint32_t n_id = 0;
                   n_id < in_n_ids;

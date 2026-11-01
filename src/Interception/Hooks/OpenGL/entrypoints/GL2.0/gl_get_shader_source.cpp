@@ -10,10 +10,10 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetShaderSource(GLuint   shader,
-                                           GLsizei  bufSize,
-                                           GLsizei* length,
-                                           GLchar*  source)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetShaderSource(GLuint   shader,
+                                                                GLsizei  bufSize,
+                                                                GLsizei* length,
+                                                                GLchar*  source)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -54,10 +54,10 @@ void AI_APIENTRY OpenGL::aiGetShaderSource(GLuint   shader,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETSHADERSOURCEPROC>(OpenGL::g_cached_gl_get_shader_source)(shader,
-                                                                                          bufSize,
-                                                                                          length,
-                                                                                          source);
+        reinterpret_cast<PFNGLGETSHADERSOURCEPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_shader_source)(shader,
+                                                                                                               bufSize,
+                                                                                                               length,
+                                                                                                               source);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETSHADERSOURCE,

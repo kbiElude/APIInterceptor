@@ -7,12 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetBufferSubData(GLenum     target,
-                                        GLintptr   offset,
-                                        GLsizeiptr size,
-                                        void*      data);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetBufferSubData(GLenum     target,
+                                                GLintptr   offset,
+                                                GLsizeiptr size,
+                                                void*      data);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_BUFFER_SUB_DATA_H */

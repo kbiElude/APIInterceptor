@@ -16,10 +16,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void* AI_APIENTRY OpenGL::aiMapBufferRange(GLenum     target,
-                                           GLintptr   offset,
-                                           GLsizeiptr length,
-                                           GLbitfield access)
+void* AI_APIENTRY Interception::Hooks::OpenGL::aiMapBufferRange(GLenum     target,
+                                                                GLintptr   offset,
+                                                                GLsizeiptr length,
+                                                                GLbitfield access)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -32,7 +32,7 @@ void* AI_APIENTRY OpenGL::aiMapBufferRange(GLenum     target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glMapBufferRange(target=[%s] offset=[%lld] length=[%lld] access=[0x%x])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  static_cast<long long>(offset),
                  static_cast<long long>(length),
                  access);
@@ -61,22 +61,22 @@ void* AI_APIENTRY OpenGL::aiMapBufferRange(GLenum     target,
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNGLMAPBUFFERRANGEPROC>(OpenGL::g_cached_gl_map_buffer_range)(target,
-                                                                                                 offset,
-                                                                                                 length,
-                                                                                                 access);
+        result = reinterpret_cast<PFNGLMAPBUFFERRANGEPROC>(Interception::Hooks::OpenGL::g_cached_gl_map_buffer_range)(target,
+                                                                                                                      offset,
+                                                                                                                      length,
+                                                                                                                      access);
     }
 
     if (tracker.is_top_level_api_call() )
     {
-        auto& context = OpenGL::get_context_state();
+        auto& context = Interception::Hooks::OpenGL::get_context_state();
 
         GLuint buffer_id = 0;
 
         {
-            OpenGL::BufferBindingTarget binding_target;
-            const bool                  is_known_target = OpenGL::Utils::get_buffer_binding_target_for_gl_enum(target,
-                                                                                                               &binding_target);
+            Interception::Hooks::OpenGL::BufferBindingTarget binding_target;
+            const bool                                       is_known_target = Interception::Hooks::OpenGL::Utils::get_buffer_binding_target_for_gl_enum(target,
+                                                                                                                                    &binding_target);
 
             AI_ASSERT(is_known_target);
 
@@ -95,7 +95,7 @@ void* AI_APIENTRY OpenGL::aiMapBufferRange(GLenum     target,
                     buffer_id);
         }
 
-        const OpenGL::BufferMappingManager::Region initial_region = context.buffer_mapping_manager.get_initial_region(buffer_id);
+        const Interception::Hooks::OpenGL::BufferMappingManager::Region initial_region = context.buffer_mapping_manager.get_initial_region(buffer_id);
 
         if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMAPBUFFERRANGE,
                                                           &post_callback_func_ptr,

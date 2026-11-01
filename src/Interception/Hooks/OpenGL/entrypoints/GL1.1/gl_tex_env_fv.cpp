@@ -13,12 +13,12 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiTexEnvfv(GLenum         target,
-                                    GLenum         pname,
-                                    const GLfloat* params)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiTexEnvfv(GLenum         target,
+                                                         GLenum         pname,
+                                                         const GLfloat* params)
 {
     APIInterceptor::MemoryChunk             params_chunk(params,
-                                                         OpenGL::Utils::get_n_tex_env_params(target, pname),
+                                                         Interception::Hooks::OpenGL::Utils::get_n_tex_env_params(target, pname),
                                                          sizeof(GLfloat));
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -30,8 +30,8 @@ void AI_APIENTRY OpenGL::aiTexEnvfv(GLenum         target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glTexEnvfv(target=[%s], pname=[%s], params=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  params);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTEXENVFV,
@@ -57,9 +57,9 @@ void AI_APIENTRY OpenGL::aiTexEnvfv(GLenum         target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLTEXENVFVPROC>(OpenGL::g_cached_gl_tex_env_fv)(target,
-                                                                            pname,
-                                                                            params);
+        reinterpret_cast<PFNGLTEXENVFVPROC>(Interception::Hooks::OpenGL::g_cached_gl_tex_env_fv)(target,
+                                                                                                 pname,
+                                                                                                 params);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTEXENVFV,

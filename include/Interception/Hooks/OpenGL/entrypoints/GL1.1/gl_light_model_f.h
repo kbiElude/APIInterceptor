@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiLightModelf(GLenum  pname,
-                                   GLfloat param);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiLightModelf(GLenum  pname,
+                                           GLfloat param);
+        }
+    }
 }
 
 #endif /* AI_GL_LIGHT_MODEL_F_H */

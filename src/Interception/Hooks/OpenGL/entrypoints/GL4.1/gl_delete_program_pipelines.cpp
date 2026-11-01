@@ -11,8 +11,8 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDeleteProgramPipelines(GLsizei       n,
-                                                  const GLuint* pipelines)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDeleteProgramPipelines(GLsizei       n,
+                                                                       const GLuint* pipelines)
 {
     APIInterceptor::MemoryChunk             pipelines_chunk(pipelines,
                                                             n,
@@ -52,8 +52,8 @@ void AI_APIENTRY OpenGL::aiDeleteProgramPipelines(GLsizei       n,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDELETEPROGRAMPIPELINESPROC>(OpenGL::g_cached_gl_delete_program_pipelines)(n,
-                                                                                                        pipelines);
+        reinterpret_cast<PFNGLDELETEPROGRAMPIPELINESPROC>(Interception::Hooks::OpenGL::g_cached_gl_delete_program_pipelines)(n,
+                                                                                                                             pipelines);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDELETEPROGRAMPIPELINES,

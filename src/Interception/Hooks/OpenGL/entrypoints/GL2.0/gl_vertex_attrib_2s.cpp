@@ -10,9 +10,9 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiVertexAttrib2s(GLuint  index,
-                                          GLshort x,
-                                          GLshort y)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiVertexAttrib2s(GLuint  index,
+                                                               GLshort x,
+                                                               GLshort y)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -51,9 +51,9 @@ void AI_APIENTRY OpenGL::aiVertexAttrib2s(GLuint  index,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLVERTEXATTRIB2SPROC>(OpenGL::g_cached_gl_vertex_attrib_2s)(index,
-                                                                                        x,
-                                                                                        y);
+        reinterpret_cast<PFNGLVERTEXATTRIB2SPROC>(Interception::Hooks::OpenGL::g_cached_gl_vertex_attrib_2s)(index,
+                                                                                                             x,
+                                                                                                             y);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLVERTEXATTRIB2S,

@@ -13,11 +13,11 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiFogfv(GLenum         pname,
-                                 const GLfloat* params)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiFogfv(GLenum         pname,
+                                                      const GLfloat* params)
 {
     APIInterceptor::MemoryChunk             params_chunk(params,
-                                                         OpenGL::Utils::get_n_fog_params(pname),
+                                                         Interception::Hooks::OpenGL::Utils::get_n_fog_params(pname),
                                                          sizeof(GLfloat));
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -29,7 +29,7 @@ void AI_APIENTRY OpenGL::aiFogfv(GLenum         pname,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glFogfv(pname=[%s], params=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  params);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLFOGFV,
@@ -54,8 +54,8 @@ void AI_APIENTRY OpenGL::aiFogfv(GLenum         pname,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLFOGFVPROC>(OpenGL::g_cached_gl_fogfv)(pname,
-                                                                    params);
+        reinterpret_cast<PFNGLFOGFVPROC>(Interception::Hooks::OpenGL::g_cached_gl_fogfv)(pname,
+                                                                                         params);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLFOGFV,

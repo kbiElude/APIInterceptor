@@ -11,11 +11,11 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetInternalformati64v(GLenum   target,
-                                                 GLenum   internalformat,
-                                                 GLenum   pname,
-                                                 GLsizei  bufSize,
-                                                 GLint64* params)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetInternalformati64v(GLenum   target,
+                                                                      GLenum   internalformat,
+                                                                      GLenum   pname,
+                                                                      GLsizei  bufSize,
+                                                                      GLint64* params)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -27,9 +27,9 @@ void AI_APIENTRY OpenGL::aiGetInternalformati64v(GLenum   target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glGetInternalformati64v(target=[%s] internalformat=[%s] pname=[%s] bufSize=[%d] params=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(internalformat),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(internalformat),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  static_cast<int32_t>(bufSize),
                  params);
 
@@ -58,11 +58,11 @@ void AI_APIENTRY OpenGL::aiGetInternalformati64v(GLenum   target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETINTERNALFORMATI64VPROC>(OpenGL::g_cached_gl_get_internalformati64v)(target,
-                                                                                                      internalformat,
-                                                                                                      pname,
-                                                                                                      bufSize,
-                                                                                                      params);
+        reinterpret_cast<PFNGLGETINTERNALFORMATI64VPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_internalformati64v)(target,
+                                                                                                                           internalformat,
+                                                                                                                           pname,
+                                                                                                                           bufSize,
+                                                                                                                           params);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETINTERNALFORMATI64V,

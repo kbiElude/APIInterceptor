@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    GLint AI_APIENTRY aiGetFragDataIndex(GLuint        program,
-                                         const GLchar* name);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            GLint AI_APIENTRY aiGetFragDataIndex(GLuint        program,
+                                                 const GLchar* name);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_FRAG_DATA_INDEX_H */

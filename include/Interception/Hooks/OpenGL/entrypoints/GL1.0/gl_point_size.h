@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiPointSize(GLfloat size);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiPointSize(GLfloat size);
+        }
+    }
 }
 
 #endif /* AI_GL_POINT_SIZE_H */

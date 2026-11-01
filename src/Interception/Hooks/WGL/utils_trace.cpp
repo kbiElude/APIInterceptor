@@ -3,6 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "Common/globals.h"
+#include "Common/macros.h"
 #include "Common/types.h"
 #include "Khronos/GL/glcorearb.h"
 #include "Khronos/GL/wglext.h"
@@ -10,7 +11,7 @@
 #include <sstream>
 #include <string>
 
-const char* WGL::convert_context_attrib_list_to_raw_string(const int* in_attrib_list)
+const char* Interception::Hooks::WGL::convert_context_attrib_list_to_raw_string(const int* in_attrib_list)
 {
     static AI_THREADLOCAL char cache[MAX_PER_FUNC_LOCAL_HELPER_STORAGE_SIZE];
     std::stringstream          result_sstream;
@@ -25,7 +26,7 @@ const char* WGL::convert_context_attrib_list_to_raw_string(const int* in_attrib_
            *traveller_ptr != 0)
     {
         const auto  attribute_name          = *traveller_ptr;
-        auto        attribute_name_string   = WGL::get_context_attribute_name(attribute_name);
+        auto        attribute_name_string   = Interception::Hooks::WGL::get_context_attribute_name(attribute_name);
         const auto  attribute_value         = *(traveller_ptr + 1);
         std::string attribute_value_string;
 
@@ -86,7 +87,7 @@ const char* WGL::convert_context_attrib_list_to_raw_string(const int* in_attrib_
 
             default:
             {
-                AI_ASSERT_FAIL();
+                AI_FAIL_UNSUPPORTED(attribute_name);
             }
         }
 
@@ -111,7 +112,7 @@ const char* WGL::convert_context_attrib_list_to_raw_string(const int* in_attrib_
     return cache;
 }
 
-const char* WGL::get_context_attribute_name(const int& in_attrib_name)
+const char* Interception::Hooks::WGL::get_context_attribute_name(const int& in_attrib_name)
 {
     const char* result_ptr = "???";
 
@@ -125,7 +126,7 @@ const char* WGL::get_context_attribute_name(const int& in_attrib_name)
 
         default:
         {
-            AI_ASSERT_FAIL();
+            AI_FAIL_UNSUPPORTED(in_attrib_name);
         }
     }
 

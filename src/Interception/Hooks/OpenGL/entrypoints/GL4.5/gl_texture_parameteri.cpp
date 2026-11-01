@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiTextureParameteri(GLuint texture,
-                                             GLenum pname,
-                                             GLint  param)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiTextureParameteri(GLuint texture,
+                                                                  GLenum pname,
+                                                                  GLint  param)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -26,7 +26,7 @@ void AI_APIENTRY OpenGL::aiTextureParameteri(GLuint texture,
     {
         AI_TRACE("glTextureParameteri(texture=[%u] pname=[%s] param=[%d])",
                  texture,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  param);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTEXTUREPARAMETERI,
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiTextureParameteri(GLuint texture,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLTEXTUREPARAMETERIPROC>(OpenGL::g_cached_gl_texture_parameteri)(texture,
-                                                                                             pname,
-                                                                                             param);
+        reinterpret_cast<PFNGLTEXTUREPARAMETERIPROC>(Interception::Hooks::OpenGL::g_cached_gl_texture_parameteri)(texture,
+                                                                                                                  pname,
+                                                                                                                  param);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTEXTUREPARAMETERI,

@@ -7,12 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiColorMask(GLboolean red,
-                                 GLboolean green,
-                                 GLboolean blue,
-                                 GLboolean alpha);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiColorMask(GLboolean red,
+                                         GLboolean green,
+                                         GLboolean blue,
+                                         GLboolean alpha);
+        }
+    }
 }
 
 #endif /* AI_GL_COLOR_MASK_H */

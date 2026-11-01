@@ -9,8 +9,8 @@
 #include "Interception/Hooks/WGL/globals.h"
 #include "Interception/Hooks/WGL/entrypoints/wgl_share_lists.h"
 
-BOOL WINAPI WGL::share_lists(HGLRC in_hglrc1,
-                             HGLRC in_hglrc2)
+BOOL WINAPI Interception::Hooks::WGL::share_lists(HGLRC in_hglrc1,
+                                                  HGLRC in_hglrc2)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -46,8 +46,8 @@ BOOL WINAPI WGL::share_lists(HGLRC in_hglrc1,
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNWGLSHARELISTSPROC>(WGL::g_cached_share_lists_func_ptr)(in_hglrc1,
-                                                                                            in_hglrc2);
+        result = reinterpret_cast<PFNWGLSHARELISTSPROC>(Interception::Hooks::WGL::g_cached_share_lists_func_ptr)(in_hglrc1,
+                                                                                                                 in_hglrc2);
     }
 
     if (tracker.is_top_level_api_call() )
@@ -60,8 +60,8 @@ BOOL WINAPI WGL::share_lists(HGLRC in_hglrc1,
 
             post_callback_func_ptr(APIInterceptor::APIFUNCTION_WGL_WGLSHARELISTS,
                                    post_callback_func_arg,
-                                   0,       /* in_n_args_out   */
-                               nullptr, /* in_args_out_ptr */
+                                   0,       /* in_n_arguments_out   */
+                               nullptr, /* in_arguments_out_ptr */
                                   &result_arg);
         }
     }

@@ -9,8 +9,8 @@
 #include "Interception/Hooks/WGL/globals.h"
 #include "Interception/Hooks/WGL/entrypoints/wgl_swap_layer_buffers.h"
 
-BOOL WINAPI WGL::swap_layer_buffers(HDC  in_hdc,
-                                    UINT in_planes)
+BOOL WINAPI Interception::Hooks::WGL::swap_layer_buffers(HDC  in_hdc,
+                                                         UINT in_planes)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -46,8 +46,8 @@ BOOL WINAPI WGL::swap_layer_buffers(HDC  in_hdc,
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<WGL::PFNWGLSWAPLAYERBUFFERSPROC>(WGL::g_cached_swap_layer_buffers_func_ptr)(in_hdc,
-                                                                                                              in_planes);
+        result = reinterpret_cast<Interception::Hooks::WGL::PFNWGLSWAPLAYERBUFFERSPROC>(Interception::Hooks::WGL::g_cached_swap_layer_buffers_func_ptr)(in_hdc,
+                                                                                                                                                        in_planes);
     }
 
     if (tracker.is_top_level_api_call() )
@@ -60,8 +60,8 @@ BOOL WINAPI WGL::swap_layer_buffers(HDC  in_hdc,
 
             post_callback_func_ptr(APIInterceptor::APIFUNCTION_WGL_WGLSWAPLAYERBUFFERS,
                                    post_callback_func_arg,
-                                   0,       /* in_n_args_out   */
-                               nullptr, /* in_args_out_ptr */
+                                   0,       /* in_n_arguments_out   */
+                               nullptr, /* in_arguments_out_ptr */
                                   &result_arg);
         }
     }

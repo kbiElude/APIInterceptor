@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiPrimitiveRestartIndex(GLuint index);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiPrimitiveRestartIndex(GLuint index);
+        }
+    }
 }
 
 #endif /* AI_GL_PRIMITIVE_RESTART_INDEX_H */

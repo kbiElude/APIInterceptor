@@ -10,14 +10,14 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiInvalidateTexSubImage(GLuint  texture,
-                                                 GLint   level,
-                                                 GLint   xoffset,
-                                                 GLint   yoffset,
-                                                 GLint   zoffset,
-                                                 GLsizei width,
-                                                 GLsizei height,
-                                                 GLsizei depth)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiInvalidateTexSubImage(GLuint  texture,
+                                                                      GLint   level,
+                                                                      GLint   xoffset,
+                                                                      GLint   yoffset,
+                                                                      GLint   zoffset,
+                                                                      GLsizei width,
+                                                                      GLsizei height,
+                                                                      GLsizei depth)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -66,14 +66,14 @@ void AI_APIENTRY OpenGL::aiInvalidateTexSubImage(GLuint  texture,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLINVALIDATETEXSUBIMAGEPROC>(OpenGL::g_cached_gl_invalidate_tex_sub_image)(texture,
-                                                                                                        level,
-                                                                                                        xoffset,
-                                                                                                        yoffset,
-                                                                                                        zoffset,
-                                                                                                        width,
-                                                                                                        height,
-                                                                                                        depth);
+        reinterpret_cast<PFNGLINVALIDATETEXSUBIMAGEPROC>(Interception::Hooks::OpenGL::g_cached_gl_invalidate_tex_sub_image)(texture,
+                                                                                                                             level,
+                                                                                                                             xoffset,
+                                                                                                                             yoffset,
+                                                                                                                             zoffset,
+                                                                                                                             width,
+                                                                                                                             height,
+                                                                                                                             depth);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLINVALIDATETEXSUBIMAGE,

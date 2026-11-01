@@ -10,8 +10,8 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiPolygonOffset(GLfloat factor,
-                                         GLfloat units)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiPolygonOffset(GLfloat factor,
+                                                              GLfloat units)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;

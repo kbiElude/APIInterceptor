@@ -11,11 +11,11 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiCopyBufferSubData(GLenum     readTarget,
-                                             GLenum     writeTarget,
-                                             GLintptr   readOffset,
-                                             GLintptr   writeOffset,
-                                             GLsizeiptr size)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiCopyBufferSubData(GLenum     readTarget,
+                                                                  GLenum     writeTarget,
+                                                                  GLintptr   readOffset,
+                                                                  GLintptr   writeOffset,
+                                                                  GLsizeiptr size)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -27,8 +27,8 @@ void AI_APIENTRY OpenGL::aiCopyBufferSubData(GLenum     readTarget,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glCopyBufferSubData(readTarget=[%s] writeTarget=[%s] readOffset=[%d] writeOffset=[%d] size=[%d])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(readTarget),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(writeTarget),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(readTarget),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(writeTarget),
                  static_cast<int32_t>(readOffset),
                  static_cast<int32_t>(writeOffset),
                  static_cast<int32_t>(size) );
@@ -58,11 +58,11 @@ void AI_APIENTRY OpenGL::aiCopyBufferSubData(GLenum     readTarget,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLCOPYBUFFERSUBDATAPROC>(OpenGL::g_cached_gl_copy_buffer_sub_data)(readTarget,
-                                                                                               writeTarget,
-                                                                                               readOffset,
-                                                                                               writeOffset,
-                                                                                               size);
+        reinterpret_cast<PFNGLCOPYBUFFERSUBDATAPROC>(Interception::Hooks::OpenGL::g_cached_gl_copy_buffer_sub_data)(readTarget,
+                                                                                                                    writeTarget,
+                                                                                                                    readOffset,
+                                                                                                                    writeOffset,
+                                                                                                                    size);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCOPYBUFFERSUBDATA,

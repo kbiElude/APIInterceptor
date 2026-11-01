@@ -4,7 +4,7 @@
  */
 #include "Interception/Hooks/D3D8/globals.h"
 
-void* D3D8::g_cached_direct3d_create8_function_ptr = nullptr;
+void* Interception::Hooks::D3D8::g_cached_direct3d_create8_function_ptr = nullptr;
 
-std::mutex D3D8::g_hook_mutex;
-bool       D3D8::g_is_direct3d_create8_hooked = false;
+std::mutex Interception::Hooks::D3D8::g_hook_mutex;
+bool       Interception::Hooks::D3D8::g_is_direct3d_create8_hooked = false;

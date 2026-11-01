@@ -13,17 +13,17 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiMap1d(GLenum          target,
-                                 GLdouble        u1,
-                                 GLdouble        u2,
-                                 GLint           stride,
-                                 GLint           order,
-                                 const GLdouble* points)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiMap1d(GLenum          target,
+                                                      GLdouble        u1,
+                                                      GLdouble        u2,
+                                                      GLint           stride,
+                                                      GLint           order,
+                                                      const GLdouble* points)
 {
     APIInterceptor::MemoryChunk             points_chunk(points,
-                                                         OpenGL::Utils::get_n_map1_values(target,
-                                                                                          stride,
-                                                                                          order),
+                                                         Interception::Hooks::OpenGL::Utils::get_n_map1_values(target,
+                                                                                                               stride,
+                                                                                                               order),
                                                          sizeof(GLdouble) );
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -35,7 +35,7 @@ void AI_APIENTRY OpenGL::aiMap1d(GLenum          target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glMap1d(target=[%s], u1=[%lf], u2=[%lf], stride=[%d], order=[%d], points=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  u1,
                  u2,
                  stride,
@@ -68,12 +68,12 @@ void AI_APIENTRY OpenGL::aiMap1d(GLenum          target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLMAP1DPROC>(OpenGL::g_cached_gl_map_1d)(target,
-                                                                     u1,
-                                                                     u2,
-                                                                     stride,
-                                                                     order,
-                                                                     points);
+        reinterpret_cast<PFNGLMAP1DPROC>(Interception::Hooks::OpenGL::g_cached_gl_map_1d)(target,
+                                                                                          u1,
+                                                                                          u2,
+                                                                                          stride,
+                                                                                          order,
+                                                                                          points);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMAP1D,

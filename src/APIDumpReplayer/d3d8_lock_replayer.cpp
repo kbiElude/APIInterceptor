@@ -170,17 +170,17 @@ bool APIDumpReplayer::D3D8LockReplayer::lock_box(const APIDumpLoader::DumpedAPIC
                                                  const LockKey&                      in_key,
                                                  std::string*                        out_error_ptr)
 {
-    typedef HRESULT (__stdcall* PFNLEVELBOXPROC)    (void*, UINT, D3D8::D3DVOLUME_DESC*);
-    typedef HRESULT (__stdcall* PFNLEVELBOXLOCKPROC)(void*, UINT, D3D8::D3DLOCKED_BOX*, const D3D8::D3DBOX*, DWORD);
-    typedef HRESULT (__stdcall* PFNVOLUMEDESCPROC)  (void*, D3D8::D3DVOLUME_DESC*);
-    typedef HRESULT (__stdcall* PFNVOLUMELOCKPROC)  (void*, D3D8::D3DLOCKED_BOX*, const D3D8::D3DBOX*, DWORD);
+    typedef HRESULT (__stdcall* PFNLEVELBOXPROC)    (void*, UINT, Interception::Hooks::D3D8::D3DVOLUME_DESC*);
+    typedef HRESULT (__stdcall* PFNLEVELBOXLOCKPROC)(void*, UINT, Interception::Hooks::D3D8::D3DLOCKED_BOX*, const Interception::Hooks::D3D8::D3DBOX*, DWORD);
+    typedef HRESULT (__stdcall* PFNVOLUMEDESCPROC)  (void*, Interception::Hooks::D3D8::D3DVOLUME_DESC*);
+    typedef HRESULT (__stdcall* PFNVOLUMELOCKPROC)  (void*, Interception::Hooks::D3D8::D3DLOCKED_BOX*, const Interception::Hooks::D3D8::D3DBOX*, DWORD);
 
-    D3D8::D3DBOX         box        = {};
-    const D3D8::D3DBOX*  box_ptr    = nullptr;
-    D3D8::D3DVOLUME_DESC desc       = {};
+    Interception::Hooks::D3D8::D3DBOX         box        = {};
+    const Interception::Hooks::D3D8::D3DBOX*  box_ptr    = nullptr;
+    Interception::Hooks::D3D8::D3DVOLUME_DESC desc       = {};
     HRESULT              hresult    = E_FAIL;
     const uint32_t       level      = std::get<2>(in_key);
-    D3D8::D3DLOCKED_BOX  locked     = {};
+    Interception::Hooks::D3D8::D3DLOCKED_BOX  locked     = {};
     LockRecord           record     = {};
     bool                 result     = false;
     const auto           spec_ptr   = get_lock_spec_ptr(in_call.func);
@@ -239,11 +239,11 @@ bool APIDumpReplayer::D3D8LockReplayer::lock_box(const APIDumpLoader::DumpedAPIC
         goto end;
     }
 
-    D3D8::Utils::get_surface_region_layout(desc.Format,
-                                           (box_ptr != nullptr) ? box.Right  - box.Left : desc.Width,
-                                           (box_ptr != nullptr) ? box.Bottom - box.Top  : desc.Height,
-                                          &record.n_rows,
-                                          &record.n_row_bytes);
+    Interception::Core::D3D8Utils::get_surface_region_layout(desc.Format,
+                                                             (box_ptr != nullptr) ? box.Right  - box.Left : desc.Width,
+                                                             (box_ptr != nullptr) ? box.Bottom - box.Top  : desc.Height,
+                                                            &record.n_rows,
+                                                            &record.n_row_bytes);
 
     record.depth              = (box_ptr != nullptr) ? box.Back - box.Front
                                                      : desc.Depth;
@@ -270,11 +270,11 @@ bool APIDumpReplayer::D3D8LockReplayer::lock_buffer(const APIDumpLoader::DumpedA
                                                     const LockKey&                      in_key,
                                                     std::string*                        out_error_ptr)
 {
-    typedef HRESULT (__stdcall* PFNBUFFERDESCPROC)(void*, D3D8::D3DVERTEXBUFFER_DESC*);
+    typedef HRESULT (__stdcall* PFNBUFFERDESCPROC)(void*, Interception::Hooks::D3D8::D3DVERTEXBUFFER_DESC*);
     typedef HRESULT (__stdcall* PFNBUFFERLOCKPROC)(void*, UINT, UINT, BYTE**, DWORD);
 
     BYTE*                      data_ptr   = nullptr;
-    D3D8::D3DVERTEXBUFFER_DESC desc       = {};
+    Interception::Hooks::D3D8::D3DVERTEXBUFFER_DESC desc       = {};
     HRESULT                    hresult    = E_FAIL;
     LockRecord                 record     = {};
     bool                       result     = false;
@@ -322,17 +322,17 @@ bool APIDumpReplayer::D3D8LockReplayer::lock_rect(const APIDumpLoader::DumpedAPI
                                                   const LockKey&                      in_key,
                                                   std::string*                        out_error_ptr)
 {
-    typedef HRESULT (__stdcall* PFNCUBELOCKPROC)   (void*, UINT, UINT, D3D8::D3DLOCKED_RECT*, const RECT*, DWORD);
-    typedef HRESULT (__stdcall* PFNLEVELDESCPROC)  (void*, UINT, D3D8::D3DSURFACE_DESC*);
-    typedef HRESULT (__stdcall* PFNLEVELLOCKPROC)  (void*, UINT, D3D8::D3DLOCKED_RECT*, const RECT*, DWORD);
-    typedef HRESULT (__stdcall* PFNSURFACEDESCPROC)(void*, D3D8::D3DSURFACE_DESC*);
-    typedef HRESULT (__stdcall* PFNSURFACELOCKPROC)(void*, D3D8::D3DLOCKED_RECT*, const RECT*, DWORD);
+    typedef HRESULT (__stdcall* PFNCUBELOCKPROC)   (void*, UINT, UINT, Interception::Hooks::D3D8::D3DLOCKED_RECT*, const RECT*, DWORD);
+    typedef HRESULT (__stdcall* PFNLEVELDESCPROC)  (void*, UINT, Interception::Hooks::D3D8::D3DSURFACE_DESC*);
+    typedef HRESULT (__stdcall* PFNLEVELLOCKPROC)  (void*, UINT, Interception::Hooks::D3D8::D3DLOCKED_RECT*, const RECT*, DWORD);
+    typedef HRESULT (__stdcall* PFNSURFACEDESCPROC)(void*, Interception::Hooks::D3D8::D3DSURFACE_DESC*);
+    typedef HRESULT (__stdcall* PFNSURFACELOCKPROC)(void*, Interception::Hooks::D3D8::D3DLOCKED_RECT*, const RECT*, DWORD);
 
-    D3D8::D3DSURFACE_DESC desc       = {};
+    Interception::Hooks::D3D8::D3DSURFACE_DESC desc       = {};
     const uint32_t        face       = std::get<1>(in_key);
     HRESULT               hresult    = E_FAIL;
     const uint32_t        level      = std::get<2>(in_key);
-    D3D8::D3DLOCKED_RECT  locked     = {};
+    Interception::Hooks::D3D8::D3DLOCKED_RECT  locked     = {};
     LockRecord            record     = {};
     RECT                  rect       = {};
     const RECT*           rect_ptr   = nullptr;
@@ -403,11 +403,11 @@ bool APIDumpReplayer::D3D8LockReplayer::lock_rect(const APIDumpLoader::DumpedAPI
                                                                                      &desc);
     }
 
-    D3D8::Utils::get_surface_region_layout(desc.Format,
-                                           (rect_ptr != nullptr) ? static_cast<uint32_t>(rect.right  - rect.left) : desc.Width,
-                                           (rect_ptr != nullptr) ? static_cast<uint32_t>(rect.bottom - rect.top)  : desc.Height,
-                                          &record.n_rows,
-                                          &record.n_row_bytes);
+    Interception::Core::D3D8Utils::get_surface_region_layout(desc.Format,
+                                                             (rect_ptr != nullptr) ? static_cast<uint32_t>(rect.right  - rect.left) : desc.Width,
+                                                             (rect_ptr != nullptr) ? static_cast<uint32_t>(rect.bottom - rect.top)  : desc.Height,
+                                                            &record.n_rows,
+                                                            &record.n_row_bytes);
 
     record.depth            = 1;
     record.dumped_row_pitch = get_dumped_int32(*m_context_ptr,
@@ -471,7 +471,7 @@ bool APIDumpReplayer::D3D8LockReplayer::unlock(const APIDumpLoader::DumpedAPICal
             const LockRecord& record = iterator->second;
 
             if (data_ptr != nullptr &&
-                (record.flags & D3D8::D3DLOCK_READONLY) == 0)
+                (record.flags & Interception::Hooks::D3D8::D3DLOCK_READONLY) == 0)
             {
                 if (spec_ptr->kind == LockKind::BUFFER)
                 {

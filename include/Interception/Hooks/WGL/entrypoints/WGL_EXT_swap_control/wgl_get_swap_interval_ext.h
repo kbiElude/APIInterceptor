@@ -7,9 +7,15 @@
 
 #include <windows.h>
 
-namespace WGL
+namespace Interception
 {
-    int WINAPI get_swap_interval_ext();
+    namespace Hooks
+    {
+        namespace WGL
+        {
+            int WINAPI get_swap_interval_ext();
+        }
+    }
 }
 
 #endif /* WGL_GET_SWAP_INTERVAL_EXT_H */

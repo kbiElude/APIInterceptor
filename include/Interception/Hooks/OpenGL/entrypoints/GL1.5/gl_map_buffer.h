@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void *AI_APIENTRY aiMapBuffer(GLenum target,
-                                  GLenum access);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void *AI_APIENTRY aiMapBuffer(GLenum target,
+                                          GLenum access);
+        }
+    }
 }
 
 #endif /* AI_GL_MAP_BUFFER_H */

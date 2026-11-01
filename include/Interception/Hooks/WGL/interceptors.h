@@ -8,9 +8,15 @@
 #include "Common/globals.h"
 #include <vector>
 
-namespace WGL
+namespace Interception
 {
-    extern std::vector<APIInterceptor::FunctionInterceptor> get_function_interceptors();
+    namespace Hooks
+    {
+        namespace WGL
+        {
+            extern std::vector<APIInterceptor::FunctionInterceptor> get_function_interceptors();
+        }
+    }
 }
 
 #endif /* WGL_INTERCEPTORS_H */

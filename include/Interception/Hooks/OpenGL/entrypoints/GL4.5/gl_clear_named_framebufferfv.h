@@ -7,9 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiClearNamedFramebufferfv(GLuint framebuffer, GLenum buffer, GLint drawbuffer, const GLfloat* value);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiClearNamedFramebufferfv(GLuint         framebuffer,
+                                                       GLenum         buffer,
+                                                       GLint          drawbuffer,
+                                                       const GLfloat* value);
+        }
+    }
 }
 
 #endif /* AI_GL_CLEAR_NAMED_FRAMEBUFFERFV_H */

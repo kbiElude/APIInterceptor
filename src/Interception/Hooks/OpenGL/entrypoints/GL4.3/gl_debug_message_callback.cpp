@@ -10,8 +10,8 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDebugMessageCallback(GLDEBUGPROC callback,
-                                                const void* userParam)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDebugMessageCallback(GLDEBUGPROC callback,
+                                                                     const void* userParam)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -48,8 +48,8 @@ void AI_APIENTRY OpenGL::aiDebugMessageCallback(GLDEBUGPROC callback,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDEBUGMESSAGECALLBACKPROC>(OpenGL::g_cached_gl_debug_message_callback)(callback,
-                                                                                                     userParam);
+        reinterpret_cast<PFNGLDEBUGMESSAGECALLBACKPROC>(Interception::Hooks::OpenGL::g_cached_gl_debug_message_callback)(callback,
+                                                                                                                          userParam);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDEBUGMESSAGECALLBACK,

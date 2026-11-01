@@ -9,7 +9,7 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-GLboolean AI_APIENTRY OpenGL::aiIsQuery(GLuint id)
+GLboolean AI_APIENTRY Interception::Hooks::OpenGL::aiIsQuery(GLuint id)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -45,7 +45,7 @@ GLboolean AI_APIENTRY OpenGL::aiIsQuery(GLuint id)
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNGLISQUERYPROC>(OpenGL::g_cached_gl_is_query)(id);
+        result = reinterpret_cast<PFNGLISQUERYPROC>(Interception::Hooks::OpenGL::g_cached_gl_is_query)(id);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLISQUERY,

@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiPixelZoom(GLfloat xfactor,
-                                 GLfloat yfactor);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiPixelZoom(GLfloat xfactor,
+                                         GLfloat yfactor);
+        }
+    }
 }
 
 #endif /* AI_GL_PIXEL_ZOOM_H */

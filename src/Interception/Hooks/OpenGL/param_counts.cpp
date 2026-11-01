@@ -18,7 +18,7 @@ static constexpr GLenum COMPAT_GL_SRC1_RGB                  = 0x8581;
 static constexpr GLenum COMPAT_GL_SRC2_ALPHA                = 0x858A;
 static constexpr GLenum COMPAT_GL_SRC2_RGB                  = 0x8582;
 
-uint32_t OpenGL::Utils::get_n_call_lists_type_bytes(const GLenum& in_type)
+uint32_t Interception::Hooks::OpenGL::Utils::get_n_call_lists_type_bytes(const GLenum& in_type)
 {
     uint32_t result = 1;
 
@@ -37,14 +37,14 @@ uint32_t OpenGL::Utils::get_n_call_lists_type_bytes(const GLenum& in_type)
 
         default:
         {
-            AI_ASSERT_FAIL();
+            AI_FAIL_UNSUPPORTED(in_type);
         }
     }
 
     return result;
 }
 
-uint32_t OpenGL::Utils::get_n_clear_buffer_values(const GLenum& in_buffer)
+uint32_t Interception::Hooks::OpenGL::Utils::get_n_clear_buffer_values(const GLenum& in_buffer)
 {
     uint32_t result = 1;
 
@@ -56,14 +56,14 @@ uint32_t OpenGL::Utils::get_n_clear_buffer_values(const GLenum& in_buffer)
 
         default:
         {
-            AI_ASSERT_FAIL();
+            AI_FAIL_UNSUPPORTED(in_buffer);
         }
     }
 
     return result;
 }
 
-uint32_t OpenGL::Utils::get_n_fog_params(const GLenum& in_pname)
+uint32_t Interception::Hooks::OpenGL::Utils::get_n_fog_params(const GLenum& in_pname)
 {
     uint32_t result = 1;
 
@@ -85,14 +85,14 @@ uint32_t OpenGL::Utils::get_n_fog_params(const GLenum& in_pname)
 
         default:
         {
-            AI_ASSERT_FAIL();
+            AI_FAIL_UNSUPPORTED(in_pname);
         }
     }
 
     return result;
 }
 
-uint32_t OpenGL::Utils::get_n_light_model_params(const GLenum& in_pname)
+uint32_t Interception::Hooks::OpenGL::Utils::get_n_light_model_params(const GLenum& in_pname)
 {
     uint32_t result = 1;
 
@@ -111,14 +111,14 @@ uint32_t OpenGL::Utils::get_n_light_model_params(const GLenum& in_pname)
 
         default:
         {
-            AI_ASSERT_FAIL();
+            AI_FAIL_UNSUPPORTED(in_pname);
         }
     }
 
     return result;
 }
 
-uint32_t OpenGL::Utils::get_n_light_params(const GLenum& in_pname)
+uint32_t Interception::Hooks::OpenGL::Utils::get_n_light_params(const GLenum& in_pname)
 {
     uint32_t result = 1;
 
@@ -149,16 +149,16 @@ uint32_t OpenGL::Utils::get_n_light_params(const GLenum& in_pname)
 
         default:
         {
-            AI_ASSERT_FAIL();
+            AI_FAIL_UNSUPPORTED(in_pname);
         }
     }
 
     return result;
 }
 
-uint32_t OpenGL::Utils::get_n_map1_values(const GLenum& in_target,
-                                          const GLint&  in_stride,
-                                          const GLint&  in_order)
+uint32_t Interception::Hooks::OpenGL::Utils::get_n_map1_values(const GLenum& in_target,
+                                                               const GLint&  in_stride,
+                                                               const GLint&  in_order)
 {
     uint32_t result = 0;
 
@@ -171,11 +171,11 @@ uint32_t OpenGL::Utils::get_n_map1_values(const GLenum& in_target,
     return result;
 }
 
-uint32_t OpenGL::Utils::get_n_map2_values(const GLenum& in_target,
-                                          const GLint&  in_ustride,
-                                          const GLint&  in_uorder,
-                                          const GLint&  in_vstride,
-                                          const GLint&  in_vorder)
+uint32_t Interception::Hooks::OpenGL::Utils::get_n_map2_values(const GLenum& in_target,
+                                                               const GLint&  in_ustride,
+                                                               const GLint&  in_uorder,
+                                                               const GLint&  in_vstride,
+                                                               const GLint&  in_vorder)
 {
     uint32_t result = 0;
 
@@ -192,7 +192,7 @@ uint32_t OpenGL::Utils::get_n_map2_values(const GLenum& in_target,
     return result;
 }
 
-uint32_t OpenGL::Utils::get_n_map_components(const GLenum& in_target)
+uint32_t Interception::Hooks::OpenGL::Utils::get_n_map_components(const GLenum& in_target)
 {
     uint32_t result = 1;
 
@@ -219,14 +219,14 @@ uint32_t OpenGL::Utils::get_n_map_components(const GLenum& in_target)
 
         default:
         {
-            AI_ASSERT_FAIL();
+            AI_FAIL_UNSUPPORTED(in_target);
         }
     }
 
     return result;
 }
 
-uint32_t OpenGL::Utils::get_n_material_params(const GLenum& in_pname)
+uint32_t Interception::Hooks::OpenGL::Utils::get_n_material_params(const GLenum& in_pname)
 {
     uint32_t result = 1;
 
@@ -248,14 +248,14 @@ uint32_t OpenGL::Utils::get_n_material_params(const GLenum& in_pname)
 
         default:
         {
-            AI_ASSERT_FAIL();
+            AI_FAIL_UNSUPPORTED(in_pname);
         }
     }
 
     return result;
 }
 
-uint32_t OpenGL::Utils::get_n_patch_parameter_values(const GLenum& in_pname)
+uint32_t Interception::Hooks::OpenGL::Utils::get_n_patch_parameter_values(const GLenum& in_pname)
 {
     uint32_t result = 1;
 
@@ -266,15 +266,15 @@ uint32_t OpenGL::Utils::get_n_patch_parameter_values(const GLenum& in_pname)
 
         default:
         {
-            AI_ASSERT_FAIL();
+            AI_FAIL_UNSUPPORTED(in_pname);
         }
     }
 
     return result;
 }
 
-uint32_t OpenGL::Utils::get_n_tex_env_params(const GLenum& in_target,
-                                             const GLenum& in_pname)
+uint32_t Interception::Hooks::OpenGL::Utils::get_n_tex_env_params(const GLenum& in_target,
+                                                                  const GLenum& in_pname)
 {
     uint32_t result = 1;
 
@@ -320,7 +320,7 @@ uint32_t OpenGL::Utils::get_n_tex_env_params(const GLenum& in_target,
 
                 default:
                 {
-                    AI_ASSERT_FAIL();
+                    AI_FAIL_UNSUPPORTED(in_pname);
                 }
             }
 
@@ -338,14 +338,14 @@ uint32_t OpenGL::Utils::get_n_tex_env_params(const GLenum& in_target,
 
         default:
         {
-            AI_ASSERT_FAIL();
+            AI_FAIL_UNSUPPORTED(in_target);
         }
     }
 
     return result;
 }
 
-uint32_t OpenGL::Utils::get_n_tex_gen_params(const GLenum& in_pname)
+uint32_t Interception::Hooks::OpenGL::Utils::get_n_tex_gen_params(const GLenum& in_pname)
 {
     uint32_t result = 1;
 
@@ -363,14 +363,14 @@ uint32_t OpenGL::Utils::get_n_tex_gen_params(const GLenum& in_pname)
 
         default:
         {
-            AI_ASSERT_FAIL();
+            AI_FAIL_UNSUPPORTED(in_pname);
         }
     }
 
     return result;
 }
 
-uint32_t OpenGL::Utils::get_n_texture_parameter_params(const GLenum& in_pname)
+uint32_t Interception::Hooks::OpenGL::Utils::get_n_texture_parameter_params(const GLenum& in_pname)
 {
     uint32_t result = 1;
 
@@ -413,7 +413,7 @@ uint32_t OpenGL::Utils::get_n_texture_parameter_params(const GLenum& in_pname)
 
         default:
         {
-            AI_ASSERT_FAIL();
+            AI_FAIL_UNSUPPORTED(in_pname);
         }
     }
 

@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetBufferParameteri64v(GLenum   target,
-                                                  GLenum   pname,
-                                                  GLint64* params)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetBufferParameteri64v(GLenum   target,
+                                                                       GLenum   pname,
+                                                                       GLint64* params)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -25,8 +25,8 @@ void AI_APIENTRY OpenGL::aiGetBufferParameteri64v(GLenum   target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glGetBufferParameteri64v(target=[%s] pname=[%s] params=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  params);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETBUFFERPARAMETERI64V,
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiGetBufferParameteri64v(GLenum   target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETBUFFERPARAMETERI64VPROC>(OpenGL::g_cached_gl_get_buffer_parameteri64v)(target,
-                                                                                                        pname,
-                                                                                                        params);
+        reinterpret_cast<PFNGLGETBUFFERPARAMETERI64VPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_buffer_parameteri64v)(target,
+                                                                                                                             pname,
+                                                                                                                             params);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETBUFFERPARAMETERI64V,

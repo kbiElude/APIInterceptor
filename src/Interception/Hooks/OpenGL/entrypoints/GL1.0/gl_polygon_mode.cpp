@@ -11,8 +11,8 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiPolygonMode(GLenum face,
-                                       GLenum mode)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiPolygonMode(GLenum face,
+                                                            GLenum mode)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -24,8 +24,8 @@ void AI_APIENTRY OpenGL::aiPolygonMode(GLenum face,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glPolygonMode(face=[%s] mode=[%s])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(face),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(mode) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(face),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(mode) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLPOLYGONMODE,
                                                          &pre_callback_func_ptr,

@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetNamedRenderbufferParameteriv(GLuint renderbuffer,
-                                                           GLenum pname,
-                                                           GLint* params)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetNamedRenderbufferParameteriv(GLuint renderbuffer,
+                                                                                GLenum pname,
+                                                                                GLint* params)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -26,7 +26,7 @@ void AI_APIENTRY OpenGL::aiGetNamedRenderbufferParameteriv(GLuint renderbuffer,
     {
         AI_TRACE("glGetNamedRenderbufferParameteriv(renderbuffer=[%u] pname=[%s] params=[%p])",
                  renderbuffer,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  params);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETNAMEDRENDERBUFFERPARAMETERIV,
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiGetNamedRenderbufferParameteriv(GLuint renderbuffer,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETNAMEDRENDERBUFFERPARAMETERIVPROC>(OpenGL::g_cached_gl_get_named_renderbuffer_parameteriv)(renderbuffer,
-                                                                                                                          pname,
-                                                                                                                          params);
+        reinterpret_cast<PFNGLGETNAMEDRENDERBUFFERPARAMETERIVPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_named_renderbuffer_parameteriv)(renderbuffer,
+                                                                                                                                               pname,
+                                                                                                                                               params);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETNAMEDRENDERBUFFERPARAMETERIV,

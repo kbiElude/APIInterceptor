@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiBeginTransformFeedback(GLenum primitiveMode);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiBeginTransformFeedback(GLenum primitiveMode);
+        }
+    }
 }
 
 #endif /* AI_GL_BEGIN_TRANSFORM_FEEDBACK_H */

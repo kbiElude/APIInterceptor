@@ -7,11 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetMapiv(GLenum target,
-                                GLenum query,
-                                GLint* v);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetMapiv(GLenum target,
+                                        GLenum query,
+                                        GLint* v);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_MAP_IV_H */

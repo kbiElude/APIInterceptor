@@ -4,7 +4,7 @@
  */
 #include "Interception/Hooks/D3D8/success_traits.h"
 
-bool D3D8::SuccessTraits<long>::is_success(const long& in_value)
+bool Interception::Hooks::D3D8::SuccessTraits<long>::is_success(const long& in_value)
 {
     return SUCCEEDED(in_value);
 }

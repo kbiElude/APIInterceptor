@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiEdgeFlagPointer(GLsizei       stride,
-                                       const GLvoid* pointer);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiEdgeFlagPointer(GLsizei       stride,
+                                               const GLvoid* pointer);
+        }
+    }
 }
 
 #endif /* AI_GL_EDGE_FLAG_POINTER_H */

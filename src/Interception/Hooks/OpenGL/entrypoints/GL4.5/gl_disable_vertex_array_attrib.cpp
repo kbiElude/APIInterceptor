@@ -10,8 +10,8 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDisableVertexArrayAttrib(GLuint vaobj,
-                                                    GLuint index)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDisableVertexArrayAttrib(GLuint vaobj,
+                                                                         GLuint index)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -48,8 +48,8 @@ void AI_APIENTRY OpenGL::aiDisableVertexArrayAttrib(GLuint vaobj,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDISABLEVERTEXARRAYATTRIBPROC>(OpenGL::g_cached_gl_disable_vertex_array_attrib)(vaobj,
-                                                                                                            index);
+        reinterpret_cast<PFNGLDISABLEVERTEXARRAYATTRIBPROC>(Interception::Hooks::OpenGL::g_cached_gl_disable_vertex_array_attrib)(vaobj,
+                                                                                                                                 index);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDISABLEVERTEXARRAYATTRIB,

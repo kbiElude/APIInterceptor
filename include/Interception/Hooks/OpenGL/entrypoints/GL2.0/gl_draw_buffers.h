@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiDrawBuffers(GLsizei       n,
-                                   const GLenum* bufs);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiDrawBuffers(GLsizei       n,
+                                           const GLenum* bufs);
+        }
+    }
 }
 
 #endif /* AI_GL_DRAW_BUFFERS_H */

@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiPopDebugGroup(void);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiPopDebugGroup(void);
+        }
+    }
 }
 
 #endif /* AI_GL_POP_DEBUG_GROUP_H */

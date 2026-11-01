@@ -12,10 +12,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiTransformFeedbackVaryings(GLuint               program,
-                                                     GLsizei              count,
-                                                     const GLchar* const* varyings,
-                                                     GLenum               bufferMode)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiTransformFeedbackVaryings(GLuint               program,
+                                                                          GLsizei              count,
+                                                                          const GLchar* const* varyings,
+                                                                          GLenum               bufferMode)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -23,9 +23,9 @@ void AI_APIENTRY OpenGL::aiTransformFeedbackVaryings(GLuint               progra
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
     APIInterceptor::Tracker                 tracker;
-    OpenGL::StringArrayChunk                varyings_chunk(varyings,
-                                                           count,
-                                                           nullptr);
+    Interception::Hooks::OpenGL::StringArrayChunk                varyings_chunk(varyings,
+                                                                                count,
+                                                                                nullptr);
 
     if (tracker.is_top_level_api_call() )
     {
@@ -33,7 +33,7 @@ void AI_APIENTRY OpenGL::aiTransformFeedbackVaryings(GLuint               progra
                  program,
                  static_cast<int32_t>(count),
                  varyings,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(bufferMode) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(bufferMode) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTRANSFORMFEEDBACKVARYINGS,
                                                          &pre_callback_func_ptr,
@@ -59,10 +59,10 @@ void AI_APIENTRY OpenGL::aiTransformFeedbackVaryings(GLuint               progra
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLTRANSFORMFEEDBACKVARYINGSPROC>(OpenGL::g_cached_gl_transform_feedback_varyings)(program,
-                                                                                                             count,
-                                                                                                             varyings,
-                                                                                                             bufferMode);
+        reinterpret_cast<PFNGLTRANSFORMFEEDBACKVARYINGSPROC>(Interception::Hooks::OpenGL::g_cached_gl_transform_feedback_varyings)(program,
+                                                                                                                                  count,
+                                                                                                                                  varyings,
+                                                                                                                                  bufferMode);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTRANSFORMFEEDBACKVARYINGS,

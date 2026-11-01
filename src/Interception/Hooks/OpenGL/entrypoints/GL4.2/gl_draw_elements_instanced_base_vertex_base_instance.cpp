@@ -12,21 +12,21 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDrawElementsInstancedBaseVertexBaseInstance(GLenum      mode,
-                                                                       GLsizei     count,
-                                                                       GLenum      type,
-                                                                       const void* indices,
-                                                                       GLsizei     instancecount,
-                                                                       GLint       basevertex,
-                                                                       GLuint      baseinstance)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDrawElementsInstancedBaseVertexBaseInstance(GLenum      mode,
+                                                                                            GLsizei     count,
+                                                                                            GLenum      type,
+                                                                                            const void* indices,
+                                                                                            GLsizei     instancecount,
+                                                                                            GLint       basevertex,
+                                                                                            GLuint      baseinstance)
 {
-    OpenGL::ClientArrayChunk                client_arrays_chunk;
-    void*                                   post_callback_func_arg = nullptr;
-    APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
-    void*                                   pre_callback_func_arg  = nullptr;
-    APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
-    bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    Interception::Hooks::OpenGL::ClientArrayChunk client_arrays_chunk;
+    void*                                         post_callback_func_arg = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC       post_callback_func_ptr = nullptr;
+    void*                                         pre_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC        pre_callback_func_ptr  = nullptr;
+    bool                                          should_pass_through    = true;
+    APIInterceptor::Tracker                       tracker;
 
     client_arrays_chunk.add_elements(count,
                                      type,
@@ -39,9 +39,9 @@ void AI_APIENTRY OpenGL::aiDrawElementsInstancedBaseVertexBaseInstance(GLenum   
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glDrawElementsInstancedBaseVertexBaseInstance(mode=[%s] count=[%d] type=[%s] indices=[%p] instancecount=[%d] basevertex=[%d] baseinstance=[%u])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(mode),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(mode),
                  static_cast<int32_t>(count),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(type),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type),
                  indices,
                  static_cast<int32_t>(instancecount),
                  basevertex,
@@ -75,13 +75,13 @@ void AI_APIENTRY OpenGL::aiDrawElementsInstancedBaseVertexBaseInstance(GLenum   
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXBASEINSTANCEPROC>(OpenGL::g_cached_gl_draw_elements_instanced_base_vertex_base_instance)(mode,
-                                                                                                                                                      count,
-                                                                                                                                                      type,
-                                                                                                                                                      indices,
-                                                                                                                                                      instancecount,
-                                                                                                                                                      basevertex,
-                                                                                                                                                      baseinstance);
+        reinterpret_cast<PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXBASEINSTANCEPROC>(Interception::Hooks::OpenGL::g_cached_gl_draw_elements_instanced_base_vertex_base_instance)(mode,
+                                                                                                                                                                           count,
+                                                                                                                                                                           type,
+                                                                                                                                                                           indices,
+                                                                                                                                                                           instancecount,
+                                                                                                                                                                           basevertex,
+                                                                                                                                                                           baseinstance);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDRAWELEMENTSINSTANCEDBASEVERTEXBASEINSTANCE,

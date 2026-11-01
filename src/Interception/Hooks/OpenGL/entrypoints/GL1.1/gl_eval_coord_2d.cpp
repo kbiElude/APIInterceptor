@@ -11,8 +11,8 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiEvalCoord2d(GLdouble u,
-                                       GLdouble v)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiEvalCoord2d(GLdouble u,
+                                                            GLdouble v)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -49,8 +49,8 @@ void AI_APIENTRY OpenGL::aiEvalCoord2d(GLdouble u,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLEVALCOORD2DPROC>(OpenGL::g_cached_gl_eval_coord_2d)(u,
-                                                                                  v);
+        reinterpret_cast<PFNGLEVALCOORD2DPROC>(Interception::Hooks::OpenGL::g_cached_gl_eval_coord_2d)(u,
+                                                                                                       v);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLEVALCOORD2D,

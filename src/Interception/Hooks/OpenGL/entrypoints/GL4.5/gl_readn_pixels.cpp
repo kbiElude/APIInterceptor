@@ -11,14 +11,14 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiReadnPixels(GLint   x,
-                                       GLint   y,
-                                       GLsizei width,
-                                       GLsizei height,
-                                       GLenum  format,
-                                       GLenum  type,
-                                       GLsizei bufSize,
-                                       void*   data)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiReadnPixels(GLint   x,
+                                                            GLint   y,
+                                                            GLsizei width,
+                                                            GLsizei height,
+                                                            GLenum  format,
+                                                            GLenum  type,
+                                                            GLsizei bufSize,
+                                                            void*   data)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -34,8 +34,8 @@ void AI_APIENTRY OpenGL::aiReadnPixels(GLint   x,
                  y,
                  static_cast<int32_t>(width),
                  static_cast<int32_t>(height),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(format),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(type),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(format),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type),
                  static_cast<int32_t>(bufSize),
                  data);
 
@@ -67,14 +67,14 @@ void AI_APIENTRY OpenGL::aiReadnPixels(GLint   x,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLREADNPIXELSPROC>(OpenGL::g_cached_gl_readn_pixels)(x,
-                                                                                 y,
-                                                                                 width,
-                                                                                 height,
-                                                                                 format,
-                                                                                 type,
-                                                                                 bufSize,
-                                                                                 data);
+        reinterpret_cast<PFNGLREADNPIXELSPROC>(Interception::Hooks::OpenGL::g_cached_gl_readn_pixels)(x,
+                                                                                                      y,
+                                                                                                      width,
+                                                                                                      height,
+                                                                                                      format,
+                                                                                                      type,
+                                                                                                      bufSize,
+                                                                                                      data);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLREADNPIXELS,

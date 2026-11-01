@@ -10,9 +10,9 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiShaderStorageBlockBinding(GLuint program,
-                                                     GLuint storageBlockIndex,
-                                                     GLuint storageBlockBinding)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiShaderStorageBlockBinding(GLuint program,
+                                                                          GLuint storageBlockIndex,
+                                                                          GLuint storageBlockBinding)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -51,9 +51,9 @@ void AI_APIENTRY OpenGL::aiShaderStorageBlockBinding(GLuint program,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLSHADERSTORAGEBLOCKBINDINGPROC>(OpenGL::g_cached_gl_shader_storage_block_binding)(program,
-                                                                                                                storageBlockIndex,
-                                                                                                                storageBlockBinding);
+        reinterpret_cast<PFNGLSHADERSTORAGEBLOCKBINDINGPROC>(Interception::Hooks::OpenGL::g_cached_gl_shader_storage_block_binding)(program,
+                                                                                                                                     storageBlockIndex,
+                                                                                                                                     storageBlockBinding);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLSHADERSTORAGEBLOCKBINDING,

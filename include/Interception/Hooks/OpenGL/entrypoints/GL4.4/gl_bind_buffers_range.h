@@ -7,14 +7,20 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiBindBuffersRange(GLenum           target,
-                                        GLuint           first,
-                                        GLsizei          count,
-                                        const GLuint*    buffers,
-                                        const GLintptr*  offsets,
-                                        const GLsizeiptr* sizes);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiBindBuffersRange(GLenum            target,
+                                                GLuint            first,
+                                                GLsizei           count,
+                                                const GLuint*     buffers,
+                                                const GLintptr*   offsets,
+                                                const GLsizeiptr* sizes);
+        }
+    }
 }
 
 #endif /* AI_GL_BIND_BUFFERS_RANGE_H */

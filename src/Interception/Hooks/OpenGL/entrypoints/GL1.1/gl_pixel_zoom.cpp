@@ -11,8 +11,8 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiPixelZoom(GLfloat xfactor,
-                                     GLfloat yfactor)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiPixelZoom(GLfloat xfactor,
+                                                          GLfloat yfactor)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -49,8 +49,8 @@ void AI_APIENTRY OpenGL::aiPixelZoom(GLfloat xfactor,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLPIXELZOOMPROC>(OpenGL::g_cached_gl_pixel_zoom)(xfactor,
-                                                                             yfactor);
+        reinterpret_cast<PFNGLPIXELZOOMPROC>(Interception::Hooks::OpenGL::g_cached_gl_pixel_zoom)(xfactor,
+                                                                                                  yfactor);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLPIXELZOOM,

@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiStencilOpSeparate(GLenum face,
-                                             GLenum sfail,
-                                             GLenum dpfail,
-                                             GLenum dppass)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiStencilOpSeparate(GLenum face,
+                                                                  GLenum sfail,
+                                                                  GLenum dpfail,
+                                                                  GLenum dppass)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -26,10 +26,10 @@ void AI_APIENTRY OpenGL::aiStencilOpSeparate(GLenum face,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glStencilOpSeparate(face=[%s] sfail=[%s] dpfail=[%s] dppass=[%s])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(face),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(sfail),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(dpfail),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(dppass) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(face),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(sfail),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(dpfail),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(dppass) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLSTENCILOPSEPARATE,
                                                          &pre_callback_func_ptr,
@@ -55,10 +55,10 @@ void AI_APIENTRY OpenGL::aiStencilOpSeparate(GLenum face,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLSTENCILOPSEPARATEPROC>(OpenGL::g_cached_gl_stencil_op_separate)(face,
-                                                                                              sfail,
-                                                                                              dpfail,
-                                                                                              dppass);
+        reinterpret_cast<PFNGLSTENCILOPSEPARATEPROC>(Interception::Hooks::OpenGL::g_cached_gl_stencil_op_separate)(face,
+                                                                                                                   sfail,
+                                                                                                                   dpfail,
+                                                                                                                   dppass);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLSTENCILOPSEPARATE,

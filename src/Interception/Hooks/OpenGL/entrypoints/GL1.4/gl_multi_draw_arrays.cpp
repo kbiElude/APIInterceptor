@@ -12,20 +12,20 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiMultiDrawArrays(GLenum         mode,
-                                           const GLint*   first,
-                                           const GLsizei* count,
-                                           GLsizei        drawcount)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiMultiDrawArrays(GLenum         mode,
+                                                                const GLint*   first,
+                                                                const GLsizei* count,
+                                                                GLsizei        drawcount)
 {
-    OpenGL::ClientArrayChunk                client_arrays_chunk;
-    uint32_t                                count_chunk_id         = 0;
-    uint32_t                                first_chunk_id         = 0;
-    void*                                   post_callback_func_arg = nullptr;
-    APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
-    void*                                   pre_callback_func_arg  = nullptr;
-    APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
-    bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    Interception::Hooks::OpenGL::ClientArrayChunk client_arrays_chunk;
+    uint32_t                                      count_chunk_id         = 0;
+    uint32_t                                      first_chunk_id         = 0;
+    void*                                         post_callback_func_arg = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC       post_callback_func_ptr = nullptr;
+    void*                                         pre_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC        pre_callback_func_ptr  = nullptr;
+    bool                                          should_pass_through    = true;
+    APIInterceptor::Tracker                       tracker;
 
     client_arrays_chunk.add_multi_arrays(first,
                                          count,
@@ -34,7 +34,7 @@ void AI_APIENTRY OpenGL::aiMultiDrawArrays(GLenum         mode,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glMultiDrawArrays(mode=[%s] first=[%p] count=[%p] drawcount=[%d])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(mode),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(mode),
                  first,
                  count,
                  static_cast<int32_t>(drawcount) );

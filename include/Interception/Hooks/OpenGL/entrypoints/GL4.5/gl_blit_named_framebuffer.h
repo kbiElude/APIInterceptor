@@ -7,9 +7,26 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiBlitNamedFramebuffer(GLuint readFramebuffer, GLuint drawFramebuffer, GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiBlitNamedFramebuffer(GLuint     readFramebuffer,
+                                                    GLuint     drawFramebuffer,
+                                                    GLint      srcX0,
+                                                    GLint      srcY0,
+                                                    GLint      srcX1,
+                                                    GLint      srcY1,
+                                                    GLint      dstX0,
+                                                    GLint      dstY0,
+                                                    GLint      dstX1,
+                                                    GLint      dstY1,
+                                                    GLbitfield mask,
+                                                    GLenum     filter);
+        }
+    }
 }
 
 #endif /* AI_GL_BLIT_NAMED_FRAMEBUFFER_H */

@@ -7,13 +7,19 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiCopyPixels(GLint   x,
-                                  GLint   y,
-                                  GLsizei width,
-                                  GLsizei height,
-                                  GLenum  type);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiCopyPixels(GLint   x,
+                                          GLint   y,
+                                          GLsizei width,
+                                          GLsizei height,
+                                          GLenum  type);
+        }
+    }
 }
 
 #endif /* AI_GL_COPY_PIXELS_H */

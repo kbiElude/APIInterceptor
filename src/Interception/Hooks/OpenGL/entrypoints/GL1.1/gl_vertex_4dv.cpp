@@ -11,7 +11,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiVertex4dv(const GLdouble* v)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiVertex4dv(const GLdouble* v)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -50,7 +50,7 @@ void AI_APIENTRY OpenGL::aiVertex4dv(const GLdouble* v)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLVERTEX4DVPROC>(OpenGL::g_cached_gl_vertex_4dv)(v);
+        reinterpret_cast<PFNGLVERTEX4DVPROC>(Interception::Hooks::OpenGL::g_cached_gl_vertex_4dv)(v);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLVERTEX4DV,

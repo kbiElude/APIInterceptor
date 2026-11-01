@@ -46,11 +46,11 @@ namespace APIDumpPrinter
 
         static std::string format_boolean            (const int32_t&             in_value);
         static std::string format_color              (const uint32_t&            in_value);
-        static std::string format_color_value        (const D3D8::D3DCOLORVALUE& in_value);
-        static std::string format_enum               (const D3D8::ValueKind&     in_kind,
-                                                      const uint32_t&            in_value);
-        static std::string format_flags              (const D3D8::ValueKind&     in_kind,
-                                                      const uint32_t&            in_value);
+        static std::string format_color_value        (const Interception::Hooks::D3D8::D3DCOLORVALUE& in_value);
+        static std::string format_enum               (const Interception::Hooks::D3D8::ValueKind&     in_kind,
+                                                                           const uint32_t&            in_value);
+        static std::string format_flags              (const Interception::Hooks::D3D8::ValueKind&     in_kind,
+                                                                           const uint32_t&            in_value);
         static std::string format_fvf                (const uint32_t&            in_value);
         static std::string format_hex                (const uint32_t&            in_value);
         static std::string format_hresult            (const int32_t&             in_value);
@@ -62,9 +62,9 @@ namespace APIDumpPrinter
                                                       const uint32_t&            in_value);
 
         /* Returns false if the structure is not decoded (e.g. the chunk has an unexpected size). */
-        static bool format_struct(const D3D8::ValueKind&      in_kind,
-                                  const std::vector<uint8_t>& in_chunk_u8_vec,
-                                  std::string*                out_text_ptr);
+        static bool format_struct(const Interception::Hooks::D3D8::ValueKind&      in_kind,
+                                                       const std::vector<uint8_t>& in_chunk_u8_vec,
+                                                       std::string*                out_text_ptr);
 
         std::map<const void*, std::string> m_object_name_map;
         std::map<std::string, uint32_t>    m_n_created_objects_map; /* by type name */

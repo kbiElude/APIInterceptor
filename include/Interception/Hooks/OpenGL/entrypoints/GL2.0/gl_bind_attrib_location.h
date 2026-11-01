@@ -7,11 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiBindAttribLocation(GLuint  program,
-                                          GLuint  index,
-                                          GLchar* name);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiBindAttribLocation(GLuint  program,
+                                                  GLuint  index,
+                                                  GLchar* name);
+        }
+    }
 }
 
 #endif /* AI_GL_BIND_ATTRIB_LOCATION_H */

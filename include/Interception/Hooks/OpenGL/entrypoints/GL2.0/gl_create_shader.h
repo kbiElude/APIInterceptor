@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    GLuint AI_APIENTRY aiCreateShader(GLenum type);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            GLuint AI_APIENTRY aiCreateShader(GLenum type);
+        }
+    }
 }
 
 #endif /* AI_GL_CREATE_SHADER_H */

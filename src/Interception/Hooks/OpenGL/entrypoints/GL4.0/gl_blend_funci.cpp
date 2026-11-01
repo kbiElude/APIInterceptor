@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiBlendFunci(GLuint buf,
-                                      GLenum src,
-                                      GLenum dst)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiBlendFunci(GLuint buf,
+                                                           GLenum src,
+                                                           GLenum dst)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -26,8 +26,8 @@ void AI_APIENTRY OpenGL::aiBlendFunci(GLuint buf,
     {
         AI_TRACE("glBlendFunci(buf=[%u] src=[%s] dst=[%s])",
                  buf,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(src),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(dst) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(src),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(dst) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBLENDFUNCI,
                                                          &pre_callback_func_ptr,
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiBlendFunci(GLuint buf,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLBLENDFUNCIPROC>(OpenGL::g_cached_gl_blend_funci)(buf,
-                                                                               src,
-                                                                               dst);
+        reinterpret_cast<PFNGLBLENDFUNCIPROC>(Interception::Hooks::OpenGL::g_cached_gl_blend_funci)(buf,
+                                                                                                    src,
+                                                                                                    dst);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBLENDFUNCI,

@@ -10,11 +10,11 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetActiveUniformName(GLuint   program,
-                                                GLuint   uniformIndex,
-                                                GLsizei  bufSize,
-                                                GLsizei* length,
-                                                GLchar*  uniformName)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetActiveUniformName(GLuint   program,
+                                                                     GLuint   uniformIndex,
+                                                                     GLsizei  bufSize,
+                                                                     GLsizei* length,
+                                                                     GLchar*  uniformName)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -57,11 +57,11 @@ void AI_APIENTRY OpenGL::aiGetActiveUniformName(GLuint   program,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETACTIVEUNIFORMNAMEPROC>(OpenGL::g_cached_gl_get_active_uniform_name)(program,
-                                                                                                     uniformIndex,
-                                                                                                     bufSize,
-                                                                                                     length,
-                                                                                                     uniformName);
+        reinterpret_cast<PFNGLGETACTIVEUNIFORMNAMEPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_active_uniform_name)(program,
+                                                                                                                          uniformIndex,
+                                                                                                                          bufSize,
+                                                                                                                          length,
+                                                                                                                          uniformName);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETACTIVEUNIFORMNAME,

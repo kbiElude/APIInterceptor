@@ -7,12 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiRects(GLshort x1,
-                             GLshort y1,
-                             GLshort x2,
-                             GLshort y2);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiRects(GLshort x1,
+                                     GLshort y1,
+                                     GLshort x2,
+                                     GLshort y2);
+        }
+    }
 }
 
 #endif /* AI_GL_RECT_S_H */

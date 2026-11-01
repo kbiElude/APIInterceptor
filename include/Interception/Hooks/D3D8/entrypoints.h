@@ -9,9 +9,15 @@
 
 #include "Interception/Hooks/D3D8/types.h"
 
-namespace D3D8
+namespace Interception
 {
-    IDirect3D8* __stdcall aiDirect3DCreate8(UINT in_sdk_version);
+    namespace Hooks
+    {
+        namespace D3D8
+        {
+            IDirect3D8* __stdcall aiDirect3DCreate8(UINT in_sdk_version);
+        }
+    }
 }
 
 #endif /* D3D8_ENTRYPOINTS_H */

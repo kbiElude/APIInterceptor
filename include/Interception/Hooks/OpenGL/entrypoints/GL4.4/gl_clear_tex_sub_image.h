@@ -7,19 +7,25 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiClearTexSubImage(GLuint      texture,
-                                        GLint       level,
-                                        GLint       xoffset,
-                                        GLint       yoffset,
-                                        GLint       zoffset,
-                                        GLsizei     width,
-                                        GLsizei     height,
-                                        GLsizei     depth,
-                                        GLenum      format,
-                                        GLenum      type,
-                                        const void* data);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiClearTexSubImage(GLuint      texture,
+                                                GLint       level,
+                                                GLint       xoffset,
+                                                GLint       yoffset,
+                                                GLint       zoffset,
+                                                GLsizei     width,
+                                                GLsizei     height,
+                                                GLsizei     depth,
+                                                GLenum      format,
+                                                GLenum      type,
+                                                const void* data);
+        }
+    }
 }
 
 #endif /* AI_GL_CLEAR_TEX_SUB_IMAGE_H */

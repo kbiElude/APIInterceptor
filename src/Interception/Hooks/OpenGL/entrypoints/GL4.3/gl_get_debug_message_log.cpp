@@ -11,14 +11,14 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-GLuint AI_APIENTRY OpenGL::aiGetDebugMessageLog(GLuint   count,
-                                                GLsizei  bufSize,
-                                                GLenum*  sources,
-                                                GLenum*  types,
-                                                GLuint*  ids,
-                                                GLenum*  severities,
-                                                GLsizei* lengths,
-                                                GLchar*  messageLog)
+GLuint AI_APIENTRY Interception::Hooks::OpenGL::aiGetDebugMessageLog(GLuint   count,
+                                                                     GLsizei  bufSize,
+                                                                     GLenum*  sources,
+                                                                     GLenum*  types,
+                                                                     GLuint*  ids,
+                                                                     GLenum*  severities,
+                                                                     GLsizei* lengths,
+                                                                     GLchar*  messageLog)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -66,14 +66,14 @@ GLuint AI_APIENTRY OpenGL::aiGetDebugMessageLog(GLuint   count,
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNGLGETDEBUGMESSAGELOGPROC>(OpenGL::g_cached_gl_get_debug_message_log)(count,
-                                                                                                           bufSize,
-                                                                                                           sources,
-                                                                                                           types,
-                                                                                                           ids,
-                                                                                                           severities,
-                                                                                                           lengths,
-                                                                                                           messageLog);
+        result = reinterpret_cast<PFNGLGETDEBUGMESSAGELOGPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_debug_message_log)(count,
+                                                                                                                                bufSize,
+                                                                                                                                sources,
+                                                                                                                                types,
+                                                                                                                                ids,
+                                                                                                                                severities,
+                                                                                                                                lengths,
+                                                                                                                                messageLog);
     }
 
     if (tracker.is_top_level_api_call() )

@@ -14,11 +14,11 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetTexImage(GLenum target,
-                                       GLint  level,
-                                       GLenum format,
-                                       GLenum type,
-                                       void*  pixels)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetTexImage(GLenum target,
+                                                            GLint  level,
+                                                            GLenum format,
+                                                            GLenum type,
+                                                            void*  pixels)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -30,10 +30,10 @@ void AI_APIENTRY OpenGL::aiGetTexImage(GLenum target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glGetTexImage(target=[%s] level=[%d] format=[%s] type=[%s] pixels=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  level,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(format),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(type),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(format),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type),
                  pixels);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETTEXIMAGE,
@@ -61,19 +61,19 @@ void AI_APIENTRY OpenGL::aiGetTexImage(GLenum target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETTEXIMAGEPROC>(OpenGL::g_cached_gl_get_tex_image)(target,
-                                                                                  level,
-                                                                                  format,
-                                                                                  type,
-                                                                                  pixels);
+        reinterpret_cast<PFNGLGETTEXIMAGEPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_tex_image)(target,
+                                                                                                       level,
+                                                                                                       format,
+                                                                                                       type,
+                                                                                                       pixels);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETTEXIMAGE,
                                                       &post_callback_func_ptr,
                                                       &post_callback_func_arg) )
     {
-        OpenGL::PixelDataChunk pixels_chunk;
-        TextureBindingTarget   binding_target;
+        Interception::Hooks::OpenGL::PixelDataChunk pixels_chunk;
+        TextureBindingTarget                        binding_target;
 
         if (Utils::get_texture_binding_target_for_gl_enum(target, &binding_target) )
         {
@@ -84,12 +84,12 @@ void AI_APIENTRY OpenGL::aiGetTexImage(GLenum target,
 
             AI_ASSERT(level_props.width != 0);
 
-            pixels_chunk = OpenGL::PixelDataChunk::create_for_pack(pixels,
-                                                                   level_props.width,
-                                                                   (level_props.height != 0) ? level_props.height : 1,
-                                                                   (level_props.depth  != 0) ? level_props.depth  : 1,
-                                                                   format,
-                                                                   type);
+            pixels_chunk = Interception::Hooks::OpenGL::PixelDataChunk::create_for_pack(pixels,
+                                                                                        level_props.width,
+                                                                                        (level_props.height != 0) ? level_props.height : 1,
+                                                                                        (level_props.depth  != 0) ? level_props.depth  : 1,
+                                                                                        format,
+                                                                                        type);
         }
 
         {

@@ -7,20 +7,26 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    namespace Utils
+    namespace Hooks
     {
-        bool     get_buffer_binding_target_for_gl_enum (const GLenum&         in_target,
-                                                        BufferBindingTarget*  out_result_ptr);
-        bool     get_texture_binding_target_for_gl_enum(const GLenum&         in_target,
-                                                        TextureBindingTarget* out_result_ptr);
-        bool     is_packed_pixel_type                  (const GLenum&         in_type);
-        uint32_t get_n_bytes_for_type                  (const GLenum&         in_type);
-        uint32_t get_n_components_for_format           (const GLenum&         in_format);
-        uint32_t get_n_texel_bytes                     (const GLenum&         in_format,
-                                                        const GLenum&         in_type);
+        namespace OpenGL
+        {
+            namespace Utils
+            {
+                bool     get_buffer_binding_target_for_gl_enum (const GLenum&         in_target,
+                                                                BufferBindingTarget*  out_result_ptr);
+                bool     get_texture_binding_target_for_gl_enum(const GLenum&         in_target,
+                                                                TextureBindingTarget* out_result_ptr);
+                bool     is_packed_pixel_type                  (const GLenum&         in_type);
+                uint32_t get_n_bytes_for_type                  (const GLenum&         in_type);
+                uint32_t get_n_components_for_format           (const GLenum&         in_format);
+                uint32_t get_n_texel_bytes                     (const GLenum&         in_format,
+                                                                const GLenum&         in_type);
+            }
+        }
     }
-};
+}
 
 #endif /* AI_UTILS_H */

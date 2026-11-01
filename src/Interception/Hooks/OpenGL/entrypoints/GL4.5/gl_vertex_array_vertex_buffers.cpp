@@ -11,12 +11,12 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiVertexArrayVertexBuffers(GLuint          vaobj,
-                                                    GLuint          first,
-                                                    GLsizei         count,
-                                                    const GLuint*   buffers,
-                                                    const GLintptr* offsets,
-                                                    const GLsizei*  strides)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiVertexArrayVertexBuffers(GLuint          vaobj,
+                                                                         GLuint          first,
+                                                                         GLsizei         count,
+                                                                         const GLuint*   buffers,
+                                                                         const GLintptr* offsets,
+                                                                         const GLsizei*  strides)
 {
     APIInterceptor::MemoryChunk             buffers_chunk(buffers,
                                                           count,
@@ -70,12 +70,12 @@ void AI_APIENTRY OpenGL::aiVertexArrayVertexBuffers(GLuint          vaobj,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLVERTEXARRAYVERTEXBUFFERSPROC>(OpenGL::g_cached_gl_vertex_array_vertex_buffers)(vaobj,
-                                                                                                            first,
-                                                                                                            count,
-                                                                                                            buffers,
-                                                                                                            offsets,
-                                                                                                            strides);
+        reinterpret_cast<PFNGLVERTEXARRAYVERTEXBUFFERSPROC>(Interception::Hooks::OpenGL::g_cached_gl_vertex_array_vertex_buffers)(vaobj,
+                                                                                                                                 first,
+                                                                                                                                 count,
+                                                                                                                                 buffers,
+                                                                                                                                 offsets,
+                                                                                                                                 strides);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLVERTEXARRAYVERTEXBUFFERS,

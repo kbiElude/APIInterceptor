@@ -7,9 +7,24 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetCompressedTextureSubImage(GLuint texture, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLsizei bufSize, void* pixels);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetCompressedTextureSubImage(GLuint  texture,
+                                                            GLint   level,
+                                                            GLint   xoffset,
+                                                            GLint   yoffset,
+                                                            GLint   zoffset,
+                                                            GLsizei width,
+                                                            GLsizei height,
+                                                            GLsizei depth,
+                                                            GLsizei bufSize,
+                                                            void*   pixels);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_COMPRESSED_TEXTURE_SUB_IMAGE_H */

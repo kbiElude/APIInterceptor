@@ -13,17 +13,17 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiMultiDrawElementsBaseVertex(GLenum             mode,
-                                                       const GLsizei*     count,
-                                                       GLenum             type,
-                                                       const void* const* indices,
-                                                       GLsizei            drawcount,
-                                                       const GLint*       basevertex)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiMultiDrawElementsBaseVertex(GLenum             mode,
+                                                                            const GLsizei*     count,
+                                                                            GLenum             type,
+                                                                            const void* const* indices,
+                                                                            GLsizei            drawcount,
+                                                                            const GLint*       basevertex)
 {
     APIInterceptor::MemoryChunk             base_vertex_chunk(basevertex,
                                                               drawcount,
                                                               sizeof(GLint));
-    OpenGL::ClientArrayChunk                client_arrays_chunk;
+    Interception::Hooks::OpenGL::ClientArrayChunk                client_arrays_chunk;
     APIInterceptor::MemoryChunk             count_chunk(count,
                                                         drawcount,
                                                         sizeof(GLsizei));
@@ -43,9 +43,9 @@ void AI_APIENTRY OpenGL::aiMultiDrawElementsBaseVertex(GLenum             mode,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glMultiDrawElementsBaseVertex(mode=[%s] count=[%p] type=[%s] indices=[%p] drawcount=[%d] basevertex=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(mode),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(mode),
                  count,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(type),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type),
                  indices,
                  static_cast<int32_t>(drawcount),
                  basevertex);
@@ -77,12 +77,12 @@ void AI_APIENTRY OpenGL::aiMultiDrawElementsBaseVertex(GLenum             mode,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLMULTIDRAWELEMENTSBASEVERTEXPROC>(OpenGL::g_cached_gl_multi_draw_elements_base_vertex)(mode,
-                                                                                                                    count,
-                                                                                                                    type,
-                                                                                                                    indices,
-                                                                                                                    drawcount,
-                                                                                                                    basevertex);
+        reinterpret_cast<PFNGLMULTIDRAWELEMENTSBASEVERTEXPROC>(Interception::Hooks::OpenGL::g_cached_gl_multi_draw_elements_base_vertex)(mode,
+                                                                                                                                         count,
+                                                                                                                                         type,
+                                                                                                                                         indices,
+                                                                                                                                         drawcount,
+                                                                                                                                         basevertex);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMULTIDRAWELEMENTSBASEVERTEX,

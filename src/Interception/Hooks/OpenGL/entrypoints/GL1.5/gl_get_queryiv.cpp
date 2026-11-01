@@ -10,9 +10,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetQueryiv(GLenum target,
-                                      GLenum pname,
-                                      GLint* params)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetQueryiv(GLenum target,
+                                                           GLenum pname,
+                                                           GLint* params)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -24,8 +24,8 @@ void AI_APIENTRY OpenGL::aiGetQueryiv(GLenum target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glGetQueryiv(target=[%s] pname=[%s] params=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  params);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETQUERYIV,
@@ -51,9 +51,9 @@ void AI_APIENTRY OpenGL::aiGetQueryiv(GLenum target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETQUERYIVPROC>(OpenGL::g_cached_gl_get_queryiv)(target,
-                                                                               pname,
-                                                                               params);
+        reinterpret_cast<PFNGLGETQUERYIVPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_queryiv)(target,
+                                                                                                    pname,
+                                                                                                    params);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETQUERYIV,

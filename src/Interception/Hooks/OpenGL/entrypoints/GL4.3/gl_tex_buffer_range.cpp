@@ -11,11 +11,11 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiTexBufferRange(GLenum     target,
-                                          GLenum     internalformat,
-                                          GLuint     buffer,
-                                          GLintptr   offset,
-                                          GLsizeiptr size)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiTexBufferRange(GLenum     target,
+                                                               GLenum     internalformat,
+                                                               GLuint     buffer,
+                                                               GLintptr   offset,
+                                                               GLsizeiptr size)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -27,8 +27,8 @@ void AI_APIENTRY OpenGL::aiTexBufferRange(GLenum     target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glTexBufferRange(target=[%s] internalformat=[%s] buffer=[%u] offset=[%d] size=[%d])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(internalformat),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(internalformat),
                  buffer,
                  static_cast<int32_t>(offset),
                  static_cast<int32_t>(size));
@@ -58,11 +58,11 @@ void AI_APIENTRY OpenGL::aiTexBufferRange(GLenum     target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLTEXBUFFERRANGEPROC>(OpenGL::g_cached_gl_tex_buffer_range)(target,
-                                                                                         internalformat,
-                                                                                         buffer,
-                                                                                         offset,
-                                                                                         size);
+        reinterpret_cast<PFNGLTEXBUFFERRANGEPROC>(Interception::Hooks::OpenGL::g_cached_gl_tex_buffer_range)(target,
+                                                                                                              internalformat,
+                                                                                                              buffer,
+                                                                                                              offset,
+                                                                                                              size);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTEXBUFFERRANGE,

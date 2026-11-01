@@ -7,12 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetShaderSource(GLuint   shader,
-                                       GLsizei  bufSize,
-                                       GLsizei* length,
-                                       GLchar*  source);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetShaderSource(GLuint   shader,
+                                               GLsizei  bufSize,
+                                               GLsizei* length,
+                                               GLchar*  source);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_SHADER_SOURCE_H */

@@ -7,9 +7,15 @@
 
 #include <windows.h>
 
-namespace GDI32
+namespace Interception
 {
-    const char* convert_pixel_format_descriptor_to_raw_string(const PIXELFORMATDESCRIPTOR* in_pixel_format_descriptor_ptr);
+    namespace Hooks
+    {
+        namespace GDI32
+        {
+            const char* convert_pixel_format_descriptor_to_raw_string(const PIXELFORMATDESCRIPTOR* in_pixel_format_descriptor_ptr);
+        }
+    }
 }
 
 #endif /* GDI32_UTILS_TRACE_H */

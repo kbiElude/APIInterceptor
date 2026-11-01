@@ -4,7 +4,7 @@
  */
 #include "Interception/Hooks/OpenGL/buffer_offset_or_memory_chunk.h"
 
-OpenGL::BufferOffsetOrMemoryChunk::BufferOffsetOrMemoryChunk()
+Interception::Hooks::OpenGL::BufferOffsetOrMemoryChunk::BufferOffsetOrMemoryChunk()
     :m_chunk           (nullptr,
                         0,
                         sizeof(uint8_t) ),
@@ -14,9 +14,9 @@ OpenGL::BufferOffsetOrMemoryChunk::BufferOffsetOrMemoryChunk()
     /* Stub */
 }
 
-OpenGL::BufferOffsetOrMemoryChunk::BufferOffsetOrMemoryChunk(const void*     in_ptr,
-                                                             const uint64_t& in_n_bytes,
-                                                             const bool&     in_is_buffer_offset)
+Interception::Hooks::OpenGL::BufferOffsetOrMemoryChunk::BufferOffsetOrMemoryChunk(const void*     in_ptr,
+                                                                                  const uint64_t& in_n_bytes,
+                                                                                  const bool&     in_is_buffer_offset)
     :m_chunk           (in_ptr,
                         static_cast<int64_t>(in_n_bytes),
                         sizeof(uint8_t) ),
@@ -26,7 +26,7 @@ OpenGL::BufferOffsetOrMemoryChunk::BufferOffsetOrMemoryChunk(const void*     in_
     /* Stub */
 }
 
-APIInterceptor::APIFunctionArgument OpenGL::BufferOffsetOrMemoryChunk::get_arg()
+APIInterceptor::APIFunctionArgument Interception::Hooks::OpenGL::BufferOffsetOrMemoryChunk::get_arg()
 {
     APIInterceptor::APIFunctionArgument result;
 

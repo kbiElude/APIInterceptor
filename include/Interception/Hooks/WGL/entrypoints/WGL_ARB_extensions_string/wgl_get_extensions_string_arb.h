@@ -7,9 +7,15 @@
 
 #include <windows.h>
 
-namespace WGL
+namespace Interception
 {
-    const char* WINAPI get_extensions_string_arb(HDC in_hdc);
+    namespace Hooks
+    {
+        namespace WGL
+        {
+            const char* WINAPI get_extensions_string_arb(HDC in_hdc);
+        }
+    }
 }
 
 #endif /* WGL_CREATE_CONTEXT_ATTRIBS_ARB_H */

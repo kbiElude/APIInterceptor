@@ -7,9 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiAlphaFunc(GLenum func, GLclampf ref);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiAlphaFunc(GLenum   func,
+                                         GLclampf ref);
+        }
+    }
 }
 
 #endif /* AI_GL_ALPHA_FUNC_H */

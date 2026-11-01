@@ -7,15 +7,15 @@
 #include "d3d8_names.h"
 #include "Interception/Hooks/D3D8/types.h"
 
-#define D3D8_FLAG_NAME(flag)          {static_cast<uint32_t>(D3D8::flag), #flag}
+#define D3D8_FLAG_NAME(flag)          {static_cast<uint32_t>(Interception::Hooks::D3D8::flag), #flag}
 #define D3D8_NAMED_VALUE(name, value) {name, value}
-#define D3D8_VALUE_NAME(enumerator)   {#enumerator, static_cast<uint32_t>(D3D8::enumerator)}
+#define D3D8_VALUE_NAME(enumerator)   {#enumerator, static_cast<uint32_t>(Interception::Hooks::D3D8::enumerator)}
 
 #define D3D8_TABLE(array) array, static_cast<uint32_t>(sizeof(array) / sizeof(array[0]) )
 
-bool APIDumpPrinter::get_flag_name_table(const D3D8::ValueKind& in_kind,
-                                         const FlagNameEntry**  out_table_ptr_ptr,
-                                         uint32_t*              out_n_entries_ptr)
+bool APIDumpPrinter::get_flag_name_table(const Interception::Hooks::D3D8::ValueKind& in_kind,
+                                                              const FlagNameEntry**  out_table_ptr_ptr,
+                                                              uint32_t*              out_n_entries_ptr)
 {
     static const FlagNameEntry clear_flag_name_array[] =
     {
@@ -67,28 +67,28 @@ bool APIDumpPrinter::get_flag_name_table(const D3D8::ValueKind& in_kind,
 
     switch (in_kind)
     {
-        case D3D8::ValueKind::CLEAR_FLAGS:
+        case Interception::Hooks::D3D8::ValueKind::CLEAR_FLAGS:
         {
             set_table_func(D3D8_TABLE(clear_flag_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::CREATE_FLAGS:
+        case Interception::Hooks::D3D8::ValueKind::CREATE_FLAGS:
         {
             set_table_func(D3D8_TABLE(create_flag_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::LOCK_FLAGS:
+        case Interception::Hooks::D3D8::ValueKind::LOCK_FLAGS:
         {
             set_table_func(D3D8_TABLE(lock_flag_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::USAGE_FLAGS:
+        case Interception::Hooks::D3D8::ValueKind::USAGE_FLAGS:
         {
             set_table_func(D3D8_TABLE(usage_flag_name_array) );
 
@@ -215,7 +215,7 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
 
     switch (in_render_state)
     {
-        case D3D8::D3DRS_ZENABLE:
+        case Interception::Hooks::D3D8::D3DRS_ZENABLE:
         {
             set_info_func(StateValueFormat::NAME,
                           D3D8_TABLE(z_buffer_type_name_array) );
@@ -223,7 +223,7 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
             break;
         }
 
-        case D3D8::D3DRS_FILLMODE:
+        case Interception::Hooks::D3D8::D3DRS_FILLMODE:
         {
             set_info_func(StateValueFormat::NAME,
                           D3D8_TABLE(fill_mode_name_array) );
@@ -231,7 +231,7 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
             break;
         }
 
-        case D3D8::D3DRS_SHADEMODE:
+        case Interception::Hooks::D3D8::D3DRS_SHADEMODE:
         {
             set_info_func(StateValueFormat::NAME,
                           D3D8_TABLE(shade_mode_name_array) );
@@ -239,8 +239,8 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
             break;
         }
 
-        case D3D8::D3DRS_SRCBLEND:
-        case D3D8::D3DRS_DESTBLEND:
+        case Interception::Hooks::D3D8::D3DRS_SRCBLEND:
+        case Interception::Hooks::D3D8::D3DRS_DESTBLEND:
         {
             set_info_func(StateValueFormat::NAME,
                           D3D8_TABLE(blend_name_array) );
@@ -248,7 +248,7 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
             break;
         }
 
-        case D3D8::D3DRS_CULLMODE:
+        case Interception::Hooks::D3D8::D3DRS_CULLMODE:
         {
             set_info_func(StateValueFormat::NAME,
                           D3D8_TABLE(cull_name_array) );
@@ -256,9 +256,9 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
             break;
         }
 
-        case D3D8::D3DRS_ZFUNC:
-        case D3D8::D3DRS_ALPHAFUNC:
-        case D3D8::D3DRS_STENCILFUNC:
+        case Interception::Hooks::D3D8::D3DRS_ZFUNC:
+        case Interception::Hooks::D3D8::D3DRS_ALPHAFUNC:
+        case Interception::Hooks::D3D8::D3DRS_STENCILFUNC:
         {
             set_info_func(StateValueFormat::NAME,
                           D3D8_TABLE(cmp_func_name_array) );
@@ -266,9 +266,9 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
             break;
         }
 
-        case D3D8::D3DRS_STENCILFAIL:
-        case D3D8::D3DRS_STENCILZFAIL:
-        case D3D8::D3DRS_STENCILPASS:
+        case Interception::Hooks::D3D8::D3DRS_STENCILFAIL:
+        case Interception::Hooks::D3D8::D3DRS_STENCILZFAIL:
+        case Interception::Hooks::D3D8::D3DRS_STENCILPASS:
         {
             set_info_func(StateValueFormat::NAME,
                           D3D8_TABLE(stencil_op_name_array) );
@@ -276,8 +276,8 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
             break;
         }
 
-        case D3D8::D3DRS_FOGTABLEMODE:
-        case D3D8::D3DRS_FOGVERTEXMODE:
+        case Interception::Hooks::D3D8::D3DRS_FOGTABLEMODE:
+        case Interception::Hooks::D3D8::D3DRS_FOGVERTEXMODE:
         {
             set_info_func(StateValueFormat::NAME,
                           D3D8_TABLE(fog_mode_name_array) );
@@ -285,10 +285,10 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
             break;
         }
 
-        case D3D8::D3DRS_DIFFUSEMATERIALSOURCE:
-        case D3D8::D3DRS_SPECULARMATERIALSOURCE:
-        case D3D8::D3DRS_AMBIENTMATERIALSOURCE:
-        case D3D8::D3DRS_EMISSIVEMATERIALSOURCE:
+        case Interception::Hooks::D3D8::D3DRS_DIFFUSEMATERIALSOURCE:
+        case Interception::Hooks::D3D8::D3DRS_SPECULARMATERIALSOURCE:
+        case Interception::Hooks::D3D8::D3DRS_AMBIENTMATERIALSOURCE:
+        case Interception::Hooks::D3D8::D3DRS_EMISSIVEMATERIALSOURCE:
         {
             set_info_func(StateValueFormat::NAME,
                           D3D8_TABLE(material_color_source_name_array) );
@@ -296,7 +296,7 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
             break;
         }
 
-        case D3D8::D3DRS_BLENDOP:
+        case Interception::Hooks::D3D8::D3DRS_BLENDOP:
         {
             set_info_func(StateValueFormat::NAME,
                           D3D8_TABLE(blend_op_name_array) );
@@ -304,27 +304,27 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
             break;
         }
 
-        case D3D8::D3DRS_ALPHABLENDENABLE:
-        case D3D8::D3DRS_ALPHATESTENABLE:
-        case D3D8::D3DRS_CLIPPING:
-        case D3D8::D3DRS_COLORVERTEX:
-        case D3D8::D3DRS_DITHERENABLE:
-        case D3D8::D3DRS_EDGEANTIALIAS:
-        case D3D8::D3DRS_FOGENABLE:
-        case D3D8::D3DRS_INDEXEDVERTEXBLENDENABLE:
-        case D3D8::D3DRS_LASTPIXEL:
-        case D3D8::D3DRS_LIGHTING:
-        case D3D8::D3DRS_LOCALVIEWER:
-        case D3D8::D3DRS_MULTISAMPLEANTIALIAS:
-        case D3D8::D3DRS_NORMALIZENORMALS:
-        case D3D8::D3DRS_POINTSCALEENABLE:
-        case D3D8::D3DRS_POINTSPRITEENABLE:
-        case D3D8::D3DRS_RANGEFOGENABLE:
-        case D3D8::D3DRS_SOFTWAREVERTEXPROCESSING:
-        case D3D8::D3DRS_SPECULARENABLE:
-        case D3D8::D3DRS_STENCILENABLE:
-        case D3D8::D3DRS_ZVISIBLE:
-        case D3D8::D3DRS_ZWRITEENABLE:
+        case Interception::Hooks::D3D8::D3DRS_ALPHABLENDENABLE:
+        case Interception::Hooks::D3D8::D3DRS_ALPHATESTENABLE:
+        case Interception::Hooks::D3D8::D3DRS_CLIPPING:
+        case Interception::Hooks::D3D8::D3DRS_COLORVERTEX:
+        case Interception::Hooks::D3D8::D3DRS_DITHERENABLE:
+        case Interception::Hooks::D3D8::D3DRS_EDGEANTIALIAS:
+        case Interception::Hooks::D3D8::D3DRS_FOGENABLE:
+        case Interception::Hooks::D3D8::D3DRS_INDEXEDVERTEXBLENDENABLE:
+        case Interception::Hooks::D3D8::D3DRS_LASTPIXEL:
+        case Interception::Hooks::D3D8::D3DRS_LIGHTING:
+        case Interception::Hooks::D3D8::D3DRS_LOCALVIEWER:
+        case Interception::Hooks::D3D8::D3DRS_MULTISAMPLEANTIALIAS:
+        case Interception::Hooks::D3D8::D3DRS_NORMALIZENORMALS:
+        case Interception::Hooks::D3D8::D3DRS_POINTSCALEENABLE:
+        case Interception::Hooks::D3D8::D3DRS_POINTSPRITEENABLE:
+        case Interception::Hooks::D3D8::D3DRS_RANGEFOGENABLE:
+        case Interception::Hooks::D3D8::D3DRS_SOFTWAREVERTEXPROCESSING:
+        case Interception::Hooks::D3D8::D3DRS_SPECULARENABLE:
+        case Interception::Hooks::D3D8::D3DRS_STENCILENABLE:
+        case Interception::Hooks::D3D8::D3DRS_ZVISIBLE:
+        case Interception::Hooks::D3D8::D3DRS_ZWRITEENABLE:
         {
             set_info_func(StateValueFormat::BOOLEAN,
                           nullptr,
@@ -333,9 +333,9 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
             break;
         }
 
-        case D3D8::D3DRS_AMBIENT:
-        case D3D8::D3DRS_FOGCOLOR:
-        case D3D8::D3DRS_TEXTUREFACTOR:
+        case Interception::Hooks::D3D8::D3DRS_AMBIENT:
+        case Interception::Hooks::D3D8::D3DRS_FOGCOLOR:
+        case Interception::Hooks::D3D8::D3DRS_TEXTUREFACTOR:
         {
             set_info_func(StateValueFormat::COLOR,
                           nullptr,
@@ -344,17 +344,17 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
             break;
         }
 
-        case D3D8::D3DRS_FOGDENSITY:
-        case D3D8::D3DRS_FOGEND:
-        case D3D8::D3DRS_FOGSTART:
-        case D3D8::D3DRS_PATCHSEGMENTS:
-        case D3D8::D3DRS_POINTSCALE_A:
-        case D3D8::D3DRS_POINTSCALE_B:
-        case D3D8::D3DRS_POINTSCALE_C:
-        case D3D8::D3DRS_POINTSIZE:
-        case D3D8::D3DRS_POINTSIZE_MAX:
-        case D3D8::D3DRS_POINTSIZE_MIN:
-        case D3D8::D3DRS_TWEENFACTOR:
+        case Interception::Hooks::D3D8::D3DRS_FOGDENSITY:
+        case Interception::Hooks::D3D8::D3DRS_FOGEND:
+        case Interception::Hooks::D3D8::D3DRS_FOGSTART:
+        case Interception::Hooks::D3D8::D3DRS_PATCHSEGMENTS:
+        case Interception::Hooks::D3D8::D3DRS_POINTSCALE_A:
+        case Interception::Hooks::D3D8::D3DRS_POINTSCALE_B:
+        case Interception::Hooks::D3D8::D3DRS_POINTSCALE_C:
+        case Interception::Hooks::D3D8::D3DRS_POINTSIZE:
+        case Interception::Hooks::D3D8::D3DRS_POINTSIZE_MAX:
+        case Interception::Hooks::D3D8::D3DRS_POINTSIZE_MIN:
+        case Interception::Hooks::D3D8::D3DRS_TWEENFACTOR:
         {
             set_info_func(StateValueFormat::FLOAT,
                           nullptr,
@@ -363,19 +363,19 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
             break;
         }
 
-        case D3D8::D3DRS_CLIPPLANEENABLE:
-        case D3D8::D3DRS_COLORWRITEENABLE:
-        case D3D8::D3DRS_MULTISAMPLEMASK:
-        case D3D8::D3DRS_STENCILMASK:
-        case D3D8::D3DRS_STENCILWRITEMASK:
-        case D3D8::D3DRS_WRAP0:
-        case D3D8::D3DRS_WRAP1:
-        case D3D8::D3DRS_WRAP2:
-        case D3D8::D3DRS_WRAP3:
-        case D3D8::D3DRS_WRAP4:
-        case D3D8::D3DRS_WRAP5:
-        case D3D8::D3DRS_WRAP6:
-        case D3D8::D3DRS_WRAP7:
+        case Interception::Hooks::D3D8::D3DRS_CLIPPLANEENABLE:
+        case Interception::Hooks::D3D8::D3DRS_COLORWRITEENABLE:
+        case Interception::Hooks::D3D8::D3DRS_MULTISAMPLEMASK:
+        case Interception::Hooks::D3D8::D3DRS_STENCILMASK:
+        case Interception::Hooks::D3D8::D3DRS_STENCILWRITEMASK:
+        case Interception::Hooks::D3D8::D3DRS_WRAP0:
+        case Interception::Hooks::D3D8::D3DRS_WRAP1:
+        case Interception::Hooks::D3D8::D3DRS_WRAP2:
+        case Interception::Hooks::D3D8::D3DRS_WRAP3:
+        case Interception::Hooks::D3D8::D3DRS_WRAP4:
+        case Interception::Hooks::D3D8::D3DRS_WRAP5:
+        case Interception::Hooks::D3D8::D3DRS_WRAP6:
+        case Interception::Hooks::D3D8::D3DRS_WRAP7:
         {
             set_info_func(StateValueFormat::HEX,
                           nullptr,
@@ -474,8 +474,8 @@ bool APIDumpPrinter::get_texture_stage_state_value_info(const uint32_t& in_textu
 
     switch (in_texture_stage_state)
     {
-        case D3D8::D3DTSS_COLOROP:
-        case D3D8::D3DTSS_ALPHAOP:
+        case Interception::Hooks::D3D8::D3DTSS_COLOROP:
+        case Interception::Hooks::D3D8::D3DTSS_ALPHAOP:
         {
             set_info_func(StateValueFormat::NAME,
                           D3D8_TABLE(texture_op_name_array) );
@@ -483,13 +483,13 @@ bool APIDumpPrinter::get_texture_stage_state_value_info(const uint32_t& in_textu
             break;
         }
 
-        case D3D8::D3DTSS_COLORARG0:
-        case D3D8::D3DTSS_COLORARG1:
-        case D3D8::D3DTSS_COLORARG2:
-        case D3D8::D3DTSS_ALPHAARG0:
-        case D3D8::D3DTSS_ALPHAARG1:
-        case D3D8::D3DTSS_ALPHAARG2:
-        case D3D8::D3DTSS_RESULTARG:
+        case Interception::Hooks::D3D8::D3DTSS_COLORARG0:
+        case Interception::Hooks::D3D8::D3DTSS_COLORARG1:
+        case Interception::Hooks::D3D8::D3DTSS_COLORARG2:
+        case Interception::Hooks::D3D8::D3DTSS_ALPHAARG0:
+        case Interception::Hooks::D3D8::D3DTSS_ALPHAARG1:
+        case Interception::Hooks::D3D8::D3DTSS_ALPHAARG2:
+        case Interception::Hooks::D3D8::D3DTSS_RESULTARG:
         {
             set_info_func(StateValueFormat::TEXTURE_ARGUMENT,
                           D3D8_TABLE(texture_argument_name_array) );
@@ -497,9 +497,9 @@ bool APIDumpPrinter::get_texture_stage_state_value_info(const uint32_t& in_textu
             break;
         }
 
-        case D3D8::D3DTSS_ADDRESSU:
-        case D3D8::D3DTSS_ADDRESSV:
-        case D3D8::D3DTSS_ADDRESSW:
+        case Interception::Hooks::D3D8::D3DTSS_ADDRESSU:
+        case Interception::Hooks::D3D8::D3DTSS_ADDRESSV:
+        case Interception::Hooks::D3D8::D3DTSS_ADDRESSW:
         {
             set_info_func(StateValueFormat::NAME,
                           D3D8_TABLE(texture_address_name_array) );
@@ -507,9 +507,9 @@ bool APIDumpPrinter::get_texture_stage_state_value_info(const uint32_t& in_textu
             break;
         }
 
-        case D3D8::D3DTSS_MAGFILTER:
-        case D3D8::D3DTSS_MINFILTER:
-        case D3D8::D3DTSS_MIPFILTER:
+        case Interception::Hooks::D3D8::D3DTSS_MAGFILTER:
+        case Interception::Hooks::D3D8::D3DTSS_MINFILTER:
+        case Interception::Hooks::D3D8::D3DTSS_MIPFILTER:
         {
             set_info_func(StateValueFormat::NAME,
                           D3D8_TABLE(texture_filter_name_array) );
@@ -517,7 +517,7 @@ bool APIDumpPrinter::get_texture_stage_state_value_info(const uint32_t& in_textu
             break;
         }
 
-        case D3D8::D3DTSS_TEXCOORDINDEX:
+        case Interception::Hooks::D3D8::D3DTSS_TEXCOORDINDEX:
         {
             set_info_func(StateValueFormat::TEX_COORD_INDEX,
                           nullptr,
@@ -526,7 +526,7 @@ bool APIDumpPrinter::get_texture_stage_state_value_info(const uint32_t& in_textu
             break;
         }
 
-        case D3D8::D3DTSS_TEXTURETRANSFORMFLAGS:
+        case Interception::Hooks::D3D8::D3DTSS_TEXTURETRANSFORMFLAGS:
         {
             set_info_func(StateValueFormat::TEXTURE_TRANSFORM_FLAGS,
                           nullptr,
@@ -535,7 +535,7 @@ bool APIDumpPrinter::get_texture_stage_state_value_info(const uint32_t& in_textu
             break;
         }
 
-        case D3D8::D3DTSS_BORDERCOLOR:
+        case Interception::Hooks::D3D8::D3DTSS_BORDERCOLOR:
         {
             set_info_func(StateValueFormat::COLOR,
                           nullptr,
@@ -544,13 +544,13 @@ bool APIDumpPrinter::get_texture_stage_state_value_info(const uint32_t& in_textu
             break;
         }
 
-        case D3D8::D3DTSS_BUMPENVLOFFSET:
-        case D3D8::D3DTSS_BUMPENVLSCALE:
-        case D3D8::D3DTSS_BUMPENVMAT00:
-        case D3D8::D3DTSS_BUMPENVMAT01:
-        case D3D8::D3DTSS_BUMPENVMAT10:
-        case D3D8::D3DTSS_BUMPENVMAT11:
-        case D3D8::D3DTSS_MIPMAPLODBIAS:
+        case Interception::Hooks::D3D8::D3DTSS_BUMPENVLOFFSET:
+        case Interception::Hooks::D3D8::D3DTSS_BUMPENVLSCALE:
+        case Interception::Hooks::D3D8::D3DTSS_BUMPENVMAT00:
+        case Interception::Hooks::D3D8::D3DTSS_BUMPENVMAT01:
+        case Interception::Hooks::D3D8::D3DTSS_BUMPENVMAT10:
+        case Interception::Hooks::D3D8::D3DTSS_BUMPENVMAT11:
+        case Interception::Hooks::D3D8::D3DTSS_MIPMAPLODBIAS:
         {
             set_info_func(StateValueFormat::FLOAT,
                           nullptr,
@@ -574,9 +574,9 @@ bool APIDumpPrinter::get_texture_stage_state_value_info(const uint32_t& in_textu
     return result;
 }
 
-bool APIDumpPrinter::get_value_name_table(const D3D8::ValueKind& in_kind,
-                                          const ValueNameEntry** out_table_ptr_ptr,
-                                          uint32_t*              out_n_entries_ptr)
+bool APIDumpPrinter::get_value_name_table(const Interception::Hooks::D3D8::ValueKind& in_kind,
+                                                               const ValueNameEntry** out_table_ptr_ptr,
+                                                               uint32_t*              out_n_entries_ptr)
 {
     static const ValueNameEntry back_buffer_type_name_array[] =
     {
@@ -875,112 +875,112 @@ bool APIDumpPrinter::get_value_name_table(const D3D8::ValueKind& in_kind,
 
     switch (in_kind)
     {
-        case D3D8::ValueKind::BACK_BUFFER_TYPE:
+        case Interception::Hooks::D3D8::ValueKind::BACK_BUFFER_TYPE:
         {
             set_table_func(D3D8_TABLE(back_buffer_type_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::BASIS_TYPE:
+        case Interception::Hooks::D3D8::ValueKind::BASIS_TYPE:
         {
             set_table_func(D3D8_TABLE(basis_type_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::CUBE_MAP_FACE:
+        case Interception::Hooks::D3D8::ValueKind::CUBE_MAP_FACE:
         {
             set_table_func(D3D8_TABLE(cube_map_face_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::DEVICE_TYPE:
+        case Interception::Hooks::D3D8::ValueKind::DEVICE_TYPE:
         {
             set_table_func(D3D8_TABLE(device_type_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::FORMAT:
+        case Interception::Hooks::D3D8::ValueKind::FORMAT:
         {
             set_table_func(D3D8_TABLE(format_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::LIGHT_TYPE:
+        case Interception::Hooks::D3D8::ValueKind::LIGHT_TYPE:
         {
             set_table_func(D3D8_TABLE(light_type_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::MULTI_SAMPLE_TYPE:
+        case Interception::Hooks::D3D8::ValueKind::MULTI_SAMPLE_TYPE:
         {
             set_table_func(D3D8_TABLE(multisample_type_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::ORDER_TYPE:
+        case Interception::Hooks::D3D8::ValueKind::ORDER_TYPE:
         {
             set_table_func(D3D8_TABLE(order_type_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::POOL:
+        case Interception::Hooks::D3D8::ValueKind::POOL:
         {
             set_table_func(D3D8_TABLE(pool_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::PRIMITIVE_TYPE:
+        case Interception::Hooks::D3D8::ValueKind::PRIMITIVE_TYPE:
         {
             set_table_func(D3D8_TABLE(primitive_type_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::RENDER_STATE_TYPE:
+        case Interception::Hooks::D3D8::ValueKind::RENDER_STATE_TYPE:
         {
             set_table_func(D3D8_TABLE(render_state_type_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::RESOURCE_TYPE:
+        case Interception::Hooks::D3D8::ValueKind::RESOURCE_TYPE:
         {
             set_table_func(D3D8_TABLE(resource_type_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::STATE_BLOCK_TYPE:
+        case Interception::Hooks::D3D8::ValueKind::STATE_BLOCK_TYPE:
         {
             set_table_func(D3D8_TABLE(state_block_type_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::SWAP_EFFECT:
+        case Interception::Hooks::D3D8::ValueKind::SWAP_EFFECT:
         {
             set_table_func(D3D8_TABLE(swap_effect_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::TEXTURE_STAGE_STATE_TYPE:
+        case Interception::Hooks::D3D8::ValueKind::TEXTURE_STAGE_STATE_TYPE:
         {
             set_table_func(D3D8_TABLE(texture_stage_state_type_name_array) );
 
             break;
         }
 
-        case D3D8::ValueKind::TRANSFORM_STATE_TYPE:
+        case Interception::Hooks::D3D8::ValueKind::TRANSFORM_STATE_TYPE:
         {
             set_table_func(D3D8_TABLE(transform_state_type_name_array) );
 

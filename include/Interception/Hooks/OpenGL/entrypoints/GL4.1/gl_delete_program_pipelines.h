@@ -7,9 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiDeleteProgramPipelines(GLsizei n, const GLuint* pipelines);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiDeleteProgramPipelines(GLsizei       n,
+                                                      const GLuint* pipelines);
+        }
+    }
 }
 
 #endif /* AI_GL_DELETE_PROGRAM_PIPELINES_H */

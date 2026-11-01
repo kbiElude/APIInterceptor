@@ -11,11 +11,11 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiVertexAttribFormat(GLuint    attribindex,
-                                              GLint     size,
-                                              GLenum    type,
-                                              GLboolean normalized,
-                                              GLuint    relativeoffset)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiVertexAttribFormat(GLuint    attribindex,
+                                                                   GLint     size,
+                                                                   GLenum    type,
+                                                                   GLboolean normalized,
+                                                                   GLuint    relativeoffset)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -29,7 +29,7 @@ void AI_APIENTRY OpenGL::aiVertexAttribFormat(GLuint    attribindex,
         AI_TRACE("glVertexAttribFormat(attribindex=[%u] size=[%d] type=[%s] normalized=[%u] relativeoffset=[%u])",
                  attribindex,
                  size,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(type),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type),
                  static_cast<uint32_t>(normalized),
                  relativeoffset);
 
@@ -58,11 +58,11 @@ void AI_APIENTRY OpenGL::aiVertexAttribFormat(GLuint    attribindex,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLVERTEXATTRIBFORMATPROC>(OpenGL::g_cached_gl_vertex_attrib_format)(attribindex,
-                                                                                                 size,
-                                                                                                 type,
-                                                                                                 normalized,
-                                                                                                 relativeoffset);
+        reinterpret_cast<PFNGLVERTEXATTRIBFORMATPROC>(Interception::Hooks::OpenGL::g_cached_gl_vertex_attrib_format)(attribindex,
+                                                                                                                      size,
+                                                                                                                      type,
+                                                                                                                      normalized,
+                                                                                                                      relativeoffset);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLVERTEXATTRIBFORMAT,

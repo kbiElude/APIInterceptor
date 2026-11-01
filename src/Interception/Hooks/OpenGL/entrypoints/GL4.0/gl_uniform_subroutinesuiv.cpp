@@ -12,9 +12,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiUniformSubroutinesuiv(GLenum        shadertype,
-                                                 GLsizei       count,
-                                                 const GLuint* indices)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiUniformSubroutinesuiv(GLenum        shadertype,
+                                                                      GLsizei       count,
+                                                                      const GLuint* indices)
 {
     APIInterceptor::MemoryChunk             indices_chunk(indices,
                                                           count,
@@ -29,7 +29,7 @@ void AI_APIENTRY OpenGL::aiUniformSubroutinesuiv(GLenum        shadertype,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glUniformSubroutinesuiv(shadertype=[%s] count=[%d] indices=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(shadertype),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(shadertype),
                  static_cast<int32_t>(count),
                  indices);
 
@@ -56,9 +56,9 @@ void AI_APIENTRY OpenGL::aiUniformSubroutinesuiv(GLenum        shadertype,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLUNIFORMSUBROUTINESUIVPROC>(OpenGL::g_cached_gl_uniform_subroutinesuiv)(shadertype,
-                                                                                                     count,
-                                                                                                     indices);
+        reinterpret_cast<PFNGLUNIFORMSUBROUTINESUIVPROC>(Interception::Hooks::OpenGL::g_cached_gl_uniform_subroutinesuiv)(shadertype,
+                                                                                                                          count,
+                                                                                                                          indices);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLUNIFORMSUBROUTINESUIV,

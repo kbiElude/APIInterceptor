@@ -14,12 +14,12 @@
 #include "Interception/Hooks/WGL/globals.h"
 #include <algorithm>
 
-void AI_APIENTRY OpenGL::aiTexStorage3D(GLenum  target,
-                                        GLsizei levels,
-                                        GLenum  internalformat,
-                                        GLsizei width,
-                                        GLsizei height,
-                                        GLsizei depth)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiTexStorage3D(GLenum  target,
+                                                             GLsizei levels,
+                                                             GLenum  internalformat,
+                                                             GLsizei width,
+                                                             GLsizei height,
+                                                             GLsizei depth)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -31,9 +31,9 @@ void AI_APIENTRY OpenGL::aiTexStorage3D(GLenum  target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glTexStorage3D(target=[%s] levels=[%d] internalformat=[%s] width=[%d] height=[%d] depth=[%d])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  static_cast<int32_t>(levels),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(internalformat),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(internalformat),
                  static_cast<int32_t>(width),
                  static_cast<int32_t>(height),
                  static_cast<int32_t>(depth) );
@@ -64,41 +64,47 @@ void AI_APIENTRY OpenGL::aiTexStorage3D(GLenum  target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLTEXSTORAGE3DPROC>(OpenGL::g_cached_gl_tex_storage3d)(target,
-                                                                                    levels,
-                                                                                    internalformat,
-                                                                                    width,
-                                                                                    height,
-                                                                                    depth);
+        reinterpret_cast<PFNGLTEXSTORAGE3DPROC>(Interception::Hooks::OpenGL::g_cached_gl_tex_storage3d)(target,
+                                                                                                         levels,
+                                                                                                         internalformat,
+                                                                                                         width,
+                                                                                                         height,
+                                                                                                         depth);
 
         TextureBindingTarget binding_target;
 
-        if (tracker.is_top_level_api_call                ()              &&
-            Utils::get_texture_binding_target_for_gl_enum(target,
-                                                         &binding_target) )
+        const bool is_top_level = tracker.is_top_level_api_call();
+
+        if (is_top_level)
         {
-            auto&        context    = get_context_state();
-            const GLuint texture_id = context.texture_manager.get_bound_texture(binding_target);
-            uint32_t     mip_width  = static_cast<uint32_t>(width);
-            uint32_t     mip_height = static_cast<uint32_t>(height);
-            uint32_t     mip_depth  = static_cast<uint32_t>(depth);
+            const bool is_binding_target_known = Utils::get_texture_binding_target_for_gl_enum(target,
+                                                                                               &binding_target);
 
-            for (GLsizei level = 0;
-                         level < levels;
-                       ++level)
+            if (is_binding_target_known)
             {
-                context.texture_manager.set_level_props(texture_id,
-                                                level,
-                                                mip_width,
-                                                mip_height,
-                                                mip_depth);
+                auto&        context    = get_context_state();
+                const GLuint texture_id = context.texture_manager.get_bound_texture(binding_target);
+                uint32_t     mip_width  = static_cast<uint32_t>(width);
+                uint32_t     mip_height = static_cast<uint32_t>(height);
+                uint32_t     mip_depth  = static_cast<uint32_t>(depth);
 
-                mip_width  = (std::max)(1u,
-                                      mip_width  / 2u);
-                mip_height = (std::max)(1u,
-                                      mip_height / 2u);
-                mip_depth  = (std::max)(1u,
-                                      mip_depth  / 2u);
+                for (GLsizei level = 0;
+                             level < levels;
+                           ++level)
+                {
+                    context.texture_manager.set_level_props(texture_id,
+                                                    level,
+                                                    mip_width,
+                                                    mip_height,
+                                                    mip_depth);
+
+                    mip_width  = (std::max)(1u,
+                                          mip_width  / 2u);
+                    mip_height = (std::max)(1u,
+                                          mip_height / 2u);
+                    mip_depth  = (std::max)(1u,
+                                          mip_depth  / 2u);
+                }
             }
         }
     }

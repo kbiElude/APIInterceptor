@@ -10,7 +10,7 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGenerateTextureMipmap(GLuint texture)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGenerateTextureMipmap(GLuint texture)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -45,7 +45,7 @@ void AI_APIENTRY OpenGL::aiGenerateTextureMipmap(GLuint texture)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGENERATETEXTUREMIPMAPPROC>(OpenGL::g_cached_gl_generate_texture_mipmap)(texture);
+        reinterpret_cast<PFNGLGENERATETEXTUREMIPMAPPROC>(Interception::Hooks::OpenGL::g_cached_gl_generate_texture_mipmap)(texture);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGENERATETEXTUREMIPMAP,

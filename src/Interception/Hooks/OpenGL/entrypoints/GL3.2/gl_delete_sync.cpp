@@ -10,7 +10,7 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDeleteSync(GLsync sync)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDeleteSync(GLsync sync)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -45,7 +45,7 @@ void AI_APIENTRY OpenGL::aiDeleteSync(GLsync sync)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDELETESYNCPROC>(OpenGL::g_cached_gl_delete_sync)(sync);
+        reinterpret_cast<PFNGLDELETESYNCPROC>(Interception::Hooks::OpenGL::g_cached_gl_delete_sync)(sync);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDELETESYNC,

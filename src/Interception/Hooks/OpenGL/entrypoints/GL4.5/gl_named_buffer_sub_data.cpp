@@ -11,10 +11,10 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiNamedBufferSubData(GLuint      buffer,
-                                              GLintptr    offset,
-                                              GLsizeiptr  size,
-                                              const void* data)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiNamedBufferSubData(GLuint      buffer,
+                                                                   GLintptr    offset,
+                                                                   GLsizeiptr  size,
+                                                                   const void* data)
 {
     APIInterceptor::MemoryChunk             data_chunk(data,
                                                        size,
@@ -58,10 +58,10 @@ void AI_APIENTRY OpenGL::aiNamedBufferSubData(GLuint      buffer,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLNAMEDBUFFERSUBDATAPROC>(OpenGL::g_cached_gl_named_buffer_sub_data)(buffer,
-                                                                                                 offset,
-                                                                                                 size,
-                                                                                                 data);
+        reinterpret_cast<PFNGLNAMEDBUFFERSUBDATAPROC>(Interception::Hooks::OpenGL::g_cached_gl_named_buffer_sub_data)(buffer,
+                                                                                                                      offset,
+                                                                                                                      size,
+                                                                                                                      data);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLNAMEDBUFFERSUBDATA,

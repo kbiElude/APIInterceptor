@@ -11,10 +11,10 @@
 #include "Interception/Hooks/OpenGL/string_chunk.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-GLint AI_APIENTRY OpenGL::aiGetFragDataIndex(GLuint        program,
-                                             const GLchar* name)
+GLint AI_APIENTRY Interception::Hooks::OpenGL::aiGetFragDataIndex(GLuint        program,
+                                                                  const GLchar* name)
 {
-    OpenGL::StringChunk                     name_chunk(name);
+    Interception::Hooks::OpenGL::StringChunk                     name_chunk(name);
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
@@ -49,8 +49,8 @@ GLint AI_APIENTRY OpenGL::aiGetFragDataIndex(GLuint        program,
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNGLGETFRAGDATAINDEXPROC>(OpenGL::g_cached_gl_get_frag_data_index)(program,
-                                                                                                       name);
+        result = reinterpret_cast<PFNGLGETFRAGDATAINDEXPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_frag_data_index)(program,
+                                                                                                                            name);
     }
 
     if (tracker.is_top_level_api_call() )
@@ -63,8 +63,8 @@ GLint AI_APIENTRY OpenGL::aiGetFragDataIndex(GLuint        program,
 
             post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETFRAGDATAINDEX,
                                    post_callback_func_arg,
-                                   0,       /* in_n_args_out   */
-                                   nullptr, /* in_args_out_ptr */
+                                   0,       /* in_n_arguments_out   */
+                                   nullptr, /* in_arguments_out_ptr */
                                   &result_arg);
         }
     }

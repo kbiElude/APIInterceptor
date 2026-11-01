@@ -10,8 +10,8 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiVertexArrayElementBuffer(GLuint vaobj,
-                                                    GLuint buffer)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiVertexArrayElementBuffer(GLuint vaobj,
+                                                                         GLuint buffer)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -48,8 +48,8 @@ void AI_APIENTRY OpenGL::aiVertexArrayElementBuffer(GLuint vaobj,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLVERTEXARRAYELEMENTBUFFERPROC>(OpenGL::g_cached_gl_vertex_array_element_buffer)(vaobj,
-                                                                                                            buffer);
+        reinterpret_cast<PFNGLVERTEXARRAYELEMENTBUFFERPROC>(Interception::Hooks::OpenGL::g_cached_gl_vertex_array_element_buffer)(vaobj,
+                                                                                                                                 buffer);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLVERTEXARRAYELEMENTBUFFER,

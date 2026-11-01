@@ -7,14 +7,20 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiMapGrid2f(GLint   un,
-                                 GLfloat u1,
-                                 GLfloat u2,
-                                 GLint   vn,
-                                 GLfloat v1,
-                                 GLfloat v2);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiMapGrid2f(GLint   un,
+                                         GLfloat u1,
+                                         GLfloat u2,
+                                         GLint   vn,
+                                         GLfloat v1,
+                                         GLfloat v2);
+        }
+    }
 }
 
 #endif /* AI_GL_MAP_GRID_2F_H */

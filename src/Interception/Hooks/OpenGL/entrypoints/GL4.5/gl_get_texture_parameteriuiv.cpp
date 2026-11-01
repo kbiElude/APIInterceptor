@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetTextureParameterIuiv(GLuint  texture,
-                                                   GLenum  pname,
-                                                   GLuint* params)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetTextureParameterIuiv(GLuint  texture,
+                                                                        GLenum  pname,
+                                                                        GLuint* params)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -26,7 +26,7 @@ void AI_APIENTRY OpenGL::aiGetTextureParameterIuiv(GLuint  texture,
     {
         AI_TRACE("glGetTextureParameterIuiv(texture=[%u] pname=[%s] params=[%p])",
                  texture,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  params);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETTEXTUREPARAMETERIUIV,
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiGetTextureParameterIuiv(GLuint  texture,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETTEXTUREPARAMETERIUIVPROC>(OpenGL::g_cached_gl_get_texture_parameteriuiv)(texture,
-                                                                                                         pname,
-                                                                                                         params);
+        reinterpret_cast<PFNGLGETTEXTUREPARAMETERIUIVPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_texture_parameteriuiv)(texture,
+                                                                                                                              pname,
+                                                                                                                              params);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETTEXTUREPARAMETERIUIV,

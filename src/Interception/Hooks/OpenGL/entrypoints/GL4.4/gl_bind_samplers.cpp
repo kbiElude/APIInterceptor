@@ -11,9 +11,9 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiBindSamplers(GLuint        first,
-                                        GLsizei       count,
-                                        const GLuint* samplers)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiBindSamplers(GLuint        first,
+                                                             GLsizei       count,
+                                                             const GLuint* samplers)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -55,9 +55,9 @@ void AI_APIENTRY OpenGL::aiBindSamplers(GLuint        first,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLBINDSAMPLERSPROC>(OpenGL::g_cached_gl_bind_samplers)(first,
-                                                                                    count,
-                                                                                    samplers);
+        reinterpret_cast<PFNGLBINDSAMPLERSPROC>(Interception::Hooks::OpenGL::g_cached_gl_bind_samplers)(first,
+                                                                                                         count,
+                                                                                                         samplers);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBINDSAMPLERS,

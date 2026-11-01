@@ -7,11 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiSecondaryColor3b(GLbyte red,
-                                        GLbyte green,
-                                        GLbyte blue);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiSecondaryColor3b(GLbyte red,
+                                                GLbyte green,
+                                                GLbyte blue);
+        }
+    }
 }
 
 #endif /* AI_GL_SECONDARY_COLOR_3B_H */

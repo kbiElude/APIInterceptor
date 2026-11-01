@@ -7,9 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    GLuint AI_APIENTRY aiGetSubroutineIndex(GLuint program, GLenum shadertype, const GLchar* name);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            GLuint AI_APIENTRY aiGetSubroutineIndex(GLuint        program,
+                                                    GLenum        shadertype,
+                                                    const GLchar* name);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_SUBROUTINE_INDEX_H */

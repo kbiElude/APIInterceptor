@@ -11,8 +11,8 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiAccum(GLenum  op,
-                                 GLfloat value)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiAccum(GLenum  op,
+                                                      GLfloat value)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -24,7 +24,7 @@ void AI_APIENTRY OpenGL::aiAccum(GLenum  op,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glAccum(op=[%s], value=[%.4f])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(op),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(op),
                  value);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLACCUM,
@@ -49,8 +49,8 @@ void AI_APIENTRY OpenGL::aiAccum(GLenum  op,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLACCUMPROC>(OpenGL::g_cached_gl_accum)(op,
-                                                                    value);
+        reinterpret_cast<PFNGLACCUMPROC>(Interception::Hooks::OpenGL::g_cached_gl_accum)(op,
+                                                                                         value);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLACCUM,

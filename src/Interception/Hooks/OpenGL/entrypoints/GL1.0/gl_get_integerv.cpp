@@ -11,8 +11,8 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetIntegerv(GLenum pname,
-                                       GLint* data)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetIntegerv(GLenum pname,
+                                                            GLint* data)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -24,7 +24,7 @@ void AI_APIENTRY OpenGL::aiGetIntegerv(GLenum pname,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glGetIntegerv(pname=[%s] data=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  data);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETINTEGERV,
@@ -49,8 +49,8 @@ void AI_APIENTRY OpenGL::aiGetIntegerv(GLenum pname,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETINTEGERVPROC>(OpenGL::g_cached_gl_get_integerv)(pname,
-                                                                                 data);
+        reinterpret_cast<PFNGLGETINTEGERVPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_integerv)(pname,
+                                                                                                      data);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETINTEGERV,

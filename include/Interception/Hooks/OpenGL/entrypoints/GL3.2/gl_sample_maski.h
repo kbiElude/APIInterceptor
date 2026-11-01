@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiSampleMaski(GLuint     maskNumber,
-                                   GLbitfield mask);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiSampleMaski(GLuint     maskNumber,
+                                           GLbitfield mask);
+        }
+    }
 }
 
 #endif /* AI_GL_SAMPLE_MASKI_H */

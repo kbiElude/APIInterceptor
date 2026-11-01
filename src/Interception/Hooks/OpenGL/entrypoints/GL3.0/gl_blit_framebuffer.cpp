@@ -11,16 +11,16 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiBlitFramebuffer(GLint      srcX0,
-                                           GLint      srcY0,
-                                           GLint      srcX1,
-                                           GLint      srcY1,
-                                           GLint      dstX0,
-                                           GLint      dstY0,
-                                           GLint      dstX1,
-                                           GLint      dstY1,
-                                           GLbitfield mask,
-                                           GLenum     filter)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiBlitFramebuffer(GLint      srcX0,
+                                                                GLint      srcY0,
+                                                                GLint      srcX1,
+                                                                GLint      srcY1,
+                                                                GLint      dstX0,
+                                                                GLint      dstY0,
+                                                                GLint      dstX1,
+                                                                GLint      dstY1,
+                                                                GLbitfield mask,
+                                                                GLenum     filter)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -40,8 +40,8 @@ void AI_APIENTRY OpenGL::aiBlitFramebuffer(GLint      srcX0,
                  dstY0,
                  dstX1,
                  dstY1,
-                 OpenGL::Utils::get_raw_string_for_gl_bitfield(OpenGL::BitfieldType::BLIT_MASK, mask),
-                 OpenGL::Utils::get_raw_string_for_gl_enum    (filter) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_bitfield(Interception::Hooks::OpenGL::BitfieldType::BLIT_MASK, mask),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum    (filter) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBLITFRAMEBUFFER,
                                                          &pre_callback_func_ptr,
@@ -73,16 +73,16 @@ void AI_APIENTRY OpenGL::aiBlitFramebuffer(GLint      srcX0,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLBLITFRAMEBUFFERPROC>(OpenGL::g_cached_gl_blit_framebuffer)(srcX0,
-                                                                                         srcY0,
-                                                                                         srcX1,
-                                                                                         srcY1,
-                                                                                         dstX0,
-                                                                                         dstY0,
-                                                                                         dstX1,
-                                                                                         dstY1,
-                                                                                         mask,
-                                                                                         filter);
+        reinterpret_cast<PFNGLBLITFRAMEBUFFERPROC>(Interception::Hooks::OpenGL::g_cached_gl_blit_framebuffer)(srcX0,
+                                                                                                              srcY0,
+                                                                                                              srcX1,
+                                                                                                              srcY1,
+                                                                                                              dstX0,
+                                                                                                              dstY0,
+                                                                                                              dstX1,
+                                                                                                              dstY1,
+                                                                                                              mask,
+                                                                                                              filter);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBLITFRAMEBUFFER,

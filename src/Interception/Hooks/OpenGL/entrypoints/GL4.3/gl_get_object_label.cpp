@@ -11,11 +11,11 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetObjectLabel(GLenum   identifier,
-                                          GLuint   name,
-                                          GLsizei  bufSize,
-                                          GLsizei* length,
-                                          GLchar*  label)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetObjectLabel(GLenum   identifier,
+                                                               GLuint   name,
+                                                               GLsizei  bufSize,
+                                                               GLsizei* length,
+                                                               GLchar*  label)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -27,7 +27,7 @@ void AI_APIENTRY OpenGL::aiGetObjectLabel(GLenum   identifier,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glGetObjectLabel(identifier=[%s] name=[%u] bufSize=[%d] length=[%p] label=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(identifier),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(identifier),
                  name,
                  static_cast<int32_t>(bufSize),
                  length,
@@ -58,11 +58,11 @@ void AI_APIENTRY OpenGL::aiGetObjectLabel(GLenum   identifier,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETOBJECTLABELPROC>(OpenGL::g_cached_gl_get_object_label)(identifier,
-                                                                                         name,
-                                                                                         bufSize,
-                                                                                         length,
-                                                                                         label);
+        reinterpret_cast<PFNGLGETOBJECTLABELPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_object_label)(identifier,
+                                                                                                              name,
+                                                                                                              bufSize,
+                                                                                                              length,
+                                                                                                              label);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETOBJECTLABEL,

@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetVertexArrayiv(GLuint vaobj,
-                                            GLenum pname,
-                                            GLint* param)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetVertexArrayiv(GLuint vaobj,
+                                                                 GLenum pname,
+                                                                 GLint* param)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -26,7 +26,7 @@ void AI_APIENTRY OpenGL::aiGetVertexArrayiv(GLuint vaobj,
     {
         AI_TRACE("glGetVertexArrayiv(vaobj=[%u] pname=[%s] param=[%p])",
                  vaobj,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  param);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETVERTEXARRAYIV,
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiGetVertexArrayiv(GLuint vaobj,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETVERTEXARRAYIVPROC>(OpenGL::g_cached_gl_get_vertex_arrayiv)(vaobj,
-                                                                                            pname,
-                                                                                            param);
+        reinterpret_cast<PFNGLGETVERTEXARRAYIVPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_vertex_arrayiv)(vaobj,
+                                                                                                                 pname,
+                                                                                                                 param);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETVERTEXARRAYIV,

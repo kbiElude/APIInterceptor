@@ -7,9 +7,20 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiDebugMessageInsert(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* buf);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiDebugMessageInsert(GLenum        source,
+                                                  GLenum        type,
+                                                  GLuint        id,
+                                                  GLenum        severity,
+                                                  GLsizei       length,
+                                                  const GLchar* buf);
+        }
+    }
 }
 
 #endif /* AI_GL_DEBUG_MESSAGE_INSERT_H */

@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiDeleteShader(GLuint shader);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiDeleteShader(GLuint shader);
+        }
+    }
 }
 
 #endif /* AI_GL_DELETE_SHADER_H */

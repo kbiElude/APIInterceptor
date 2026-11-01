@@ -12,10 +12,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiProgramBinary(GLuint      program,
-                                         GLenum      binaryFormat,
-                                         const void* binary,
-                                         GLsizei     length)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiProgramBinary(GLuint      program,
+                                                              GLenum      binaryFormat,
+                                                              const void* binary,
+                                                              GLsizei     length)
 {
     APIInterceptor::MemoryChunk             binary_chunk(binary,
                                                          length,
@@ -31,7 +31,7 @@ void AI_APIENTRY OpenGL::aiProgramBinary(GLuint      program,
     {
         AI_TRACE("glProgramBinary(program=[%u] binaryFormat=[%s] binary=[%p] length=[%d])",
                  program,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(binaryFormat),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(binaryFormat),
                  binary,
                  static_cast<int32_t>(length) );
 
@@ -59,10 +59,10 @@ void AI_APIENTRY OpenGL::aiProgramBinary(GLuint      program,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLPROGRAMBINARYPROC>(OpenGL::g_cached_gl_program_binary)(program,
-                                                                                      binaryFormat,
-                                                                                      binary,
-                                                                                      length);
+        reinterpret_cast<PFNGLPROGRAMBINARYPROC>(Interception::Hooks::OpenGL::g_cached_gl_program_binary)(program,
+                                                                                                           binaryFormat,
+                                                                                                           binary,
+                                                                                                           length);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLPROGRAMBINARY,

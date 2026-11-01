@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiMultiTexCoord3i(GLenum target,
-                                           GLint  s,
-                                           GLint  t,
-                                           GLint  r)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiMultiTexCoord3i(GLenum target,
+                                                                GLint  s,
+                                                                GLint  t,
+                                                                GLint  r)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -26,7 +26,7 @@ void AI_APIENTRY OpenGL::aiMultiTexCoord3i(GLenum target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glMultiTexCoord3i(target=[%s] s=[%d] t=[%d] r=[%d])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  s,
                  t,
                  r);
@@ -55,10 +55,10 @@ void AI_APIENTRY OpenGL::aiMultiTexCoord3i(GLenum target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLMULTITEXCOORD3IPROC>(OpenGL::g_cached_gl_multi_tex_coord_3i)(target,
-                                                                                           s,
-                                                                                           t,
-                                                                                           r);
+        reinterpret_cast<PFNGLMULTITEXCOORD3IPROC>(Interception::Hooks::OpenGL::g_cached_gl_multi_tex_coord_3i)(target,
+                                                                                                                s,
+                                                                                                                t,
+                                                                                                                r);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMULTITEXCOORD3I,

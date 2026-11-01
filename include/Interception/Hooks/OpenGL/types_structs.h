@@ -12,23 +12,29 @@
 #include "Interception/Hooks/OpenGL/texture_manager.h"
 #include "Interception/Hooks/OpenGL/types_interfaces.h"
 
-namespace OpenGL
+namespace Interception
 {
-    struct ContextState
+    namespace Hooks
     {
-        BufferManager         buffer_manager;
-        BufferMappingManager  buffer_mapping_manager;
-        ClientArrayManager    client_array_manager;
-        PixelStoreManager     pixel_store_manager;
-        TextureManager        texture_manager;
-    };
+        namespace OpenGL
+        {
+            struct ContextState
+            {
+                BufferManager         buffer_manager;
+                BufferMappingManager  buffer_mapping_manager;
+                ClientArrayManager    client_array_manager;
+                PixelStoreManager     pixel_store_manager;
+                TextureManager        texture_manager;
+            };
 
-    struct DispatchTable
-    {
-        Context* bound_context_ptr;
+            struct DispatchTable
+            {
+                Context* bound_context_ptr;
 
-        DispatchTable();
-    };
+                DispatchTable();
+            };
+        }
+    }
 }
 
 #endif /* AI_TYPES_STRUCTS_H */

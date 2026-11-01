@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiTexGend(GLenum   coord,
-                                   GLenum   pname,
-                                   GLdouble param)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiTexGend(GLenum   coord,
+                                                        GLenum   pname,
+                                                        GLdouble param)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -25,8 +25,8 @@ void AI_APIENTRY OpenGL::aiTexGend(GLenum   coord,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glTexGend(coord=[%s], pname=[%s], param=[%.4lf])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(coord),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(coord),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  param);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTEXGEND,
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiTexGend(GLenum   coord,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLTEXGENDPROC>(OpenGL::g_cached_gl_tex_gen_d)(coord,
-                                                                          pname,
-                                                                          param);
+        reinterpret_cast<PFNGLTEXGENDPROC>(Interception::Hooks::OpenGL::g_cached_gl_tex_gen_d)(coord,
+                                                                                               pname,
+                                                                                               param);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTEXGEND,

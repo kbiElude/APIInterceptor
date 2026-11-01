@@ -11,15 +11,15 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiCopyTexSubImage3D(GLenum  target,
-                                             GLint   level,
-                                             GLint   xoffset,
-                                             GLint   yoffset,
-                                             GLint   zoffset,
-                                             GLint   x,
-                                             GLint   y,
-                                             GLsizei width,
-                                             GLsizei height)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiCopyTexSubImage3D(GLenum  target,
+                                                                  GLint   level,
+                                                                  GLint   xoffset,
+                                                                  GLint   yoffset,
+                                                                  GLint   zoffset,
+                                                                  GLint   x,
+                                                                  GLint   y,
+                                                                  GLsizei width,
+                                                                  GLsizei height)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -31,7 +31,7 @@ void AI_APIENTRY OpenGL::aiCopyTexSubImage3D(GLenum  target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glCopyTexSubImage3D(target=[%s] level=[%d] xoffset=[%d] yoffset=[%d] zoffset=[%d] x=[%d] y=[%d] width=[%d] height=[%d])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  level,
                  xoffset,
                  yoffset,
@@ -70,15 +70,15 @@ void AI_APIENTRY OpenGL::aiCopyTexSubImage3D(GLenum  target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLCOPYTEXSUBIMAGE3DPROC>(OpenGL::g_cached_gl_copy_tex_sub_image_3D)(target,
-                                                                                                level,
-                                                                                                xoffset,
-                                                                                                yoffset,
-                                                                                                zoffset,
-                                                                                                x,
-                                                                                                y,
-                                                                                                width,
-                                                                                                height);
+        reinterpret_cast<PFNGLCOPYTEXSUBIMAGE3DPROC>(Interception::Hooks::OpenGL::g_cached_gl_copy_tex_sub_image_3D)(target,
+                                                                                                                     level,
+                                                                                                                     xoffset,
+                                                                                                                     yoffset,
+                                                                                                                     zoffset,
+                                                                                                                     x,
+                                                                                                                     y,
+                                                                                                                     width,
+                                                                                                                     height);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCOPYTEXSUBIMAGE3D,

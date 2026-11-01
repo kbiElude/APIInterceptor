@@ -7,9 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    GLint AI_APIENTRY aiGetSubroutineUniformLocation(GLuint program, GLenum shadertype, const GLchar* name);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            GLint AI_APIENTRY aiGetSubroutineUniformLocation(GLuint        program,
+                                                             GLenum        shadertype,
+                                                             const GLchar* name);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_SUBROUTINE_UNIFORM_LOCATION_H */

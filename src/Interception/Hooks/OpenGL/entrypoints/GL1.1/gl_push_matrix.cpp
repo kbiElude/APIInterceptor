@@ -11,7 +11,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiPushMatrix()
+void AI_APIENTRY Interception::Hooks::OpenGL::aiPushMatrix()
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -29,8 +29,8 @@ void AI_APIENTRY OpenGL::aiPushMatrix()
                                                          &pre_callback_func_arg) )
         {
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLPUSHMATRIX,
-                              0,       /* in_n_args   */
-                              nullptr, /* in_args_ptr */
+                              0,       /* in_n_arguments   */
+                              nullptr, /* in_arguments_ptr */
                               pre_callback_func_arg,
                              &should_pass_through);
         }
@@ -40,7 +40,7 @@ void AI_APIENTRY OpenGL::aiPushMatrix()
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLPUSHMATRIXPROC>(OpenGL::g_cached_gl_push_matrix)();
+        reinterpret_cast<PFNGLPUSHMATRIXPROC>(Interception::Hooks::OpenGL::g_cached_gl_push_matrix)();
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLPUSHMATRIX,

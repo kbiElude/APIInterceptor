@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetUniformSubroutineuiv(GLenum  shadertype,
-                                                   GLint   location,
-                                                   GLuint* params)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetUniformSubroutineuiv(GLenum  shadertype,
+                                                                        GLint   location,
+                                                                        GLuint* params)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -25,7 +25,7 @@ void AI_APIENTRY OpenGL::aiGetUniformSubroutineuiv(GLenum  shadertype,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glGetUniformSubroutineuiv(shadertype=[%s] location=[%d] params=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(shadertype),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(shadertype),
                  location,
                  params);
 
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiGetUniformSubroutineuiv(GLenum  shadertype,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETUNIFORMSUBROUTINEUIVPROC>(OpenGL::g_cached_gl_get_uniform_subroutineuiv)(shadertype,
-                                                                                                          location,
-                                                                                                          params);
+        reinterpret_cast<PFNGLGETUNIFORMSUBROUTINEUIVPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_uniform_subroutineuiv)(shadertype,
+                                                                                                                               location,
+                                                                                                                               params);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETUNIFORMSUBROUTINEUIV,

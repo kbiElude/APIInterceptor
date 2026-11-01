@@ -7,11 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetTexParameterIuiv(GLenum  target,
-                                           GLenum  pname,
-                                           GLuint* params);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetTexParameterIuiv(GLenum  target,
+                                                   GLenum  pname,
+                                                   GLuint* params);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_TEX_PARAMETER_I_UIV_H */

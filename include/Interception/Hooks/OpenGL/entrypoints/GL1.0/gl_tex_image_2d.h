@@ -7,17 +7,23 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiTexImage2D(GLenum      target,
-                                  GLint       level,
-                                  GLint       internalformat,
-                                  GLsizei     width,
-                                  GLsizei     height,
-                                  GLint       border,
-                                  GLenum      format,
-                                  GLenum      type,
-                                  const void* pixels);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiTexImage2D(GLenum      target,
+                                          GLint       level,
+                                          GLint       internalformat,
+                                          GLsizei     width,
+                                          GLsizei     height,
+                                          GLint       border,
+                                          GLenum      format,
+                                          GLenum      type,
+                                          const void* pixels);
+        }
+    }
 }
 
 #endif /* AI_GL_TEX_IMAGE_2D_H */

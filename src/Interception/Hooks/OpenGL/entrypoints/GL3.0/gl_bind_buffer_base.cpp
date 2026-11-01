@@ -13,9 +13,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiBindBufferBase(GLenum target,
-                                          GLuint index,
-                                          GLuint buffer)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiBindBufferBase(GLenum target,
+                                                               GLuint index,
+                                                               GLuint buffer)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -27,7 +27,7 @@ void AI_APIENTRY OpenGL::aiBindBufferBase(GLenum target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glBindBufferBase(target=[%s] index=[%u] buffer=[%u])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  index,
                  buffer);
 
@@ -54,20 +54,20 @@ void AI_APIENTRY OpenGL::aiBindBufferBase(GLenum target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLBINDBUFFERBASEPROC>(OpenGL::g_cached_gl_bind_buffer_base)(target,
-                                                                                        index,
-                                                                                        buffer);
+        reinterpret_cast<PFNGLBINDBUFFERBASEPROC>(Interception::Hooks::OpenGL::g_cached_gl_bind_buffer_base)(target,
+                                                                                                             index,
+                                                                                                             buffer);
     }
 
     if (tracker.is_top_level_api_call() )
     {
-        OpenGL::BufferBindingTarget binding_target;
+        Interception::Hooks::OpenGL::BufferBindingTarget binding_target;
 
-        if (OpenGL::Utils::get_buffer_binding_target_for_gl_enum(target,
-                                                                &binding_target) )
+        if (Interception::Hooks::OpenGL::Utils::get_buffer_binding_target_for_gl_enum(target,
+                                                                                     &binding_target) )
         {
-            OpenGL::get_context_state().buffer_manager.on_buffer_bound(binding_target,
-                                                                       buffer);
+            Interception::Hooks::OpenGL::get_context_state().buffer_manager.on_buffer_bound(binding_target,
+                                                                                            buffer);
         }
     }
 

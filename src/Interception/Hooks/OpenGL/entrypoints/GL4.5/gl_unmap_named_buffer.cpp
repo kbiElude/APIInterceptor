@@ -16,7 +16,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-GLboolean AI_APIENTRY OpenGL::aiUnmapNamedBuffer(GLuint buffer)
+GLboolean AI_APIENTRY Interception::Hooks::OpenGL::aiUnmapNamedBuffer(GLuint buffer)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -34,10 +34,10 @@ GLboolean AI_APIENTRY OpenGL::aiUnmapNamedBuffer(GLuint buffer)
         AI_TRACE("glUnmapNamedBuffer(buffer=[%u])",
                  buffer);
 
-        auto& context = OpenGL::get_context_state();
+        auto& context = Interception::Hooks::OpenGL::get_context_state();
 
         /* The pointer is not valid once the buffer is unmapped, so the copy is made now. */
-        const OpenGL::BufferMappingManager::Region unmap_region = context.buffer_mapping_manager.get_unmap_region(buffer);
+        const Interception::Hooks::OpenGL::BufferMappingManager::Region unmap_region = context.buffer_mapping_manager.get_unmap_region(buffer);
 
         unmap_chunk = APIInterceptor::MemoryChunk(unmap_region.data_ptr,
                                                   static_cast<int64_t>(unmap_region.n_bytes),
@@ -72,12 +72,12 @@ GLboolean AI_APIENTRY OpenGL::aiUnmapNamedBuffer(GLuint buffer)
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNGLUNMAPNAMEDBUFFERPROC>(OpenGL::g_cached_gl_unmap_named_buffer)(buffer);
+        result = reinterpret_cast<PFNGLUNMAPNAMEDBUFFERPROC>(Interception::Hooks::OpenGL::g_cached_gl_unmap_named_buffer)(buffer);
     }
 
     if (tracker.is_top_level_api_call() )
     {
-        OpenGL::get_context_state().buffer_mapping_manager.on_buffer_unmapped(buffer);
+        Interception::Hooks::OpenGL::get_context_state().buffer_mapping_manager.on_buffer_unmapped(buffer);
 
         if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLUNMAPNAMEDBUFFER,
                                                           &post_callback_func_ptr,

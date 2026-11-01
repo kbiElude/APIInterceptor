@@ -11,11 +11,11 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiRenderbufferStorageMultisample(GLenum  target,
-                                                          GLsizei samples,
-                                                          GLenum  internalformat,
-                                                          GLsizei width,
-                                                          GLsizei height)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiRenderbufferStorageMultisample(GLenum  target,
+                                                                               GLsizei samples,
+                                                                               GLenum  internalformat,
+                                                                               GLsizei width,
+                                                                               GLsizei height)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -27,9 +27,9 @@ void AI_APIENTRY OpenGL::aiRenderbufferStorageMultisample(GLenum  target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glRenderbufferStorageMultisample(target=[%s] samples=[%d] internalformat=[%s] width=[%d] height=[%d])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  static_cast<int32_t>(samples),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(internalformat),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(internalformat),
                  static_cast<int32_t>(width),
                  static_cast<int32_t>(height) );
 

@@ -11,11 +11,11 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetSynciv(GLsync   sync,
-                                     GLenum   pname,
-                                     GLsizei  bufSize,
-                                     GLsizei* length,
-                                     GLint*   values)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetSynciv(GLsync   sync,
+                                                          GLenum   pname,
+                                                          GLsizei  bufSize,
+                                                          GLsizei* length,
+                                                          GLint*   values)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -28,7 +28,7 @@ void AI_APIENTRY OpenGL::aiGetSynciv(GLsync   sync,
     {
         AI_TRACE("glGetSynciv(sync=[%p] pname=[%s] bufSize=[%d] length=[%p] values=[%p])",
                  sync,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  static_cast<int32_t>(bufSize),
                  length,
                  values);
@@ -58,11 +58,11 @@ void AI_APIENTRY OpenGL::aiGetSynciv(GLsync   sync,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETSYNCIVPROC>(OpenGL::g_cached_gl_get_synciv)(sync,
-                                                                              pname,
-                                                                              bufSize,
-                                                                              length,
-                                                                              values);
+        reinterpret_cast<PFNGLGETSYNCIVPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_synciv)(sync,
+                                                                                                   pname,
+                                                                                                   bufSize,
+                                                                                                   length,
+                                                                                                   values);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETSYNCIV,

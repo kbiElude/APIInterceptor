@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiQueryCounter(GLuint id,
-                                    GLenum target);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiQueryCounter(GLuint id,
+                                            GLenum target);
+        }
+    }
 }
 
 #endif /* AI_GL_QUERY_COUNTER_H */

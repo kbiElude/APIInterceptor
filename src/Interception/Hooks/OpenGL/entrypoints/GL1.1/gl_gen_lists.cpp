@@ -10,7 +10,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-GLuint AI_APIENTRY OpenGL::aiGenLists(GLsizei range)
+GLuint AI_APIENTRY Interception::Hooks::OpenGL::aiGenLists(GLsizei range)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -44,7 +44,7 @@ GLuint AI_APIENTRY OpenGL::aiGenLists(GLsizei range)
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNGLGENLISTSPROC>(OpenGL::g_cached_gl_gen_lists)(range);
+        result = reinterpret_cast<PFNGLGENLISTSPROC>(Interception::Hooks::OpenGL::g_cached_gl_gen_lists)(range);
     }
 
     if (tracker.is_top_level_api_call() )
@@ -57,8 +57,8 @@ GLuint AI_APIENTRY OpenGL::aiGenLists(GLsizei range)
 
             post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGENLISTS,
                                    post_callback_func_arg,
-                                   0,       /* in_n_args_out   */
-                                   nullptr, /* in_args_out_ptr */
+                                   0,       /* in_n_arguments_out   */
+                                   nullptr, /* in_arguments_out_ptr */
                                   &result_arg);
         }
     }

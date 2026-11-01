@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiNamedRenderbufferStorage(GLuint  renderbuffer,
-                                                    GLenum  internalformat,
-                                                    GLsizei width,
-                                                    GLsizei height)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiNamedRenderbufferStorage(GLuint  renderbuffer,
+                                                                         GLenum  internalformat,
+                                                                         GLsizei width,
+                                                                         GLsizei height)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -27,7 +27,7 @@ void AI_APIENTRY OpenGL::aiNamedRenderbufferStorage(GLuint  renderbuffer,
     {
         AI_TRACE("glNamedRenderbufferStorage(renderbuffer=[%u] internalformat=[%s] width=[%d] height=[%d])",
                  renderbuffer,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(internalformat),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(internalformat),
                  static_cast<int32_t>(width),
                  static_cast<int32_t>(height) );
 
@@ -55,10 +55,10 @@ void AI_APIENTRY OpenGL::aiNamedRenderbufferStorage(GLuint  renderbuffer,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLNAMEDRENDERBUFFERSTORAGEPROC>(OpenGL::g_cached_gl_named_renderbuffer_storage)(renderbuffer,
-                                                                                                           internalformat,
-                                                                                                           width,
-                                                                                                           height);
+        reinterpret_cast<PFNGLNAMEDRENDERBUFFERSTORAGEPROC>(Interception::Hooks::OpenGL::g_cached_gl_named_renderbuffer_storage)(renderbuffer,
+                                                                                                                                internalformat,
+                                                                                                                                width,
+                                                                                                                                height);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLNAMEDRENDERBUFFERSTORAGE,

@@ -7,10 +7,16 @@
 
 #include <windows.h>
 
-namespace WGL
+namespace Interception
 {
-    BOOL WINAPI swap_layer_buffers(HDC  in_hdc,
-                                   UINT in_planes);
+    namespace Hooks
+    {
+        namespace WGL
+        {
+            BOOL WINAPI swap_layer_buffers(HDC  in_hdc,
+                                           UINT in_planes);
+        }
+    }
 }
 
 #endif /* WGL_SHARE_LISTS_H */

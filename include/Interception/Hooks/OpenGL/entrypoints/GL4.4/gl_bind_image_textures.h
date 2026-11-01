@@ -7,11 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiBindImageTextures(GLuint        first,
-                                         GLsizei       count,
-                                         const GLuint* textures);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiBindImageTextures(GLuint        first,
+                                                 GLsizei       count,
+                                                 const GLuint* textures);
+        }
+    }
 }
 
 #endif /* AI_GL_BIND_IMAGE_TEXTURES_H */

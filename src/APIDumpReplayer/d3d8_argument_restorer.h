@@ -37,19 +37,19 @@ namespace APIDumpReplayer
          * screen.
          */
         template<>
-        struct StructFixup<D3D8::D3DPRESENT_PARAMETERS>
+        struct StructFixup<Interception::Hooks::D3D8::D3DPRESENT_PARAMETERS>
         {
             /* The format of the desktop: the back buffer of a window has to have it (D3D8 does not take D3DFMT_UNKNOWN). */
-            static D3D8::D3DFORMAT get_display_format(D3D8ReplayContext* in_context_ptr)
+            static Interception::Hooks::D3D8::D3DFORMAT get_display_format(D3D8ReplayContext* in_context_ptr)
             {
-                typedef HRESULT (__stdcall* PFNGETADAPTERDISPLAYMODEPROC)(void*, UINT, D3D8::D3DDISPLAYMODE*);
-                typedef HRESULT (__stdcall* PFNGETDISPLAYMODEPROC)       (void*, D3D8::D3DDISPLAYMODE*);
+                typedef HRESULT (__stdcall* PFNGETADAPTERDISPLAYMODEPROC)(void*, UINT, Interception::Hooks::D3D8::D3DDISPLAYMODE*);
+                typedef HRESULT (__stdcall* PFNGETDISPLAYMODEPROC)       (void*, Interception::Hooks::D3D8::D3DDISPLAYMODE*);
 
                 const auto&          call   = in_context_ptr->get_call();
                 std::string          error;
-                D3D8::D3DDISPLAYMODE mode   = {};
+                Interception::Hooks::D3D8::D3DDISPLAYMODE mode   = {};
                 void*                object = nullptr;
-                D3D8::D3DFORMAT      result = D3D8::D3DFMT_X8R8G8B8;
+                Interception::Hooks::D3D8::D3DFORMAT      result = Interception::Hooks::D3D8::D3DFMT_X8R8G8B8;
 
                 if (in_context_ptr->get_live_object(call.arg_in_vec.at(0),
                                                    &object,
@@ -61,14 +61,14 @@ namespace APIDumpReplayer
                     /* The adapter's mode for a device that is being created, the device's own after that. */
                     if (call.func == APIInterceptor::APIFUNCTION_D3D8_IDIRECT3D8_CREATEDEVICE)
                     {
-                        hresult = reinterpret_cast<PFNGETADAPTERDISPLAYMODEPROC>(vtable_ptr[D3D8::VTABLE_INDEX_IDIRECT3D8_GETADAPTERDISPLAYMODE])(object,
-                                                                                                                                                   call.arg_in_vec.at(1).get_u32(),
-                                                                                                                                                  &mode);
+                        hresult = reinterpret_cast<PFNGETADAPTERDISPLAYMODEPROC>(vtable_ptr[Interception::Hooks::D3D8::VTABLE_INDEX_IDIRECT3D8_GETADAPTERDISPLAYMODE])(object,
+                                                                                                                                                                        call.arg_in_vec.at(1).get_u32(),
+                                                                                                                                                                       &mode);
                     }
                     else
                     {
-                        hresult = reinterpret_cast<PFNGETDISPLAYMODEPROC>(vtable_ptr[D3D8::VTABLE_INDEX_IDIRECT3DDEVICE8_GETDISPLAYMODE])(object,
-                                                                                                                                         &mode);
+                        hresult = reinterpret_cast<PFNGETDISPLAYMODEPROC>(vtable_ptr[Interception::Hooks::D3D8::VTABLE_INDEX_IDIRECT3DDEVICE8_GETDISPLAYMODE])(object,
+                                                                                                                                                              &mode);
                     }
 
                     if (hresult >= 0)
@@ -80,8 +80,8 @@ namespace APIDumpReplayer
                 return result;
             }
 
-            static void apply(D3D8::D3DPRESENT_PARAMETERS* inout_value_ptr,
-                              D3D8ReplayContext*           in_context_ptr)
+            static void apply(Interception::Hooks::D3D8::D3DPRESENT_PARAMETERS* inout_value_ptr,
+                                                   D3D8ReplayContext*           in_context_ptr)
             {
                 uint64_t live_window = 0;
 
@@ -101,9 +101,9 @@ namespace APIDumpReplayer
                 inout_value_ptr->BackBufferFormat                = get_display_format(in_context_ptr);
                 inout_value_ptr->BackBufferHeight                = 0;
                 inout_value_ptr->BackBufferWidth                 = 0;
-                inout_value_ptr->FullScreen_PresentationInterval = D3D8::D3DPRESENT_INTERVAL_DEFAULT;
+                inout_value_ptr->FullScreen_PresentationInterval = Interception::Hooks::D3D8::D3DPRESENT_INTERVAL_DEFAULT;
                 inout_value_ptr->FullScreen_RefreshRateInHz      = 0;
-                inout_value_ptr->SwapEffect                      = D3D8::D3DSWAPEFFECT_DISCARD;
+                inout_value_ptr->SwapEffect                      = Interception::Hooks::D3D8::D3DSWAPEFFECT_DISCARD;
                 inout_value_ptr->Windowed                        = TRUE;
             }
         };
@@ -123,12 +123,12 @@ namespace APIDumpReplayer
         };
 
         template<typename T,
-                 D3D8::Utils::ArgumentCategory category>
+                 Interception::Core::D3D8Utils::ArgumentCategory category>
         class ArgumentRestorer;
 
         /* const S*: an input structure. */
         template<typename T>
-        class ArgumentRestorer<T, D3D8::Utils::ArgumentCategory::CONST_STRUCT> : public PassiveRestorer
+        class ArgumentRestorer<T, Interception::Core::D3D8Utils::ArgumentCategory::CONST_STRUCT> : public PassiveRestorer
         {
         public:
             ArgumentRestorer()
@@ -146,7 +146,7 @@ namespace APIDumpReplayer
                          const size_t&      in_n_argument,
                          std::string*       out_error_ptr)
             {
-                typedef typename D3D8::Utils::PointeeOf<T>::type StructType;
+                typedef typename Interception::Core::D3D8Utils::PointeeOf<T>::type StructType;
 
                 size_t         n_bytes  = 0;
                 const uint8_t* data_ptr = in_context_ptr->get_chunk_data_ptr(in_context_ptr->get_in_argument_ptr(in_n_argument),
@@ -166,7 +166,7 @@ namespace APIDumpReplayer
 
         /* const GUID&. */
         template<typename T>
-        class ArgumentRestorer<T, D3D8::Utils::ArgumentCategory::GUID> : public PassiveRestorer
+        class ArgumentRestorer<T, Interception::Core::D3D8Utils::ArgumentCategory::GUID> : public PassiveRestorer
         {
         public:
             ArgumentRestorer()
@@ -206,10 +206,10 @@ namespace APIDumpReplayer
 
         /* S*: a structure which the method writes (and, for a few, reads, too). */
         template<typename T>
-        class ArgumentRestorer<T, D3D8::Utils::ArgumentCategory::MUTABLE_STRUCT> : public PassiveRestorer
+        class ArgumentRestorer<T, Interception::Core::D3D8Utils::ArgumentCategory::MUTABLE_STRUCT> : public PassiveRestorer
         {
         public:
-            typedef typename D3D8::Utils::PointeeOf<T>::type StructType;
+            typedef typename Interception::Core::D3D8Utils::PointeeOf<T>::type StructType;
 
             ArgumentRestorer()
                 :m_has_pointer(false),
@@ -232,7 +232,7 @@ namespace APIDumpReplayer
 
                 (void) out_error_ptr;
 
-                if (D3D8::Utils::StructTraits<StructType>::is_input_output)
+                if (Interception::Core::D3D8Utils::StructTraits<StructType>::is_input_output)
                 {
                     size_t         n_bytes  = 0;
                     const uint8_t* data_ptr = in_context_ptr->get_chunk_data_ptr(argument_ptr,
@@ -276,7 +276,7 @@ namespace APIDumpReplayer
 
         /* I*: an interface which the replay has created. */
         template<typename T>
-        class ArgumentRestorer<T, D3D8::Utils::ArgumentCategory::OBJECT> : public PassiveRestorer
+        class ArgumentRestorer<T, Interception::Core::D3D8Utils::ArgumentCategory::OBJECT> : public PassiveRestorer
         {
         public:
             ArgumentRestorer()
@@ -385,14 +385,14 @@ namespace APIDumpReplayer
         };
 
         template<typename T>
-        class ArgumentRestorer<T, D3D8::Utils::ArgumentCategory::OBJECT_OUT>
-            : public OutPointerRestorer<typename D3D8::Utils::PointeeOf<typename D3D8::Utils::PointeeOf<T>::type>::type>
+        class ArgumentRestorer<T, Interception::Core::D3D8Utils::ArgumentCategory::OBJECT_OUT>
+            : public OutPointerRestorer<typename Interception::Core::D3D8Utils::PointeeOf<typename Interception::Core::D3D8Utils::PointeeOf<T>::type>::type>
         {
             /* Stub */
         };
 
         template<typename T>
-        class ArgumentRestorer<T, D3D8::Utils::ArgumentCategory::POINTER_OUT> : public OutPointerRestorer<void>
+        class ArgumentRestorer<T, Interception::Core::D3D8Utils::ArgumentCategory::POINTER_OUT> : public OutPointerRestorer<void>
         {
             /* Stub */
         };
@@ -418,7 +418,7 @@ namespace APIDumpReplayer
                          const size_t&      in_n_argument,
                          std::string*       out_error_ptr)
             {
-                typedef typename D3D8::ScalarConversion<T>::type NumberType;
+                typedef typename Interception::Hooks::D3D8::ScalarConversion<T>::type NumberType;
 
                 const auto argument_ptr = in_context_ptr->get_in_argument_ptr(in_n_argument);
                 NumberType number       = NumberType();
@@ -492,14 +492,14 @@ namespace APIDumpReplayer
         };
 
         template<typename T>
-        class ArgumentRestorer<T, D3D8::Utils::ArgumentCategory::SCALAR> : public ScalarRestorer<T>
+        class ArgumentRestorer<T, Interception::Core::D3D8Utils::ArgumentCategory::SCALAR> : public ScalarRestorer<T>
         {
             /* Stub */
         };
 
         /* A window of the replay. */
         template<>
-        class ArgumentRestorer<HWND, D3D8::Utils::ArgumentCategory::SCALAR> : public PassiveRestorer
+        class ArgumentRestorer<HWND, Interception::Core::D3D8Utils::ArgumentCategory::SCALAR> : public PassiveRestorer
         {
         public:
             ArgumentRestorer()
@@ -550,7 +550,7 @@ namespace APIDumpReplayer
 
         /* BYTE**: where a lock gives out the memory. */
         template<>
-        class ArgumentRestorer<BYTE**, D3D8::Utils::ArgumentCategory::SCALAR> : public PassiveRestorer
+        class ArgumentRestorer<BYTE**, Interception::Core::D3D8Utils::ArgumentCategory::SCALAR> : public PassiveRestorer
         {
         public:
             ArgumentRestorer()
@@ -581,10 +581,10 @@ namespace APIDumpReplayer
 
         /* U*: an integer which the method writes; a handle which the method creates is registered. */
         template<typename T>
-        class ArgumentRestorer<T, D3D8::Utils::ArgumentCategory::SCALAR_OUT>
+        class ArgumentRestorer<T, Interception::Core::D3D8Utils::ArgumentCategory::SCALAR_OUT>
         {
         public:
-            typedef typename D3D8::Utils::PointeeOf<T>::type NumberType;
+            typedef typename Interception::Core::D3D8Utils::PointeeOf<T>::type NumberType;
 
             ArgumentRestorer()
                 :m_has_pointer(false),

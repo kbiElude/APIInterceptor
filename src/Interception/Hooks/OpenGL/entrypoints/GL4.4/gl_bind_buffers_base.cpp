@@ -12,10 +12,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiBindBuffersBase(GLenum        target,
-                                           GLuint        first,
-                                           GLsizei       count,
-                                           const GLuint* buffers)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiBindBuffersBase(GLenum        target,
+                                                                GLuint        first,
+                                                                GLsizei       count,
+                                                                const GLuint* buffers)
 {
     APIInterceptor::MemoryChunk             buffers_chunk(buffers,
                                                           count,
@@ -30,7 +30,7 @@ void AI_APIENTRY OpenGL::aiBindBuffersBase(GLenum        target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glBindBuffersBase(target=[%s] first=[%u] count=[%d] buffers=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  first,
                  static_cast<int32_t>(count),
                  buffers);
@@ -59,10 +59,10 @@ void AI_APIENTRY OpenGL::aiBindBuffersBase(GLenum        target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLBINDBUFFERSBASEPROC>(OpenGL::g_cached_gl_bind_buffers_base)(target,
-                                                                                           first,
-                                                                                           count,
-                                                                                           buffers);
+        reinterpret_cast<PFNGLBINDBUFFERSBASEPROC>(Interception::Hooks::OpenGL::g_cached_gl_bind_buffers_base)(target,
+                                                                                                                first,
+                                                                                                                count,
+                                                                                                                buffers);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBINDBUFFERSBASE,

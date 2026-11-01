@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiEvalCoord2d(GLdouble u,
-                                   GLdouble v);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiEvalCoord2d(GLdouble u,
+                                           GLdouble v);
+        }
+    }
 }
 
 #endif /* AI_GL_EVAL_COORD_2D_H */

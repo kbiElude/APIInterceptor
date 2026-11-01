@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiTexGeni(GLenum coord,
-                                   GLenum pname,
-                                   GLint  param)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiTexGeni(GLenum coord,
+                                                        GLenum pname,
+                                                        GLint  param)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -25,8 +25,8 @@ void AI_APIENTRY OpenGL::aiTexGeni(GLenum coord,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glTexGeni(coord=[%s], pname=[%s], param=[%d])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(coord),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(coord),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  param);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTEXGENI,
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiTexGeni(GLenum coord,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLTEXGENIPROC>(OpenGL::g_cached_gl_tex_gen_i)(coord,
-                                                                          pname,
-                                                                          param);
+        reinterpret_cast<PFNGLTEXGENIPROC>(Interception::Hooks::OpenGL::g_cached_gl_tex_gen_i)(coord,
+                                                                                               pname,
+                                                                                               param);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTEXGENI,

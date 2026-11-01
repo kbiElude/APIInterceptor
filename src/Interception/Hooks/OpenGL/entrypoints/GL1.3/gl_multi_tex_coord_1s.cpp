@@ -11,8 +11,8 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiMultiTexCoord1s(GLenum  target,
-                                           GLshort s)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiMultiTexCoord1s(GLenum  target,
+                                                                GLshort s)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -24,7 +24,7 @@ void AI_APIENTRY OpenGL::aiMultiTexCoord1s(GLenum  target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glMultiTexCoord1s(target=[%s] s=[%d])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  static_cast<int32_t>(s));
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMULTITEXCOORD1S,
@@ -49,8 +49,8 @@ void AI_APIENTRY OpenGL::aiMultiTexCoord1s(GLenum  target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLMULTITEXCOORD1SPROC>(OpenGL::g_cached_gl_multi_tex_coord_1s)(target,
-                                                                                           s);
+        reinterpret_cast<PFNGLMULTITEXCOORD1SPROC>(Interception::Hooks::OpenGL::g_cached_gl_multi_tex_coord_1s)(target,
+                                                                                                                s);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMULTITEXCOORD1S,

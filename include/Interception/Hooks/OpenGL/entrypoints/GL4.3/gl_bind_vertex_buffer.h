@@ -7,9 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiBindVertexBuffer(GLuint bindingindex, GLuint buffer, GLintptr offset, GLsizei stride);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiBindVertexBuffer(GLuint   bindingindex,
+                                                GLuint   buffer,
+                                                GLintptr offset,
+                                                GLsizei  stride);
+        }
+    }
 }
 
 #endif /* AI_GL_BIND_VERTEX_BUFFER_H */

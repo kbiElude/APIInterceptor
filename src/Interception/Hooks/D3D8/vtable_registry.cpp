@@ -7,8 +7,8 @@
 #include "Interception/Core/D3D8Utils/methods.h"
 #include <Windows.h>
 
-void* D3D8::VTableRegistry::get_original_function_ptr(const void*     in_object_ptr,
-                                                      const uint32_t& in_vtable_index)
+void* Interception::Hooks::D3D8::VTableRegistry::get_original_function_ptr(const void*     in_object_ptr,
+                                                                           const uint32_t& in_vtable_index)
 {
     void* result_ptr = nullptr;
 
@@ -31,7 +31,7 @@ void* D3D8::VTableRegistry::get_original_function_ptr(const void*     in_object_
     return result_ptr;
 }
 
-D3D8::VTableRegistry* D3D8::VTableRegistry::get_ptr()
+Interception::Hooks::D3D8::VTableRegistry* Interception::Hooks::D3D8::VTableRegistry::get_ptr()
 {
     /* Never destroyed: hooks can still run during shutdown. */
     static VTableRegistry* instance_ptr = new VTableRegistry();
@@ -39,10 +39,10 @@ D3D8::VTableRegistry* D3D8::VTableRegistry::get_ptr()
     return instance_ptr;
 }
 
-bool D3D8::VTableRegistry::patch_vtable(const Interface& in_interface,
-                                        const void*      in_object_ptr,
-                                        const HookEntry* in_hook_entry_array_ptr,
-                                        uint32_t         in_n_hook_entries)
+bool Interception::Hooks::D3D8::VTableRegistry::patch_vtable(const Interface& in_interface,
+                                                             const void*      in_object_ptr,
+                                                             const HookEntry* in_hook_entry_array_ptr,
+                                                             uint32_t         in_n_hook_entries)
 {
     bool result = false;
 
@@ -60,7 +60,7 @@ bool D3D8::VTableRegistry::patch_vtable(const Interface& in_interface,
 
                 new_vtable.interface_type = in_interface;
 
-                new_vtable.original_function_ptr_vec.resize(Utils::get_n_methods(in_interface) );
+                new_vtable.original_function_ptr_vec.resize(Interception::Core::D3D8Utils::get_n_methods(in_interface) );
                 iterator = m_patched_vtable_map.emplace(vtable_ptr,
                                                         std::move(new_vtable) ).first;
             }

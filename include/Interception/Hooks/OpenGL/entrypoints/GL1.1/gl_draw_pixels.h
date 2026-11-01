@@ -7,13 +7,19 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiDrawPixels(GLsizei       width,
-                                  GLsizei       height,
-                                  GLenum        format,
-                                  GLenum        type,
-                                  const GLvoid* pixels);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiDrawPixels(GLsizei       width,
+                                          GLsizei       height,
+                                          GLenum        format,
+                                          GLenum        type,
+                                          const GLvoid* pixels);
+        }
+    }
 }
 
 #endif /* AI_GL_DRAW_PIXELS_H */

@@ -14,10 +14,10 @@
 #include "Interception/Hooks/WGL/globals.h"
 #include <algorithm>
 
-void AI_APIENTRY OpenGL::aiTextureStorage1D(GLuint  texture,
-                                            GLsizei levels,
-                                            GLenum  internalformat,
-                                            GLsizei width)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiTextureStorage1D(GLuint  texture,
+                                                                 GLsizei levels,
+                                                                 GLenum  internalformat,
+                                                                 GLsizei width)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -31,7 +31,7 @@ void AI_APIENTRY OpenGL::aiTextureStorage1D(GLuint  texture,
         AI_TRACE("glTextureStorage1D(texture=[%u] levels=[%d] internalformat=[%s] width=[%d])",
                  texture,
                  static_cast<int32_t>(levels),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(internalformat),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(internalformat),
                  static_cast<int32_t>(width) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTEXTURESTORAGE1D,
@@ -58,14 +58,14 @@ void AI_APIENTRY OpenGL::aiTextureStorage1D(GLuint  texture,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLTEXTURESTORAGE1DPROC>(OpenGL::g_cached_gl_texture_storage1d)(texture,
-                                                                                           levels,
-                                                                                           internalformat,
-                                                                                           width);
+        reinterpret_cast<PFNGLTEXTURESTORAGE1DPROC>(Interception::Hooks::OpenGL::g_cached_gl_texture_storage1d)(texture,
+                                                                                                                levels,
+                                                                                                                internalformat,
+                                                                                                                width);
 
         if (tracker.is_top_level_api_call() )
         {
-            auto&    context   = OpenGL::get_context_state();
+            auto&    context   = Interception::Hooks::OpenGL::get_context_state();
             uint32_t mip_width = static_cast<uint32_t>(width);
 
             for (GLsizei level = 0;

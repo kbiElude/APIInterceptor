@@ -7,9 +7,19 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiProgramUniformMatrix3x4dv(GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLdouble* value);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiProgramUniformMatrix3x4dv(GLuint          program,
+                                                         GLint           location,
+                                                         GLsizei         count,
+                                                         GLboolean       transpose,
+                                                         const GLdouble* value);
+        }
+    }
 }
 
 #endif /* AI_GL_PROGRAM_UNIFORM_MATRIX3X4DV_H */

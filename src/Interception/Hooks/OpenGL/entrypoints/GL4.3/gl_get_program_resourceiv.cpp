@@ -11,14 +11,14 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetProgramResourceiv(GLuint        program,
-                                                GLenum        programInterface,
-                                                GLuint        index,
-                                                GLsizei       propCount,
-                                                const GLenum* props,
-                                                GLsizei       bufSize,
-                                                GLsizei*      length,
-                                                GLint*        params)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetProgramResourceiv(GLuint        program,
+                                                                     GLenum        programInterface,
+                                                                     GLuint        index,
+                                                                     GLsizei       propCount,
+                                                                     const GLenum* props,
+                                                                     GLsizei       bufSize,
+                                                                     GLsizei*      length,
+                                                                     GLint*        params)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -31,7 +31,7 @@ void AI_APIENTRY OpenGL::aiGetProgramResourceiv(GLuint        program,
     {
         AI_TRACE("glGetProgramResourceiv(program=[%u] programInterface=[%s] index=[%u] propCount=[%d] props=[%p] bufSize=[%d] length=[%p] params=[%p])",
                  program,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(programInterface),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(programInterface),
                  index,
                  static_cast<int32_t>(propCount),
                  props,
@@ -67,14 +67,14 @@ void AI_APIENTRY OpenGL::aiGetProgramResourceiv(GLuint        program,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETPROGRAMRESOURCEIVPROC>(OpenGL::g_cached_gl_get_program_resourceiv)(program,
-                                                                                                     programInterface,
-                                                                                                     index,
-                                                                                                     propCount,
-                                                                                                     props,
-                                                                                                     bufSize,
-                                                                                                     length,
-                                                                                                     params);
+        reinterpret_cast<PFNGLGETPROGRAMRESOURCEIVPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_program_resourceiv)(program,
+                                                                                                                          programInterface,
+                                                                                                                          index,
+                                                                                                                          propCount,
+                                                                                                                          props,
+                                                                                                                          bufSize,
+                                                                                                                          length,
+                                                                                                                          params);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETPROGRAMRESOURCEIV,

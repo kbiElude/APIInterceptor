@@ -7,9 +7,19 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiBlendFuncSeparatei(GLuint buf, GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiBlendFuncSeparatei(GLuint buf,
+                                                  GLenum srcRGB,
+                                                  GLenum dstRGB,
+                                                  GLenum srcAlpha,
+                                                  GLenum dstAlpha);
+        }
+    }
 }
 
 #endif /* AI_GL_BLEND_FUNC_SEPARATEI_H */

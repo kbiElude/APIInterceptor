@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiDepthFunc(GLenum func);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiDepthFunc(GLenum func);
+        }
+    }
 }
 
 #endif /* AI_GL_DEPTH_FUNC_H */

@@ -11,9 +11,9 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiViewportArrayv(GLuint         first,
-                                          GLsizei        count,
-                                          const GLfloat* v)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiViewportArrayv(GLuint         first,
+                                                               GLsizei        count,
+                                                               const GLfloat* v)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -55,9 +55,9 @@ void AI_APIENTRY OpenGL::aiViewportArrayv(GLuint         first,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLVIEWPORTARRAYVPROC>(OpenGL::g_cached_gl_viewport_arrayv)(first,
-                                                                                        count,
-                                                                                        v);
+        reinterpret_cast<PFNGLVIEWPORTARRAYVPROC>(Interception::Hooks::OpenGL::g_cached_gl_viewport_arrayv)(first,
+                                                                                                             count,
+                                                                                                             v);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLVIEWPORTARRAYV,

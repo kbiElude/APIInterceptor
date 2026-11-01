@@ -11,11 +11,11 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiNamedRenderbufferStorageMultisample(GLuint  renderbuffer,
-                                                               GLsizei samples,
-                                                               GLenum  internalformat,
-                                                               GLsizei width,
-                                                               GLsizei height)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiNamedRenderbufferStorageMultisample(GLuint  renderbuffer,
+                                                                                    GLsizei samples,
+                                                                                    GLenum  internalformat,
+                                                                                    GLsizei width,
+                                                                                    GLsizei height)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -29,7 +29,7 @@ void AI_APIENTRY OpenGL::aiNamedRenderbufferStorageMultisample(GLuint  renderbuf
         AI_TRACE("glNamedRenderbufferStorageMultisample(renderbuffer=[%u] samples=[%d] internalformat=[%s] width=[%d] height=[%d])",
                  renderbuffer,
                  static_cast<int32_t>(samples),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(internalformat),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(internalformat),
                  static_cast<int32_t>(width),
                  static_cast<int32_t>(height) );
 
@@ -58,11 +58,11 @@ void AI_APIENTRY OpenGL::aiNamedRenderbufferStorageMultisample(GLuint  renderbuf
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLNAMEDRENDERBUFFERSTORAGEMULTISAMPLEPROC>(OpenGL::g_cached_gl_named_renderbuffer_storage_multisample)(renderbuffer,
-                                                                                                                                  samples,
-                                                                                                                                  internalformat,
-                                                                                                                                  width,
-                                                                                                                                  height);
+        reinterpret_cast<PFNGLNAMEDRENDERBUFFERSTORAGEMULTISAMPLEPROC>(Interception::Hooks::OpenGL::g_cached_gl_named_renderbuffer_storage_multisample)(renderbuffer,
+                                                                                                                                                       samples,
+                                                                                                                                                       internalformat,
+                                                                                                                                                       width,
+                                                                                                                                                       height);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLNAMEDRENDERBUFFERSTORAGEMULTISAMPLE,

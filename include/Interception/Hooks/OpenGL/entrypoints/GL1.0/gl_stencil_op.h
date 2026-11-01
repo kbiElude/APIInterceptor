@@ -7,11 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiStencilOp(GLenum fail,
-                                 GLenum zfail,
-                                 GLenum zpass);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiStencilOp(GLenum fail,
+                                         GLenum zfail,
+                                         GLenum zpass);
+        }
+    }
 }
 
 #endif /* AI_GL_STENCIL_OP_H */

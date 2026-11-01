@@ -11,37 +11,45 @@
 #include "Interception/Hooks/D3D8/success_traits.h"
 #include <utility>
 
-namespace D3D8
+namespace Interception
 {
-    template<typename ReturnType>
-    struct HookResult
+    namespace Hooks
     {
-        ReturnType value;
+        namespace D3D8
+        {
+            template<typename ReturnType>
+            struct HookResult
+            {
+                ReturnType value;
 
-        HookResult();
+                HookResult();
 
-        template<typename Function, typename... Arguments>
-        void call(Function in_function, Arguments&&... in_arguments);
+                template<typename Function, typename... Arguments>
+                void call(Function in_function,
+                          Arguments&&... in_arguments);
 
-        APIInterceptor::APIFunctionArgument create_argument() const;
-        ReturnType                          get            () const;
-        bool                                is_success     () const;
-    };
+                APIInterceptor::APIFunctionArgument create_argument() const;
+                ReturnType                          get            () const;
+                bool                                is_success     () const;
+            };
 
-    template<>
-    struct HookResult<void>
-    {
-        template<typename Function, typename... Arguments>
-        void call(Function in_function, Arguments&&... in_arguments);
+            template<>
+            struct HookResult<void>
+            {
+                template<typename Function, typename... Arguments>
+                void call(Function in_function,
+                          Arguments&&... in_arguments);
 
-        APIInterceptor::APIFunctionArgument create_argument() const;
-        void                                get            () const;
-        bool                                is_success     () const;
-    };
+                APIInterceptor::APIFunctionArgument create_argument() const;
+                void                                get            () const;
+                bool                                is_success     () const;
+            };
+        }
+    }
 }
 
 template<typename ReturnType>
-D3D8::HookResult<ReturnType>::HookResult()
+Interception::Hooks::D3D8::HookResult<ReturnType>::HookResult()
     :value()
 {
     /* Stub */
@@ -49,13 +57,13 @@ D3D8::HookResult<ReturnType>::HookResult()
 
 template<typename ReturnType>
 template<typename Function, typename... Arguments>
-void D3D8::HookResult<ReturnType>::call(Function in_function, Arguments&&... in_arguments)
+void Interception::Hooks::D3D8::HookResult<ReturnType>::call(Function in_function, Arguments&&... in_arguments)
 {
     value = in_function(std::forward<Arguments>(in_arguments)...);
 }
 
 template<typename ReturnType>
-APIInterceptor::APIFunctionArgument D3D8::HookResult<ReturnType>::create_argument() const
+APIInterceptor::APIFunctionArgument Interception::Hooks::D3D8::HookResult<ReturnType>::create_argument() const
 {
     return ArgumentCapture<ReturnType>::create_post_argument(value,
                                                              APIInterceptor::APIFunctionArgument(),
@@ -63,19 +71,19 @@ APIInterceptor::APIFunctionArgument D3D8::HookResult<ReturnType>::create_argumen
 }
 
 template<typename ReturnType>
-ReturnType D3D8::HookResult<ReturnType>::get() const
+ReturnType Interception::Hooks::D3D8::HookResult<ReturnType>::get() const
 {
     return value;
 }
 
 template<typename ReturnType>
-bool D3D8::HookResult<ReturnType>::is_success() const
+bool Interception::Hooks::D3D8::HookResult<ReturnType>::is_success() const
 {
     return SuccessTraits<ReturnType>::is_success(value);
 }
 
 template<typename Function, typename... Arguments>
-void D3D8::HookResult<void>::call(Function in_function, Arguments&&... in_arguments)
+void Interception::Hooks::D3D8::HookResult<void>::call(Function in_function, Arguments&&... in_arguments)
 {
     in_function(std::forward<Arguments>(in_arguments)...);
 }

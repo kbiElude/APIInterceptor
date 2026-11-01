@@ -7,17 +7,23 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiCopyTexSubImage3D(GLenum  target,
-                                         GLint   level,
-                                         GLint   xoffset,
-                                         GLint   yoffset,
-                                         GLint   zoffset,
-                                         GLint   x,
-                                         GLint   y,
-                                         GLsizei width,
-                                         GLsizei height);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiCopyTexSubImage3D(GLenum  target,
+                                                 GLint   level,
+                                                 GLint   xoffset,
+                                                 GLint   yoffset,
+                                                 GLint   zoffset,
+                                                 GLint   x,
+                                                 GLint   y,
+                                                 GLsizei width,
+                                                 GLsizei height);
+        }
+    }
 }
 
 #endif /* AI_GL_COPY_TEX_SUB_IMAGE_3D_H */

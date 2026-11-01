@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetVertexAttribPointerv(GLuint index,
-                                                   GLenum pname,
-                                                   void** pointer)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetVertexAttribPointerv(GLuint index,
+                                                                        GLenum pname,
+                                                                        void** pointer)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -26,7 +26,7 @@ void AI_APIENTRY OpenGL::aiGetVertexAttribPointerv(GLuint index,
     {
         AI_TRACE("glGetVertexAttribPointerv(index=[%u] pname=[%s] pointer=[%p])",
                  index,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  pointer);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETVERTEXATTRIBPOINTERV,
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiGetVertexAttribPointerv(GLuint index,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETVERTEXATTRIBPOINTERVPROC>(OpenGL::g_cached_gl_get_vertex_attrib_pointerv)(index,
-                                                                                                           pname,
-                                                                                                           pointer);
+        reinterpret_cast<PFNGLGETVERTEXATTRIBPOINTERVPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_vertex_attrib_pointerv)(index,
+                                                                                                                                pname,
+                                                                                                                                pointer);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETVERTEXATTRIBPOINTERV,

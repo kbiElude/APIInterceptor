@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiEvalMesh1(GLenum mode,
-                                     GLint  i1,
-                                     GLint  i2)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiEvalMesh1(GLenum mode,
+                                                          GLint  i1,
+                                                          GLint  i2)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -25,7 +25,7 @@ void AI_APIENTRY OpenGL::aiEvalMesh1(GLenum mode,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glEvalMesh1(mode=[%s], i1=[%d], i2=[%d])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(mode),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(mode),
                  i1,
                  i2);
 
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiEvalMesh1(GLenum mode,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLEVALMESH1PROC>(OpenGL::g_cached_gl_eval_mesh1)(mode,
-                                                                             i1,
-                                                                             i2);
+        reinterpret_cast<PFNGLEVALMESH1PROC>(Interception::Hooks::OpenGL::g_cached_gl_eval_mesh1)(mode,
+                                                                                                  i1,
+                                                                                                  i2);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLEVALMESH1,

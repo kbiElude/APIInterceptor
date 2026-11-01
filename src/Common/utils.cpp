@@ -2,9 +2,9 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
+#include "Common/macros.h"
 #include "Common/utils.h"
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
-#include <cassert>
 #include <sstream>
 
 void APIInterceptor::convert_api_command_to_string(const APICommand& in_api_command,
@@ -20,7 +20,7 @@ void APIInterceptor::convert_api_command_to_string(const APICommand& in_api_comm
             const auto arg_ref  = in_api_command.api_arg_vec.at(1).get_fp32();
 
             sstream << "glAlphaFunc("
-                    << OpenGL::Utils::get_raw_string_for_gl_enum(arg_func)
+                    << Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(arg_func)
                     << ", "
                     << arg_ref
                     << ")\n";
@@ -33,7 +33,7 @@ void APIInterceptor::convert_api_command_to_string(const APICommand& in_api_comm
             const auto arg_mode = in_api_command.api_arg_vec.at(0).get_u32();
 
             sstream << "glBegin("
-                    << OpenGL::Utils::get_raw_string_for_gl_enum(arg_mode)
+                    << Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(arg_mode)
                     << ")\n";
 
             break;
@@ -45,7 +45,7 @@ void APIInterceptor::convert_api_command_to_string(const APICommand& in_api_comm
             const auto arg_texture = in_api_command.api_arg_vec.at(1).get_u32();
 
             sstream << "glBindTexture("
-                    << OpenGL::Utils::get_raw_string_for_gl_enum(arg_target)
+                    << Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(arg_target)
                     << ", "
                     << arg_texture
                     << ")\n";
@@ -59,9 +59,9 @@ void APIInterceptor::convert_api_command_to_string(const APICommand& in_api_comm
             const auto arg_dfactor = in_api_command.api_arg_vec.at(1).get_u32();
 
             sstream << "glBlendFunc("
-                    << OpenGL::Utils::get_raw_string_for_gl_enum(arg_sfactor)
+                    << Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(arg_sfactor)
                     << ", "
-                    << OpenGL::Utils::get_raw_string_for_gl_enum(arg_dfactor)
+                    << Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(arg_dfactor)
                     << ")\n";
 
             break;
@@ -72,8 +72,8 @@ void APIInterceptor::convert_api_command_to_string(const APICommand& in_api_comm
             const auto arg_mask = in_api_command.api_arg_vec.at(0).get_u32();
 
             sstream << "glClear("
-                    << OpenGL::Utils::get_raw_string_for_gl_bitfield(OpenGL::BitfieldType::CLEAR_BUFFER_MASK,
-                                                                     arg_mask)
+                    << Interception::Core::OpenGLUtils::get_raw_string_for_gl_bitfield(Interception::Hooks::OpenGL::BitfieldType::CLEAR_BUFFER_MASK,
+                                                                                       arg_mask)
                     << ")\n";
 
             break;
@@ -168,7 +168,7 @@ void APIInterceptor::convert_api_command_to_string(const APICommand& in_api_comm
             const auto arg_mode = in_api_command.api_arg_vec.at(0).get_u32();
 
             sstream << "glCullFace("
-                    << OpenGL::Utils::get_raw_string_for_gl_enum(arg_mode)
+                    << Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(arg_mode)
                     << ")\n";
 
             break;
@@ -179,7 +179,7 @@ void APIInterceptor::convert_api_command_to_string(const APICommand& in_api_comm
             const auto arg_func = in_api_command.api_arg_vec.at(0).get_u32();
 
             sstream << "glDepthFunc("
-                    << OpenGL::Utils::get_raw_string_for_gl_enum(arg_func)
+                    << Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(arg_func)
                     << ")\n";
 
             break;
@@ -215,7 +215,7 @@ void APIInterceptor::convert_api_command_to_string(const APICommand& in_api_comm
             const auto arg_cap = in_api_command.api_arg_vec.at(0).get_u32();
 
             sstream << "glDisable("
-                    << OpenGL::Utils::get_raw_string_for_gl_enum(arg_cap)
+                    << Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(arg_cap)
                     << ")\n";
 
             break;
@@ -226,7 +226,7 @@ void APIInterceptor::convert_api_command_to_string(const APICommand& in_api_comm
             const auto arg_mode = in_api_command.api_arg_vec.at(0).get_u32();
 
             sstream << "glDrawBuffer("
-                    << OpenGL::Utils::get_raw_string_for_gl_enum(arg_mode)
+                    << Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(arg_mode)
                     << ")\n";
 
             break;
@@ -237,7 +237,7 @@ void APIInterceptor::convert_api_command_to_string(const APICommand& in_api_comm
             const auto arg_cap = in_api_command.api_arg_vec.at(0).get_u32();
 
             sstream << "glEnable("
-                    << OpenGL::Utils::get_raw_string_for_gl_enum(arg_cap)
+                    << Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(arg_cap)
                     << ")\n";
 
             break;
@@ -269,7 +269,7 @@ void APIInterceptor::convert_api_command_to_string(const APICommand& in_api_comm
             const auto arg_mode = in_api_command.api_arg_vec.at(0).get_u32();
 
             sstream << "glFrontFace("
-                    << OpenGL::Utils::get_raw_string_for_gl_enum(arg_mode)
+                    << Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(arg_mode)
                     << ")\n";
 
             break;
@@ -313,7 +313,7 @@ void APIInterceptor::convert_api_command_to_string(const APICommand& in_api_comm
             const auto arg_mode = in_api_command.api_arg_vec.at(0).get_u32();
 
             sstream << "glMatrixMode("
-                    << OpenGL::Utils::get_raw_string_for_gl_enum(arg_mode)
+                    << Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(arg_mode)
                     << ")\n";
 
             break;
@@ -401,7 +401,7 @@ void APIInterceptor::convert_api_command_to_string(const APICommand& in_api_comm
             const auto arg_mode = in_api_command.api_arg_vec.at(0).get_u32();
 
             sstream << "glShaderModel("
-                    << OpenGL::Utils::get_raw_string_for_gl_enum(arg_mode)
+                    << Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(arg_mode)
                     << ")\n";
 
             break;
@@ -428,11 +428,11 @@ void APIInterceptor::convert_api_command_to_string(const APICommand& in_api_comm
             const auto arg_param  = in_api_command.api_arg_vec.at(2).get_fp32();
 
             sstream << "glTexEnvf("
-                    << OpenGL::Utils::get_raw_string_for_gl_enum(arg_target)
+                    << Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(arg_target)
                     << ", "
-                    << OpenGL::Utils::get_raw_string_for_gl_enum(arg_pname)
+                    << Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(arg_pname)
                     << ", "
-                    << OpenGL::Utils::get_raw_string_for_gl_enum(static_cast<uint32_t>(arg_param) )
+                    << Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(static_cast<uint32_t>(arg_param) )
                     << ")\n";
 
             break;
@@ -451,11 +451,11 @@ void APIInterceptor::convert_api_command_to_string(const APICommand& in_api_comm
             const auto arg_data            = in_api_command.api_arg_vec.at(8).get_ptr();
 
             sstream << "glTexImage2D("
-                    << OpenGL::Utils::get_raw_string_for_gl_enum(arg_target)
+                    << Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(arg_target)
                     << ", "
                     << arg_level
                     << ", "
-                    << OpenGL::Utils::get_raw_string_for_gl_enum(arg_internal_format)
+                    << Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(arg_internal_format)
                     << ", "
                     << arg_width
                     << ", "
@@ -463,9 +463,9 @@ void APIInterceptor::convert_api_command_to_string(const APICommand& in_api_comm
                     << ", "
                     << arg_border
                     << ", "
-                    << OpenGL::Utils::get_raw_string_for_gl_enum(arg_format)
+                    << Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(arg_format)
                     << ", "
-                    << OpenGL::Utils::get_raw_string_for_gl_enum(arg_type)
+                    << Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(arg_type)
                     << ", "
                     << arg_data
                     << ")\n";
@@ -480,9 +480,9 @@ void APIInterceptor::convert_api_command_to_string(const APICommand& in_api_comm
             const auto arg_param  = in_api_command.api_arg_vec.at(2).get_fp32();
 
             sstream << "glTexParameterf("
-                    << OpenGL::Utils::get_raw_string_for_gl_enum(arg_target)
+                    << Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(arg_target)
                     << ", "
-                    << OpenGL::Utils::get_raw_string_for_gl_enum(arg_pname)
+                    << Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(arg_pname)
                     << ", "
                     << arg_param
                     << ")\n";
@@ -580,7 +580,7 @@ void APIInterceptor::convert_api_command_to_string(const APICommand& in_api_comm
 
         default:
         {
-            assert(false);
+            AI_FAIL_UNSUPPORTED(in_api_command.api_func);
         }
     }
 

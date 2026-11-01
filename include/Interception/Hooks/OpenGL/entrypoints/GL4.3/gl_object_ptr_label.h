@@ -7,9 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiObjectPtrLabel(const void* ptr, GLsizei length, const GLchar* label);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiObjectPtrLabel(const void*   ptr,
+                                              GLsizei       length,
+                                              const GLchar* label);
+        }
+    }
 }
 
 #endif /* AI_GL_OBJECT_PTR_LABEL_H */

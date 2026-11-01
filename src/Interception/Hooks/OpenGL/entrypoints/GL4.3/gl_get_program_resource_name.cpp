@@ -11,12 +11,12 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetProgramResourceName(GLuint   program,
-                                                  GLenum   programInterface,
-                                                  GLuint   index,
-                                                  GLsizei  bufSize,
-                                                  GLsizei* length,
-                                                  GLchar*  name)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetProgramResourceName(GLuint   program,
+                                                                       GLenum   programInterface,
+                                                                       GLuint   index,
+                                                                       GLsizei  bufSize,
+                                                                       GLsizei* length,
+                                                                       GLchar*  name)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -29,7 +29,7 @@ void AI_APIENTRY OpenGL::aiGetProgramResourceName(GLuint   program,
     {
         AI_TRACE("glGetProgramResourceName(program=[%u] programInterface=[%s] index=[%u] bufSize=[%d] length=[%p] name=[%p])",
                  program,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(programInterface),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(programInterface),
                  index,
                  static_cast<int32_t>(bufSize),
                  length,
@@ -61,12 +61,12 @@ void AI_APIENTRY OpenGL::aiGetProgramResourceName(GLuint   program,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETPROGRAMRESOURCENAMEPROC>(OpenGL::g_cached_gl_get_program_resource_name)(program,
-                                                                                                          programInterface,
-                                                                                                          index,
-                                                                                                          bufSize,
-                                                                                                          length,
-                                                                                                          name);
+        reinterpret_cast<PFNGLGETPROGRAMRESOURCENAMEPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_program_resource_name)(program,
+                                                                                                                               programInterface,
+                                                                                                                               index,
+                                                                                                                               bufSize,
+                                                                                                                               length,
+                                                                                                                               name);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETPROGRAMRESOURCENAME,

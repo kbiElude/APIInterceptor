@@ -7,9 +7,19 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiShaderBinary(GLsizei count, const GLuint* shaders, GLenum binaryformat, const void* binary, GLsizei length);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiShaderBinary(GLsizei       count,
+                                            const GLuint* shaders,
+                                            GLenum        binaryformat,
+                                            const void*   binary,
+                                            GLsizei       length);
+        }
+    }
 }
 
 #endif /* AI_GL_SHADER_BINARY_H */

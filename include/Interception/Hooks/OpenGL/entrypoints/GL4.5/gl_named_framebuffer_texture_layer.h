@@ -7,9 +7,19 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiNamedFramebufferTextureLayer(GLuint framebuffer, GLenum attachment, GLuint texture, GLint level, GLint layer);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiNamedFramebufferTextureLayer(GLuint framebuffer,
+                                                            GLenum attachment,
+                                                            GLuint texture,
+                                                            GLint  level,
+                                                            GLint  layer);
+        }
+    }
 }
 
 #endif /* AI_GL_NAMED_FRAMEBUFFER_TEXTURE_LAYER_H */

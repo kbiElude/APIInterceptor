@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiReadBuffer(GLenum src);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiReadBuffer(GLenum src);
+        }
+    }
 }
 
 #endif /* AI_GL_READ_BUFFER_H */

@@ -7,9 +7,22 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiReadnPixels(GLint x, GLint y, GLsizei width, GLsizei height, GLenum format, GLenum type, GLsizei bufSize, void* data);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiReadnPixels(GLint   x,
+                                           GLint   y,
+                                           GLsizei width,
+                                           GLsizei height,
+                                           GLenum  format,
+                                           GLenum  type,
+                                           GLsizei bufSize,
+                                           void*   data);
+        }
+    }
 }
 
 #endif /* AI_GL_READN_PIXELS_H */

@@ -7,10 +7,16 @@
 
 #include <windows.h>
 
-namespace GDI32
+namespace Interception
 {
-    int WINAPI choose_pixel_format(HDC                          in_hdc,
-                                   CONST PIXELFORMATDESCRIPTOR* in_pixel_format_descriptor_ptr);
+    namespace Hooks
+    {
+        namespace GDI32
+        {
+            int WINAPI choose_pixel_format(HDC                          in_hdc,
+                                           CONST PIXELFORMATDESCRIPTOR* in_pixel_format_descriptor_ptr);
+        }
+    }
 }
 
 #endif /* AI_CHOOSE_PIXEL_FORMAT_H */

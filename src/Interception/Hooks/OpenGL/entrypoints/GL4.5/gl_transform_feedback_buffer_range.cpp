@@ -10,11 +10,11 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiTransformFeedbackBufferRange(GLuint     xfb,
-                                                        GLuint     index,
-                                                        GLuint     buffer,
-                                                        GLintptr   offset,
-                                                        GLsizeiptr size)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiTransformFeedbackBufferRange(GLuint     xfb,
+                                                                             GLuint     index,
+                                                                             GLuint     buffer,
+                                                                             GLintptr   offset,
+                                                                             GLsizeiptr size)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -57,11 +57,11 @@ void AI_APIENTRY OpenGL::aiTransformFeedbackBufferRange(GLuint     xfb,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLTRANSFORMFEEDBACKBUFFERRANGEPROC>(OpenGL::g_cached_gl_transform_feedback_buffer_range)(xfb,
-                                                                                                                     index,
-                                                                                                                     buffer,
-                                                                                                                     offset,
-                                                                                                                     size);
+        reinterpret_cast<PFNGLTRANSFORMFEEDBACKBUFFERRANGEPROC>(Interception::Hooks::OpenGL::g_cached_gl_transform_feedback_buffer_range)(xfb,
+                                                                                                                                          index,
+                                                                                                                                          buffer,
+                                                                                                                                          offset,
+                                                                                                                                          size);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTRANSFORMFEEDBACKBUFFERRANGE,

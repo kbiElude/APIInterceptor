@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    GLboolean AI_APIENTRY aiIsEnabledi(GLenum target,
-                                       GLuint index);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            GLboolean AI_APIENTRY aiIsEnabledi(GLenum target,
+                                               GLuint index);
+        }
+    }
 }
 
 #endif /* AI_GL_IS_ENABLEDI_H */

@@ -10,8 +10,8 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiCreateBuffers(GLsizei n,
-                                         GLuint* buffers)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiCreateBuffers(GLsizei n,
+                                                              GLuint* buffers)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -48,8 +48,8 @@ void AI_APIENTRY OpenGL::aiCreateBuffers(GLsizei n,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLCREATEBUFFERSPROC>(OpenGL::g_cached_gl_create_buffers)(n,
-                                                                                     buffers);
+        reinterpret_cast<PFNGLCREATEBUFFERSPROC>(Interception::Hooks::OpenGL::g_cached_gl_create_buffers)(n,
+                                                                                                          buffers);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCREATEBUFFERS,

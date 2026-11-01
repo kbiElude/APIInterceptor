@@ -7,9 +7,19 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetInternalformati64v(GLenum target, GLenum internalformat, GLenum pname, GLsizei bufSize, GLint64* params);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetInternalformati64v(GLenum   target,
+                                                     GLenum   internalformat,
+                                                     GLenum   pname,
+                                                     GLsizei  bufSize,
+                                                     GLint64* params);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_INTERNALFORMATI64V_H */

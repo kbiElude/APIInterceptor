@@ -10,15 +10,15 @@
 /* For GL 1.1 compatibility profile support */
 #include "GL/gl.h"
 
-const char* OpenGL::Utils::get_raw_string_for_gl_bitfield(const OpenGL::BitfieldType& in_bitfield,
-                                                          const GLenum&               in_enum)
+const char* Interception::Core::OpenGLUtils::get_raw_string_for_gl_bitfield(const Interception::Hooks::OpenGL::BitfieldType& in_bitfield,
+                                                                            const GLenum&                                    in_enum)
 {
     static AI_THREADLOCAL char result[MAX_PER_FUNC_LOCAL_HELPER_STORAGE_SIZE];
 
     switch (in_bitfield)
     {
-        case OpenGL::BitfieldType::BLIT_MASK:
-        case OpenGL::BitfieldType::CLEAR_BUFFER_MASK:
+        case Interception::Hooks::OpenGL::BitfieldType::BLIT_MASK:
+        case Interception::Hooks::OpenGL::BitfieldType::CLEAR_BUFFER_MASK:
         {
             snprintf(result,
                      sizeof(result),
@@ -30,7 +30,7 @@ const char* OpenGL::Utils::get_raw_string_for_gl_bitfield(const OpenGL::Bitfield
             break;
         }
 
-        case OpenGL::BitfieldType::BUFFER_ACCESS_MASK:
+        case Interception::Hooks::OpenGL::BitfieldType::BUFFER_ACCESS_MASK:
         {
             snprintf(result,
                      sizeof(result),
@@ -46,7 +46,7 @@ const char* OpenGL::Utils::get_raw_string_for_gl_bitfield(const OpenGL::Bitfield
 
         }
 
-        case OpenGL::BitfieldType::SYNC_CONDITION_MASK:
+        case Interception::Hooks::OpenGL::BitfieldType::SYNC_CONDITION_MASK:
         {
             assert(in_enum == GL_SYNC_GPU_COMMANDS_COMPLETE);
 
@@ -57,7 +57,7 @@ const char* OpenGL::Utils::get_raw_string_for_gl_bitfield(const OpenGL::Bitfield
             break;
         }
 
-        case OpenGL::BitfieldType::WAIT_SYNC_MASK:
+        case Interception::Hooks::OpenGL::BitfieldType::WAIT_SYNC_MASK:
         {
             snprintf(result,
                      sizeof(result),
@@ -69,14 +69,14 @@ const char* OpenGL::Utils::get_raw_string_for_gl_bitfield(const OpenGL::Bitfield
 
         default:
         {
-            assert(false);
+            AI_FAIL_UNSUPPORTED(in_bitfield);
         }
     }
 
     return result;
 }
 
-const char* OpenGL::Utils::get_raw_string_for_gl_enum(const GLenum& in_enum)
+const char* Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(const GLenum& in_enum)
 {
     const char* result = "???";
 

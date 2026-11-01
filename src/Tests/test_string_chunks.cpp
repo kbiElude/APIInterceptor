@@ -60,9 +60,9 @@ TEST(StringArrayChunk, HonoursExplicitLengthsAndTerminators)
     const char* const strings_ptr_vec[] = {"abcdef", "ghi", nullptr};
     const int32_t     lengths_i32vec3[] = {3, -1, 5};
 
-    OpenGL::StringArrayChunk chunk(strings_ptr_vec,
-                                   3,
-                                   lengths_i32vec3);
+    Interception::Hooks::OpenGL::StringArrayChunk chunk(strings_ptr_vec,
+                                                        3,
+                                                        lengths_i32vec3);
 
     /* A null string is stored as empty, whatever its length says. */
     EXPECT_EQ(get_chunk_contents(chunk.get_id() ),
@@ -73,12 +73,12 @@ TEST(StringArrayChunk, IsEmptyWithoutStrings)
 {
     const char* const strings_ptr_vec[] = {"a"};
 
-    OpenGL::StringArrayChunk no_array_chunk(nullptr,
-                                            1,
-                                            nullptr);
-    OpenGL::StringArrayChunk no_strings_chunk(strings_ptr_vec,
-                                              0,
-                                              nullptr);
+    Interception::Hooks::OpenGL::StringArrayChunk no_array_chunk(nullptr,
+                                                                 1,
+                                                                 nullptr);
+    Interception::Hooks::OpenGL::StringArrayChunk no_strings_chunk(strings_ptr_vec,
+                                                                   0,
+                                                                   nullptr);
 
     EXPECT_TRUE(get_chunk_contents(no_array_chunk.get_id() ).empty() );
     EXPECT_TRUE(get_chunk_contents(no_strings_chunk.get_id() ).empty() );
@@ -88,9 +88,9 @@ TEST(StringArrayChunk, NullLengthsMeanTerminatedStrings)
 {
     const char* const strings_ptr_vec[] = {"vertex", "main"};
 
-    OpenGL::StringArrayChunk chunk(strings_ptr_vec,
-                                   2,
-                                   nullptr);
+    Interception::Hooks::OpenGL::StringArrayChunk chunk(strings_ptr_vec,
+                                                        2,
+                                                        nullptr);
 
     EXPECT_EQ(get_chunk_contents(chunk.get_id() ),
               build_expected_array({"vertex", "main"}) );
@@ -100,7 +100,7 @@ TEST(StringChunk, CopiesTheStringOnceAndOnlyWhenAsked)
 {
     const auto n_chunks_before = APIInterceptor::get_n_data_chunks();
 
-    OpenGL::StringChunk chunk("uColor");
+    Interception::Hooks::OpenGL::StringChunk chunk("uColor");
 
     EXPECT_EQ(APIInterceptor::get_n_data_chunks(),
               n_chunks_before);
@@ -120,7 +120,7 @@ TEST(StringChunk, CopiesTheStringOnceAndOnlyWhenAsked)
 
 TEST(StringChunk, NullStringGivesAnEmptyChunk)
 {
-    OpenGL::StringChunk chunk(nullptr);
+    Interception::Hooks::OpenGL::StringChunk chunk(nullptr);
 
     EXPECT_TRUE(get_chunk_contents(chunk.get_id() ).empty() );
 }

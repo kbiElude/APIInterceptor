@@ -7,14 +7,20 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiMultiDrawElementsBaseVertex(GLenum             mode,
-                                                   const GLsizei*     count,
-                                                   GLenum             type,
-                                                   const void* const* indices,
-                                                   GLsizei            drawcount,
-                                                   const GLint*       basevertex);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiMultiDrawElementsBaseVertex(GLenum             mode,
+                                                           const GLsizei*     count,
+                                                           GLenum             type,
+                                                           const void* const* indices,
+                                                           GLsizei            drawcount,
+                                                           const GLint*       basevertex);
+        }
+    }
 }
 
 #endif /* AI_GL_MULTI_DRAW_ELEMENTS_BASE_VERTEX_H */

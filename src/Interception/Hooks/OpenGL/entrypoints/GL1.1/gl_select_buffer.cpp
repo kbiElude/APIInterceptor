@@ -11,8 +11,8 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiSelectBuffer(GLsizei size,
-                                        GLuint* buffer)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiSelectBuffer(GLsizei size,
+                                                             GLuint* buffer)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -49,8 +49,8 @@ void AI_APIENTRY OpenGL::aiSelectBuffer(GLsizei size,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLSELECTBUFFERPROC>(OpenGL::g_cached_gl_select_buffer)(size,
-                                                                                   buffer);
+        reinterpret_cast<PFNGLSELECTBUFFERPROC>(Interception::Hooks::OpenGL::g_cached_gl_select_buffer)(size,
+                                                                                                        buffer);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLSELECTBUFFER,

@@ -12,8 +12,8 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiPixelStorei(GLenum pname,
-                                       GLint  param)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiPixelStorei(GLenum pname,
+                                                            GLint  param)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -25,7 +25,7 @@ void AI_APIENTRY OpenGL::aiPixelStorei(GLenum pname,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glPixelStorei(pname=[%s] param=[%d])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  param);
 
         switch (pname)
@@ -92,8 +92,8 @@ void AI_APIENTRY OpenGL::aiPixelStorei(GLenum pname,
 
     if (tracker.is_top_level_api_call() )
     {
-        OpenGL::get_context_state().pixel_store_manager.on_pixel_store(pname,
-                                                                       param);
+        Interception::Hooks::OpenGL::get_context_state().pixel_store_manager.on_pixel_store(pname,
+                                                                                            param);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLPIXELSTOREI,

@@ -7,9 +7,20 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiProgramUniform4d(GLuint program, GLint location, GLdouble v0, GLdouble v1, GLdouble v2, GLdouble v3);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiProgramUniform4d(GLuint   program,
+                                                GLint    location,
+                                                GLdouble v0,
+                                                GLdouble v1,
+                                                GLdouble v2,
+                                                GLdouble v3);
+        }
+    }
 }
 
 #endif /* AI_GL_PROGRAM_UNIFORM4D_H */

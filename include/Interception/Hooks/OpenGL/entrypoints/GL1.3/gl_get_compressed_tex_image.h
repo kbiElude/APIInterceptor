@@ -7,11 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetCompressedTexImage(GLenum target,
-                                             GLint  level,
-                                             void*  img);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetCompressedTexImage(GLenum target,
+                                                     GLint  level,
+                                                     void*  img);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_COMPRESSED_TEX_IMAGE_H */

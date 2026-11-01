@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiVertex4f(GLfloat x,
-                                    GLfloat y,
-                                    GLfloat z,
-                                    GLfloat w)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiVertex4f(GLfloat x,
+                                                         GLfloat y,
+                                                         GLfloat z,
+                                                         GLfloat w)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -55,10 +55,10 @@ void AI_APIENTRY OpenGL::aiVertex4f(GLfloat x,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLVERTEX4FPROC>(OpenGL::g_cached_gl_vertex_4f)(x,
-                                                                           y,
-                                                                           z,
-                                                                           w);
+        reinterpret_cast<PFNGLVERTEX4FPROC>(Interception::Hooks::OpenGL::g_cached_gl_vertex_4f)(x,
+                                                                                                y,
+                                                                                                z,
+                                                                                                w);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLVERTEX4F,

@@ -13,13 +13,13 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiTextureStorage3DMultisample(GLuint    texture,
-                                                       GLsizei   samples,
-                                                       GLenum    internalformat,
-                                                       GLsizei   width,
-                                                       GLsizei   height,
-                                                       GLsizei   depth,
-                                                       GLboolean fixedsamplelocations)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiTextureStorage3DMultisample(GLuint    texture,
+                                                                            GLsizei   samples,
+                                                                            GLenum    internalformat,
+                                                                            GLsizei   width,
+                                                                            GLsizei   height,
+                                                                            GLsizei   depth,
+                                                                            GLboolean fixedsamplelocations)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -33,7 +33,7 @@ void AI_APIENTRY OpenGL::aiTextureStorage3DMultisample(GLuint    texture,
         AI_TRACE("glTextureStorage3DMultisample(texture=[%u] samples=[%d] internalformat=[%s] width=[%d] height=[%d] depth=[%d] fixedsamplelocations=[%u])",
                  texture,
                  static_cast<int32_t>(samples),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(internalformat),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(internalformat),
                  static_cast<int32_t>(width),
                  static_cast<int32_t>(height),
                  static_cast<int32_t>(depth),
@@ -66,17 +66,17 @@ void AI_APIENTRY OpenGL::aiTextureStorage3DMultisample(GLuint    texture,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLTEXTURESTORAGE3DMULTISAMPLEPROC>(OpenGL::g_cached_gl_texture_storage3d_multisample)(texture,
-                                                                                                                  samples,
-                                                                                                                  internalformat,
-                                                                                                                  width,
-                                                                                                                  height,
-                                                                                                                  depth,
-                                                                                                                  fixedsamplelocations);
+        reinterpret_cast<PFNGLTEXTURESTORAGE3DMULTISAMPLEPROC>(Interception::Hooks::OpenGL::g_cached_gl_texture_storage3d_multisample)(texture,
+                                                                                                                                       samples,
+                                                                                                                                       internalformat,
+                                                                                                                                       width,
+                                                                                                                                       height,
+                                                                                                                                       depth,
+                                                                                                                                       fixedsamplelocations);
 
         if (tracker.is_top_level_api_call() )
         {
-            auto& context = OpenGL::get_context_state();
+            auto& context = Interception::Hooks::OpenGL::get_context_state();
 
             context.texture_manager.set_level_props(texture,
                                             0, /* multisample textures have a single implicit level */

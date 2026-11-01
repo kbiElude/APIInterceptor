@@ -12,26 +12,26 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDrawArraysIndirect(GLenum      mode,
-                                              const void* indirect)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDrawArraysIndirect(GLenum      mode,
+                                                                   const void* indirect)
 {
-    OpenGL::IndirectCommandChunk            indirect_chunk;
-    void*                                   post_callback_func_arg = nullptr;
-    APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
-    void*                                   pre_callback_func_arg  = nullptr;
-    APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
-    bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    Interception::Hooks::OpenGL::IndirectCommandChunk indirect_chunk;
+    void*                                             post_callback_func_arg = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC           post_callback_func_ptr = nullptr;
+    void*                                             pre_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC            pre_callback_func_ptr  = nullptr;
+    bool                                              should_pass_through    = true;
+    APIInterceptor::Tracker                           tracker;
 
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glDrawArraysIndirect(mode=[%s] indirect=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(mode),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(mode),
                  indirect);
 
-        indirect_chunk = OpenGL::IndirectCommandChunk::create_for_draw_arrays(indirect,
-                                                                              1,
-                                                                              0);
+        indirect_chunk = Interception::Hooks::OpenGL::IndirectCommandChunk::create_for_draw_arrays(indirect,
+                                                                                                   1,
+                                                                                                   0);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDRAWARRAYSINDIRECT,
                                                          &pre_callback_func_ptr,
@@ -55,8 +55,8 @@ void AI_APIENTRY OpenGL::aiDrawArraysIndirect(GLenum      mode,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDRAWARRAYSINDIRECTPROC>(OpenGL::g_cached_gl_draw_arrays_indirect)(mode,
-                                                                                                indirect);
+        reinterpret_cast<PFNGLDRAWARRAYSINDIRECTPROC>(Interception::Hooks::OpenGL::g_cached_gl_draw_arrays_indirect)(mode,
+                                                                                                                     indirect);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDRAWARRAYSINDIRECT,

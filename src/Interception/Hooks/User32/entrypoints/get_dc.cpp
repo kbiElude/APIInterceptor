@@ -10,7 +10,7 @@
 #include "Interception/Hooks/User32/globals.h"
 #include "Interception/Hooks/User32/entrypoints/get_dc.h"
 
-HDC WINAPI User32::get_dc(HWND in_hwnd)
+HDC WINAPI Interception::Hooks::User32::get_dc(HWND in_hwnd)
 {
     APIInterceptor::GateScope               gate_scope;
     void*                                   post_callback_func_arg  = nullptr;
@@ -45,7 +45,7 @@ HDC WINAPI User32::get_dc(HWND in_hwnd)
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<User32::PFNGETDCPROC>(User32::g_cached_get_dc_func_ptr)(in_hwnd);
+        result = reinterpret_cast<Interception::Hooks::User32::PFNGETDCPROC>(Interception::Hooks::User32::g_cached_get_dc_func_ptr)(in_hwnd);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_USER32_GETDC,
@@ -56,8 +56,8 @@ HDC WINAPI User32::get_dc(HWND in_hwnd)
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_USER32_GETDC,
                                post_callback_func_arg,
-                               0,       /* in_n_args_out   */
-                               nullptr, /* in_args_out_ptr */
+                               0,       /* in_n_arguments_out   */
+                               nullptr, /* in_arguments_out_ptr */
                               &result_arg);
     }
 

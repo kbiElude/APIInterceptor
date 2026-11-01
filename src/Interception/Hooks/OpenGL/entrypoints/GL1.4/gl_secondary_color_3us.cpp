@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiSecondaryColor3us(GLushort red,
-                                             GLushort green,
-                                             GLushort blue)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiSecondaryColor3us(GLushort red,
+                                                                  GLushort green,
+                                                                  GLushort blue)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiSecondaryColor3us(GLushort red,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLSECONDARYCOLOR3USPROC>(OpenGL::g_cached_gl_secondary_color_3us)(red,
-                                                                                              green,
-                                                                                              blue);
+        reinterpret_cast<PFNGLSECONDARYCOLOR3USPROC>(Interception::Hooks::OpenGL::g_cached_gl_secondary_color_3us)(red,
+                                                                                                                   green,
+                                                                                                                   blue);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLSECONDARYCOLOR3US,

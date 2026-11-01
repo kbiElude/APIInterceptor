@@ -30,36 +30,36 @@ bool APIDumperDLL::D3D8SwapchainReader::read(void*                    in_device_
     constexpr uint32_t RGBA8_BLUE_OFFSET    = 2;
     constexpr uint32_t RGBA8_ALPHA_OFFSET   = 3;
 
-    D3D8::IDirect3DSurface8* back_buffer_ptr = nullptr;
-    D3D8::D3DSURFACE_DESC    description     = {};
-    D3D8::D3DLOCKED_RECT     locked_rect     = {};
+    Interception::Hooks::D3D8::IDirect3DSurface8* back_buffer_ptr = nullptr;
+    Interception::Hooks::D3D8::D3DSURFACE_DESC    description     = {};
+    Interception::Hooks::D3D8::D3DLOCKED_RECT     locked_rect     = {};
     bool                     is_locked       = false;
     bool                     result          = false;
-    D3D8::IDirect3DSurface8* system_ptr      = nullptr;
+    Interception::Hooks::D3D8::IDirect3DSurface8* system_ptr      = nullptr;
 
     void** const device_vtable = *reinterpret_cast<void***>(in_device_ptr);
 
-    const auto get_back_buffer_func = reinterpret_cast<D3D8::PFN_IDIRECT3DDEVICE8_GETBACKBUFFER>   (device_vtable[D3D8::VTABLE_INDEX_IDIRECT3DDEVICE8_GETBACKBUFFER]);
-    const auto create_image_func    = reinterpret_cast<D3D8::PFN_IDIRECT3DDEVICE8_CREATEIMAGESURFACE>(device_vtable[D3D8::VTABLE_INDEX_IDIRECT3DDEVICE8_CREATEIMAGESURFACE]);
-    const auto copy_rects_func      = reinterpret_cast<D3D8::PFN_IDIRECT3DDEVICE8_COPYRECTS>        (device_vtable[D3D8::VTABLE_INDEX_IDIRECT3DDEVICE8_COPYRECTS]);
+    const auto get_back_buffer_func = reinterpret_cast<Interception::Hooks::D3D8::PFN_IDIRECT3DDEVICE8_GETBACKBUFFER>   (device_vtable[Interception::Hooks::D3D8::VTABLE_INDEX_IDIRECT3DDEVICE8_GETBACKBUFFER]);
+    const auto create_image_func    = reinterpret_cast<Interception::Hooks::D3D8::PFN_IDIRECT3DDEVICE8_CREATEIMAGESURFACE>(device_vtable[Interception::Hooks::D3D8::VTABLE_INDEX_IDIRECT3DDEVICE8_CREATEIMAGESURFACE]);
+    const auto copy_rects_func      = reinterpret_cast<Interception::Hooks::D3D8::PFN_IDIRECT3DDEVICE8_COPYRECTS>        (device_vtable[Interception::Hooks::D3D8::VTABLE_INDEX_IDIRECT3DDEVICE8_COPYRECTS]);
 
     /* Releases a surface and clears the pointer. */
-    const auto release_func = [](D3D8::IDirect3DSurface8** inout_surface_ptr_ptr)
+    const auto release_func = [](Interception::Hooks::D3D8::IDirect3DSurface8** inout_surface_ptr_ptr)
     {
         if (*inout_surface_ptr_ptr != nullptr)
         {
             void** const vtable = *reinterpret_cast<void***>(*inout_surface_ptr_ptr);
 
-            reinterpret_cast<D3D8::PFN_IDIRECT3DSURFACE8_RELEASE>(vtable[D3D8::VTABLE_INDEX_IDIRECT3DSURFACE8_RELEASE])(*inout_surface_ptr_ptr);
+            reinterpret_cast<Interception::Hooks::D3D8::PFN_IDIRECT3DSURFACE8_RELEASE>(vtable[Interception::Hooks::D3D8::VTABLE_INDEX_IDIRECT3DSURFACE8_RELEASE])(*inout_surface_ptr_ptr);
 
             *inout_surface_ptr_ptr = nullptr;
         }
     };
 
-    if (FAILED(get_back_buffer_func(static_cast<D3D8::IDirect3DDevice8*>(in_device_ptr),
-                                    0, /* BackBuffer */
-                                    D3D8::D3DBACKBUFFER_TYPE_MONO,
-                                   &back_buffer_ptr) ))
+    if (FAILED(get_back_buffer_func(static_cast<Interception::Hooks::D3D8::IDirect3DDevice8*>(in_device_ptr),
+                                                         0, /* BackBuffer */
+                                                         Interception::Hooks::D3D8::D3DBACKBUFFER_TYPE_MONO,
+                                                        &back_buffer_ptr) ))
     {
         goto end;
     }
@@ -67,29 +67,29 @@ bool APIDumperDLL::D3D8SwapchainReader::read(void*                    in_device_
     {
         void** const back_buffer_vtable = *reinterpret_cast<void***>(back_buffer_ptr);
 
-        if (FAILED(reinterpret_cast<D3D8::PFN_IDIRECT3DSURFACE8_GETDESC>(back_buffer_vtable[D3D8::VTABLE_INDEX_IDIRECT3DSURFACE8_GETDESC])(back_buffer_ptr,
-                                                                                                                                         &description) ))
+        if (FAILED(reinterpret_cast<Interception::Hooks::D3D8::PFN_IDIRECT3DSURFACE8_GETDESC>(back_buffer_vtable[Interception::Hooks::D3D8::VTABLE_INDEX_IDIRECT3DSURFACE8_GETDESC])(back_buffer_ptr,
+                                                                                                                                                              &description) ))
         {
             goto end;
         }
     }
 
     /* The back buffer may not be lockable; a system memory copy of it always is. */
-    if (FAILED(create_image_func(static_cast<D3D8::IDirect3DDevice8*>(in_device_ptr),
-                                 description.Width,
-                                 description.Height,
-                                 description.Format,
-                                &system_ptr) ))
+    if (FAILED(create_image_func(static_cast<Interception::Hooks::D3D8::IDirect3DDevice8*>(in_device_ptr),
+                                                      description.Width,
+                                                      description.Height,
+                                                      description.Format,
+                                                     &system_ptr) ))
     {
         goto end;
     }
 
-    if (FAILED(copy_rects_func(static_cast<D3D8::IDirect3DDevice8*>(in_device_ptr),
-                               back_buffer_ptr,
-                               nullptr,
-                               0,
-                               system_ptr,
-                               nullptr) ))
+    if (FAILED(copy_rects_func(static_cast<Interception::Hooks::D3D8::IDirect3DDevice8*>(in_device_ptr),
+                                                    back_buffer_ptr,
+                                                    nullptr,
+                                                    0,
+                                                    system_ptr,
+                                                    nullptr) ))
     {
         goto end;
     }
@@ -97,10 +97,10 @@ bool APIDumperDLL::D3D8SwapchainReader::read(void*                    in_device_
     {
         void** const system_vtable = *reinterpret_cast<void***>(system_ptr);
 
-        if (FAILED(reinterpret_cast<D3D8::PFN_IDIRECT3DSURFACE8_LOCKRECT>(system_vtable[D3D8::VTABLE_INDEX_IDIRECT3DSURFACE8_LOCKRECT])(system_ptr,
-                                                                                                                                       &locked_rect,
-                                                                                                                                        nullptr,
-                                                                                                                                        D3D8::D3DLOCK_READONLY) ))
+        if (FAILED(reinterpret_cast<Interception::Hooks::D3D8::PFN_IDIRECT3DSURFACE8_LOCKRECT>(system_vtable[Interception::Hooks::D3D8::VTABLE_INDEX_IDIRECT3DSURFACE8_LOCKRECT])(system_ptr,
+                                                                                                                                                            &locked_rect,
+                                                                                                                                                             nullptr,
+                                                                                                                                                             Interception::Hooks::D3D8::D3DLOCK_READONLY) ))
         {
             goto end;
         }
@@ -128,22 +128,22 @@ bool APIDumperDLL::D3D8SwapchainReader::read(void*                    in_device_
 
                 switch (description.Format)
                 {
-                    case D3D8::D3DFMT_A8R8G8B8:
-                    case D3D8::D3DFMT_X8R8G8B8:
+                    case Interception::Hooks::D3D8::D3DFMT_A8R8G8B8:
+                    case Interception::Hooks::D3D8::D3DFMT_X8R8G8B8:
                     {
                         const uint8_t* pixel_ptr = source_ptr + x * sizeof(uint32_t);
 
                         blue  = pixel_ptr[ARGB8_BLUE_OFFSET];
                         green = pixel_ptr[ARGB8_GREEN_OFFSET];
                         red   = pixel_ptr[ARGB8_RED_OFFSET];
-                        alpha = (description.Format == D3D8::D3DFMT_A8R8G8B8) ? pixel_ptr[ARGB8_ALPHA_OFFSET]
+                        alpha = (description.Format == Interception::Hooks::D3D8::D3DFMT_A8R8G8B8) ? pixel_ptr[ARGB8_ALPHA_OFFSET]
                                                                               : CHANNEL_MAX;
 
                         break;
                     }
 
-                    case D3D8::D3DFMT_A1R5G5B5:
-                    case D3D8::D3DFMT_X1R5G5B5:
+                    case Interception::Hooks::D3D8::D3DFMT_A1R5G5B5:
+                    case Interception::Hooks::D3D8::D3DFMT_X1R5G5B5:
                     {
                         uint16_t pixel = 0;
 
@@ -154,13 +154,13 @@ bool APIDumperDLL::D3D8SwapchainReader::read(void*                    in_device_
                         blue  = ((pixel >> X1R5G5B5_BLUE_SHIFT)  & FIVE_BIT_MAX) * CHANNEL_MAX / FIVE_BIT_MAX;
                         green = ((pixel >> X1R5G5B5_GREEN_SHIFT) & FIVE_BIT_MAX) * CHANNEL_MAX / FIVE_BIT_MAX;
                         red   = ((pixel >> X1R5G5B5_RED_SHIFT)   & FIVE_BIT_MAX) * CHANNEL_MAX / FIVE_BIT_MAX;
-                        alpha = (description.Format == D3D8::D3DFMT_A1R5G5B5) ? (((pixel >> A1R5G5B5_ALPHA_SHIFT) & 1) * CHANNEL_MAX)
+                        alpha = (description.Format == Interception::Hooks::D3D8::D3DFMT_A1R5G5B5) ? (((pixel >> A1R5G5B5_ALPHA_SHIFT) & 1) * CHANNEL_MAX)
                                                                               : CHANNEL_MAX;
 
                         break;
                     }
 
-                    case D3D8::D3DFMT_R5G6B5:
+                    case Interception::Hooks::D3D8::D3DFMT_R5G6B5:
                     {
                         uint16_t pixel = 0;
 
@@ -198,7 +198,7 @@ end:
     {
         void** const system_vtable = *reinterpret_cast<void***>(system_ptr);
 
-        reinterpret_cast<D3D8::PFN_IDIRECT3DSURFACE8_UNLOCKRECT>(system_vtable[D3D8::VTABLE_INDEX_IDIRECT3DSURFACE8_UNLOCKRECT])(system_ptr);
+        reinterpret_cast<Interception::Hooks::D3D8::PFN_IDIRECT3DSURFACE8_UNLOCKRECT>(system_vtable[Interception::Hooks::D3D8::VTABLE_INDEX_IDIRECT3DSURFACE8_UNLOCKRECT])(system_ptr);
     }
 
     release_func(&system_ptr);

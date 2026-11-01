@@ -1393,7 +1393,7 @@ namespace APIInterceptor
             /* Stub */
         }
 
-        APIFunctionArgument(const APIFunctionArgument& in_arg) = default;
+        APIFunctionArgument(const APIFunctionArgument& in_argument) = default;
 
     private:
 

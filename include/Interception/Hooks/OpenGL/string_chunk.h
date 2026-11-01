@@ -7,25 +7,31 @@
 
 #include "Common/callbacks.h"
 
-namespace OpenGL
+namespace Interception
 {
-    /* Copies a NUL-terminated string into a data chunk. The copy is made when the ID is asked for for the first time,
-     * and only then, so that nothing is copied when no callback wants the arguments. Later calls return the same chunk.
-     *
-     * The chunk holds the characters and the terminator. A null string gives an empty chunk.
-     */
-    class StringChunk
+    namespace Hooks
     {
-    public:
-        StringChunk(const char* in_string_ptr);
+        namespace OpenGL
+        {
+            /* Copies a NUL-terminated string into a data chunk. The copy is made when the ID is asked for for the first time,
+             * and only then, so that nothing is copied when no callback wants the arguments. Later calls return the same chunk.
+             *
+             * The chunk holds the characters and the terminator. A null string gives an empty chunk.
+             */
+            class StringChunk
+            {
+            public:
+                StringChunk(const char* in_string_ptr);
 
-        APIInterceptor::DataChunkID get_id();
+                APIInterceptor::DataChunkID get_id();
 
-    private:
-        APIInterceptor::DataChunkID m_id;
-        bool                        m_is_registered;
-        const char*                 m_string_ptr;
-    };
+            private:
+                APIInterceptor::DataChunkID m_id;
+                bool                        m_is_registered;
+                const char*                 m_string_ptr;
+            };
+        }
+    }
 }
 
 #endif /* OPENGL_STRING_CHUNK_H */

@@ -12,11 +12,11 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiShaderBinary(GLsizei       count,
-                                        const GLuint* shaders,
-                                        GLenum        binaryformat,
-                                        const void*   binary,
-                                        GLsizei       length)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiShaderBinary(GLsizei       count,
+                                                             const GLuint* shaders,
+                                                             GLenum        binaryformat,
+                                                             const void*   binary,
+                                                             GLsizei       length)
 {
     APIInterceptor::MemoryChunk             binary_chunk(binary,
                                                          length,
@@ -36,7 +36,7 @@ void AI_APIENTRY OpenGL::aiShaderBinary(GLsizei       count,
         AI_TRACE("glShaderBinary(count=[%d] shaders=[%p] binaryformat=[%s] binary=[%p] length=[%d])",
                  static_cast<int32_t>(count),
                  shaders,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(binaryformat),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(binaryformat),
                  binary,
                  static_cast<int32_t>(length) );
 
@@ -65,11 +65,11 @@ void AI_APIENTRY OpenGL::aiShaderBinary(GLsizei       count,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLSHADERBINARYPROC>(OpenGL::g_cached_gl_shader_binary)(count,
-                                                                                    shaders,
-                                                                                    binaryformat,
-                                                                                    binary,
-                                                                                    length);
+        reinterpret_cast<PFNGLSHADERBINARYPROC>(Interception::Hooks::OpenGL::g_cached_gl_shader_binary)(count,
+                                                                                                         shaders,
+                                                                                                         binaryformat,
+                                                                                                         binary,
+                                                                                                         length);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLSHADERBINARY,

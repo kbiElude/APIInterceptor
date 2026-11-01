@@ -7,16 +7,22 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiCompressedTexImage3D(GLenum      target,
-                                            GLint       level,
-                                            GLenum      internalformat,
-                                            GLsizei     width,
-                                            GLsizei     height,
-                                            GLsizei     depth,
-                                            GLint       border,
-                                            GLsizei     imageSize,
-                                            const void* data);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiCompressedTexImage3D(GLenum      target,
+                                                    GLint       level,
+                                                    GLenum      internalformat,
+                                                    GLsizei     width,
+                                                    GLsizei     height,
+                                                    GLsizei     depth,
+                                                    GLint       border,
+                                                    GLsizei     imageSize,
+                                                    const void* data);
+        }
+    }
 }
 #endif /* AI_GL_COMPRESSED_TEX_IMAGE_3D_H */

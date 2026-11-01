@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    ContextState& get_context_state   ();
-    void          on_context_destroyed(const HGLRC& in_hglrc);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            ContextState& get_context_state   ();
+            void          on_context_destroyed(const HGLRC& in_hglrc);
+        }
+    }
 }
 
 #endif /* AI_STATE_TRACKER_H */

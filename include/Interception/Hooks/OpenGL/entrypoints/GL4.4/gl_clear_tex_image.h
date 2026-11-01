@@ -7,13 +7,19 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiClearTexImage(GLuint      texture,
-                                     GLint       level,
-                                     GLenum      format,
-                                     GLenum      type,
-                                     const void* data);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiClearTexImage(GLuint      texture,
+                                             GLint       level,
+                                             GLenum      format,
+                                             GLenum      type,
+                                             const void* data);
+        }
+    }
 }
 
 #endif /* AI_GL_CLEAR_TEX_IMAGE_H */

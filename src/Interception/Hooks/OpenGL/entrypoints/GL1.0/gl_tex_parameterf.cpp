@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiTexParameterf(GLenum  target,
-                                         GLenum  pname,
-                                         GLfloat param)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiTexParameterf(GLenum  target,
+                                                              GLenum  pname,
+                                                              GLfloat param)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -30,16 +30,16 @@ void AI_APIENTRY OpenGL::aiTexParameterf(GLenum  target,
              (pname == GL_TEXTURE_MAX_LEVEL)  )
         {
             AI_TRACE("glTexParameterf(target=[%s] pname=[%s] param=[%.4f])",
-                     OpenGL::Utils::get_raw_string_for_gl_enum(target),
-                     OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                     Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
+                     Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                      param);
         }
         else
         {
             AI_TRACE("glTexParameterf(target=[%s] pname=[%s] param=[%s])",
-                     OpenGL::Utils::get_raw_string_for_gl_enum(target),
-                     OpenGL::Utils::get_raw_string_for_gl_enum(pname),
-                     OpenGL::Utils::get_raw_string_for_gl_enum(static_cast<GLenum>(param) ));
+                     Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
+                     Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
+                     Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(static_cast<GLenum>(param) ));
         }
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTEXPARAMETERF,
@@ -65,9 +65,9 @@ void AI_APIENTRY OpenGL::aiTexParameterf(GLenum  target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLTEXPARAMETERFPROC>(OpenGL::g_cached_gl_tex_parameterf)(target,
-                                                                                     pname,
-                                                                                     param);
+        reinterpret_cast<PFNGLTEXPARAMETERFPROC>(Interception::Hooks::OpenGL::g_cached_gl_tex_parameterf)(target,
+                                                                                                          pname,
+                                                                                                          param);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTEXPARAMETERF,

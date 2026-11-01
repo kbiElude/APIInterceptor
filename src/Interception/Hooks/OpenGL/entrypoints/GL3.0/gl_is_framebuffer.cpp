@@ -10,7 +10,7 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-GLboolean AI_APIENTRY OpenGL::aiIsFramebuffer(GLuint framebuffer)
+GLboolean AI_APIENTRY Interception::Hooks::OpenGL::aiIsFramebuffer(GLuint framebuffer)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -44,7 +44,7 @@ GLboolean AI_APIENTRY OpenGL::aiIsFramebuffer(GLuint framebuffer)
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNGLISFRAMEBUFFERPROC>(OpenGL::g_cached_gl_is_framebuffer)(framebuffer);
+        result = reinterpret_cast<PFNGLISFRAMEBUFFERPROC>(Interception::Hooks::OpenGL::g_cached_gl_is_framebuffer)(framebuffer);
     }
 
     if (tracker.is_top_level_api_call() )

@@ -10,10 +10,10 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiScissor(GLint   x,
-                                   GLint   y,
-                                   GLsizei width,
-                                   GLsizei height)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiScissor(GLint   x,
+                                                        GLint   y,
+                                                        GLsizei width,
+                                                        GLsizei height)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;

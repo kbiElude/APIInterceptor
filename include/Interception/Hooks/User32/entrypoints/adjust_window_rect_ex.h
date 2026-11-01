@@ -7,9 +7,18 @@
 
 #include <windows.h>
 
-namespace User32
+namespace Interception
 {
-    BOOL WINAPI adjust_window_rect_ex(LPRECT, DWORD, BOOL, DWORD);
+    namespace Hooks
+    {
+        namespace User32
+        {
+            BOOL WINAPI adjust_window_rect_ex(LPRECT,
+                                              DWORD,
+                                              BOOL,
+                                              DWORD);
+        }
+    }
 }
 
 #endif /* AI_ADJUST_WINDOW_RECT_EX_H */

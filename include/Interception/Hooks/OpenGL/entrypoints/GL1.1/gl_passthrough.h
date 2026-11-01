@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiPassthrough(GLfloat token);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiPassthrough(GLfloat token);
+        }
+    }
 }
 
 #endif /* AI_GL_PASSTHROUGH_H */

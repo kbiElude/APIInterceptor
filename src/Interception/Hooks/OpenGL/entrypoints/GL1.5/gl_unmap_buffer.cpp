@@ -16,7 +16,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-GLboolean AI_APIENTRY OpenGL::aiUnmapBuffer(GLenum target)
+GLboolean AI_APIENTRY Interception::Hooks::OpenGL::aiUnmapBuffer(GLenum target)
 {
     GLuint                                  buffer_id              = 0;
     void*                                   post_callback_func_arg = nullptr;
@@ -33,14 +33,14 @@ GLboolean AI_APIENTRY OpenGL::aiUnmapBuffer(GLenum target)
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glUnmapBuffer(target=[%s])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target));
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target));
 
-        auto& context = OpenGL::get_context_state();
+        auto& context = Interception::Hooks::OpenGL::get_context_state();
 
         {
-            OpenGL::BufferBindingTarget binding_target;
-            const bool                  is_known_target = OpenGL::Utils::get_buffer_binding_target_for_gl_enum(target,
-                                                                                                               &binding_target);
+            Interception::Hooks::OpenGL::BufferBindingTarget binding_target;
+            const bool                                       is_known_target = Interception::Hooks::OpenGL::Utils::get_buffer_binding_target_for_gl_enum(target,
+                                                                                                                                    &binding_target);
 
             AI_ASSERT(is_known_target);
 
@@ -48,7 +48,7 @@ GLboolean AI_APIENTRY OpenGL::aiUnmapBuffer(GLenum target)
         }
 
         /* The pointer is not valid once the buffer is unmapped, so the copy is made now. */
-        const OpenGL::BufferMappingManager::Region unmap_region = context.buffer_mapping_manager.get_unmap_region(buffer_id);
+        const Interception::Hooks::OpenGL::BufferMappingManager::Region unmap_region = context.buffer_mapping_manager.get_unmap_region(buffer_id);
 
         unmap_chunk = APIInterceptor::MemoryChunk(unmap_region.data_ptr,
                                                   static_cast<int64_t>(unmap_region.n_bytes),
@@ -83,12 +83,12 @@ GLboolean AI_APIENTRY OpenGL::aiUnmapBuffer(GLenum target)
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNGLUNMAPBUFFERPROC>(OpenGL::g_cached_gl_unmap_buffer)(target);
+        result = reinterpret_cast<PFNGLUNMAPBUFFERPROC>(Interception::Hooks::OpenGL::g_cached_gl_unmap_buffer)(target);
     }
 
     if (tracker.is_top_level_api_call() )
     {
-        OpenGL::get_context_state().buffer_mapping_manager.on_buffer_unmapped(buffer_id);
+        Interception::Hooks::OpenGL::get_context_state().buffer_mapping_manager.on_buffer_unmapped(buffer_id);
 
         if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLUNMAPBUFFER,
                                                           &post_callback_func_ptr,

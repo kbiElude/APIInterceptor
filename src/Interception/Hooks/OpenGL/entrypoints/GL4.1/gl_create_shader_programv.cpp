@@ -12,9 +12,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-GLuint AI_APIENTRY OpenGL::aiCreateShaderProgramv(GLenum               type,
-                                                  GLsizei              count,
-                                                  const GLchar* const* strings)
+GLuint AI_APIENTRY Interception::Hooks::OpenGL::aiCreateShaderProgramv(GLenum               type,
+                                                                       GLsizei              count,
+                                                                       const GLchar* const* strings)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -22,15 +22,15 @@ GLuint AI_APIENTRY OpenGL::aiCreateShaderProgramv(GLenum               type,
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     GLuint                                  result                 = 0;
     bool                                    should_pass_through    = true;
-    OpenGL::StringArrayChunk                strings_chunk(strings,
-                                                          count,
-                                                          nullptr);
+    Interception::Hooks::OpenGL::StringArrayChunk                strings_chunk(strings,
+                                                                               count,
+                                                                               nullptr);
     APIInterceptor::Tracker                 tracker;
 
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glCreateShaderProgramv(type=[%s] count=[%d] strings=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(type),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type),
                  static_cast<int32_t>(count),
                  strings);
 
@@ -55,9 +55,9 @@ GLuint AI_APIENTRY OpenGL::aiCreateShaderProgramv(GLenum               type,
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNGLCREATESHADERPROGRAMVPROC>(OpenGL::g_cached_gl_create_shader_programv)(type,
-                                                                                                             count,
-                                                                                                             strings);
+        result = reinterpret_cast<PFNGLCREATESHADERPROGRAMVPROC>(Interception::Hooks::OpenGL::g_cached_gl_create_shader_programv)(type,
+                                                                                                                                  count,
+                                                                                                                                  strings);
     }
 
     if (tracker.is_top_level_api_call() )

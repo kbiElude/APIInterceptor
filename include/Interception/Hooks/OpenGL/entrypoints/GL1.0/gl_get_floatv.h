@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetFloatv(GLenum   pname,
-                                 GLfloat* data);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetFloatv(GLenum   pname,
+                                         GLfloat* data);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_FLOATV_H */

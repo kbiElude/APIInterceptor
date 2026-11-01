@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetPointerv(GLenum   pname,
-                                   GLvoid** params);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetPointerv(GLenum   pname,
+                                           GLvoid** params);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_POINTERV_H */

@@ -10,7 +10,7 @@
 #include "Interception/Hooks/WGL/globals.h"
 #include "Interception/Hooks/WGL/utils_trace.h"
 
-BOOL WINAPI WGL::swap_interval_ext(int in_interval)
+BOOL WINAPI Interception::Hooks::WGL::swap_interval_ext(int in_interval)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -44,7 +44,7 @@ BOOL WINAPI WGL::swap_interval_ext(int in_interval)
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNWGLSWAPINTERVALEXTPROC>(WGL::g_cached_swap_interval_ext_func_ptr)(in_interval);
+        result = reinterpret_cast<PFNWGLSWAPINTERVALEXTPROC>(Interception::Hooks::WGL::g_cached_swap_interval_ext_func_ptr)(in_interval);
     }
 
     if (tracker.is_top_level_api_call() )
@@ -57,8 +57,8 @@ BOOL WINAPI WGL::swap_interval_ext(int in_interval)
 
             post_callback_func_ptr(APIInterceptor::APIFUNCTION_WGL_WGLSWAPINTERVALEXT,
                                    post_callback_func_arg,
-                                   0,       /* in_n_args_out   */
-                               nullptr, /* in_args_out_ptr */
+                                   0,       /* in_n_arguments_out   */
+                               nullptr, /* in_arguments_out_ptr */
                                   &result_arg);
         }
     }

@@ -7,11 +7,17 @@
 
 #include <Windows.h>
 
-namespace GDI32
+namespace Interception
 {
-    BOOL WINAPI set_pixel_format(HDC                          in_hdc,
-                                 int                          in_format,
-                                 CONST PIXELFORMATDESCRIPTOR* in_pixel_format_descriptor_ptr);
+    namespace Hooks
+    {
+        namespace GDI32
+        {
+            BOOL WINAPI set_pixel_format(HDC                          in_hdc,
+                                         int                          in_format,
+                                         CONST PIXELFORMATDESCRIPTOR* in_pixel_format_descriptor_ptr);
+        }
+    }
 }
 
 #endif /* AI_SET_PIXEL_FORMAT_H */

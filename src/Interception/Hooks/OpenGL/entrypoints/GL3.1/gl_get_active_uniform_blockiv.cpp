@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetActiveUniformBlockiv(GLuint program,
-                                                   GLuint uniformBlockIndex,
-                                                   GLenum pname,
-                                                   GLint* params)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetActiveUniformBlockiv(GLuint program,
+                                                                        GLuint uniformBlockIndex,
+                                                                        GLenum pname,
+                                                                        GLint* params)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -28,7 +28,7 @@ void AI_APIENTRY OpenGL::aiGetActiveUniformBlockiv(GLuint program,
         AI_TRACE("glGetActiveUniformBlockiv(program=[%u] uniformBlockIndex=[%u] pname=[%s] params=[%p])",
                  program,
                  uniformBlockIndex,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  params);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETACTIVEUNIFORMBLOCKIV,
@@ -55,10 +55,10 @@ void AI_APIENTRY OpenGL::aiGetActiveUniformBlockiv(GLuint program,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETACTIVEUNIFORMBLOCKIVPROC>(OpenGL::g_cached_gl_get_active_uniform_blockiv)(program,
-                                                                                                          uniformBlockIndex,
-                                                                                                          pname,
-                                                                                                          params);
+        reinterpret_cast<PFNGLGETACTIVEUNIFORMBLOCKIVPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_active_uniform_blockiv)(program,
+                                                                                                                               uniformBlockIndex,
+                                                                                                                               pname,
+                                                                                                                               params);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETACTIVEUNIFORMBLOCKIV,

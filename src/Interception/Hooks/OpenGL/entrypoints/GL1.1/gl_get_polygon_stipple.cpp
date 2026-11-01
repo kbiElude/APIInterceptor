@@ -11,7 +11,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetPolygonStipple(GLubyte* mask)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetPolygonStipple(GLubyte* mask)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -46,7 +46,7 @@ void AI_APIENTRY OpenGL::aiGetPolygonStipple(GLubyte* mask)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETPOLYGONSTIPPLEPROC>(OpenGL::g_cached_gl_get_polygon_stipple)(mask);
+        reinterpret_cast<PFNGLGETPOLYGONSTIPPLEPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_polygon_stipple)(mask);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETPOLYGONSTIPPLE,

@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    GLboolean AI_APIENTRY aiIsShader(GLuint shader);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            GLboolean AI_APIENTRY aiIsShader(GLuint shader);
+        }
+    }
 }
 
 #endif /* AI_GL_IS_SHADER_H */

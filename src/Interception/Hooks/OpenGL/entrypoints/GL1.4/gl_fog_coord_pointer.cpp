@@ -12,9 +12,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiFogCoordPointer(GLenum        type,
-                                           GLsizei       stride,
-                                           const GLvoid* pointer)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiFogCoordPointer(GLenum        type,
+                                                                GLsizei       stride,
+                                                                const GLvoid* pointer)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -26,7 +26,7 @@ void AI_APIENTRY OpenGL::aiFogCoordPointer(GLenum        type,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glFogCoordPointer(type=[%s], stride=[%d], pointer=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(type),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type),
                  stride,
                  pointer);
 
@@ -53,22 +53,22 @@ void AI_APIENTRY OpenGL::aiFogCoordPointer(GLenum        type,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLFOGCOORDPOINTERPROC>(OpenGL::g_cached_gl_fog_coord_pointer)(type,
-                                                                                          stride,
-                                                                                          pointer);
+        reinterpret_cast<PFNGLFOGCOORDPOINTERPROC>(Interception::Hooks::OpenGL::g_cached_gl_fog_coord_pointer)(type,
+                                                                                                               stride,
+                                                                                                               pointer);
     }
 
     if (tracker.is_top_level_api_call() )
     {
-        auto& context = OpenGL::get_context_state();
+        auto& context = Interception::Hooks::OpenGL::get_context_state();
 
-        context.client_array_manager.set_pointer(OpenGL::ClientArrayKind::FOG_COORD,
+        context.client_array_manager.set_pointer(Interception::Hooks::OpenGL::ClientArrayKind::FOG_COORD,
                                                0,
                                                1,
                                                type,
                                                stride,
                                                pointer,
-                                               context.buffer_manager.get_bound_buffer(OpenGL::BufferBindingTarget::ARRAY_BUFFER),
+                                               context.buffer_manager.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ARRAY_BUFFER),
                                                false,  /* in_is_integer    */
                                                false,  /* in_is_long       */
                                                false); /* in_is_normalized */

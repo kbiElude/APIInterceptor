@@ -7,9 +7,19 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiVertexArrayAttribIFormat(GLuint vaobj, GLuint attribindex, GLint size, GLenum type, GLuint relativeoffset);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiVertexArrayAttribIFormat(GLuint vaobj,
+                                                        GLuint attribindex,
+                                                        GLint  size,
+                                                        GLenum type,
+                                                        GLuint relativeoffset);
+        }
+    }
 }
 
 #endif /* AI_GL_VERTEX_ARRAY_ATTRIB_IFORMAT_H */

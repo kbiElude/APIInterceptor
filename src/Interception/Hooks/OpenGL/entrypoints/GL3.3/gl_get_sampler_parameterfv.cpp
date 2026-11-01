@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetSamplerParameterfv(GLuint   sampler,
-                                                 GLenum   pname,
-                                                 GLfloat* params)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetSamplerParameterfv(GLuint   sampler,
+                                                                      GLenum   pname,
+                                                                      GLfloat* params)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -26,7 +26,7 @@ void AI_APIENTRY OpenGL::aiGetSamplerParameterfv(GLuint   sampler,
     {
         AI_TRACE("glGetSamplerParameterfv(sampler=[%u] pname=[%s] params=[%p])",
                  sampler,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  params);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETSAMPLERPARAMETERFV,
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiGetSamplerParameterfv(GLuint   sampler,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETSAMPLERPARAMETERFVPROC>(OpenGL::g_cached_gl_get_sampler_parameterfv)(sampler,
-                                                                                                      pname,
-                                                                                                      params);
+        reinterpret_cast<PFNGLGETSAMPLERPARAMETERFVPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_sampler_parameterfv)(sampler,
+                                                                                                                           pname,
+                                                                                                                           params);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETSAMPLERPARAMETERFV,

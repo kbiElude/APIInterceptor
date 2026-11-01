@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiBindVertexBuffer(GLuint   bindingindex,
-                                            GLuint   buffer,
-                                            GLintptr offset,
-                                            GLsizei  stride)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiBindVertexBuffer(GLuint   bindingindex,
+                                                                 GLuint   buffer,
+                                                                 GLintptr offset,
+                                                                 GLsizei  stride)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -55,10 +55,10 @@ void AI_APIENTRY OpenGL::aiBindVertexBuffer(GLuint   bindingindex,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLBINDVERTEXBUFFERPROC>(OpenGL::g_cached_gl_bind_vertex_buffer)(bindingindex,
-                                                                                             buffer,
-                                                                                             offset,
-                                                                                             stride);
+        reinterpret_cast<PFNGLBINDVERTEXBUFFERPROC>(Interception::Hooks::OpenGL::g_cached_gl_bind_vertex_buffer)(bindingindex,
+                                                                                                                  buffer,
+                                                                                                                  offset,
+                                                                                                                  stride);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBINDVERTEXBUFFER,

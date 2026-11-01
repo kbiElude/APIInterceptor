@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiSamplerParameteri(GLuint sampler,
-                                             GLenum pname,
-                                             GLint  param)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiSamplerParameteri(GLuint sampler,
+                                                                  GLenum pname,
+                                                                  GLint  param)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -26,7 +26,7 @@ void AI_APIENTRY OpenGL::aiSamplerParameteri(GLuint sampler,
     {
         AI_TRACE("glSamplerParameteri(sampler=[%u] pname=[%s] param=[%d])",
                  sampler,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  param);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLSAMPLERPARAMETERI,
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiSamplerParameteri(GLuint sampler,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLSAMPLERPARAMETERIPROC>(OpenGL::g_cached_gl_sampler_parameteri)(sampler,
-                                                                                             pname,
-                                                                                             param);
+        reinterpret_cast<PFNGLSAMPLERPARAMETERIPROC>(Interception::Hooks::OpenGL::g_cached_gl_sampler_parameteri)(sampler,
+                                                                                                                  pname,
+                                                                                                                  param);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLSAMPLERPARAMETERI,

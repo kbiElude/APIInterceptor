@@ -12,23 +12,23 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiPolygonStipple(const GLubyte* mask)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiPolygonStipple(const GLubyte* mask)
 {
-    OpenGL::PixelDataChunk                  pixels_chunk;
-    void*                                   post_callback_func_arg = nullptr;
-    APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
-    void*                                   pre_callback_func_arg  = nullptr;
-    APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
-    bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    Interception::Hooks::OpenGL::PixelDataChunk pixels_chunk;
+    void*                                       post_callback_func_arg = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC     post_callback_func_ptr = nullptr;
+    void*                                       pre_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC      pre_callback_func_ptr  = nullptr;
+    bool                                        should_pass_through    = true;
+    APIInterceptor::Tracker                     tracker;
 
     if (tracker.is_top_level_api_call() )
     {
         constexpr int64_t POLYGON_STIPPLE_N_PIXELS_PER_SIDE = 32;
 
-        pixels_chunk = OpenGL::PixelDataChunk::create_for_unpack_bitmap(mask,
-                                                                        POLYGON_STIPPLE_N_PIXELS_PER_SIDE,
-                                                                        POLYGON_STIPPLE_N_PIXELS_PER_SIDE);
+        pixels_chunk = Interception::Hooks::OpenGL::PixelDataChunk::create_for_unpack_bitmap(mask,
+                                                                                             POLYGON_STIPPLE_N_PIXELS_PER_SIDE,
+                                                                                             POLYGON_STIPPLE_N_PIXELS_PER_SIDE);
     }
 
     if (tracker.is_top_level_api_call() )
@@ -57,7 +57,7 @@ void AI_APIENTRY OpenGL::aiPolygonStipple(const GLubyte* mask)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLPOLYGONSTIPPLEPROC>(OpenGL::g_cached_gl_polygon_stipple)(mask);
+        reinterpret_cast<PFNGLPOLYGONSTIPPLEPROC>(Interception::Hooks::OpenGL::g_cached_gl_polygon_stipple)(mask);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLPOLYGONSTIPPLE,

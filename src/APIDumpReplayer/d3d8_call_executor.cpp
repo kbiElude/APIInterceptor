@@ -21,7 +21,7 @@ APIDumpReplayer::D3D8CallExecutor::D3D8CallExecutor(ObjectRemapper* in_remapper_
         \
         if (is_ignored_method(#method_name) == false) \
         { \
-            typedef D3D8Replay::Invoker<D3D8::PFN_##INTERFACE_TAG##_##METHOD_TAG, vtable_index> MethodReplay; \
+            typedef D3D8Replay::Invoker<Interception::Hooks::D3D8::PFN_##INTERFACE_TAG##_##METHOD_TAG, vtable_index> MethodReplay; \
             \
             m_invoker_map[APIInterceptor::APIFUNCTION_D3D8_##INTERFACE_TAG##_##METHOD_TAG] = {&MethodReplay::invoke, MethodReplay::get_n_arguments()}; \
         }
@@ -197,7 +197,7 @@ bool APIDumpReplayer::D3D8CallExecutor::release(const APIDumpLoader::DumpedAPICa
                                  &error) )
     {
         void** const vtable_ptr = *reinterpret_cast<void***>(object_ptr);
-        const ULONG  n_refs     = reinterpret_cast<PFNRELEASEPROC>(vtable_ptr[D3D8::VTABLE_INDEX_IDIRECT3DDEVICE8_RELEASE])(object_ptr);
+        const ULONG  n_refs     = reinterpret_cast<PFNRELEASEPROC>(vtable_ptr[Interception::Hooks::D3D8::VTABLE_INDEX_IDIRECT3DDEVICE8_RELEASE])(object_ptr);
 
         if (n_refs == 0)
         {

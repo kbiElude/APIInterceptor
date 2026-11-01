@@ -7,9 +7,21 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiClearBufferSubData(GLenum target, GLenum internalformat, GLintptr offset, GLsizeiptr size, GLenum format, GLenum type, const void* data);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiClearBufferSubData(GLenum      target,
+                                                  GLenum      internalformat,
+                                                  GLintptr    offset,
+                                                  GLsizeiptr  size,
+                                                  GLenum      format,
+                                                  GLenum      type,
+                                                  const void* data);
+        }
+    }
 }
 
 #endif /* AI_GL_CLEAR_BUFFER_SUB_DATA_H */

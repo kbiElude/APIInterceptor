@@ -11,7 +11,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiEndList()
+void AI_APIENTRY Interception::Hooks::OpenGL::aiEndList()
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -29,8 +29,8 @@ void AI_APIENTRY OpenGL::aiEndList()
                                                          &pre_callback_func_arg) )
         {
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLENDLIST,
-                              0,       /* in_n_args   */
-                              nullptr, /* in_args_ptr */
+                              0,       /* in_n_arguments   */
+                              nullptr, /* in_arguments_ptr */
                               pre_callback_func_arg,
                              &should_pass_through);
         }
@@ -40,7 +40,7 @@ void AI_APIENTRY OpenGL::aiEndList()
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLENDLISTPROC>(OpenGL::g_cached_gl_end_list)();
+        reinterpret_cast<PFNGLENDLISTPROC>(Interception::Hooks::OpenGL::g_cached_gl_end_list)();
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLENDLIST,

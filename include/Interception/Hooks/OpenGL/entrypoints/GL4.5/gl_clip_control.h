@@ -7,9 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiClipControl(GLenum origin, GLenum depth);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiClipControl(GLenum origin,
+                                           GLenum depth);
+        }
+    }
 }
 
 #endif /* AI_GL_CLIP_CONTROL_H */

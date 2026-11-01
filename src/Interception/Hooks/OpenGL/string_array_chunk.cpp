@@ -6,9 +6,9 @@
 #include <string.h>
 #include <vector>
 
-OpenGL::StringArrayChunk::StringArrayChunk(const char* const* in_strings_ptr,
-                                           const int32_t&     in_n_strings,
-                                           const int32_t*     in_lengths_ptr)
+Interception::Hooks::OpenGL::StringArrayChunk::StringArrayChunk(const char* const* in_strings_ptr,
+                                                                const int32_t&     in_n_strings,
+                                                                const int32_t*     in_lengths_ptr)
     :m_id           (0),
      m_is_registered(false),
      m_lengths_ptr  (in_lengths_ptr),
@@ -18,7 +18,7 @@ OpenGL::StringArrayChunk::StringArrayChunk(const char* const* in_strings_ptr,
     /* Stub */
 }
 
-APIInterceptor::DataChunkID OpenGL::StringArrayChunk::get_id()
+APIInterceptor::DataChunkID Interception::Hooks::OpenGL::StringArrayChunk::get_id()
 {
     if (m_is_registered == false)
     {

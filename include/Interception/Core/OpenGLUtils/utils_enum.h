@@ -7,14 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    namespace Utils
+    namespace Core
     {
-        const char* get_raw_string_for_gl_bitfield(const OpenGL::BitfieldType& in_bitfield,
-                                                   const GLenum&               in_enum);
-        const char* get_raw_string_for_gl_enum    (const GLenum&               in_enum);
+        namespace OpenGLUtils
+        {
+            const char* get_raw_string_for_gl_bitfield(const Interception::Hooks::OpenGL::BitfieldType& in_bitfield,
+                                                       const GLenum&                                    in_enum);
+            const char* get_raw_string_for_gl_enum    (const GLenum&                                    in_enum);
+        }
     }
-};
+}
 
 #endif /* AI_UTILS_ENUM_H */

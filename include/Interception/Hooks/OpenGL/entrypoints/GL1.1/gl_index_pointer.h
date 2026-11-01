@@ -7,11 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiIndexPointer(GLenum        type,
-                                    GLsizei       stride,
-                                    const GLvoid* pointer);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiIndexPointer(GLenum        type,
+                                            GLsizei       stride,
+                                            const GLvoid* pointer);
+        }
+    }
 }
 
 #endif /* AI_GL_INDEX_POINTER_H */

@@ -11,11 +11,11 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiProgramUniformMatrix2dv(GLuint          program,
-                                                   GLint           location,
-                                                   GLsizei         count,
-                                                   GLboolean       transpose,
-                                                   const GLdouble* value)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiProgramUniformMatrix2dv(GLuint          program,
+                                                                        GLint           location,
+                                                                        GLsizei         count,
+                                                                        GLboolean       transpose,
+                                                                        const GLdouble* value)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -61,11 +61,11 @@ void AI_APIENTRY OpenGL::aiProgramUniformMatrix2dv(GLuint          program,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLPROGRAMUNIFORMMATRIX2DVPROC>(OpenGL::g_cached_gl_program_uniform_matrix2dv)(program,
-                                                                                                          location,
-                                                                                                          count,
-                                                                                                          transpose,
-                                                                                                          value);
+        reinterpret_cast<PFNGLPROGRAMUNIFORMMATRIX2DVPROC>(Interception::Hooks::OpenGL::g_cached_gl_program_uniform_matrix2dv)(program,
+                                                                                                                               location,
+                                                                                                                               count,
+                                                                                                                               transpose,
+                                                                                                                               value);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLPROGRAMUNIFORMMATRIX2DV,

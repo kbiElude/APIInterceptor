@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiDeleteSamplers(GLsizei        count,
-                                      const GLuint*  samplers);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiDeleteSamplers(GLsizei       count,
+                                              const GLuint* samplers);
+        }
+    }
 }
 
 #endif /* AI_GL_DELETE_SAMPLERS_H */

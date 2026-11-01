@@ -10,9 +10,9 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetUniformdv(GLuint    program,
-                                        GLint     location,
-                                        GLdouble* params)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetUniformdv(GLuint    program,
+                                                             GLint     location,
+                                                             GLdouble* params)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -51,9 +51,9 @@ void AI_APIENTRY OpenGL::aiGetUniformdv(GLuint    program,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETUNIFORMDVPROC>(OpenGL::g_cached_gl_get_uniformdv)(program,
-                                                                                   location,
-                                                                                   params);
+        reinterpret_cast<PFNGLGETUNIFORMDVPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_uniformdv)(program,
+                                                                                                        location,
+                                                                                                        params);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETUNIFORMDV,

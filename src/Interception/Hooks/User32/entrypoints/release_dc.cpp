@@ -10,8 +10,8 @@
 #include "Interception/Hooks/User32/globals.h"
 #include "Interception/Hooks/User32/entrypoints/release_dc.h"
 
-int WINAPI User32::release_dc(HWND in_hwnd,
-                              HDC  in_hdc)
+int WINAPI Interception::Hooks::User32::release_dc(HWND in_hwnd,
+                                                   HDC  in_hdc)
 {
     APIInterceptor::GateScope               gate_scope;
     void*                                   post_callback_func_arg  = nullptr;
@@ -49,8 +49,8 @@ int WINAPI User32::release_dc(HWND in_hwnd,
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<User32::PFNRELEASEDCPROC>(User32::g_cached_release_dc_func_ptr)(in_hwnd,
-                                                                                                  in_hdc);
+        result = reinterpret_cast<Interception::Hooks::User32::PFNRELEASEDCPROC>(Interception::Hooks::User32::g_cached_release_dc_func_ptr)(in_hwnd,
+                                                                                                                                            in_hdc);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_USER32_RELEASEDC,
@@ -61,8 +61,8 @@ int WINAPI User32::release_dc(HWND in_hwnd,
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_USER32_RELEASEDC,
                                post_callback_func_arg,
-                               0,       /* in_n_args_out   */
-                               nullptr, /* in_args_out_ptr */
+                               0,       /* in_n_arguments_out   */
+                               nullptr, /* in_arguments_out_ptr */
                               &result_arg);
     }
 

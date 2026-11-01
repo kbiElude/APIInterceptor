@@ -7,9 +7,15 @@
 
 #include <Windows.h>
 
-namespace GDI32
+namespace Interception
 {
-    BOOL WINAPI swap_buffers(HDC in_hdc);
+    namespace Hooks
+    {
+        namespace GDI32
+        {
+            BOOL WINAPI swap_buffers(HDC in_hdc);
+        }
+    }
 }
 
 #endif /* AI_SWAP_BUFFERS_H */

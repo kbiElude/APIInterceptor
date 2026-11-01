@@ -7,11 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiPrioritizeTextures(GLsizei         n,
-                                          const GLuint*   textures,
-                                          const GLclampf* priorities);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiPrioritizeTextures(GLsizei         n,
+                                                  const GLuint*   textures,
+                                                  const GLclampf* priorities);
+        }
+    }
 }
 
 #endif /* AI_GL_PRIORITIZE_TEXTURES_H */

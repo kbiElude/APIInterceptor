@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiTexCoord2i(GLint s,
-                                  GLint t);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiTexCoord2i(GLint s,
+                                          GLint t);
+        }
+    }
 }
 
 #endif /* AI_GL_TEX_COORD_2I_H */

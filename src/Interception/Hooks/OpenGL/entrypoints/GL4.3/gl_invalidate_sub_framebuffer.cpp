@@ -12,13 +12,13 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiInvalidateSubFramebuffer(GLenum        target,
-                                                    GLsizei       numAttachments,
-                                                    const GLenum* attachments,
-                                                    GLint         x,
-                                                    GLint         y,
-                                                    GLsizei       width,
-                                                    GLsizei       height)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiInvalidateSubFramebuffer(GLenum        target,
+                                                                         GLsizei       numAttachments,
+                                                                         const GLenum* attachments,
+                                                                         GLint         x,
+                                                                         GLint         y,
+                                                                         GLsizei       width,
+                                                                         GLsizei       height)
 {
     APIInterceptor::MemoryChunk             attachments_chunk(attachments,
                                                               numAttachments,
@@ -33,7 +33,7 @@ void AI_APIENTRY OpenGL::aiInvalidateSubFramebuffer(GLenum        target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glInvalidateSubFramebuffer(target=[%s] numAttachments=[%d] attachments=[%p] x=[%d] y=[%d] width=[%d] height=[%d])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  static_cast<int32_t>(numAttachments),
                  attachments,
                  x,
@@ -68,13 +68,13 @@ void AI_APIENTRY OpenGL::aiInvalidateSubFramebuffer(GLenum        target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLINVALIDATESUBFRAMEBUFFERPROC>(OpenGL::g_cached_gl_invalidate_sub_framebuffer)(target,
-                                                                                                             numAttachments,
-                                                                                                             attachments,
-                                                                                                             x,
-                                                                                                             y,
-                                                                                                             width,
-                                                                                                             height);
+        reinterpret_cast<PFNGLINVALIDATESUBFRAMEBUFFERPROC>(Interception::Hooks::OpenGL::g_cached_gl_invalidate_sub_framebuffer)(target,
+                                                                                                                                  numAttachments,
+                                                                                                                                  attachments,
+                                                                                                                                  x,
+                                                                                                                                  y,
+                                                                                                                                  width,
+                                                                                                                                  height);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLINVALIDATESUBFRAMEBUFFER,

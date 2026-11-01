@@ -10,7 +10,7 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiFinish(void)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiFinish(void)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -39,7 +39,7 @@ void AI_APIENTRY OpenGL::aiFinish(void)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLFINISHPROC>(OpenGL::g_cached_gl_finish)();
+        reinterpret_cast<PFNGLFINISHPROC>(Interception::Hooks::OpenGL::g_cached_gl_finish)();
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLFINISH,

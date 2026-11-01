@@ -11,11 +11,11 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiFramebufferTextureLayer(GLenum target,
-                                                   GLenum attachment,
-                                                   GLuint texture,
-                                                   GLint  level,
-                                                   GLint  layer)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiFramebufferTextureLayer(GLenum target,
+                                                                        GLenum attachment,
+                                                                        GLuint texture,
+                                                                        GLint  level,
+                                                                        GLint  layer)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -27,8 +27,8 @@ void AI_APIENTRY OpenGL::aiFramebufferTextureLayer(GLenum target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glFramebufferTextureLayer(target=[%s] attachment=[%s] texture=[%u] level=[%d] layer=[%d])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(attachment),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(attachment),
                  texture,
                  level,
                  layer);
@@ -58,11 +58,11 @@ void AI_APIENTRY OpenGL::aiFramebufferTextureLayer(GLenum target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLFRAMEBUFFERTEXTURELAYERPROC>(OpenGL::g_cached_gl_framebuffer_texture_layer)(target,
-                                                                                                          attachment,
-                                                                                                          texture,
-                                                                                                          level,
-                                                                                                          layer);
+        reinterpret_cast<PFNGLFRAMEBUFFERTEXTURELAYERPROC>(Interception::Hooks::OpenGL::g_cached_gl_framebuffer_texture_layer)(target,
+                                                                                                                               attachment,
+                                                                                                                               texture,
+                                                                                                                               level,
+                                                                                                                               layer);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLFRAMEBUFFERTEXTURELAYER,

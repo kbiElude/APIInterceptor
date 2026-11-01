@@ -10,9 +10,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetQueryObjectuiv(GLuint  id,
-                                             GLenum  pname,
-                                             GLuint* params)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetQueryObjectuiv(GLuint  id,
+                                                                  GLenum  pname,
+                                                                  GLuint* params)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -25,7 +25,7 @@ void AI_APIENTRY OpenGL::aiGetQueryObjectuiv(GLuint  id,
     {
         AI_TRACE("glGetQueryObjectuiv(id=[%u] pname=[%s] params=[%p])",
                  id,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  params);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETQUERYOBJECTUIV,
@@ -51,9 +51,9 @@ void AI_APIENTRY OpenGL::aiGetQueryObjectuiv(GLuint  id,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETQUERYOBJECTUIVPROC>(OpenGL::g_cached_gl_get_query_objectuiv)(id,
-                                                                                              pname,
-                                                                                              params);
+        reinterpret_cast<PFNGLGETQUERYOBJECTUIVPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_query_objectuiv)(id,
+                                                                                                                   pname,
+                                                                                                                   params);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETQUERYOBJECTUIV,

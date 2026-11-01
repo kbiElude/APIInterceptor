@@ -11,9 +11,9 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiBindImageTextures(GLuint        first,
-                                             GLsizei       count,
-                                             const GLuint* textures)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiBindImageTextures(GLuint        first,
+                                                                  GLsizei       count,
+                                                                  const GLuint* textures)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -55,9 +55,9 @@ void AI_APIENTRY OpenGL::aiBindImageTextures(GLuint        first,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLBINDIMAGETEXTURESPROC>(OpenGL::g_cached_gl_bind_image_textures)(first,
-                                                                                               count,
-                                                                                               textures);
+        reinterpret_cast<PFNGLBINDIMAGETEXTURESPROC>(Interception::Hooks::OpenGL::g_cached_gl_bind_image_textures)(first,
+                                                                                                                    count,
+                                                                                                                    textures);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBINDIMAGETEXTURES,

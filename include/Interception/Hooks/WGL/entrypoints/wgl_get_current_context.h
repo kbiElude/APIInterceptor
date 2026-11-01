@@ -7,9 +7,15 @@
 
 #include <windows.h>
 
-namespace WGL
+namespace Interception
 {
-    HGLRC WINAPI get_current_context();
+    namespace Hooks
+    {
+        namespace WGL
+        {
+            HGLRC WINAPI get_current_context();
+        }
+    }
 }
 
 #endif /* WGL_GET_CURRENT_CONTEXT_H */

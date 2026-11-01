@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetVertexAttribIuiv(GLuint  index,
-                                               GLenum  pname,
-                                               GLuint* params)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetVertexAttribIuiv(GLuint  index,
+                                                                    GLenum  pname,
+                                                                    GLuint* params)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -26,7 +26,7 @@ void AI_APIENTRY OpenGL::aiGetVertexAttribIuiv(GLuint  index,
     {
         AI_TRACE("glGetVertexAttribIuiv(index=[%u] pname=[%s] params=[%p])",
                  index,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  params);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETVERTEXATTRIBI_UIV,
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiGetVertexAttribIuiv(GLuint  index,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETVERTEXATTRIBIUIVPROC>(OpenGL::g_cached_gl_get_vertex_attrib_i_uiv)(index,
-                                                                                                    pname,
-                                                                                                    params);
+        reinterpret_cast<PFNGLGETVERTEXATTRIBIUIVPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_vertex_attrib_i_uiv)(index,
+                                                                                                                         pname,
+                                                                                                                         params);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETVERTEXATTRIBI_UIV,

@@ -11,12 +11,12 @@
 #include "Interception/Hooks/OpenGL/string_chunk.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiBindFragDataLocationIndexed(GLuint        program,
-                                                       GLuint        colorNumber,
-                                                       GLuint        index,
-                                                       const GLchar* name)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiBindFragDataLocationIndexed(GLuint        program,
+                                                                            GLuint        colorNumber,
+                                                                            GLuint        index,
+                                                                            const GLchar* name)
 {
-    OpenGL::StringChunk                     name_chunk(name);
+    Interception::Hooks::OpenGL::StringChunk                     name_chunk(name);
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
@@ -56,10 +56,10 @@ void AI_APIENTRY OpenGL::aiBindFragDataLocationIndexed(GLuint        program,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLBINDFRAGDATALOCATIONINDEXEDPROC>(OpenGL::g_cached_gl_bind_frag_data_location_indexed)(program,
-                                                                                                                    colorNumber,
-                                                                                                                    index,
-                                                                                                                    name);
+        reinterpret_cast<PFNGLBINDFRAGDATALOCATIONINDEXEDPROC>(Interception::Hooks::OpenGL::g_cached_gl_bind_frag_data_location_indexed)(program,
+                                                                                                                                         colorNumber,
+                                                                                                                                         index,
+                                                                                                                                         name);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBINDFRAGDATALOCATIONINDEXED,

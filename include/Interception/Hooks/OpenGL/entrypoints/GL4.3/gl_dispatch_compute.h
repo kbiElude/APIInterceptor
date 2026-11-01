@@ -7,9 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiDispatchCompute(GLuint num_groups_x, GLuint num_groups_y, GLuint num_groups_z);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiDispatchCompute(GLuint num_groups_x,
+                                               GLuint num_groups_y,
+                                               GLuint num_groups_z);
+        }
+    }
 }
 
 #endif /* AI_GL_DISPATCH_COMPUTE_H */

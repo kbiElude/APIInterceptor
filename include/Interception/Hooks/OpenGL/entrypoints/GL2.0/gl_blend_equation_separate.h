@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiBlendEquationSeparate(GLenum modeRGB,
-                                             GLenum modeAlpha);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiBlendEquationSeparate(GLenum modeRGB,
+                                                     GLenum modeAlpha);
+        }
+    }
 }
 
 #endif /* AI_GL_BLEND_EQUATION_SEPARATE_H */

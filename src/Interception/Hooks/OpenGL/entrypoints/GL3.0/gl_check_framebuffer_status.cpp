@@ -11,7 +11,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-GLenum AI_APIENTRY OpenGL::aiCheckFramebufferStatus(GLenum target)
+GLenum AI_APIENTRY Interception::Hooks::OpenGL::aiCheckFramebufferStatus(GLenum target)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -24,7 +24,7 @@ GLenum AI_APIENTRY OpenGL::aiCheckFramebufferStatus(GLenum target)
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glCheckFramebufferStatus(target=[%s])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCHECKFRAMEBUFFERSTATUS,
                                                          &pre_callback_func_ptr,
@@ -45,7 +45,7 @@ GLenum AI_APIENTRY OpenGL::aiCheckFramebufferStatus(GLenum target)
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNGLCHECKFRAMEBUFFERSTATUSPROC>(OpenGL::g_cached_gl_check_framebuffer_status)(target);
+        result = reinterpret_cast<PFNGLCHECKFRAMEBUFFERSTATUSPROC>(Interception::Hooks::OpenGL::g_cached_gl_check_framebuffer_status)(target);
     }
 
     if (tracker.is_top_level_api_call() )

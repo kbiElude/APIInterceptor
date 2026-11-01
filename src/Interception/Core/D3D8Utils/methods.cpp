@@ -2,14 +2,15 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
+#include "Common/macros.h"
 #include "Interception/Core/D3D8Utils/methods.h"
 #include <assert.h>
 
-APIInterceptor::APIFunction D3D8::Utils::get_api_function(const Interface& in_interface,
-                                                          const uint32_t&  in_vtable_index)
+APIInterceptor::APIFunction Interception::Core::D3D8Utils::get_api_function(const Interception::Hooks::D3D8::Interface& in_interface,
+                                                                            const uint32_t&                             in_vtable_index)
 {
     uint32_t                    n_methods   = 0;
-    const MethodInfo*           methods_ptr = get_method_info_array_ptr(&n_methods);
+    const Interception::Hooks::D3D8::MethodInfo*           methods_ptr = get_method_info_array_ptr(&n_methods);
     APIInterceptor::APIFunction result      = APIInterceptor::APIFUNCTION_UNKNOWN;
 
     for (uint32_t n_method = 0;
@@ -28,9 +29,9 @@ APIInterceptor::APIFunction D3D8::Utils::get_api_function(const Interface& in_in
     return result;
 }
 
-const char* D3D8::Utils::get_function_name_ptr(const APIInterceptor::APIFunction& in_function)
+const char* Interception::Core::D3D8Utils::get_function_name_ptr(const APIInterceptor::APIFunction& in_function)
 {
-    const MethodInfo* method_info_ptr = get_method_info_ptr(in_function);
+    const Interception::Hooks::D3D8::MethodInfo* method_info_ptr = get_method_info_ptr(in_function);
     const char*       result_ptr      = nullptr;
 
     if (in_function == APIInterceptor::APIFUNCTION_D3D8_DIRECT3DCREATE8)
@@ -46,14 +47,14 @@ const char* D3D8::Utils::get_function_name_ptr(const APIInterceptor::APIFunction
     return result_ptr;
 }
 
-const char* D3D8::Utils::get_interface_name_ptr(const Interface& in_interface)
+const char* Interception::Core::D3D8Utils::get_interface_name_ptr(const Interception::Hooks::D3D8::Interface& in_interface)
 {
     const char* result_ptr = "?";
 
     switch (in_interface)
     {
         #define D3D8_INTERFACE(INTERFACE_TAG, interface_name) \
-            case Interface::INTERFACE_TAG:                    \
+            case Interception::Hooks::D3D8::Interface::INTERFACE_TAG:                    \
             {                                                 \
                 result_ptr = #interface_name;                 \
                                                               \
@@ -67,8 +68,15 @@ const char* D3D8::Utils::get_interface_name_ptr(const Interface& in_interface)
         #undef D3D8_METHOD
         #undef D3D8_INTERFACE
 
+        case Interception::Hooks::D3D8::Interface::UNKNOWN:
+        {
+            break;
+        }
+
         default:
         {
+            AI_FAIL_UNSUPPORTED(in_interface);
+
             break;
         }
     }
@@ -76,11 +84,11 @@ const char* D3D8::Utils::get_interface_name_ptr(const Interface& in_interface)
     return result_ptr;
 }
 
-const D3D8::MethodInfo* D3D8::Utils::get_method_info_ptr(const APIInterceptor::APIFunction& in_function)
+const Interception::Hooks::D3D8::MethodInfo* Interception::Core::D3D8Utils::get_method_info_ptr(const APIInterceptor::APIFunction& in_function)
 {
     uint32_t          n_methods   = 0;
-    const MethodInfo* methods_ptr = get_method_info_array_ptr(&n_methods);
-    const MethodInfo* result_ptr  = nullptr;
+    const Interception::Hooks::D3D8::MethodInfo* methods_ptr = get_method_info_array_ptr(&n_methods);
+    const Interception::Hooks::D3D8::MethodInfo* result_ptr  = nullptr;
 
     if (in_function >= APIInterceptor::APIFUNCTION_D3D8_METHODS_FIRST &&
         in_function <= APIInterceptor::APIFUNCTION_D3D8_METHODS_LAST)
@@ -93,17 +101,17 @@ const D3D8::MethodInfo* D3D8::Utils::get_method_info_ptr(const APIInterceptor::A
     return result_ptr;
 }
 
-const D3D8::MethodInfo* D3D8::Utils::get_method_info_array_ptr(uint32_t* out_n_methods_ptr)
+const Interception::Hooks::D3D8::MethodInfo* Interception::Core::D3D8Utils::get_method_info_array_ptr(uint32_t* out_n_methods_ptr)
 {
     /* Same order as the APIFUNCTION_D3D8_* enum: position = function - APIFUNCTION_D3D8_METHODS_FIRST. */
-    static const MethodInfo method_info_array[] =
+    static const Interception::Hooks::D3D8::MethodInfo method_info_array[] =
     {
         #define D3D8_METHOD(INTERFACE_TAG, interface_name, METHOD_TAG, method_name, vtable_index, return_type, parameters) \
             {                                                                                                              \
                 #interface_name "::" #method_name,                                                                         \
                 APIInterceptor::APIFUNCTION_D3D8_##INTERFACE_TAG##_##METHOD_TAG,                                           \
                 #interface_name,                                                                                           \
-                Interface::INTERFACE_TAG,                                                                                  \
+                Interception::Hooks::D3D8::Interface::INTERFACE_TAG,                                                                                  \
                 #method_name,                                                                                              \
                 vtable_index                                                                                               \
             },
@@ -118,10 +126,10 @@ const D3D8::MethodInfo* D3D8::Utils::get_method_info_array_ptr(uint32_t* out_n_m
     return method_info_array;
 }
 
-uint32_t D3D8::Utils::get_n_methods(const Interface& in_interface)
+uint32_t Interception::Core::D3D8Utils::get_n_methods(const Interception::Hooks::D3D8::Interface& in_interface)
 {
     uint32_t          n_methods   = 0;
-    const MethodInfo* methods_ptr = get_method_info_array_ptr(&n_methods);
+    const Interception::Hooks::D3D8::MethodInfo* methods_ptr = get_method_info_array_ptr(&n_methods);
     uint32_t          result      = 0;
 
     for (uint32_t n_method = 0;
@@ -137,7 +145,7 @@ uint32_t D3D8::Utils::get_n_methods(const Interface& in_interface)
     return result;
 }
 
-const char* D3D8::Utils::get_object_type_name_ptr(const ObjectType& in_object_type)
+const char* Interception::Core::D3D8Utils::get_object_type_name_ptr(const ObjectType& in_object_type)
 {
     const char* result_ptr = nullptr;
 
@@ -220,8 +228,15 @@ const char* D3D8::Utils::get_object_type_name_ptr(const ObjectType& in_object_ty
             break;
         }
 
+        case ObjectType::NONE:
+        {
+            break;
+        }
+
         default:
         {
+            AI_FAIL_UNSUPPORTED(in_object_type);
+
             break;
         }
     }

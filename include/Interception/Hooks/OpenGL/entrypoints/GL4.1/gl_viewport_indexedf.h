@@ -7,9 +7,19 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiViewportIndexedf(GLuint index, GLfloat x, GLfloat y, GLfloat w, GLfloat h);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiViewportIndexedf(GLuint  index,
+                                                GLfloat x,
+                                                GLfloat y,
+                                                GLfloat w,
+                                                GLfloat h);
+        }
+    }
 }
 
 #endif /* AI_GL_VIEWPORT_INDEXEDF_H */

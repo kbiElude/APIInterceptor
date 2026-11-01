@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiBindProgramPipeline(GLuint pipeline);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiBindProgramPipeline(GLuint pipeline);
+        }
+    }
 }
 
 #endif /* AI_GL_BIND_PROGRAM_PIPELINE_H */

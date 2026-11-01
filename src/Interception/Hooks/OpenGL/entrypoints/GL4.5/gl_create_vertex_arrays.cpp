@@ -10,8 +10,8 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiCreateVertexArrays(GLsizei n,
-                                              GLuint* arrays)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiCreateVertexArrays(GLsizei n,
+                                                                   GLuint* arrays)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -48,8 +48,8 @@ void AI_APIENTRY OpenGL::aiCreateVertexArrays(GLsizei n,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLCREATEVERTEXARRAYSPROC>(OpenGL::g_cached_gl_create_vertex_arrays)(n,
-                                                                                                arrays);
+        reinterpret_cast<PFNGLCREATEVERTEXARRAYSPROC>(Interception::Hooks::OpenGL::g_cached_gl_create_vertex_arrays)(n,
+                                                                                                                     arrays);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCREATEVERTEXARRAYS,

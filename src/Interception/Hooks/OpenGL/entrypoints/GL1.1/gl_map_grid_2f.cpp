@@ -11,12 +11,12 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiMapGrid2f(GLint   un,
-                                     GLfloat u1,
-                                     GLfloat u2,
-                                     GLint   vn,
-                                     GLfloat v1,
-                                     GLfloat v2)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiMapGrid2f(GLint   un,
+                                                          GLfloat u1,
+                                                          GLfloat u2,
+                                                          GLint   vn,
+                                                          GLfloat v1,
+                                                          GLfloat v2)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -61,12 +61,12 @@ void AI_APIENTRY OpenGL::aiMapGrid2f(GLint   un,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLMAPGRID2FPROC>(OpenGL::g_cached_gl_map_grid_2f)(un,
-                                                                              u1,
-                                                                              u2,
-                                                                              vn,
-                                                                              v1,
-                                                                              v2);
+        reinterpret_cast<PFNGLMAPGRID2FPROC>(Interception::Hooks::OpenGL::g_cached_gl_map_grid_2f)(un,
+                                                                                                   u1,
+                                                                                                   u2,
+                                                                                                   vn,
+                                                                                                   v1,
+                                                                                                   v2);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMAPGRID2F,

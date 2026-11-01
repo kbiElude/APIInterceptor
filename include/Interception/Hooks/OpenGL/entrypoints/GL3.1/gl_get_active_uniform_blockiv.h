@@ -7,12 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetActiveUniformBlockiv(GLuint program,
-                                               GLuint uniformBlockIndex,
-                                               GLenum pname,
-                                               GLint* params);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetActiveUniformBlockiv(GLuint program,
+                                                       GLuint uniformBlockIndex,
+                                                       GLenum pname,
+                                                       GLint* params);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_ACTIVE_UNIFORM_BLOCKIV_H */

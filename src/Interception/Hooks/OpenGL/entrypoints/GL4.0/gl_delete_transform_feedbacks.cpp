@@ -11,8 +11,8 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDeleteTransformFeedbacks(GLsizei       n,
-                                                    const GLuint* ids)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDeleteTransformFeedbacks(GLsizei       n,
+                                                                         const GLuint* ids)
 {
     APIInterceptor::MemoryChunk             ids_chunk(ids,
                                                       n,
@@ -52,8 +52,8 @@ void AI_APIENTRY OpenGL::aiDeleteTransformFeedbacks(GLsizei       n,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDELETETRANSFORMFEEDBACKSPROC>(OpenGL::g_cached_gl_delete_transform_feedbacks)(n,
-                                                                                                           ids);
+        reinterpret_cast<PFNGLDELETETRANSFORMFEEDBACKSPROC>(Interception::Hooks::OpenGL::g_cached_gl_delete_transform_feedbacks)(n,
+                                                                                                                                ids);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDELETETRANSFORMFEEDBACKS,

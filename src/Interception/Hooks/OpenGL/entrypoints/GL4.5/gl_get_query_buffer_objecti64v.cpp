@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetQueryBufferObjecti64v(GLuint   id,
-                                                    GLuint   buffer,
-                                                    GLenum   pname,
-                                                    GLintptr offset)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetQueryBufferObjecti64v(GLuint   id,
+                                                                         GLuint   buffer,
+                                                                         GLenum   pname,
+                                                                         GLintptr offset)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -28,7 +28,7 @@ void AI_APIENTRY OpenGL::aiGetQueryBufferObjecti64v(GLuint   id,
         AI_TRACE("glGetQueryBufferObjecti64v(id=[%u] buffer=[%u] pname=[%s] offset=[%d])",
                  id,
                  buffer,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  static_cast<int32_t>(offset) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETQUERYBUFFEROBJECTI64V,
@@ -55,10 +55,10 @@ void AI_APIENTRY OpenGL::aiGetQueryBufferObjecti64v(GLuint   id,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETQUERYBUFFEROBJECTI64VPROC>(OpenGL::g_cached_gl_get_query_buffer_objecti64v)(id,
-                                                                                                             buffer,
-                                                                                                             pname,
-                                                                                                             offset);
+        reinterpret_cast<PFNGLGETQUERYBUFFEROBJECTI64VPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_query_buffer_objecti64v)(id,
+                                                                                                                                  buffer,
+                                                                                                                                  pname,
+                                                                                                                                  offset);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETQUERYBUFFEROBJECTI64V,

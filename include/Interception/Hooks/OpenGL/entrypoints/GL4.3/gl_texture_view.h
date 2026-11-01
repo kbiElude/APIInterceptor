@@ -7,9 +7,22 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiTextureView(GLuint texture, GLenum target, GLuint origtexture, GLenum internalformat, GLuint minlevel, GLuint numlevels, GLuint minlayer, GLuint numlayers);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiTextureView(GLuint texture,
+                                           GLenum target,
+                                           GLuint origtexture,
+                                           GLenum internalformat,
+                                           GLuint minlevel,
+                                           GLuint numlevels,
+                                           GLuint minlayer,
+                                           GLuint numlayers);
+        }
+    }
 }
 
 #endif /* AI_GL_TEXTURE_VIEW_H */

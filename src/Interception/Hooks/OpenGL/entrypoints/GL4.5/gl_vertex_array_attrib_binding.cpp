@@ -10,9 +10,9 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiVertexArrayAttribBinding(GLuint vaobj,
-                                                    GLuint attribindex,
-                                                    GLuint bindingindex)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiVertexArrayAttribBinding(GLuint vaobj,
+                                                                         GLuint attribindex,
+                                                                         GLuint bindingindex)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -51,9 +51,9 @@ void AI_APIENTRY OpenGL::aiVertexArrayAttribBinding(GLuint vaobj,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLVERTEXARRAYATTRIBBINDINGPROC>(OpenGL::g_cached_gl_vertex_array_attrib_binding)(vaobj,
-                                                                                                            attribindex,
-                                                                                                            bindingindex);
+        reinterpret_cast<PFNGLVERTEXARRAYATTRIBBINDINGPROC>(Interception::Hooks::OpenGL::g_cached_gl_vertex_array_attrib_binding)(vaobj,
+                                                                                                                                 attribindex,
+                                                                                                                                 bindingindex);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLVERTEXARRAYATTRIBBINDING,

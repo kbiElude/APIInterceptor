@@ -11,10 +11,10 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiUniformMatrix3x4dv(GLint           location,
-                                              GLsizei         count,
-                                              GLboolean       transpose,
-                                              const GLdouble* value)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiUniformMatrix3x4dv(GLint           location,
+                                                                   GLsizei         count,
+                                                                   GLboolean       transpose,
+                                                                   const GLdouble* value)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -58,10 +58,10 @@ void AI_APIENTRY OpenGL::aiUniformMatrix3x4dv(GLint           location,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLUNIFORMMATRIX3X4DVPROC>(OpenGL::g_cached_gl_uniform_matrix3x4dv)(location,
-                                                                                               count,
-                                                                                               transpose,
-                                                                                               value);
+        reinterpret_cast<PFNGLUNIFORMMATRIX3X4DVPROC>(Interception::Hooks::OpenGL::g_cached_gl_uniform_matrix3x4dv)(location,
+                                                                                                                    count,
+                                                                                                                    transpose,
+                                                                                                                    value);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLUNIFORMMATRIX3X4DV,

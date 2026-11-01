@@ -11,7 +11,7 @@
 #include "Interception/Hooks/WGL/globals.h"
 
 
-void AI_APIENTRY OpenGL::aiClearDepth(GLdouble depth)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiClearDepth(GLdouble depth)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -46,7 +46,7 @@ void AI_APIENTRY OpenGL::aiClearDepth(GLdouble depth)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLCLEARDEPTHPROC>(OpenGL::g_cached_gl_clear_depth)(depth);
+        reinterpret_cast<PFNGLCLEARDEPTHPROC>(Interception::Hooks::OpenGL::g_cached_gl_clear_depth)(depth);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCLEARDEPTH,

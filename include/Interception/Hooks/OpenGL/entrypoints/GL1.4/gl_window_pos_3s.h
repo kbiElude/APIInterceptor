@@ -7,11 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiWindowPos3s(GLshort x,
-                                   GLshort y,
-                                   GLshort z);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiWindowPos3s(GLshort x,
+                                           GLshort y,
+                                           GLshort z);
+        }
+    }
 }
 
 #endif /* AI_GL_WINDOW_POS_3S_H */

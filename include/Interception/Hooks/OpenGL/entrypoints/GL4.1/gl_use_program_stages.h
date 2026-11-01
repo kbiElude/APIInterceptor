@@ -7,9 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiUseProgramStages(GLuint pipeline, GLbitfield stages, GLuint program);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiUseProgramStages(GLuint     pipeline,
+                                                GLbitfield stages,
+                                                GLuint     program);
+        }
+    }
 }
 
 #endif /* AI_GL_USE_PROGRAM_STAGES_H */

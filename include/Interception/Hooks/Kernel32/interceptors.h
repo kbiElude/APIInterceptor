@@ -8,9 +8,15 @@
 #include "Common/globals.h"
 #include <vector>
 
-namespace Kernel32
+namespace Interception
 {
-    extern std::vector<APIInterceptor::FunctionInterceptor> get_function_interceptors();
+    namespace Hooks
+    {
+        namespace Kernel32
+        {
+            extern std::vector<APIInterceptor::FunctionInterceptor> get_function_interceptors();
+        }
+    }
 }
 
 #endif /* KERNEL32_INTERCEPTORS_H */

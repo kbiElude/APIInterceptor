@@ -12,9 +12,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiInterleavedArrays(GLenum        format,
-                                             GLsizei       stride,
-                                             const GLvoid* pointer)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiInterleavedArrays(GLenum        format,
+                                                                  GLsizei       stride,
+                                                                  const GLvoid* pointer)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -26,7 +26,7 @@ void AI_APIENTRY OpenGL::aiInterleavedArrays(GLenum        format,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glInterleavedArrays(format=[%s], stride=[%d], pointer=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(format),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(format),
                  stride,
                  pointer);
 
@@ -53,19 +53,19 @@ void AI_APIENTRY OpenGL::aiInterleavedArrays(GLenum        format,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLINTERLEAVEDARRAYSPROC>(OpenGL::g_cached_gl_interleaved_arrays)(format,
-                                                                                             stride,
-                                                                                             pointer);
+        reinterpret_cast<PFNGLINTERLEAVEDARRAYSPROC>(Interception::Hooks::OpenGL::g_cached_gl_interleaved_arrays)(format,
+                                                                                                                  stride,
+                                                                                                                  pointer);
     }
 
     if (tracker.is_top_level_api_call() )
     {
-        auto& context = OpenGL::get_context_state();
+        auto& context = Interception::Hooks::OpenGL::get_context_state();
 
         context.client_array_manager.set_interleaved_arrays(format,
                                                           stride,
                                                           pointer,
-                                                          context.buffer_manager.get_bound_buffer(OpenGL::BufferBindingTarget::ARRAY_BUFFER));
+                                                          context.buffer_manager.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ARRAY_BUFFER));
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLINTERLEAVEDARRRAYS,

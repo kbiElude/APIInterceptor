@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void APIENTRY aiPixelStoref(GLenum  pname,
-                                GLfloat param);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void APIENTRY aiPixelStoref(GLenum  pname,
+                                        GLfloat param);
+        }
+    }
 }
 
 #endif /* AI_GL_PIXEL_STOREF_H */

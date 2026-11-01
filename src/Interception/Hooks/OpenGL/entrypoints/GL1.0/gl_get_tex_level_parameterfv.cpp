@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetTexLevelParameterfv(GLenum   target,
-                                                  GLint    level,
-                                                  GLenum   pname,
-                                                  GLfloat* params)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetTexLevelParameterfv(GLenum   target,
+                                                                       GLint    level,
+                                                                       GLenum   pname,
+                                                                       GLfloat* params)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -26,9 +26,9 @@ void AI_APIENTRY OpenGL::aiGetTexLevelParameterfv(GLenum   target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glGetTexLevelParameterfv(target=[%s] level=[%d] pname=[%s] params=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  level,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  params);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETTEXLEVELPARAMETERFV,
@@ -55,10 +55,10 @@ void AI_APIENTRY OpenGL::aiGetTexLevelParameterfv(GLenum   target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETTEXLEVELPARAMETERFVPROC>(OpenGL::g_cached_gl_get_tex_level_parameterfv)(target,
-                                                                                                         level,
-                                                                                                         pname,
-                                                                                                         params);
+        reinterpret_cast<PFNGLGETTEXLEVELPARAMETERFVPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_tex_level_parameterfv)(target,
+                                                                                                                              level,
+                                                                                                                              pname,
+                                                                                                                              params);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETTEXLEVELPARAMETERFV,

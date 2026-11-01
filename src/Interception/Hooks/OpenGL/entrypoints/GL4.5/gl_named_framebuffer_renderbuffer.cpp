@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiNamedFramebufferRenderbuffer(GLuint framebuffer,
-                                                        GLenum attachment,
-                                                        GLenum renderbuffertarget,
-                                                        GLuint renderbuffer)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiNamedFramebufferRenderbuffer(GLuint framebuffer,
+                                                                             GLenum attachment,
+                                                                             GLenum renderbuffertarget,
+                                                                             GLuint renderbuffer)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -27,8 +27,8 @@ void AI_APIENTRY OpenGL::aiNamedFramebufferRenderbuffer(GLuint framebuffer,
     {
         AI_TRACE("glNamedFramebufferRenderbuffer(framebuffer=[%u] attachment=[%s] renderbuffertarget=[%s] renderbuffer=[%u])",
                  framebuffer,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(attachment),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(renderbuffertarget),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(attachment),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(renderbuffertarget),
                  renderbuffer);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLNAMEDFRAMEBUFFERRENDERBUFFER,
@@ -55,10 +55,10 @@ void AI_APIENTRY OpenGL::aiNamedFramebufferRenderbuffer(GLuint framebuffer,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLNAMEDFRAMEBUFFERRENDERBUFFERPROC>(OpenGL::g_cached_gl_named_framebuffer_renderbuffer)(framebuffer,
-                                                                                                                   attachment,
-                                                                                                                   renderbuffertarget,
-                                                                                                                   renderbuffer);
+        reinterpret_cast<PFNGLNAMEDFRAMEBUFFERRENDERBUFFERPROC>(Interception::Hooks::OpenGL::g_cached_gl_named_framebuffer_renderbuffer)(framebuffer,
+                                                                                                                                        attachment,
+                                                                                                                                        renderbuffertarget,
+                                                                                                                                        renderbuffer);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLNAMEDFRAMEBUFFERRENDERBUFFER,

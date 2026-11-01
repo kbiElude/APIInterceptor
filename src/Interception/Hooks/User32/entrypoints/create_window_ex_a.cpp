@@ -11,18 +11,18 @@
 #include "Interception/Hooks/User32/globals.h"
 #include "Interception/Hooks/User32/entrypoints/create_window_ex_a.h"
 
-HWND WINAPI User32::create_window_ex_a(DWORD     in_ex_style,
-                                       LPCSTR    in_class_name_ptr,
-                                       LPCSTR    in_window_name_ptr,
-                                       DWORD     in_style,
-                                       int       in_x,
-                                       int       in_y,
-                                       int       in_width,
-                                       int       in_height,
-                                       HWND      in_hwnd_parent,
-                                       HMENU     in_hmenu,
-                                       HINSTANCE in_hinstance,
-                                       LPVOID    in_param_ptr)
+HWND WINAPI Interception::Hooks::User32::create_window_ex_a(DWORD     in_ex_style,
+                                                            LPCSTR    in_class_name_ptr,
+                                                            LPCSTR    in_window_name_ptr,
+                                                            DWORD     in_style,
+                                                            int       in_x,
+                                                            int       in_y,
+                                                            int       in_width,
+                                                            int       in_height,
+                                                            HWND      in_hwnd_parent,
+                                                            HMENU     in_hmenu,
+                                                            HINSTANCE in_hinstance,
+                                                            LPVOID    in_param_ptr)
 {
     APIInterceptor::MemoryChunk             class_name_chunk(in_class_name_ptr,
                                                              (in_class_name_ptr != nullptr && IS_INTRESOURCE(in_class_name_ptr) == FALSE) ? ::strlen(in_class_name_ptr) + 1 : 0,
@@ -96,18 +96,18 @@ HWND WINAPI User32::create_window_ex_a(DWORD     in_ex_style,
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<User32::PFNCREATEWINDOWEXAPROC>(User32::g_cached_create_window_ex_a_func_ptr)(in_ex_style,
-                                                                                                                in_class_name_ptr,
-                                                                                                                in_window_name_ptr,
-                                                                                                                in_style,
-                                                                                                                in_x,
-                                                                                                                in_y,
-                                                                                                                in_width,
-                                                                                                                in_height,
-                                                                                                                in_hwnd_parent,
-                                                                                                                in_hmenu,
-                                                                                                                in_hinstance,
-                                                                                                                in_param_ptr);
+        result = reinterpret_cast<Interception::Hooks::User32::PFNCREATEWINDOWEXAPROC>(Interception::Hooks::User32::g_cached_create_window_ex_a_func_ptr)(in_ex_style,
+                                                                                                                                                          in_class_name_ptr,
+                                                                                                                                                          in_window_name_ptr,
+                                                                                                                                                          in_style,
+                                                                                                                                                          in_x,
+                                                                                                                                                          in_y,
+                                                                                                                                                          in_width,
+                                                                                                                                                          in_height,
+                                                                                                                                                          in_hwnd_parent,
+                                                                                                                                                          in_hmenu,
+                                                                                                                                                          in_hinstance,
+                                                                                                                                                          in_param_ptr);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_USER32_CREATEWINDOWEXA,
@@ -118,8 +118,8 @@ HWND WINAPI User32::create_window_ex_a(DWORD     in_ex_style,
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_USER32_CREATEWINDOWEXA,
                                post_callback_func_arg,
-                               0,       /* in_n_args_out   */
-                               nullptr, /* in_args_out_ptr */
+                               0,       /* in_n_arguments_out   */
+                               nullptr, /* in_arguments_out_ptr */
                               &result_arg);
     }
 

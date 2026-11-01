@@ -8,7 +8,7 @@
 #include "Interception/Hooks/OpenGL/state_tracker.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-OpenGL::ClientArrayChunk::ClientArrayChunk()
+Interception::Hooks::OpenGL::ClientArrayChunk::ClientArrayChunk()
     :m_base_instance       (0),
      m_id                  (0),
      m_instance_count      (1),
@@ -19,8 +19,8 @@ OpenGL::ClientArrayChunk::ClientArrayChunk()
     /* Stub */
 }
 
-void OpenGL::ClientArrayChunk::add_arrays(const int32_t& in_first,
-                                          const int32_t& in_count)
+void Interception::Hooks::OpenGL::ClientArrayChunk::add_arrays(const int32_t& in_first,
+                                                               const int32_t& in_count)
 {
     Request request;
 
@@ -30,10 +30,10 @@ void OpenGL::ClientArrayChunk::add_arrays(const int32_t& in_first,
     m_request_vec.push_back(request);
 }
 
-void OpenGL::ClientArrayChunk::add_elements(const int32_t&  in_count,
-                                            const uint32_t& in_type,
-                                            const void*     in_indices_ptr,
-                                            const int32_t&  in_base_vertex)
+void Interception::Hooks::OpenGL::ClientArrayChunk::add_elements(const int32_t&  in_count,
+                                                                 const uint32_t& in_type,
+                                                                 const void*     in_indices_ptr,
+                                                                 const int32_t&  in_base_vertex)
 {
     Request request;
 
@@ -46,9 +46,9 @@ void OpenGL::ClientArrayChunk::add_elements(const int32_t&  in_count,
     m_request_vec.push_back(request);
 }
 
-void OpenGL::ClientArrayChunk::add_multi_arrays(const int32_t* in_first_ptr,
-                                                const int32_t* in_count_ptr,
-                                                const int32_t& in_draw_count)
+void Interception::Hooks::OpenGL::ClientArrayChunk::add_multi_arrays(const int32_t* in_first_ptr,
+                                                                     const int32_t* in_count_ptr,
+                                                                     const int32_t& in_draw_count)
 {
     if (in_first_ptr == nullptr)
     {
@@ -72,11 +72,11 @@ end:
     ;
 }
 
-void OpenGL::ClientArrayChunk::add_multi_elements(const int32_t*     in_count_ptr,
-                                                  const uint32_t&    in_type,
-                                                  const void* const* in_indices_ptr_ptr,
-                                                  const int32_t&     in_draw_count,
-                                                  const int32_t*     in_base_vertex_ptr)
+void Interception::Hooks::OpenGL::ClientArrayChunk::add_multi_elements(const int32_t*     in_count_ptr,
+                                                                       const uint32_t&    in_type,
+                                                                       const void* const* in_indices_ptr_ptr,
+                                                                       const int32_t&     in_draw_count,
+                                                                       const int32_t*     in_base_vertex_ptr)
 {
     if (in_count_ptr == nullptr)
     {
@@ -102,12 +102,12 @@ end:
     ;
 }
 
-APIInterceptor::DataChunkID OpenGL::ClientArrayChunk::get_id()
+APIInterceptor::DataChunkID Interception::Hooks::OpenGL::ClientArrayChunk::get_id()
 {
     if (m_is_registered == false)
     {
         std::vector<uint8_t> snapshot_u8_vec;
-        auto&                state = OpenGL::get_context_state().client_array_manager;
+        auto&                state = Interception::Hooks::OpenGL::get_context_state().client_array_manager;
 
         if (state.has_client_arrays() )
         {
@@ -168,13 +168,13 @@ APIInterceptor::DataChunkID OpenGL::ClientArrayChunk::get_id()
     return m_id;
 }
 
-bool OpenGL::ClientArrayChunk::get_index_range(const Request& in_request,
-                                               int64_t*       out_min_ptr,
-                                               int64_t*       out_max_ptr)
+bool Interception::Hooks::OpenGL::ClientArrayChunk::get_index_range(const Request& in_request,
+                                                                    int64_t*       out_min_ptr,
+                                                                    int64_t*       out_max_ptr)
 {
     std::vector<uint8_t> buffer_u8_vec;
     const uint8_t*       data_u8_ptr          = nullptr;
-    const auto           element_array_buffer = OpenGL::get_context_state().buffer_manager.get_bound_buffer(OpenGL::BufferBindingTarget::ELEMENT_ARRAY_BUFFER);
+    const auto           element_array_buffer = Interception::Hooks::OpenGL::get_context_state().buffer_manager.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ELEMENT_ARRAY_BUFFER);
     int64_t              max_index            = -1;
     int64_t              min_index            = INT64_MAX;
     const uint32_t       n_index_bytes        = get_n_index_bytes(in_request.type);
@@ -205,8 +205,8 @@ bool OpenGL::ClientArrayChunk::get_index_range(const Request& in_request,
     if (element_array_buffer != 0)
     {
         /* The indices are in the buffer, which has to be read back. Buffers that are mapped cannot be. */
-        const auto& context      = OpenGL::get_context_state();
-        void*       get_func_ptr = OpenGL::g_cached_gl_get_buffer_sub_data;
+        const auto& context      = Interception::Hooks::OpenGL::get_context_state();
+        void*       get_func_ptr = Interception::Hooks::OpenGL::g_cached_gl_get_buffer_sub_data;
 
         if (context.buffer_mapping_manager.is_mapped(element_array_buffer) )
         {
@@ -215,7 +215,7 @@ bool OpenGL::ClientArrayChunk::get_index_range(const Request& in_request,
 
         if (get_func_ptr == nullptr)
         {
-            get_func_ptr = reinterpret_cast<void*>(reinterpret_cast<WGL::PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("glGetBufferSubData") );
+            get_func_ptr = reinterpret_cast<void*>(reinterpret_cast<Interception::Hooks::WGL::PFNWGLGETPROCADDRESSPROC>(Interception::Hooks::WGL::g_cached_get_proc_address_func_ptr)("glGetBufferSubData") );
         }
 
         if (get_func_ptr == nullptr)
@@ -251,7 +251,7 @@ bool OpenGL::ClientArrayChunk::get_index_range(const Request& in_request,
 
             default:
             {
-                AI_ASSERT_FAIL();
+                AI_FAIL_UNSUPPORTED(in_request.type);
             }
         }
 
@@ -284,11 +284,11 @@ end:
     return result;
 }
 
-APIInterceptor::APIFunctionArgument OpenGL::ClientArrayChunk::get_indices_arg()
+APIInterceptor::APIFunctionArgument Interception::Hooks::OpenGL::ClientArrayChunk::get_indices_arg()
 {
     if (m_is_indices_arg_ready == false)
     {
-        const auto element_array_buffer = OpenGL::get_context_state().buffer_manager.get_bound_buffer(OpenGL::BufferBindingTarget::ELEMENT_ARRAY_BUFFER);
+        const auto element_array_buffer = Interception::Hooks::OpenGL::get_context_state().buffer_manager.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ELEMENT_ARRAY_BUFFER);
 
         for (const auto& current_request : m_request_vec)
         {
@@ -320,11 +320,11 @@ APIInterceptor::APIFunctionArgument OpenGL::ClientArrayChunk::get_indices_arg()
     return m_indices_arg;
 }
 
-APIInterceptor::APIFunctionArgument OpenGL::ClientArrayChunk::get_multi_indices_arg()
+APIInterceptor::APIFunctionArgument Interception::Hooks::OpenGL::ClientArrayChunk::get_multi_indices_arg()
 {
     if (m_is_multi_indices_arg_ready == false)
     {
-        const auto element_array_buffer = OpenGL::get_context_state().buffer_manager.get_bound_buffer(OpenGL::BufferBindingTarget::ELEMENT_ARRAY_BUFFER);
+        const auto element_array_buffer = Interception::Hooks::OpenGL::get_context_state().buffer_manager.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ELEMENT_ARRAY_BUFFER);
 
         if (element_array_buffer != 0)
         {
@@ -367,7 +367,7 @@ APIInterceptor::APIFunctionArgument OpenGL::ClientArrayChunk::get_multi_indices_
     return m_multi_indices_arg;
 }
 
-uint32_t OpenGL::ClientArrayChunk::get_n_index_bytes(const uint32_t& in_type)
+uint32_t Interception::Hooks::OpenGL::ClientArrayChunk::get_n_index_bytes(const uint32_t& in_type)
 {
     uint32_t result = 0;
 
@@ -379,15 +379,15 @@ uint32_t OpenGL::ClientArrayChunk::get_n_index_bytes(const uint32_t& in_type)
 
         default:
         {
-            AI_ASSERT_FAIL();
+            AI_FAIL_UNSUPPORTED(in_type);
         }
     }
 
     return result;
 }
 
-void OpenGL::ClientArrayChunk::set_instancing(const int32_t&  in_instance_count,
-                                              const uint32_t& in_base_instance)
+void Interception::Hooks::OpenGL::ClientArrayChunk::set_instancing(const int32_t&  in_instance_count,
+                                                                   const uint32_t& in_base_instance)
 {
     m_base_instance  = in_base_instance;
     m_instance_count = (in_instance_count > 0) ? static_cast<uint32_t>(in_instance_count)

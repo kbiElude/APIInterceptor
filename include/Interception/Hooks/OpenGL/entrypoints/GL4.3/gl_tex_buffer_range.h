@@ -7,9 +7,19 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiTexBufferRange(GLenum target, GLenum internalformat, GLuint buffer, GLintptr offset, GLsizeiptr size);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiTexBufferRange(GLenum     target,
+                                              GLenum     internalformat,
+                                              GLuint     buffer,
+                                              GLintptr   offset,
+                                              GLsizeiptr size);
+        }
+    }
 }
 
 #endif /* AI_GL_TEX_BUFFER_RANGE_H */

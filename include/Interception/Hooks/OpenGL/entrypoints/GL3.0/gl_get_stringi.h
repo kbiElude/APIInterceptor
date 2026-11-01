@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    const GLubyte *APIENTRY aiGetStringi(GLenum name,
-                                         GLuint index);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            const GLubyte *APIENTRY aiGetStringi(GLenum name,
+                                                 GLuint index);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_STRINGI_H */

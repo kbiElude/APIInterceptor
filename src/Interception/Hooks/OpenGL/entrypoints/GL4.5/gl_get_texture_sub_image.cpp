@@ -11,18 +11,18 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetTextureSubImage(GLuint  texture,
-                                              GLint   level,
-                                              GLint   xoffset,
-                                              GLint   yoffset,
-                                              GLint   zoffset,
-                                              GLsizei width,
-                                              GLsizei height,
-                                              GLsizei depth,
-                                              GLenum  format,
-                                              GLenum  type,
-                                              GLsizei bufSize,
-                                              void*   pixels)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetTextureSubImage(GLuint  texture,
+                                                                   GLint   level,
+                                                                   GLint   xoffset,
+                                                                   GLint   yoffset,
+                                                                   GLint   zoffset,
+                                                                   GLsizei width,
+                                                                   GLsizei height,
+                                                                   GLsizei depth,
+                                                                   GLenum  format,
+                                                                   GLenum  type,
+                                                                   GLsizei bufSize,
+                                                                   void*   pixels)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -42,8 +42,8 @@ void AI_APIENTRY OpenGL::aiGetTextureSubImage(GLuint  texture,
                  static_cast<int32_t>(width),
                  static_cast<int32_t>(height),
                  static_cast<int32_t>(depth),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(format),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(type),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(format),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type),
                  static_cast<int32_t>(bufSize),
                  pixels);
 
@@ -79,18 +79,18 @@ void AI_APIENTRY OpenGL::aiGetTextureSubImage(GLuint  texture,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETTEXTURESUBIMAGEPROC>(OpenGL::g_cached_gl_get_texture_sub_image)(texture,
-                                                                                                 level,
-                                                                                                 xoffset,
-                                                                                                 yoffset,
-                                                                                                 zoffset,
-                                                                                                 width,
-                                                                                                 height,
-                                                                                                 depth,
-                                                                                                 format,
-                                                                                                 type,
-                                                                                                 bufSize,
-                                                                                                 pixels);
+        reinterpret_cast<PFNGLGETTEXTURESUBIMAGEPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_texture_sub_image)(texture,
+                                                                                                                      level,
+                                                                                                                      xoffset,
+                                                                                                                      yoffset,
+                                                                                                                      zoffset,
+                                                                                                                      width,
+                                                                                                                      height,
+                                                                                                                      depth,
+                                                                                                                      format,
+                                                                                                                      type,
+                                                                                                                      bufSize,
+                                                                                                                      pixels);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETTEXTURESUBIMAGE,

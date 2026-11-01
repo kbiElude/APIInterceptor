@@ -10,10 +10,10 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiVertexAttribI3ui(GLuint index,
-                                            GLuint x,
-                                            GLuint y,
-                                            GLuint z)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiVertexAttribI3ui(GLuint index,
+                                                                 GLuint x,
+                                                                 GLuint y,
+                                                                 GLuint z)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -54,10 +54,10 @@ void AI_APIENTRY OpenGL::aiVertexAttribI3ui(GLuint index,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLVERTEXATTRIBI3UIPROC>(OpenGL::g_cached_gl_vertex_attrib_i_3ui)(index,
-                                                                                             x,
-                                                                                             y,
-                                                                                             z);
+        reinterpret_cast<PFNGLVERTEXATTRIBI3UIPROC>(Interception::Hooks::OpenGL::g_cached_gl_vertex_attrib_i_3ui)(index,
+                                                                                                                  x,
+                                                                                                                  y,
+                                                                                                                  z);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLVERTEXATTRIB_I3UI,

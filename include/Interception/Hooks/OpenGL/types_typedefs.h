@@ -5,15 +5,21 @@
 #ifndef AI_TYPES_TYPEDEFS_H
 #define AI_TYPES_TYPEDEFS_H
 
-namespace OpenGL
+namespace Interception
 {
-    /* GL_EXT_texture_object */
-    typedef GLboolean (AI_APIENTRY* PFNGLARETEXTURESRESIDENTEXTPROC)(GLsizei         n,
-                                                                     const GLuint*   textures,
-                                                                     GLboolean*      residences);
-    typedef void      (AI_APIENTRY* PFNGLPRIORITIZETEXTURESEXTPROC) (GLsizei         n,
-                                                                     const GLuint*   textures,
-                                                                     const GLclampf* priorities);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            /* GL_EXT_texture_object */
+            typedef GLboolean (AI_APIENTRY* PFNGLARETEXTURESRESIDENTEXTPROC)(GLsizei         n,
+                                                                             const GLuint*   textures,
+                                                                             GLboolean*      residences);
+            typedef void      (AI_APIENTRY* PFNGLPRIORITIZETEXTURESEXTPROC) (GLsizei         n,
+                                                                             const GLuint*   textures,
+                                                                             const GLclampf* priorities);
+        }
+    }
 }
 
 /* Core 1.1 compat profile */

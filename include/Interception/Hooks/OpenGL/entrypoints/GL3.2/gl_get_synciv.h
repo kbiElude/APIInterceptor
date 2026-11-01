@@ -7,13 +7,19 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetSynciv(GLsync   sync,
-                                 GLenum   pname,
-                                 GLsizei  bufSize,
-                                 GLsizei* length,
-                                 GLint*   values);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetSynciv(GLsync   sync,
+                                         GLenum   pname,
+                                         GLsizei  bufSize,
+                                         GLsizei* length,
+                                         GLint*   values);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_SYNCIV_H */

@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiFeedbackBuffer(GLsizei  size,
-                                          GLenum   type,
-                                          GLfloat* buffer)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiFeedbackBuffer(GLsizei  size,
+                                                               GLenum   type,
+                                                               GLfloat* buffer)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -26,7 +26,7 @@ void AI_APIENTRY OpenGL::aiFeedbackBuffer(GLsizei  size,
     {
         AI_TRACE("glFeedbackBuffer(size={%d], type=[%s], buffer=[%p])",
                  size,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(type),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type),
                  buffer);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLFEEDBACKBUFFER,
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiFeedbackBuffer(GLsizei  size,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLFEEDBACKBUFFERPROC>(OpenGL::g_cached_gl_feedback_buffer)(size,
-                                                                                       type,
-                                                                                       buffer);
+        reinterpret_cast<PFNGLFEEDBACKBUFFERPROC>(Interception::Hooks::OpenGL::g_cached_gl_feedback_buffer)(size,
+                                                                                                            type,
+                                                                                                            buffer);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLFEEDBACKBUFFER,

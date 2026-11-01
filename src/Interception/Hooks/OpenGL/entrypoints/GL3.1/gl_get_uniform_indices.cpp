@@ -11,10 +11,10 @@
 #include "Interception/Hooks/OpenGL/string_array_chunk.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetUniformIndices(GLuint               program,
-                                             GLsizei              uniformCount,
-                                             const GLchar* const* uniformNames,
-                                             GLuint*              uniformIndices)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetUniformIndices(GLuint               program,
+                                                                  GLsizei              uniformCount,
+                                                                  const GLchar* const* uniformNames,
+                                                                  GLuint*              uniformIndices)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -22,9 +22,9 @@ void AI_APIENTRY OpenGL::aiGetUniformIndices(GLuint               program,
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
     APIInterceptor::Tracker                 tracker;
-    OpenGL::StringArrayChunk                uniform_names_chunk(uniformNames,
-                                                                uniformCount,
-                                                                nullptr);
+    Interception::Hooks::OpenGL::StringArrayChunk                uniform_names_chunk(uniformNames,
+                                                                                     uniformCount,
+                                                                                     nullptr);
 
     if (tracker.is_top_level_api_call() )
     {
@@ -58,10 +58,10 @@ void AI_APIENTRY OpenGL::aiGetUniformIndices(GLuint               program,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETUNIFORMINDICESPROC>(OpenGL::g_cached_gl_get_uniform_indices)(program,
-                                                                                              uniformCount,
-                                                                                              uniformNames,
-                                                                                              uniformIndices);
+        reinterpret_cast<PFNGLGETUNIFORMINDICESPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_uniform_indices)(program,
+                                                                                                                   uniformCount,
+                                                                                                                   uniformNames,
+                                                                                                                   uniformIndices);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETUNIFORMINDICES,

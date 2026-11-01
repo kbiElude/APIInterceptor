@@ -6,7 +6,7 @@
 #include "Interception/Hooks/Kernel32/entrypoints.h"
 #include "Interception/Hooks/Kernel32/globals.h"
 
-HMODULE WINAPI Kernel32::aiLoadLibraryA(LPCSTR lpLibFileName)
+HMODULE WINAPI Interception::Hooks::Kernel32::aiLoadLibraryA(LPCSTR lpLibFileName)
 {
     const HMODULE result = reinterpret_cast<PFNLOADLIBRARYAPROC>(g_cached_load_library_a_function_ptr)(lpLibFileName);
 
@@ -15,9 +15,9 @@ HMODULE WINAPI Kernel32::aiLoadLibraryA(LPCSTR lpLibFileName)
     return result;
 }
 
-HMODULE WINAPI Kernel32::aiLoadLibraryExA(LPCSTR lpLibFileName,
-                                          HANDLE hFile,
-                                          DWORD  dwFlags)
+HMODULE WINAPI Interception::Hooks::Kernel32::aiLoadLibraryExA(LPCSTR lpLibFileName,
+                                                               HANDLE hFile,
+                                                               DWORD  dwFlags)
 {
     const HMODULE result = reinterpret_cast<PFNLOADLIBRARYEXAPROC>(g_cached_load_library_ex_a_function_ptr)(lpLibFileName,
                                                                                                             hFile,
@@ -28,9 +28,9 @@ HMODULE WINAPI Kernel32::aiLoadLibraryExA(LPCSTR lpLibFileName,
     return result;
 }
 
-HMODULE WINAPI Kernel32::aiLoadLibraryExW(LPCWSTR lpLibFileName,
-                                          HANDLE  hFile,
-                                          DWORD   dwFlags)
+HMODULE WINAPI Interception::Hooks::Kernel32::aiLoadLibraryExW(LPCWSTR lpLibFileName,
+                                                               HANDLE  hFile,
+                                                               DWORD   dwFlags)
 {
     const HMODULE result = reinterpret_cast<PFNLOADLIBRARYEXWPROC>(g_cached_load_library_ex_w_function_ptr)(lpLibFileName,
                                                                                                             hFile,
@@ -41,7 +41,7 @@ HMODULE WINAPI Kernel32::aiLoadLibraryExW(LPCWSTR lpLibFileName,
     return result;
 }
 
-HMODULE WINAPI Kernel32::aiLoadLibraryW(LPCWSTR lpLibFileName)
+HMODULE WINAPI Interception::Hooks::Kernel32::aiLoadLibraryW(LPCWSTR lpLibFileName)
 {
     const HMODULE result = reinterpret_cast<PFNLOADLIBRARYWPROC>(g_cached_load_library_w_function_ptr)(lpLibFileName);
 

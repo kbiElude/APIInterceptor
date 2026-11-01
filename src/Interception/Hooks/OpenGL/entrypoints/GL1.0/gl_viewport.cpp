@@ -10,10 +10,10 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiViewport(GLint   x,
-                                    GLint   y,
-                                    GLsizei width,
-                                    GLsizei height)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiViewport(GLint   x,
+                                                         GLint   y,
+                                                         GLsizei width,
+                                                         GLsizei height)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -54,10 +54,10 @@ void AI_APIENTRY OpenGL::aiViewport(GLint   x,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLVIEWPORTPROC>(OpenGL::g_cached_gl_viewport)(x,
-                                                                          y,
-                                                                          width,
-                                                                          height);
+        reinterpret_cast<PFNGLVIEWPORTPROC>(Interception::Hooks::OpenGL::g_cached_gl_viewport)(x,
+                                                                                               y,
+                                                                                               width,
+                                                                                               height);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLVIEWPORT,

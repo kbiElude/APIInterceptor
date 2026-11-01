@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiMemoryBarrierByRegion(GLbitfield barriers);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiMemoryBarrierByRegion(GLbitfield barriers);
+        }
+    }
 }
 
 #endif /* AI_GL_MEMORY_BARRIER_BY_REGION_H */

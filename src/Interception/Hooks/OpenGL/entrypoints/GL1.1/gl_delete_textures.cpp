@@ -12,8 +12,8 @@
 #include "Interception/Hooks/OpenGL/state_tracker.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDeleteTextures(GLsizei       n,
-                                          const GLuint* textures)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDeleteTextures(GLsizei       n,
+                                                               const GLuint* textures)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -53,18 +53,23 @@ void AI_APIENTRY OpenGL::aiDeleteTextures(GLsizei       n,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDELETETEXTURESPROC>(OpenGL::g_cached_gl_delete_textures)(n,
-                                                                                       textures);
+        reinterpret_cast<PFNGLDELETETEXTURESPROC>(Interception::Hooks::OpenGL::g_cached_gl_delete_textures)(n,
+                                                                                                            textures);
 
-        if (tracker.is_top_level_api_call() && textures != nullptr)
+        const bool is_top_level = tracker.is_top_level_api_call();
+
+        if (is_top_level)
         {
-            auto& context = OpenGL::get_context_state();
-
-            for (GLsizei n_texture = 0;
-                         n_texture < n;
-                       ++n_texture)
+            if (textures != nullptr)
             {
-                context.texture_manager.on_texture_deleted(textures[n_texture]);
+                auto& context = Interception::Hooks::OpenGL::get_context_state();
+
+                for (GLsizei n_texture = 0;
+                             n_texture < n;
+                           ++n_texture)
+                {
+                    context.texture_manager.on_texture_deleted(textures[n_texture]);
+                }
             }
         }
     }

@@ -7,11 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiNormal3f(GLfloat nx,
-                                GLfloat ny,
-                                GLfloat nz);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiNormal3f(GLfloat nx,
+                                        GLfloat ny,
+                                        GLfloat nz);
+        }
+    }
 }
 
 #endif /* AI_GL_NORMAL_3F_H */

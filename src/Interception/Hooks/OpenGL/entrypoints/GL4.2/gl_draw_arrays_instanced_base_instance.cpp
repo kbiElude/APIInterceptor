@@ -12,19 +12,19 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDrawArraysInstancedBaseInstance(GLenum  mode,
-                                                           GLint   first,
-                                                           GLsizei count,
-                                                           GLsizei instancecount,
-                                                           GLuint  baseinstance)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDrawArraysInstancedBaseInstance(GLenum  mode,
+                                                                                GLint   first,
+                                                                                GLsizei count,
+                                                                                GLsizei instancecount,
+                                                                                GLuint  baseinstance)
 {
-    OpenGL::ClientArrayChunk                client_arrays_chunk;
-    void*                                   post_callback_func_arg = nullptr;
-    APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
-    void*                                   pre_callback_func_arg  = nullptr;
-    APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
-    bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    Interception::Hooks::OpenGL::ClientArrayChunk client_arrays_chunk;
+    void*                                         post_callback_func_arg = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC       post_callback_func_ptr = nullptr;
+    void*                                         pre_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC        pre_callback_func_ptr  = nullptr;
+    bool                                          should_pass_through    = true;
+    APIInterceptor::Tracker                       tracker;
 
     client_arrays_chunk.add_arrays(first,
                                    count);
@@ -35,7 +35,7 @@ void AI_APIENTRY OpenGL::aiDrawArraysInstancedBaseInstance(GLenum  mode,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glDrawArraysInstancedBaseInstance(mode=[%s] first=[%d] count=[%d] instancecount=[%d] baseinstance=[%u])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(mode),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(mode),
                  first,
                  static_cast<int32_t>(count),
                  static_cast<int32_t>(instancecount),
@@ -67,11 +67,11 @@ void AI_APIENTRY OpenGL::aiDrawArraysInstancedBaseInstance(GLenum  mode,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDRAWARRAYSINSTANCEDBASEINSTANCEPROC>(OpenGL::g_cached_gl_draw_arrays_instanced_base_instance)(mode,
-                                                                                                                            first,
-                                                                                                                            count,
-                                                                                                                            instancecount,
-                                                                                                                            baseinstance);
+        reinterpret_cast<PFNGLDRAWARRAYSINSTANCEDBASEINSTANCEPROC>(Interception::Hooks::OpenGL::g_cached_gl_draw_arrays_instanced_base_instance)(mode,
+                                                                                                                                                 first,
+                                                                                                                                                 count,
+                                                                                                                                                 instancecount,
+                                                                                                                                                 baseinstance);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDRAWARRAYSINSTANCEDBASEINSTANCE,

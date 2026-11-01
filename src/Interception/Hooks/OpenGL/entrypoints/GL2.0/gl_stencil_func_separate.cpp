@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiStencilFuncSeparate(GLenum face,
-                                               GLenum func,
-                                               GLint  ref,
-                                               GLuint mask)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiStencilFuncSeparate(GLenum face,
+                                                                    GLenum func,
+                                                                    GLint  ref,
+                                                                    GLuint mask)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -26,8 +26,8 @@ void AI_APIENTRY OpenGL::aiStencilFuncSeparate(GLenum face,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glStencilFuncSeparate(face=[%s] func=[%s] ref=[%d] mask=[%u])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(face),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(func),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(face),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(func),
                  ref,
                  mask);
 
@@ -55,10 +55,10 @@ void AI_APIENTRY OpenGL::aiStencilFuncSeparate(GLenum face,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLSTENCILFUNCSEPARATEPROC>(OpenGL::g_cached_gl_stencil_func_separate)(face,
-                                                                                                  func,
-                                                                                                  ref,
-                                                                                                  mask);
+        reinterpret_cast<PFNGLSTENCILFUNCSEPARATEPROC>(Interception::Hooks::OpenGL::g_cached_gl_stencil_func_separate)(face,
+                                                                                                                       func,
+                                                                                                                       ref,
+                                                                                                                       mask);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLSTENCILFUNCSEPARATE,

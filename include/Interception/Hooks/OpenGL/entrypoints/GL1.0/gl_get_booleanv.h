@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetBooleanv(GLenum     pname,
-                                   GLboolean* data);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetBooleanv(GLenum     pname,
+                                           GLboolean* data);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_BOOLEANV_H */

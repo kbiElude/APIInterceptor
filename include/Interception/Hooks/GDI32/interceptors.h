@@ -9,9 +9,15 @@
 #include "Common/types.h"
 #include <vector>
 
-namespace GDI32
+namespace Interception
 {
-    extern std::vector<APIInterceptor::FunctionInterceptor> get_function_interceptors();
+    namespace Hooks
+    {
+        namespace GDI32
+        {
+            extern std::vector<APIInterceptor::FunctionInterceptor> get_function_interceptors();
+        }
+    }
 }
 
 #endif /* GDI32_INTERCEPTORS_H */

@@ -11,8 +11,8 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiPatchParameteri(GLenum pname,
-                                           GLint  value)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiPatchParameteri(GLenum pname,
+                                                                GLint  value)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -24,7 +24,7 @@ void AI_APIENTRY OpenGL::aiPatchParameteri(GLenum pname,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glPatchParameteri(pname=[%s] value=[%d])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  value);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLPATCHPARAMETERI,
@@ -49,8 +49,8 @@ void AI_APIENTRY OpenGL::aiPatchParameteri(GLenum pname,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLPATCHPARAMETERIPROC>(OpenGL::g_cached_gl_patch_parameteri)(pname,
-                                                                                         value);
+        reinterpret_cast<PFNGLPATCHPARAMETERIPROC>(Interception::Hooks::OpenGL::g_cached_gl_patch_parameteri)(pname,
+                                                                                                              value);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLPATCHPARAMETERI,

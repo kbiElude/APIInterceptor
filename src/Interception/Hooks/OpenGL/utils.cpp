@@ -3,6 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "Common/globals.h"
+#include "Common/macros.h"
 #include "Interception/Hooks/OpenGL/utils.h"
 #include <cassert>
 
@@ -10,8 +11,8 @@
  * that are absent from glcorearb.h but valid as pixel transfer formats. */
 #include "gl/gl.h"
 
-bool OpenGL::Utils::get_texture_binding_target_for_gl_enum(const GLenum&         in_target,
-                                                           TextureBindingTarget* out_result_ptr)
+bool Interception::Hooks::OpenGL::Utils::get_texture_binding_target_for_gl_enum(const GLenum&         in_target,
+                                                                                TextureBindingTarget* out_result_ptr)
 {
     bool result = true;
 
@@ -46,17 +47,15 @@ bool OpenGL::Utils::get_texture_binding_target_for_gl_enum(const GLenum&        
 
         default:
         {
-            assert(false);
-
-            result = false;
+            AI_FAIL_UNSUPPORTED(in_target);
         }
     }
 
     return result;
 }
 
-bool OpenGL::Utils::get_buffer_binding_target_for_gl_enum(const GLenum&        in_target,
-                                                          BufferBindingTarget* out_result_ptr)
+bool Interception::Hooks::OpenGL::Utils::get_buffer_binding_target_for_gl_enum(const GLenum&        in_target,
+                                                                               BufferBindingTarget* out_result_ptr)
 {
     bool result = true;
 
@@ -79,16 +78,14 @@ bool OpenGL::Utils::get_buffer_binding_target_for_gl_enum(const GLenum&        i
 
         default:
         {
-            assert(false);
-
-            result = false;
+            AI_FAIL_UNSUPPORTED(in_target);
         }
     }
 
     return result;
 }
 
-bool OpenGL::Utils::is_packed_pixel_type(const GLenum& in_type)
+bool Interception::Hooks::OpenGL::Utils::is_packed_pixel_type(const GLenum& in_type)
 {
     switch (in_type)
     {
@@ -119,7 +116,7 @@ bool OpenGL::Utils::is_packed_pixel_type(const GLenum& in_type)
     }
 }
 
-uint32_t OpenGL::Utils::get_n_bytes_for_type(const GLenum& in_type)
+uint32_t Interception::Hooks::OpenGL::Utils::get_n_bytes_for_type(const GLenum& in_type)
 {
     uint32_t result = 0;
 
@@ -152,7 +149,7 @@ uint32_t OpenGL::Utils::get_n_bytes_for_type(const GLenum& in_type)
 
         default:
         {
-            assert(false);
+            AI_FAIL_UNSUPPORTED(in_type);
         }
     }
 
@@ -160,7 +157,7 @@ uint32_t OpenGL::Utils::get_n_bytes_for_type(const GLenum& in_type)
     return result;
 }
 
-uint32_t OpenGL::Utils::get_n_components_for_format(const GLenum& in_format)
+uint32_t Interception::Hooks::OpenGL::Utils::get_n_components_for_format(const GLenum& in_format)
 {
     uint32_t result = 0;
 
@@ -191,7 +188,7 @@ uint32_t OpenGL::Utils::get_n_components_for_format(const GLenum& in_format)
 
         default:
         {
-            assert(false);
+            AI_FAIL_UNSUPPORTED(in_format);
         }
     }
 
@@ -199,18 +196,18 @@ uint32_t OpenGL::Utils::get_n_components_for_format(const GLenum& in_format)
     return result;
 }
 
-uint32_t OpenGL::Utils::get_n_texel_bytes(const GLenum& in_format,
-                                          const GLenum& in_type)
+uint32_t Interception::Hooks::OpenGL::Utils::get_n_texel_bytes(const GLenum& in_format,
+                                                               const GLenum& in_type)
 {
     uint32_t result = 0;
 
-    if (OpenGL::Utils::is_packed_pixel_type(in_type) )
+    if (Interception::Hooks::OpenGL::Utils::is_packed_pixel_type(in_type) )
     {
-        result = OpenGL::Utils::get_n_bytes_for_type(in_type);
+        result = Interception::Hooks::OpenGL::Utils::get_n_bytes_for_type(in_type);
     }
     else
     {
-        result = OpenGL::Utils::get_n_components_for_format(in_format) * OpenGL::Utils::get_n_bytes_for_type(in_type);
+        result = Interception::Hooks::OpenGL::Utils::get_n_components_for_format(in_format) * Interception::Hooks::OpenGL::Utils::get_n_bytes_for_type(in_type);
     }
 
     return result;

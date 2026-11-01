@@ -14,10 +14,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiBufferStorage(GLenum      target,
-                                         GLsizeiptr  size,
-                                         const void* data,
-                                         GLbitfield  flags)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiBufferStorage(GLenum      target,
+                                                              GLsizeiptr  size,
+                                                              const void* data,
+                                                              GLbitfield  flags)
 {
     APIInterceptor::MemoryChunk             data_chunk(data,
                                                        size,
@@ -32,7 +32,7 @@ void AI_APIENTRY OpenGL::aiBufferStorage(GLenum      target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glBufferStorage(target=[%s] size=[%d] data=[%p] flags=[%u])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  static_cast<int32_t>(size),
                  data,
                  flags);
@@ -61,24 +61,30 @@ void AI_APIENTRY OpenGL::aiBufferStorage(GLenum      target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLBUFFERSTORAGEPROC>(OpenGL::g_cached_gl_buffer_storage)(target,
-                                                                                      size,
-                                                                                      data,
-                                                                                      flags);
+        reinterpret_cast<PFNGLBUFFERSTORAGEPROC>(Interception::Hooks::OpenGL::g_cached_gl_buffer_storage)(target,
+                                                                                                           size,
+                                                                                                           data,
+                                                                                                           flags);
 
-        OpenGL::BufferBindingTarget binding_target;
+        Interception::Hooks::OpenGL::BufferBindingTarget binding_target;
 
-        if (tracker.is_top_level_api_call                       ()              &&
-            OpenGL::Utils::get_buffer_binding_target_for_gl_enum(target,
-                                                                &binding_target) )
+        const bool is_top_level = tracker.is_top_level_api_call();
+
+        if (is_top_level)
         {
-            auto&        context         = OpenGL::get_context_state();
-            const GLuint bound_buffer_id = context.buffer_manager.get_bound_buffer(binding_target);
+            const bool is_binding_target_known = Interception::Hooks::OpenGL::Utils::get_buffer_binding_target_for_gl_enum(target,
+                                                                                                                           &binding_target);
 
-            if (bound_buffer_id != 0)
+            if (is_binding_target_known)
             {
-                context.buffer_manager.set_size(bound_buffer_id,
-                                                static_cast<uint64_t>(size) );
+                auto&        context         = Interception::Hooks::OpenGL::get_context_state();
+                const GLuint bound_buffer_id = context.buffer_manager.get_bound_buffer(binding_target);
+
+                if (bound_buffer_id != 0)
+                {
+                    context.buffer_manager.set_size(bound_buffer_id,
+                                                    static_cast<uint64_t>(size) );
+                }
             }
         }
     }

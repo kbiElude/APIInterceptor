@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetActiveAtomicCounterBufferiv(GLuint program,
-                                                          GLuint bufferIndex,
-                                                          GLenum pname,
-                                                          GLint* params)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetActiveAtomicCounterBufferiv(GLuint program,
+                                                                               GLuint bufferIndex,
+                                                                               GLenum pname,
+                                                                               GLint* params)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -28,7 +28,7 @@ void AI_APIENTRY OpenGL::aiGetActiveAtomicCounterBufferiv(GLuint program,
         AI_TRACE("glGetActiveAtomicCounterBufferiv(program=[%u] bufferIndex=[%u] pname=[%s] params=[%p])",
                  program,
                  bufferIndex,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  params);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETACTIVEATOMICCOUNTERBUFFERIV,
@@ -55,10 +55,10 @@ void AI_APIENTRY OpenGL::aiGetActiveAtomicCounterBufferiv(GLuint program,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETACTIVEATOMICCOUNTERBUFFERIVPROC>(OpenGL::g_cached_gl_get_active_atomic_counter_bufferiv)(program,
-                                                                                                                          bufferIndex,
-                                                                                                                          pname,
-                                                                                                                          params);
+        reinterpret_cast<PFNGLGETACTIVEATOMICCOUNTERBUFFERIVPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_active_atomic_counter_bufferiv)(program,
+                                                                                                                                               bufferIndex,
+                                                                                                                                               pname,
+                                                                                                                                               params);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETACTIVEATOMICCOUNTERBUFFERIV,

@@ -12,12 +12,12 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiBindBuffersRange(GLenum            target,
-                                            GLuint            first,
-                                            GLsizei           count,
-                                            const GLuint*     buffers,
-                                            const GLintptr*   offsets,
-                                            const GLsizeiptr* sizes)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiBindBuffersRange(GLenum            target,
+                                                                 GLuint            first,
+                                                                 GLsizei           count,
+                                                                 const GLuint*     buffers,
+                                                                 const GLintptr*   offsets,
+                                                                 const GLsizeiptr* sizes)
 {
     APIInterceptor::MemoryChunk             buffers_chunk(buffers,
                                                           count,
@@ -38,7 +38,7 @@ void AI_APIENTRY OpenGL::aiBindBuffersRange(GLenum            target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glBindBuffersRange(target=[%s] first=[%u] count=[%d] buffers=[%p] offsets=[%p] sizes=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  first,
                  static_cast<int32_t>(count),
                  buffers,
@@ -71,12 +71,12 @@ void AI_APIENTRY OpenGL::aiBindBuffersRange(GLenum            target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLBINDBUFFERSRANGEPROC>(OpenGL::g_cached_gl_bind_buffers_range)(target,
-                                                                                             first,
-                                                                                             count,
-                                                                                             buffers,
-                                                                                             offsets,
-                                                                                             sizes);
+        reinterpret_cast<PFNGLBINDBUFFERSRANGEPROC>(Interception::Hooks::OpenGL::g_cached_gl_bind_buffers_range)(target,
+                                                                                                                  first,
+                                                                                                                  count,
+                                                                                                                  buffers,
+                                                                                                                  offsets,
+                                                                                                                  sizes);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBINDBUFFERSRANGE,

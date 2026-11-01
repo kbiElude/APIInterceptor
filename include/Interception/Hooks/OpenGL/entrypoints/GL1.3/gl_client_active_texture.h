@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiClientActiveTexture(GLenum texture);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiClientActiveTexture(GLenum texture);
+        }
+    }
 }
 
 #endif /* AI_GL_CLIENT_ACTIVE_TEXTURE_H */

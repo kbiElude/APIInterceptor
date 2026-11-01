@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiInvalidateBufferData(GLuint buffer);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiInvalidateBufferData(GLuint buffer);
+        }
+    }
 }
 
 #endif /* AI_GL_INVALIDATE_BUFFER_DATA_H */

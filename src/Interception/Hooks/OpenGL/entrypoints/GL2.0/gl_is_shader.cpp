@@ -10,7 +10,7 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-GLboolean AI_APIENTRY OpenGL::aiIsShader(GLuint shader)
+GLboolean AI_APIENTRY Interception::Hooks::OpenGL::aiIsShader(GLuint shader)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -46,7 +46,7 @@ GLboolean AI_APIENTRY OpenGL::aiIsShader(GLuint shader)
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNGLISSHADERPROC>(OpenGL::g_cached_gl_is_shader)(shader);
+        result = reinterpret_cast<PFNGLISSHADERPROC>(Interception::Hooks::OpenGL::g_cached_gl_is_shader)(shader);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLISSHADER,

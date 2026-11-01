@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetTexGendv(GLenum    coord,
-                                       GLenum    pname,
-                                       GLdouble* params)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetTexGendv(GLenum    coord,
+                                                            GLenum    pname,
+                                                            GLdouble* params)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -25,8 +25,8 @@ void AI_APIENTRY OpenGL::aiGetTexGendv(GLenum    coord,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glGetTexGendv(coord=[%s], pname=[%s], params=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(coord),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(coord),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  params);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETTEXGENDV,
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiGetTexGendv(GLenum    coord,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETTEXGENDVPROC>(OpenGL::g_cached_gl_get_tex_gen_dv)(coord,
-                                                                                   pname,
-                                                                                   params);
+        reinterpret_cast<PFNGLGETTEXGENDVPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_tex_gen_dv)(coord,
+                                                                                                        pname,
+                                                                                                        params);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETTEXGENDV,

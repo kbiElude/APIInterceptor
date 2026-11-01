@@ -8,13 +8,13 @@
 
 namespace
 {
-    std::unordered_map<HGLRC, OpenGL::ContextStateUniquePtr> g_context_state_map;
-    std::mutex                                               g_mutex;
+    std::unordered_map<HGLRC, Interception::Hooks::OpenGL::ContextStateUniquePtr> g_context_state_map;
+    std::mutex                                                                    g_mutex;
 }
 
-OpenGL::ContextState& OpenGL::get_context_state()
+Interception::Hooks::OpenGL::ContextState& Interception::Hooks::OpenGL::get_context_state()
 {
-    const auto hglrc = reinterpret_cast<WGL::PFNWGLGETCURRENTCONTEXTPROC>(WGL::g_cached_get_current_context_func_ptr)();
+    const auto hglrc = reinterpret_cast<Interception::Hooks::WGL::PFNWGLGETCURRENTCONTEXTPROC>(Interception::Hooks::WGL::g_cached_get_current_context_func_ptr)();
 
     AI_ASSERT(hglrc != nullptr);
 
@@ -32,7 +32,7 @@ OpenGL::ContextState& OpenGL::get_context_state()
     }
 }
 
-void OpenGL::on_context_destroyed(const HGLRC& in_hglrc)
+void Interception::Hooks::OpenGL::on_context_destroyed(const HGLRC& in_hglrc)
 {
     {
         std::lock_guard<std::mutex> lock(g_mutex);

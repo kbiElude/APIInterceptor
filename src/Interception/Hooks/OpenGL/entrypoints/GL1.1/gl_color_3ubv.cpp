@@ -11,7 +11,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiColor3ubv(const GLubyte* v)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiColor3ubv(const GLubyte* v)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -50,7 +50,7 @@ void AI_APIENTRY OpenGL::aiColor3ubv(const GLubyte* v)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLCOLOR3UBVPROC>(OpenGL::g_cached_gl_color_3ubv)(v);
+        reinterpret_cast<PFNGLCOLOR3UBVPROC>(Interception::Hooks::OpenGL::g_cached_gl_color_3ubv)(v);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCOLOR3UBV,

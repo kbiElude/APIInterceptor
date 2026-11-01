@@ -11,8 +11,8 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiBlendFunc(GLenum sfactor,
-                                     GLenum dfactor)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiBlendFunc(GLenum sfactor,
+                                                          GLenum dfactor)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -24,8 +24,8 @@ void AI_APIENTRY OpenGL::aiBlendFunc(GLenum sfactor,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glBlendFunc(sfactor=[%s] dfactor=[%s])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(sfactor),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(dfactor) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(sfactor),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(dfactor) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBLENDFUNC,
                                                          &pre_callback_func_ptr,
@@ -49,8 +49,8 @@ void AI_APIENTRY OpenGL::aiBlendFunc(GLenum sfactor,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLBLENDFUNCPROC>(OpenGL::g_cached_gl_blend_func)(sfactor,
-                                                                             dfactor);
+        reinterpret_cast<PFNGLBLENDFUNCPROC>(Interception::Hooks::OpenGL::g_cached_gl_blend_func)(sfactor,
+                                                                                                  dfactor);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBLENDFUNC,

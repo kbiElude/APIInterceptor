@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiLoadMatrixd(const GLdouble* m);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiLoadMatrixd(const GLdouble* m);
+        }
+    }
 }
 
 #endif /* AI_GL_LOAD_MATRIX_D_H */

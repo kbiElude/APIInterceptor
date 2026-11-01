@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiCreateQueries(GLenum  target,
-                                         GLsizei n,
-                                         GLuint* ids)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiCreateQueries(GLenum  target,
+                                                              GLsizei n,
+                                                              GLuint* ids)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -25,7 +25,7 @@ void AI_APIENTRY OpenGL::aiCreateQueries(GLenum  target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glCreateQueries(target=[%s] n=[%d] ids=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  static_cast<int32_t>(n),
                  ids);
 
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiCreateQueries(GLenum  target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLCREATEQUERIESPROC>(OpenGL::g_cached_gl_create_queries)(target,
-                                                                                     n,
-                                                                                     ids);
+        reinterpret_cast<PFNGLCREATEQUERIESPROC>(Interception::Hooks::OpenGL::g_cached_gl_create_queries)(target,
+                                                                                                          n,
+                                                                                                          ids);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCREATEQUERIES,

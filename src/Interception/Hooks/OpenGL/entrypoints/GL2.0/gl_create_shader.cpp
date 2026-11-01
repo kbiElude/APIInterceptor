@@ -11,7 +11,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-GLuint AI_APIENTRY OpenGL::aiCreateShader(GLenum type)
+GLuint AI_APIENTRY Interception::Hooks::OpenGL::aiCreateShader(GLenum type)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -24,7 +24,7 @@ GLuint AI_APIENTRY OpenGL::aiCreateShader(GLenum type)
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glCreateShader(type=[%s])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(type) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCREATESHADER,
                                                          &pre_callback_func_ptr,
@@ -47,7 +47,7 @@ GLuint AI_APIENTRY OpenGL::aiCreateShader(GLenum type)
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNGLCREATESHADERPROC>(OpenGL::g_cached_gl_create_shader)(type);
+        result = reinterpret_cast<PFNGLCREATESHADERPROC>(Interception::Hooks::OpenGL::g_cached_gl_create_shader)(type);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCREATESHADER,

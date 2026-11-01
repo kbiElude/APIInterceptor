@@ -10,12 +10,12 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiCopyTextureSubImage1D(GLuint  texture,
-                                                 GLint   level,
-                                                 GLint   xoffset,
-                                                 GLint   x,
-                                                 GLint   y,
-                                                 GLsizei width)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiCopyTextureSubImage1D(GLuint  texture,
+                                                                      GLint   level,
+                                                                      GLint   xoffset,
+                                                                      GLint   x,
+                                                                      GLint   y,
+                                                                      GLsizei width)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -60,12 +60,12 @@ void AI_APIENTRY OpenGL::aiCopyTextureSubImage1D(GLuint  texture,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLCOPYTEXTURESUBIMAGE1DPROC>(OpenGL::g_cached_gl_copy_texture_sub_image1d)(texture,
-                                                                                                       level,
-                                                                                                       xoffset,
-                                                                                                       x,
-                                                                                                       y,
-                                                                                                       width);
+        reinterpret_cast<PFNGLCOPYTEXTURESUBIMAGE1DPROC>(Interception::Hooks::OpenGL::g_cached_gl_copy_texture_sub_image1d)(texture,
+                                                                                                                            level,
+                                                                                                                            xoffset,
+                                                                                                                            x,
+                                                                                                                            y,
+                                                                                                                            width);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCOPYTEXTURESUBIMAGE1D,

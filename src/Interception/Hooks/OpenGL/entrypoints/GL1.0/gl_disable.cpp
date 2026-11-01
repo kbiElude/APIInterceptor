@@ -11,7 +11,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDisable(GLenum cap)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDisable(GLenum cap)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -23,7 +23,7 @@ void AI_APIENTRY OpenGL::aiDisable(GLenum cap)
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glDisable(cap=[%s])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(cap) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(cap) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDISABLE,
                                                          &pre_callback_func_ptr,
@@ -46,7 +46,7 @@ void AI_APIENTRY OpenGL::aiDisable(GLenum cap)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDISABLEPROC>(OpenGL::g_cached_gl_disable)(cap);
+        reinterpret_cast<PFNGLDISABLEPROC>(Interception::Hooks::OpenGL::g_cached_gl_disable)(cap);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDISABLE,

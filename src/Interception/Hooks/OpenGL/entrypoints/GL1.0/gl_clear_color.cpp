@@ -10,10 +10,10 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiClearColor(GLfloat red,
-                                      GLfloat green,
-                                      GLfloat blue,
-                                      GLfloat alpha)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiClearColor(GLfloat red,
+                                                           GLfloat green,
+                                                           GLfloat blue,
+                                                           GLfloat alpha)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -54,10 +54,10 @@ void AI_APIENTRY OpenGL::aiClearColor(GLfloat red,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLCLEARCOLORPROC>(OpenGL::g_cached_gl_clear_color)(red,
-                                                                               green,
-                                                                               blue,
-                                                                               alpha);
+        reinterpret_cast<PFNGLCLEARCOLORPROC>(Interception::Hooks::OpenGL::g_cached_gl_clear_color)(red,
+                                                                                                    green,
+                                                                                                    blue,
+                                                                                                    alpha);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCLEARCOLOR,

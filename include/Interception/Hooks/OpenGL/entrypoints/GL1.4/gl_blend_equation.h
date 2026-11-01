@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiBlendEquation(GLenum mode);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiBlendEquation(GLenum mode);
+        }
+    }
 }
 
 #endif /* AI_GL_BLEND_EQUATION_H */

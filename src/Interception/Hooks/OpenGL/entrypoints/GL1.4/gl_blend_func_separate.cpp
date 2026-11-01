@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiBlendFuncSeparate(GLenum sfactorRGB,
-                                             GLenum dfactorRGB,
-                                             GLenum sfactorAlpha,
-                                             GLenum dfactorAlpha)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiBlendFuncSeparate(GLenum sfactorRGB,
+                                                                  GLenum dfactorRGB,
+                                                                  GLenum sfactorAlpha,
+                                                                  GLenum dfactorAlpha)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -26,10 +26,10 @@ void AI_APIENTRY OpenGL::aiBlendFuncSeparate(GLenum sfactorRGB,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glBlendFuncSeparate(sfactorRGB=[%s] dfactorRGB=[%s] sfactorAlpha=[%s] dfactorAlpha=[%s])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(sfactorRGB),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(dfactorRGB),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(sfactorAlpha),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(dfactorAlpha) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(sfactorRGB),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(dfactorRGB),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(sfactorAlpha),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(dfactorAlpha) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBLENDFUNCSEPARATE,
                                                          &pre_callback_func_ptr,
@@ -55,10 +55,10 @@ void AI_APIENTRY OpenGL::aiBlendFuncSeparate(GLenum sfactorRGB,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLBLENDFUNCSEPARATEPROC>(OpenGL::g_cached_gl_blend_func_separate)(sfactorRGB,
-                                                                                              dfactorRGB,
-                                                                                              sfactorAlpha,
-                                                                                              dfactorAlpha);
+        reinterpret_cast<PFNGLBLENDFUNCSEPARATEPROC>(Interception::Hooks::OpenGL::g_cached_gl_blend_func_separate)(sfactorRGB,
+                                                                                                                   dfactorRGB,
+                                                                                                                   sfactorAlpha,
+                                                                                                                   dfactorAlpha);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBLENDFUNCSEPARATE,

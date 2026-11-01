@@ -7,12 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetShaderInfoLog(GLuint   shader,
-                                        GLsizei  bufSize,
-                                        GLsizei* length,
-                                        GLchar*  infoLog);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetShaderInfoLog(GLuint   shader,
+                                                GLsizei  bufSize,
+                                                GLsizei* length,
+                                                GLchar*  infoLog);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_SHADER_INFO_LOG_H */

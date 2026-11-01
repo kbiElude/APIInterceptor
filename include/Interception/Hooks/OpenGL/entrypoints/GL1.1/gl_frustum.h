@@ -7,14 +7,20 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiFrustum(GLdouble left,
-                               GLdouble right,
-                               GLdouble bottom,
-                               GLdouble top,
-                               GLdouble zNear,
-                               GLdouble zFar);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiFrustum(GLdouble left,
+                                       GLdouble right,
+                                       GLdouble bottom,
+                                       GLdouble top,
+                                       GLdouble zNear,
+                                       GLdouble zFar);
+        }
+    }
 }
 
 #endif /* AI_GL_FRUSTUM_H */

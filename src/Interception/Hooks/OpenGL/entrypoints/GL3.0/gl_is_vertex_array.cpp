@@ -10,7 +10,7 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-GLboolean AI_APIENTRY OpenGL::aiIsVertexArray(GLuint array)
+GLboolean AI_APIENTRY Interception::Hooks::OpenGL::aiIsVertexArray(GLuint array)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -44,7 +44,7 @@ GLboolean AI_APIENTRY OpenGL::aiIsVertexArray(GLuint array)
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNGLISVERTEXARRAYPROC>(OpenGL::g_cached_gl_is_vertex_array)(array);
+        result = reinterpret_cast<PFNGLISVERTEXARRAYPROC>(Interception::Hooks::OpenGL::g_cached_gl_is_vertex_array)(array);
     }
 
     if (tracker.is_top_level_api_call() )

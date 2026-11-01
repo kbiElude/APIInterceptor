@@ -11,7 +11,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiBegin(GLenum mode)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiBegin(GLenum mode)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -23,7 +23,7 @@ void AI_APIENTRY OpenGL::aiBegin(GLenum mode)
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glBegin(mode=[%s])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(mode) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(mode) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBEGIN,
                                                          &pre_callback_func_ptr,
@@ -46,7 +46,7 @@ void AI_APIENTRY OpenGL::aiBegin(GLenum mode)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLBEGINPROC>(OpenGL::g_cached_gl_begin)(mode);
+        reinterpret_cast<PFNGLBEGINPROC>(Interception::Hooks::OpenGL::g_cached_gl_begin)(mode);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBEGIN,

@@ -7,9 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiActiveShaderProgram(GLuint pipeline, GLuint program);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiActiveShaderProgram(GLuint pipeline,
+                                                   GLuint program);
+        }
+    }
 }
 
 #endif /* AI_GL_ACTIVE_SHADER_PROGRAM_H */

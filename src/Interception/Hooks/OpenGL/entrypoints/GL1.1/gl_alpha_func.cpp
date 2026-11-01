@@ -11,8 +11,8 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiAlphaFunc(GLenum   func,
-                                     GLclampf ref)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiAlphaFunc(GLenum   func,
+                                                          GLclampf ref)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -24,7 +24,7 @@ void AI_APIENTRY OpenGL::aiAlphaFunc(GLenum   func,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glAlphaFunc(func=[%s], ref=[%.4f])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(func),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(func),
                  ref);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLALPHAFUNC,
@@ -49,8 +49,8 @@ void AI_APIENTRY OpenGL::aiAlphaFunc(GLenum   func,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLACCUMPROC>(OpenGL::g_cached_gl_alpha_func)(func,
-                                                                         ref);
+        reinterpret_cast<PFNGLACCUMPROC>(Interception::Hooks::OpenGL::g_cached_gl_alpha_func)(func,
+                                                                                              ref);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLALPHAFUNC,

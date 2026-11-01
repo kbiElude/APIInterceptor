@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetMultisamplefv(GLenum   pname,
-                                            GLuint   index,
-                                            GLfloat* val)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetMultisamplefv(GLenum   pname,
+                                                                 GLuint   index,
+                                                                 GLfloat* val)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -25,7 +25,7 @@ void AI_APIENTRY OpenGL::aiGetMultisamplefv(GLenum   pname,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glGetMultisamplefv(pname=[%s] index=[%u] val=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  index,
                  val);
 
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiGetMultisamplefv(GLenum   pname,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETMULTISAMPLEFVPROC>(OpenGL::g_cached_gl_get_multisamplefv)(pname,
-                                                                                            index,
-                                                                                            val);
+        reinterpret_cast<PFNGLGETMULTISAMPLEFVPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_multisamplefv)(pname,
+                                                                                                                 index,
+                                                                                                                 val);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETMULTISAMPLEFV,

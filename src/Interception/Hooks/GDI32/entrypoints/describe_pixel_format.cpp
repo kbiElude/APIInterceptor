@@ -10,10 +10,10 @@
 #include "Interception/Hooks/GDI32/globals.h"
 #include "Interception/Hooks/GDI32/entrypoints/describe_pixel_format.h"
 
-int WINAPI GDI32::describe_pixel_format(HDC                     in_hdc,
-                                        int                     in_n_pixel_format,
-                                        UINT                    in_n_bytes,
-                                        LPPIXELFORMATDESCRIPTOR out_pixel_format_descriptor_ptr)
+int WINAPI Interception::Hooks::GDI32::describe_pixel_format(HDC                     in_hdc,
+                                                             int                     in_n_pixel_format,
+                                                             UINT                    in_n_bytes,
+                                                             LPPIXELFORMATDESCRIPTOR out_pixel_format_descriptor_ptr)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -53,10 +53,10 @@ int WINAPI GDI32::describe_pixel_format(HDC                     in_hdc,
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<GDI32::PFNDESCRIBEPIXELFORMATPROC>(GDI32::g_cached_describe_pixel_format_func_ptr)(in_hdc,
-                                                                                                                     in_n_pixel_format,
-                                                                                                                     in_n_bytes,
-                                                                                                                     out_pixel_format_descriptor_ptr);
+        result = reinterpret_cast<Interception::Hooks::GDI32::PFNDESCRIBEPIXELFORMATPROC>(Interception::Hooks::GDI32::g_cached_describe_pixel_format_func_ptr)(in_hdc,
+                                                                                                                                                               in_n_pixel_format,
+                                                                                                                                                               in_n_bytes,
+                                                                                                                                                               out_pixel_format_descriptor_ptr);
     }
 
     if (tracker.is_top_level_api_call() )
@@ -72,8 +72,8 @@ int WINAPI GDI32::describe_pixel_format(HDC                     in_hdc,
 
             post_callback_func_ptr(APIInterceptor::APIFUNCTION_GDI32_DESCRIBEPIXELFORMAT,
                                    post_callback_func_arg,
-                                   0,       /* in_n_args_out   */
-                                   nullptr, /* in_args_out_ptr */
+                                   0,       /* in_n_arguments_out   */
+                                   nullptr, /* in_arguments_out_ptr */
                                   &result_arg);
         }
     }

@@ -13,9 +13,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiClearBufferiv(GLenum       buffer,
-                                         GLint        drawbuffer,
-                                         const GLint* value)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiClearBufferiv(GLenum       buffer,
+                                                              GLint        drawbuffer,
+                                                              const GLint* value)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -24,13 +24,13 @@ void AI_APIENTRY OpenGL::aiClearBufferiv(GLenum       buffer,
     bool                                    should_pass_through    = true;
     APIInterceptor::Tracker                 tracker;
     APIInterceptor::MemoryChunk             value_chunk(value,
-                                                        OpenGL::Utils::get_n_clear_buffer_values(buffer),
+                                                        Interception::Hooks::OpenGL::Utils::get_n_clear_buffer_values(buffer),
                                                         sizeof(GLint));
 
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glClearBufferiv(buffer=[%s] drawbuffer=[%d] value=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(buffer),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(buffer),
                  drawbuffer,
                  value);
 
@@ -57,9 +57,9 @@ void AI_APIENTRY OpenGL::aiClearBufferiv(GLenum       buffer,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLCLEARBUFFERIVPROC>(OpenGL::g_cached_gl_clear_buffer_iv)(buffer,
-                                                                                      drawbuffer,
-                                                                                      value);
+        reinterpret_cast<PFNGLCLEARBUFFERIVPROC>(Interception::Hooks::OpenGL::g_cached_gl_clear_buffer_iv)(buffer,
+                                                                                                           drawbuffer,
+                                                                                                           value);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCLEARBUFFERIV,

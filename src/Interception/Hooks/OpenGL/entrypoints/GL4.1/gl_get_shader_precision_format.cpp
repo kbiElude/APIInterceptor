@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetShaderPrecisionFormat(GLenum shadertype,
-                                                    GLenum precisiontype,
-                                                    GLint* range,
-                                                    GLint* precision)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetShaderPrecisionFormat(GLenum shadertype,
+                                                                         GLenum precisiontype,
+                                                                         GLint* range,
+                                                                         GLint* precision)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -26,8 +26,8 @@ void AI_APIENTRY OpenGL::aiGetShaderPrecisionFormat(GLenum shadertype,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glGetShaderPrecisionFormat(shadertype=[%s] precisiontype=[%s] range=[%p] precision=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(shadertype),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(precisiontype),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(shadertype),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(precisiontype),
                  range,
                  precision);
 
@@ -55,10 +55,10 @@ void AI_APIENTRY OpenGL::aiGetShaderPrecisionFormat(GLenum shadertype,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETSHADERPRECISIONFORMATPROC>(OpenGL::g_cached_gl_get_shader_precision_format)(shadertype,
-                                                                                                             precisiontype,
-                                                                                                             range,
-                                                                                                             precision);
+        reinterpret_cast<PFNGLGETSHADERPRECISIONFORMATPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_shader_precision_format)(shadertype,
+                                                                                                                                  precisiontype,
+                                                                                                                                  range,
+                                                                                                                                  precision);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETSHADERPRECISIONFORMAT,

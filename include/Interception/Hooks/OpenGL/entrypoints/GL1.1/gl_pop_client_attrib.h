@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiPopClientAttrib();
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiPopClientAttrib();
+        }
+    }
 }
 
 #endif /* AI_GL_POP_CLIENT_ATTRIB_H */

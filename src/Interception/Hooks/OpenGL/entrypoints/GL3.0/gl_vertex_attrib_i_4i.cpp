@@ -10,11 +10,11 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiVertexAttribI4i(GLuint index,
-                                           GLint  x,
-                                           GLint  y,
-                                           GLint  z,
-                                           GLint  w)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiVertexAttribI4i(GLuint index,
+                                                                GLint  x,
+                                                                GLint  y,
+                                                                GLint  z,
+                                                                GLint  w)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -57,11 +57,11 @@ void AI_APIENTRY OpenGL::aiVertexAttribI4i(GLuint index,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLVERTEXATTRIBI4IPROC>(OpenGL::g_cached_gl_vertex_attrib_i_4i)(index,
-                                                                                           x,
-                                                                                           y,
-                                                                                           z,
-                                                                                           w);
+        reinterpret_cast<PFNGLVERTEXATTRIBI4IPROC>(Interception::Hooks::OpenGL::g_cached_gl_vertex_attrib_i_4i)(index,
+                                                                                                                x,
+                                                                                                                y,
+                                                                                                                z,
+                                                                                                                w);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLVERTEXATTRIB_I4I,

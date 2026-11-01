@@ -7,10 +7,16 @@
 
 #include <windows.h>
 
-namespace WGL
+namespace Interception
 {
-    BOOL WINAPI share_lists(HGLRC in_hglrc1,
-                            HGLRC in_hglrc2);
+    namespace Hooks
+    {
+        namespace WGL
+        {
+            BOOL WINAPI share_lists(HGLRC in_hglrc1,
+                                    HGLRC in_hglrc2);
+        }
+    }
 }
 
 #endif /* WGL_SHARE_LISTS_H */

@@ -11,7 +11,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiPopMatrix()
+void AI_APIENTRY Interception::Hooks::OpenGL::aiPopMatrix()
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -29,8 +29,8 @@ void AI_APIENTRY OpenGL::aiPopMatrix()
                                                          &pre_callback_func_arg) )
         {
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLPOPMATRIX,
-                              0,       /* in_n_args   */
-                              nullptr, /* in_args_ptr */
+                              0,       /* in_n_arguments   */
+                              nullptr, /* in_arguments_ptr */
                               pre_callback_func_arg,
                              &should_pass_through);
         }
@@ -40,7 +40,7 @@ void AI_APIENTRY OpenGL::aiPopMatrix()
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLPOPMATRIXPROC>(OpenGL::g_cached_gl_pop_matrix)();
+        reinterpret_cast<PFNGLPOPMATRIXPROC>(Interception::Hooks::OpenGL::g_cached_gl_pop_matrix)();
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLPOPMATRIX,

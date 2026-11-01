@@ -7,12 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiStencilOpSeparate(GLenum face,
-                                         GLenum sfail,
-                                         GLenum dpfail,
-                                         GLenum dppass);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiStencilOpSeparate(GLenum face,
+                                                 GLenum sfail,
+                                                 GLenum dpfail,
+                                                 GLenum dppass);
+        }
+    }
 }
 
 #endif /* AI_GL_STENCIL_OP_SEPARATE_H */

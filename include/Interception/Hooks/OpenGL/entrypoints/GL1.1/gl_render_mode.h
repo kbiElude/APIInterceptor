@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    GLint AI_APIENTRY aiRenderMode(GLenum mode);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            GLint AI_APIENTRY aiRenderMode(GLenum mode);
+        }
+    }
 }
 
 #endif /* AI_GL_RENDER_MODE_H */

@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    GLsync AI_APIENTRY aiFenceSync(GLenum     condition,
-                                   GLbitfield flags);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            GLsync AI_APIENTRY aiFenceSync(GLenum     condition,
+                                           GLbitfield flags);
+        }
+    }
 }
 
 #endif /* AI_GL_FENCE_SYNC_H */

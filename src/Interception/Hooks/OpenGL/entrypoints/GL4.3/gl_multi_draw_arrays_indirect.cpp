@@ -12,30 +12,30 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiMultiDrawArraysIndirect(GLenum      mode,
-                                                   const void* indirect,
-                                                   GLsizei     drawcount,
-                                                   GLsizei     stride)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiMultiDrawArraysIndirect(GLenum      mode,
+                                                                        const void* indirect,
+                                                                        GLsizei     drawcount,
+                                                                        GLsizei     stride)
 {
-    OpenGL::IndirectCommandChunk            indirect_chunk;
-    void*                                   post_callback_func_arg = nullptr;
-    APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
-    void*                                   pre_callback_func_arg  = nullptr;
-    APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
-    bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    Interception::Hooks::OpenGL::IndirectCommandChunk indirect_chunk;
+    void*                                             post_callback_func_arg = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC           post_callback_func_ptr = nullptr;
+    void*                                             pre_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC            pre_callback_func_ptr  = nullptr;
+    bool                                              should_pass_through    = true;
+    APIInterceptor::Tracker                           tracker;
 
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glMultiDrawArraysIndirect(mode=[%s] indirect=[%p] drawcount=[%d] stride=[%d])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(mode),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(mode),
                  indirect,
                  static_cast<int32_t>(drawcount),
                  static_cast<int32_t>(stride));
 
-        indirect_chunk = OpenGL::IndirectCommandChunk::create_for_draw_arrays(indirect,
-                                                                              drawcount,
-                                                                              stride);
+        indirect_chunk = Interception::Hooks::OpenGL::IndirectCommandChunk::create_for_draw_arrays(indirect,
+                                                                                                   drawcount,
+                                                                                                   stride);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMULTIDRAWARRAYSINDIRECT,
                                                          &pre_callback_func_ptr,
@@ -61,10 +61,10 @@ void AI_APIENTRY OpenGL::aiMultiDrawArraysIndirect(GLenum      mode,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLMULTIDRAWARRAYSINDIRECTPROC>(OpenGL::g_cached_gl_multi_draw_arrays_indirect)(mode,
-                                                                                                            indirect,
-                                                                                                            drawcount,
-                                                                                                            stride);
+        reinterpret_cast<PFNGLMULTIDRAWARRAYSINDIRECTPROC>(Interception::Hooks::OpenGL::g_cached_gl_multi_draw_arrays_indirect)(mode,
+                                                                                                                                 indirect,
+                                                                                                                                 drawcount,
+                                                                                                                                 stride);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMULTIDRAWARRAYSINDIRECT,

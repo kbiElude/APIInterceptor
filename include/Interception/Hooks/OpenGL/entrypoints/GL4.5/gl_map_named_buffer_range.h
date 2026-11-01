@@ -7,9 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void* AI_APIENTRY aiMapNamedBufferRange(GLuint buffer, GLintptr offset, GLsizeiptr length, GLbitfield access);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void* AI_APIENTRY aiMapNamedBufferRange(GLuint     buffer,
+                                                    GLintptr   offset,
+                                                    GLsizeiptr length,
+                                                    GLbitfield access);
+        }
+    }
 }
 
 #endif /* AI_GL_MAP_NAMED_BUFFER_RANGE_H */

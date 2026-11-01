@@ -7,9 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiDrawArraysIndirect(GLenum mode, const void* indirect);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiDrawArraysIndirect(GLenum      mode,
+                                                  const void* indirect);
+        }
+    }
 }
 
 #endif /* AI_GL_DRAW_ARRAYS_INDIRECT_H */

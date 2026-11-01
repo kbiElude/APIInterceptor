@@ -10,9 +10,9 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiObjectPtrLabel(const void*   ptr,
-                                          GLsizei       length,
-                                          const GLchar* label)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiObjectPtrLabel(const void*   ptr,
+                                                               GLsizei       length,
+                                                               const GLchar* label)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -51,9 +51,9 @@ void AI_APIENTRY OpenGL::aiObjectPtrLabel(const void*   ptr,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLOBJECTPTRLABELPROC>(OpenGL::g_cached_gl_object_ptr_label)(ptr,
-                                                                                         length,
-                                                                                         label);
+        reinterpret_cast<PFNGLOBJECTPTRLABELPROC>(Interception::Hooks::OpenGL::g_cached_gl_object_ptr_label)(ptr,
+                                                                                                              length,
+                                                                                                              label);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLOBJECTPTRLABEL,

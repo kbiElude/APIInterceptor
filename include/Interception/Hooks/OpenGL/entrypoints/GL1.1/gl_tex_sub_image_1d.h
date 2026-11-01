@@ -7,15 +7,21 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiTexSubImage1D(GLenum      target,
-                                     GLint       level,
-                                     GLint       xoffset,
-                                     GLsizei     width,
-                                     GLenum      format,
-                                     GLenum      type,
-                                     const void* pixels);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiTexSubImage1D(GLenum      target,
+                                             GLint       level,
+                                             GLint       xoffset,
+                                             GLsizei     width,
+                                             GLenum      format,
+                                             GLenum      type,
+                                             const void* pixels);
+        }
+    }
 }
 
 #endif /* AI_GL_TEX_SUB_IMAGE_1D_H */

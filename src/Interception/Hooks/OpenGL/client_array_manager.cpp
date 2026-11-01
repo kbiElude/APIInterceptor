@@ -17,32 +17,32 @@ static constexpr GLenum COMPAT_GL_SECONDARY_COLOR_ARRAY = 0x845E;
 /* Copies of the draw call which are bigger than this are assumed to be the result of bad arguments. */
 static constexpr uint64_t MAX_SNAPSHOT_ARRAY_N_BYTES = 256ull * 1024 * 1024;
 
-OpenGL::ClientArrayManager::ClientArrayManager()
+Interception::Hooks::OpenGL::ClientArrayManager::ClientArrayManager()
     :m_bound_vertex_array   (0),
      m_client_active_texture(0)
 {
     /* Stub */
 }
 
-OpenGL::ClientArrayManager::ClientArray& OpenGL::ClientArrayManager::get_array(const ClientArrayKind& in_kind,
-                                                                               const uint32_t&        in_index)
+Interception::Hooks::OpenGL::ClientArrayManager::ClientArray& Interception::Hooks::OpenGL::ClientArrayManager::get_array(const ClientArrayKind& in_kind,
+                                                                                                                         const uint32_t&        in_index)
 {
     return m_array_map[ClientArrayKey(in_kind,
                                       in_index)];
 }
 
-uint32_t OpenGL::ClientArrayManager::get_bound_vertex_array() const
+uint32_t Interception::Hooks::OpenGL::ClientArrayManager::get_bound_vertex_array() const
 {
     return m_bound_vertex_array;
 }
 
-uint32_t OpenGL::ClientArrayManager::get_client_active_texture() const
+uint32_t Interception::Hooks::OpenGL::ClientArrayManager::get_client_active_texture() const
 {
     return m_client_active_texture;
 }
 
-uint32_t OpenGL::ClientArrayManager::get_element_n_bytes(const int32_t&  in_size,
-                                                         const uint32_t& in_type)
+uint32_t Interception::Hooks::OpenGL::ClientArrayManager::get_element_n_bytes(const int32_t&  in_size,
+                                                                              const uint32_t& in_type)
 {
     uint32_t n_components = static_cast<uint32_t>(in_size);
     uint32_t result       = 0;
@@ -76,7 +76,7 @@ end:
     return result;
 }
 
-const OpenGL::ClientArrayManager::InterleavedFormat* OpenGL::ClientArrayManager::get_interleaved_format_ptr(const uint32_t& in_format)
+const Interception::Hooks::OpenGL::ClientArrayManager::InterleavedFormat* Interception::Hooks::OpenGL::ClientArrayManager::get_interleaved_format_ptr(const uint32_t& in_format)
 {
     static const InterleavedFormat format_table[] =
     {
@@ -112,8 +112,8 @@ const OpenGL::ClientArrayManager::InterleavedFormat* OpenGL::ClientArrayManager:
     return result_ptr;
 }
 
-bool OpenGL::ClientArrayManager::get_kind_for_array_enum(const uint32_t&  in_array,
-                                                         ClientArrayKind* out_kind_ptr)
+bool Interception::Hooks::OpenGL::ClientArrayManager::get_kind_for_array_enum(const uint32_t&  in_array,
+                                                                              ClientArrayKind* out_kind_ptr)
 {
     bool result = true;
 
@@ -137,7 +137,7 @@ bool OpenGL::ClientArrayManager::get_kind_for_array_enum(const uint32_t&  in_arr
     return result;
 }
 
-uint32_t OpenGL::ClientArrayManager::get_n_type_bytes(const uint32_t& in_type)
+uint32_t Interception::Hooks::OpenGL::ClientArrayManager::get_n_type_bytes(const uint32_t& in_type)
 {
     uint32_t result = 0;
 
@@ -156,14 +156,14 @@ uint32_t OpenGL::ClientArrayManager::get_n_type_bytes(const uint32_t& in_type)
 
         default:
         {
-            AI_ASSERT_FAIL();
+            AI_FAIL_UNSUPPORTED(in_type);
         }
     }
 
     return result;
 }
 
-bool OpenGL::ClientArrayManager::has_client_arrays() const
+bool Interception::Hooks::OpenGL::ClientArrayManager::has_client_arrays() const
 {
     bool result = false;
 
@@ -183,25 +183,25 @@ bool OpenGL::ClientArrayManager::has_client_arrays() const
     return result;
 }
 
-bool OpenGL::ClientArrayManager::is_client_array(const ClientArray& in_array)
+bool Interception::Hooks::OpenGL::ClientArrayManager::is_client_array(const ClientArray& in_array)
 {
     return (in_array.is_enabled   &&
             in_array.array_buffer == 0 &&
             in_array.pointer_ptr  != nullptr);
 }
 
-void OpenGL::ClientArrayManager::set_bound_vertex_array(const uint32_t& in_vertex_array)
+void Interception::Hooks::OpenGL::ClientArrayManager::set_bound_vertex_array(const uint32_t& in_vertex_array)
 {
     m_bound_vertex_array = in_vertex_array;
 }
 
-void OpenGL::ClientArrayManager::set_client_active_texture(const uint32_t& in_texture_unit)
+void Interception::Hooks::OpenGL::ClientArrayManager::set_client_active_texture(const uint32_t& in_texture_unit)
 {
     m_client_active_texture = in_texture_unit;
 }
 
-void OpenGL::ClientArrayManager::set_divisor(const uint32_t& in_index,
-                                             const uint32_t& in_divisor)
+void Interception::Hooks::OpenGL::ClientArrayManager::set_divisor(const uint32_t& in_index,
+                                                                  const uint32_t& in_divisor)
 {
     if (m_bound_vertex_array == 0)
     {
@@ -210,9 +210,9 @@ void OpenGL::ClientArrayManager::set_divisor(const uint32_t& in_index,
     }
 }
 
-void OpenGL::ClientArrayManager::set_enabled(const ClientArrayKind& in_kind,
-                                             const uint32_t&        in_index,
-                                             const bool&            in_is_enabled)
+void Interception::Hooks::OpenGL::ClientArrayManager::set_enabled(const ClientArrayKind& in_kind,
+                                                                  const uint32_t&        in_index,
+                                                                  const bool&            in_is_enabled)
 {
     if (m_bound_vertex_array == 0)
     {
@@ -221,10 +221,10 @@ void OpenGL::ClientArrayManager::set_enabled(const ClientArrayKind& in_kind,
     }
 }
 
-void OpenGL::ClientArrayManager::set_interleaved_arrays(const uint32_t& in_format,
-                                                        const int32_t&  in_stride,
-                                                        const void*     in_pointer_ptr,
-                                                        const uint32_t& in_array_buffer)
+void Interception::Hooks::OpenGL::ClientArrayManager::set_interleaved_arrays(const uint32_t& in_format,
+                                                                             const int32_t&  in_stride,
+                                                                             const void*     in_pointer_ptr,
+                                                                             const uint32_t& in_array_buffer)
 {
     const auto format_ptr = get_interleaved_format_ptr(in_format);
 
@@ -338,16 +338,16 @@ end:
     ;
 }
 
-void OpenGL::ClientArrayManager::set_pointer(const ClientArrayKind& in_kind,
-                                             const uint32_t&        in_index,
-                                             const int32_t&         in_size,
-                                             const uint32_t&        in_type,
-                                             const int32_t&         in_stride,
-                                             const void*            in_pointer_ptr,
-                                             const uint32_t&        in_array_buffer,
-                                             const bool&            in_is_integer,
-                                             const bool&            in_is_long,
-                                             const bool&            in_is_normalized)
+void Interception::Hooks::OpenGL::ClientArrayManager::set_pointer(const ClientArrayKind& in_kind,
+                                                                  const uint32_t&        in_index,
+                                                                  const int32_t&         in_size,
+                                                                  const uint32_t&        in_type,
+                                                                  const int32_t&         in_stride,
+                                                                  const void*            in_pointer_ptr,
+                                                                  const uint32_t&        in_array_buffer,
+                                                                  const bool&            in_is_integer,
+                                                                  const bool&            in_is_long,
+                                                                  const bool&            in_is_normalized)
 {
     if (m_bound_vertex_array == 0)
     {
@@ -365,10 +365,10 @@ void OpenGL::ClientArrayManager::set_pointer(const ClientArrayKind& in_kind,
     }
 }
 
-std::vector<uint8_t> OpenGL::ClientArrayManager::take_snapshot(const int64_t&  in_first_element,
-                                                               const int64_t&  in_n_elements,
-                                                               const uint32_t& in_instance_count,
-                                                               const uint32_t& in_base_instance) const
+std::vector<uint8_t> Interception::Hooks::OpenGL::ClientArrayManager::take_snapshot(const int64_t&  in_first_element,
+                                                                                    const int64_t&  in_n_elements,
+                                                                                    const uint32_t& in_instance_count,
+                                                                                    const uint32_t& in_base_instance) const
 {
     uint32_t             n_arrays = 0;
     std::vector<uint8_t> result_u8_vec;

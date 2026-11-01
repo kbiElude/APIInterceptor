@@ -11,11 +11,11 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetInternalformativ(GLenum  target,
-                                               GLenum  internalformat,
-                                               GLenum  pname,
-                                               GLsizei bufSize,
-                                               GLint*  params)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetInternalformativ(GLenum  target,
+                                                                    GLenum  internalformat,
+                                                                    GLenum  pname,
+                                                                    GLsizei bufSize,
+                                                                    GLint*  params)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -27,9 +27,9 @@ void AI_APIENTRY OpenGL::aiGetInternalformativ(GLenum  target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glGetInternalformativ(target=[%s] internalformat=[%s] pname=[%s] bufSize=[%d] params=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(internalformat),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(internalformat),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  static_cast<int32_t>(bufSize),
                  params);
 
@@ -58,11 +58,11 @@ void AI_APIENTRY OpenGL::aiGetInternalformativ(GLenum  target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETINTERNALFORMATIVPROC>(OpenGL::g_cached_gl_get_internalformativ)(target,
-                                                                                                 internalformat,
-                                                                                                 pname,
-                                                                                                 bufSize,
-                                                                                                 params);
+        reinterpret_cast<PFNGLGETINTERNALFORMATIVPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_internalformativ)(target,
+                                                                                                                      internalformat,
+                                                                                                                      pname,
+                                                                                                                      bufSize,
+                                                                                                                      params);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETINTERNALFORMATIV,

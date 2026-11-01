@@ -12,32 +12,32 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiMultiDrawElementsIndirect(GLenum      mode,
-                                                     GLenum      type,
-                                                     const void* indirect,
-                                                     GLsizei     drawcount,
-                                                     GLsizei     stride)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiMultiDrawElementsIndirect(GLenum      mode,
+                                                                          GLenum      type,
+                                                                          const void* indirect,
+                                                                          GLsizei     drawcount,
+                                                                          GLsizei     stride)
 {
-    OpenGL::IndirectCommandChunk            indirect_chunk;
-    void*                                   post_callback_func_arg = nullptr;
-    APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
-    void*                                   pre_callback_func_arg  = nullptr;
-    APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
-    bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    Interception::Hooks::OpenGL::IndirectCommandChunk indirect_chunk;
+    void*                                             post_callback_func_arg = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC           post_callback_func_ptr = nullptr;
+    void*                                             pre_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC            pre_callback_func_ptr  = nullptr;
+    bool                                              should_pass_through    = true;
+    APIInterceptor::Tracker                           tracker;
 
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glMultiDrawElementsIndirect(mode=[%s] type=[%s] indirect=[%p] drawcount=[%d] stride=[%d])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(mode),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(type),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(mode),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type),
                  indirect,
                  static_cast<int32_t>(drawcount),
                  static_cast<int32_t>(stride));
 
-        indirect_chunk = OpenGL::IndirectCommandChunk::create_for_draw_elements(indirect,
-                                                                                drawcount,
-                                                                                stride);
+        indirect_chunk = Interception::Hooks::OpenGL::IndirectCommandChunk::create_for_draw_elements(indirect,
+                                                                                                     drawcount,
+                                                                                                     stride);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMULTIDRAWELEMENTSINDIRECT,
                                                          &pre_callback_func_ptr,
@@ -64,11 +64,11 @@ void AI_APIENTRY OpenGL::aiMultiDrawElementsIndirect(GLenum      mode,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLMULTIDRAWELEMENTSINDIRECTPROC>(OpenGL::g_cached_gl_multi_draw_elements_indirect)(mode,
-                                                                                                               type,
-                                                                                                               indirect,
-                                                                                                               drawcount,
-                                                                                                               stride);
+        reinterpret_cast<PFNGLMULTIDRAWELEMENTSINDIRECTPROC>(Interception::Hooks::OpenGL::g_cached_gl_multi_draw_elements_indirect)(mode,
+                                                                                                                                    type,
+                                                                                                                                    indirect,
+                                                                                                                                    drawcount,
+                                                                                                                                    stride);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMULTIDRAWELEMENTSINDIRECT,

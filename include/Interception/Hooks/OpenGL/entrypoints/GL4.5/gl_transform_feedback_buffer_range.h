@@ -7,9 +7,19 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiTransformFeedbackBufferRange(GLuint xfb, GLuint index, GLuint buffer, GLintptr offset, GLsizeiptr size);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiTransformFeedbackBufferRange(GLuint     xfb,
+                                                            GLuint     index,
+                                                            GLuint     buffer,
+                                                            GLintptr   offset,
+                                                            GLsizeiptr size);
+        }
+    }
 }
 
 #endif /* AI_GL_TRANSFORM_FEEDBACK_BUFFER_RANGE_H */

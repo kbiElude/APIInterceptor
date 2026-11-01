@@ -17,11 +17,11 @@
 
 const std::vector<APIInterceptor::FunctionInterceptor> g_function_interceptors[] =
 {
-    GDI32::get_function_interceptors (),
-    Kernel32::get_function_interceptors(),
-    OpenGL::get_function_interceptors(),
-    User32::get_function_interceptors(),
-    WGL::get_function_interceptors   (),
+    Interception::Hooks::GDI32::get_function_interceptors (),
+    Interception::Hooks::Kernel32::get_function_interceptors(),
+    Interception::Hooks::OpenGL::get_function_interceptors(),
+    Interception::Hooks::User32::get_function_interceptors(),
+    Interception::Hooks::WGL::get_function_interceptors   (),
 };
 
 
@@ -86,13 +86,13 @@ INT APIENTRY DllMain(HMODULE in_module_handle,
             handle_attach_detach_event (true); /* in_is_attach_event */
             on_api_interceptor_injected();
 
-            D3D8::on_attach();
+            Interception::Hooks::D3D8::on_attach();
             break;
         }
 
         case DLL_PROCESS_DETACH:
         {
-            D3D8::on_detach();
+            Interception::Hooks::D3D8::on_detach();
 
             on_api_interceptor_removed();
 

@@ -7,9 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiTextureParameterIuiv(GLuint texture, GLenum pname, const GLuint* params);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiTextureParameterIuiv(GLuint        texture,
+                                                    GLenum        pname,
+                                                    const GLuint* params);
+        }
+    }
 }
 
 #endif /* AI_GL_TEXTURE_PARAMETERIUIV_H */

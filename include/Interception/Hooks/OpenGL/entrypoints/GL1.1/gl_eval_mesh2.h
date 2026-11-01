@@ -7,13 +7,19 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiEvalMesh2(GLenum mode,
-                                 GLint  i1,
-                                 GLint  i2,
-                                 GLint  j1,
-                                 GLint  j2);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiEvalMesh2(GLenum mode,
+                                         GLint  i1,
+                                         GLint  i2,
+                                         GLint  j1,
+                                         GLint  j2);
+        }
+    }
 }
 
 #endif /* AI_GL_EVAL_MESH2_H */

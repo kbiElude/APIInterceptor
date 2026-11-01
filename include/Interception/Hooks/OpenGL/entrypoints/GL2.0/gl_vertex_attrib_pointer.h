@@ -7,14 +7,20 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiVertexAttribPointer(GLuint      index,
-                                           GLint       size,
-                                           GLenum      type,
-                                           GLboolean   normalized,
-                                           GLsizei     stride,
-                                           const void* pointer);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiVertexAttribPointer(GLuint      index,
+                                                   GLint       size,
+                                                   GLenum      type,
+                                                   GLboolean   normalized,
+                                                   GLsizei     stride,
+                                                   const void* pointer);
+        }
+    }
 }
 
 #endif /* AI_GL_VERTEX_ATTRIB_POINTER_H */

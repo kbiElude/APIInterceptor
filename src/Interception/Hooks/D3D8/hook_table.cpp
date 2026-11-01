@@ -6,7 +6,7 @@
 #include "Interception/Hooks/D3D8/hook_table.h"
 #include "Interception/Hooks/D3D8/vtable_registry.h"
 
-D3D8::HookTable::HookTable()
+Interception::Hooks::D3D8::HookTable::HookTable()
 {
     m_hook_entry_vec_vec.resize(static_cast<uint32_t>(Interface::COUNT) );
 
@@ -21,9 +21,9 @@ D3D8::HookTable::HookTable()
     #undef D3D8_METHOD
 }
 
-void D3D8::HookTable::get_hook_entries(const Interface&  in_interface,
-                                       const HookEntry** out_hook_entry_array_ptr_ptr,
-                                       uint32_t*         out_n_hook_entries_ptr) const
+void Interception::Hooks::D3D8::HookTable::get_hook_entries(const Interface&  in_interface,
+                                                            const HookEntry** out_hook_entry_array_ptr_ptr,
+                                                            uint32_t*         out_n_hook_entries_ptr) const
 {
     const auto n_interface = static_cast<uint32_t>(in_interface);
 
@@ -39,15 +39,15 @@ void D3D8::HookTable::get_hook_entries(const Interface&  in_interface,
     }
 }
 
-D3D8::HookTable* D3D8::HookTable::get_ptr()
+Interception::Hooks::D3D8::HookTable* Interception::Hooks::D3D8::HookTable::get_ptr()
 {
     static HookTable instance;
 
     return &instance;
 }
 
-void D3D8::HookTable::patch_object(const Interface& in_interface,
-                                   const void*      in_object_ptr)
+void Interception::Hooks::D3D8::HookTable::patch_object(const Interface& in_interface,
+                                                        const void*      in_object_ptr)
 {
     const HookEntry* hook_entry_array_ptr = nullptr;
     uint32_t         n_hook_entries       = 0;

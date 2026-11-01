@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetProgramiv(GLuint program,
-                                        GLenum pname,
-                                        GLint* params)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetProgramiv(GLuint program,
+                                                             GLenum pname,
+                                                             GLint* params)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -26,7 +26,7 @@ void AI_APIENTRY OpenGL::aiGetProgramiv(GLuint program,
     {
         AI_TRACE("glGetProgramiv(program=[%u] pname=[%s] params=[%p])",
                  program,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  params);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETPROGRAMIV,
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiGetProgramiv(GLuint program,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETPROGRAMIVPROC>(OpenGL::g_cached_gl_get_programiv)(program,
-                                                                                   pname,
-                                                                                   params);
+        reinterpret_cast<PFNGLGETPROGRAMIVPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_programiv)(program,
+                                                                                                        pname,
+                                                                                                        params);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETPROGRAMIV,

@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiRotatef(GLfloat angle,
-                                   GLfloat x,
-                                   GLfloat y,
-                                   GLfloat z)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiRotatef(GLfloat angle,
+                                                        GLfloat x,
+                                                        GLfloat y,
+                                                        GLfloat z)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -55,10 +55,10 @@ void AI_APIENTRY OpenGL::aiRotatef(GLfloat angle,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLROTATEFPROC>(OpenGL::g_cached_gl_rotate_f)(angle,
-                                                                         x,
-                                                                         y,
-                                                                         z);
+        reinterpret_cast<PFNGLROTATEFPROC>(Interception::Hooks::OpenGL::g_cached_gl_rotate_f)(angle,
+                                                                                              x,
+                                                                                              y,
+                                                                                              z);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLROTATEF,

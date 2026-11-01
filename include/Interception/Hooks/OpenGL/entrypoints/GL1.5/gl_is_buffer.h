@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    GLboolean AI_APIENTRY aiIsBuffer(GLuint buffer);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            GLboolean AI_APIENTRY aiIsBuffer(GLuint buffer);
+        }
+    }
 }
 
 #endif /* AI_GL_IS_BUFFER_H */

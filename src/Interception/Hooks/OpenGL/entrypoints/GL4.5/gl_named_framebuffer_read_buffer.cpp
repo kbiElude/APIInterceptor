@@ -11,8 +11,8 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiNamedFramebufferReadBuffer(GLuint framebuffer,
-                                                      GLenum src)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiNamedFramebufferReadBuffer(GLuint framebuffer,
+                                                                           GLenum src)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -25,7 +25,7 @@ void AI_APIENTRY OpenGL::aiNamedFramebufferReadBuffer(GLuint framebuffer,
     {
         AI_TRACE("glNamedFramebufferReadBuffer(framebuffer=[%u] src=[%s])",
                  framebuffer,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(src) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(src) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLNAMEDFRAMEBUFFERREADBUFFER,
                                                          &pre_callback_func_ptr,
@@ -49,8 +49,8 @@ void AI_APIENTRY OpenGL::aiNamedFramebufferReadBuffer(GLuint framebuffer,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLNAMEDFRAMEBUFFERREADBUFFERPROC>(OpenGL::g_cached_gl_named_framebuffer_read_buffer)(framebuffer,
-                                                                                                                 src);
+        reinterpret_cast<PFNGLNAMEDFRAMEBUFFERREADBUFFERPROC>(Interception::Hooks::OpenGL::g_cached_gl_named_framebuffer_read_buffer)(framebuffer,
+                                                                                                                                      src);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLNAMEDFRAMEBUFFERREADBUFFER,

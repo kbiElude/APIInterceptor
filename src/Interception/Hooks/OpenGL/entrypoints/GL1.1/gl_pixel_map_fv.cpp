@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiPixelMapfv(GLenum         map,
-                                      GLsizei        mapsize,
-                                      const GLfloat* values)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiPixelMapfv(GLenum         map,
+                                                           GLsizei        mapsize,
+                                                           const GLfloat* values)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -26,7 +26,7 @@ void AI_APIENTRY OpenGL::aiPixelMapfv(GLenum         map,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glPixelMapfv(map=[%s], mapsize=[%d], values=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(map),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(map),
                  mapsize,
                  values);
 
@@ -56,9 +56,9 @@ void AI_APIENTRY OpenGL::aiPixelMapfv(GLenum         map,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLPIXELMAPFVPROC>(OpenGL::g_cached_gl_pixel_map_fv)(map,
-                                                                                mapsize,
-                                                                                values);
+        reinterpret_cast<PFNGLPIXELMAPFVPROC>(Interception::Hooks::OpenGL::g_cached_gl_pixel_map_fv)(map,
+                                                                                                     mapsize,
+                                                                                                     values);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLPIXELMAPFV,

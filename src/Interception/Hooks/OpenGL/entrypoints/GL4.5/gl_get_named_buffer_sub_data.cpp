@@ -10,10 +10,10 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetNamedBufferSubData(GLuint     buffer,
-                                                 GLintptr   offset,
-                                                 GLsizeiptr size,
-                                                 void*      data)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetNamedBufferSubData(GLuint     buffer,
+                                                                      GLintptr   offset,
+                                                                      GLsizeiptr size,
+                                                                      void*      data)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -54,10 +54,10 @@ void AI_APIENTRY OpenGL::aiGetNamedBufferSubData(GLuint     buffer,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETNAMEDBUFFERSUBDATAPROC>(OpenGL::g_cached_gl_get_named_buffer_sub_data)(buffer,
-                                                                                                        offset,
-                                                                                                        size,
-                                                                                                        data);
+        reinterpret_cast<PFNGLGETNAMEDBUFFERSUBDATAPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_named_buffer_sub_data)(buffer,
+                                                                                                                             offset,
+                                                                                                                             size,
+                                                                                                                             data);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETNAMEDBUFFERSUBDATA,

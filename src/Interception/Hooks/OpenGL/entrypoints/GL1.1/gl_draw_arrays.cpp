@@ -12,17 +12,17 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDrawArrays(GLenum  mode,
-                                      GLint   first,
-                                      GLsizei count)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDrawArrays(GLenum  mode,
+                                                           GLint   first,
+                                                           GLsizei count)
 {
-    OpenGL::ClientArrayChunk                client_arrays_chunk;
-    void*                                   post_callback_func_arg = nullptr;
-    APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
-    void*                                   pre_callback_func_arg  = nullptr;
-    APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
-    bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    Interception::Hooks::OpenGL::ClientArrayChunk client_arrays_chunk;
+    void*                                         post_callback_func_arg = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC       post_callback_func_ptr = nullptr;
+    void*                                         pre_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC        pre_callback_func_ptr  = nullptr;
+    bool                                          should_pass_through    = true;
+    APIInterceptor::Tracker                       tracker;
 
     client_arrays_chunk.add_arrays(first,
                                    count);
@@ -30,7 +30,7 @@ void AI_APIENTRY OpenGL::aiDrawArrays(GLenum  mode,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glDrawArrays(mode=[%s] first=[%d] count=[%d])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(mode),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(mode),
                  first,
                  static_cast<int32_t>(count) );
 
@@ -58,9 +58,9 @@ void AI_APIENTRY OpenGL::aiDrawArrays(GLenum  mode,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDRAWARRAYSPROC>(OpenGL::g_cached_gl_draw_arrays)(mode,
-                                                                               first,
-                                                                               count);
+        reinterpret_cast<PFNGLDRAWARRAYSPROC>(Interception::Hooks::OpenGL::g_cached_gl_draw_arrays)(mode,
+                                                                                                    first,
+                                                                                                    count);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDRAWARRAYS,

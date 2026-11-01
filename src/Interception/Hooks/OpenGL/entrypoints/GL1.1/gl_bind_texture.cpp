@@ -13,8 +13,8 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiBindTexture(GLenum target,
-                                       GLuint texture)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiBindTexture(GLenum target,
+                                                            GLuint texture)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -26,7 +26,7 @@ void AI_APIENTRY OpenGL::aiBindTexture(GLenum target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glBindTexture(target=[%s] texture=[%d])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  texture);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBINDTEXTURE,
@@ -51,8 +51,8 @@ void AI_APIENTRY OpenGL::aiBindTexture(GLenum target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLBINDTEXTUREPROC>(OpenGL::g_cached_gl_bind_texture)(target,
-                                                                                 texture);
+        reinterpret_cast<PFNGLBINDTEXTUREPROC>(Interception::Hooks::OpenGL::g_cached_gl_bind_texture)(target,
+                                                                                                      texture);
     }
 
     if (tracker.is_top_level_api_call() )

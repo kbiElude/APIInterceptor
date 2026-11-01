@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiObjectLabel(GLenum        identifier,
-                                       GLuint        name,
-                                       GLsizei       length,
-                                       const GLchar* label)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiObjectLabel(GLenum        identifier,
+                                                            GLuint        name,
+                                                            GLsizei       length,
+                                                            const GLchar* label)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -26,7 +26,7 @@ void AI_APIENTRY OpenGL::aiObjectLabel(GLenum        identifier,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glObjectLabel(identifier=[%s] name=[%u] length=[%d] label=[%s])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(identifier),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(identifier),
                  name,
                  static_cast<int32_t>(length),
                  label);
@@ -55,10 +55,10 @@ void AI_APIENTRY OpenGL::aiObjectLabel(GLenum        identifier,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLOBJECTLABELPROC>(OpenGL::g_cached_gl_object_label)(identifier,
-                                                                                  name,
-                                                                                  length,
-                                                                                  label);
+        reinterpret_cast<PFNGLOBJECTLABELPROC>(Interception::Hooks::OpenGL::g_cached_gl_object_label)(identifier,
+                                                                                                       name,
+                                                                                                       length,
+                                                                                                       label);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLOBJECTLABEL,

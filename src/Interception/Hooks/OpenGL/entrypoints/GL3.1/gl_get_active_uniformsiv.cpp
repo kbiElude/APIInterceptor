@@ -11,11 +11,11 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetActiveUniformsiv(GLuint        program,
-                                               GLsizei       uniformCount,
-                                               const GLuint* uniformIndices,
-                                               GLenum        pname,
-                                               GLint*        params)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetActiveUniformsiv(GLuint        program,
+                                                                    GLsizei       uniformCount,
+                                                                    const GLuint* uniformIndices,
+                                                                    GLenum        pname,
+                                                                    GLint*        params)
 {
     void*                                   post_callback_func_arg    = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr    = nullptr;
@@ -31,7 +31,7 @@ void AI_APIENTRY OpenGL::aiGetActiveUniformsiv(GLuint        program,
                  program,
                  static_cast<int32_t>(uniformCount),
                  uniformIndices,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  params);
 
         uniformIndices_chunk_id = APIInterceptor::register_data_chunk(uniformIndices,
@@ -62,11 +62,11 @@ void AI_APIENTRY OpenGL::aiGetActiveUniformsiv(GLuint        program,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETACTIVEUNIFORMSIVPROC>(OpenGL::g_cached_gl_get_active_uniformsiv)(program,
-                                                                                                  uniformCount,
-                                                                                                  uniformIndices,
-                                                                                                  pname,
-                                                                                                  params);
+        reinterpret_cast<PFNGLGETACTIVEUNIFORMSIVPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_active_uniformsiv)(program,
+                                                                                                                       uniformCount,
+                                                                                                                       uniformIndices,
+                                                                                                                       pname,
+                                                                                                                       params);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETACTIVEUNIFORMSIV,

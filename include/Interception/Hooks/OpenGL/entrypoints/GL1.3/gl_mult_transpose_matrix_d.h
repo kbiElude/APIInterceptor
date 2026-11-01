@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiMultTransposeMatrixd(const GLdouble* m);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiMultTransposeMatrixd(const GLdouble* m);
+        }
+    }
 }
 
 #endif /* AI_GL_MULT_TRANSPOSE_MATRIX_D_H */

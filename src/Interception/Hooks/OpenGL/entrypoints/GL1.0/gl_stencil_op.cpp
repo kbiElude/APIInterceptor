@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiStencilOp(GLenum fail,
-                                     GLenum zfail,
-                                     GLenum zpass)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiStencilOp(GLenum fail,
+                                                          GLenum zfail,
+                                                          GLenum zpass)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -25,9 +25,9 @@ void AI_APIENTRY OpenGL::aiStencilOp(GLenum fail,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glStencilOp(fail=[%s] zfail=[%s] zpass=[%s])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(fail),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(zfail),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(zpass) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(fail),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(zfail),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(zpass) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLSTENCILOP,
                                                          &pre_callback_func_ptr,

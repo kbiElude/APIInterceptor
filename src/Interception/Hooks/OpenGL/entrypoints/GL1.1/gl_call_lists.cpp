@@ -13,13 +13,13 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiCallLists(GLsizei       n,
-                                     GLenum        type,
-                                     const GLvoid* lists)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiCallLists(GLsizei       n,
+                                                          GLenum        type,
+                                                          const GLvoid* lists)
 {
     APIInterceptor::MemoryChunk             lists_chunk(lists,
                                                         n,
-                                                        OpenGL::Utils::get_n_call_lists_type_bytes(type));
+                                                        Interception::Hooks::OpenGL::Utils::get_n_call_lists_type_bytes(type));
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
@@ -31,7 +31,7 @@ void AI_APIENTRY OpenGL::aiCallLists(GLsizei       n,
     {
         AI_TRACE("glCallLists(n=[%d], type=[%s], lists=[%p])",
                  n,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(type),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type),
                  lists);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCALLLISTS,
@@ -57,9 +57,9 @@ void AI_APIENTRY OpenGL::aiCallLists(GLsizei       n,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLCALLLISTSPROC>(OpenGL::g_cached_gl_call_lists)(n,
-                                                                             type,
-                                                                             lists);
+        reinterpret_cast<PFNGLCALLLISTSPROC>(Interception::Hooks::OpenGL::g_cached_gl_call_lists)(n,
+                                                                                                  type,
+                                                                                                  lists);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCALLLISTS,

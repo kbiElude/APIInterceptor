@@ -7,11 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiTexGend(GLenum   coord,
-                               GLenum   pname,
-                               GLdouble param);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiTexGend(GLenum   coord,
+                                       GLenum   pname,
+                                       GLdouble param);
+        }
+    }
 }
 
 #endif /* AI_GL_TEX_GEN_D_H */

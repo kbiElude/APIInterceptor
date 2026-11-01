@@ -7,12 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiVertexAttribP4uiv(GLuint        index,
-                                         GLenum        type,
-                                         GLboolean     normalized,
-                                         const GLuint* value);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiVertexAttribP4uiv(GLuint        index,
+                                                 GLenum        type,
+                                                 GLboolean     normalized,
+                                                 const GLuint* value);
+        }
+    }
 }
 
 #endif /* AI_GL_VERTEX_ATTRIB_P4UIV_H */

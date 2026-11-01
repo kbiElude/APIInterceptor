@@ -11,17 +11,17 @@
 
 TEST(D3D8Methods, Direct3DCreate8IsNamedButIsNotAMethod)
 {
-    EXPECT_EQ(std::string(D3D8::Utils::get_function_name_ptr(APIInterceptor::APIFUNCTION_D3D8_DIRECT3DCREATE8) ),
-              std::string("Direct3DCreate8") );
-    EXPECT_EQ(D3D8::Utils::get_method_info_ptr(APIInterceptor::APIFUNCTION_D3D8_DIRECT3DCREATE8),
-              nullptr);
+    EXPECT_EQ(std::string(Interception::Core::D3D8Utils::get_function_name_ptr(APIInterceptor::APIFUNCTION_D3D8_DIRECT3DCREATE8) ),
+                                std::string("Direct3DCreate8") );
+    EXPECT_EQ(Interception::Core::D3D8Utils::get_method_info_ptr(APIInterceptor::APIFUNCTION_D3D8_DIRECT3DCREATE8),
+                                nullptr);
 
-    EXPECT_EQ(std::string(D3D8::Utils::get_function_name_ptr(APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_PRESENT) ),
-              std::string("IDirect3DDevice8::Present") );
-    EXPECT_EQ(D3D8::Utils::get_function_name_ptr(APIInterceptor::APIFUNCTION_GL_GLACCUM),
-              nullptr);
-    EXPECT_EQ(D3D8::Utils::get_function_name_ptr(APIInterceptor::APIFUNCTION_D3D8_METHODS_BEGIN),
-              nullptr);
+    EXPECT_EQ(std::string(Interception::Core::D3D8Utils::get_function_name_ptr(APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_PRESENT) ),
+                                std::string("IDirect3DDevice8::Present") );
+    EXPECT_EQ(Interception::Core::D3D8Utils::get_function_name_ptr(APIInterceptor::APIFUNCTION_GL_GLACCUM),
+                                nullptr);
+    EXPECT_EQ(Interception::Core::D3D8Utils::get_function_name_ptr(APIInterceptor::APIFUNCTION_D3D8_METHODS_BEGIN),
+                                nullptr);
 
     EXPECT_EQ(static_cast<uint32_t>(APIInterceptor::APIFUNCTION_D3D8_FIRST),
               static_cast<uint32_t>(APIInterceptor::APIFUNCTION_D3D8_DIRECT3DCREATE8) );
@@ -33,35 +33,35 @@ TEST(D3D8Methods, EveryInterfaceHasTheExpectedNumberOfMethods)
 {
     struct ExpectedCount
     {
-        D3D8::Interface interface_type;
+        Interception::Hooks::D3D8::Interface interface_type;
         uint32_t        n_methods;
     };
 
     static const ExpectedCount expected_count_array[] =
     {
-        { D3D8::Interface::IDIRECT3D8,              16 },
-        { D3D8::Interface::IDIRECT3DCUBETEXTURE8,   19 },
-        { D3D8::Interface::IDIRECT3DDEVICE8,        97 },
-        { D3D8::Interface::IDIRECT3DINDEXBUFFER8,   14 },
-        { D3D8::Interface::IDIRECT3DSURFACE8,       11 },
-        { D3D8::Interface::IDIRECT3DSWAPCHAIN8,      5 },
-        { D3D8::Interface::IDIRECT3DTEXTURE8,       19 },
-        { D3D8::Interface::IDIRECT3DVERTEXBUFFER8,  14 },
-        { D3D8::Interface::IDIRECT3DVOLUME8,        11 },
-        { D3D8::Interface::IDIRECT3DVOLUMETEXTURE8, 19 },
+        { Interception::Hooks::D3D8::Interface::IDIRECT3D8,              16 },
+        { Interception::Hooks::D3D8::Interface::IDIRECT3DCUBETEXTURE8,   19 },
+        { Interception::Hooks::D3D8::Interface::IDIRECT3DDEVICE8,        97 },
+        { Interception::Hooks::D3D8::Interface::IDIRECT3DINDEXBUFFER8,   14 },
+        { Interception::Hooks::D3D8::Interface::IDIRECT3DSURFACE8,       11 },
+        { Interception::Hooks::D3D8::Interface::IDIRECT3DSWAPCHAIN8,      5 },
+        { Interception::Hooks::D3D8::Interface::IDIRECT3DTEXTURE8,       19 },
+        { Interception::Hooks::D3D8::Interface::IDIRECT3DVERTEXBUFFER8,  14 },
+        { Interception::Hooks::D3D8::Interface::IDIRECT3DVOLUME8,        11 },
+        { Interception::Hooks::D3D8::Interface::IDIRECT3DVOLUMETEXTURE8, 19 },
     };
     uint32_t total = 0;
 
     for (const auto& expected_count : expected_count_array)
     {
-        EXPECT_EQ(D3D8::Utils::get_n_methods(expected_count.interface_type),
-                  expected_count.n_methods) << D3D8::Utils::get_interface_name_ptr(expected_count.interface_type);
+        EXPECT_EQ(Interception::Core::D3D8Utils::get_n_methods(expected_count.interface_type),
+                                    expected_count.n_methods) << Interception::Core::D3D8Utils::get_interface_name_ptr(expected_count.interface_type);
 
         total += expected_count.n_methods;
     }
 
-    EXPECT_EQ(static_cast<uint32_t>(D3D8::Interface::COUNT),
-              sizeof(expected_count_array) / sizeof(expected_count_array[0]) );
+    EXPECT_EQ(static_cast<uint32_t>(Interception::Hooks::D3D8::Interface::COUNT),
+                                   sizeof(expected_count_array) / sizeof(expected_count_array[0]) );
     EXPECT_EQ(total,
               static_cast<uint32_t>(APIInterceptor::APIFUNCTION_D3D8_METHODS_LAST - APIInterceptor::APIFUNCTION_D3D8_METHODS_FIRST + 1) );
 }
@@ -69,7 +69,7 @@ TEST(D3D8Methods, EveryInterfaceHasTheExpectedNumberOfMethods)
 TEST(D3D8Methods, FunctionEnumFollowsTheTableOrder)
 {
     uint32_t                n_methods   = 0;
-    const D3D8::MethodInfo* methods_ptr = D3D8::Utils::get_method_info_array_ptr(&n_methods);
+    const Interception::Hooks::D3D8::MethodInfo* methods_ptr = Interception::Core::D3D8Utils::get_method_info_array_ptr(&n_methods);
 
     ASSERT_EQ(n_methods,
               static_cast<uint32_t>(APIInterceptor::APIFUNCTION_D3D8_METHODS_LAST - APIInterceptor::APIFUNCTION_D3D8_METHODS_FIRST + 1) );
@@ -80,45 +80,45 @@ TEST(D3D8Methods, FunctionEnumFollowsTheTableOrder)
     {
         EXPECT_EQ(static_cast<uint32_t>(methods_ptr[n_method].function),
                   static_cast<uint32_t>(APIInterceptor::APIFUNCTION_D3D8_METHODS_FIRST) + n_method);
-        EXPECT_EQ(D3D8::Utils::get_method_info_ptr(methods_ptr[n_method].function),
-                  methods_ptr + n_method);
+        EXPECT_EQ(Interception::Core::D3D8Utils::get_method_info_ptr(methods_ptr[n_method].function),
+                                    methods_ptr + n_method);
     }
 }
 
 TEST(D3D8Methods, FunctionsOutsideTheD3D8RangeHaveNoInfo)
 {
-    EXPECT_EQ(D3D8::Utils::get_method_info_ptr(APIInterceptor::APIFUNCTION_D3D8_METHODS_BEGIN),
-              nullptr);
-    EXPECT_EQ(D3D8::Utils::get_method_info_ptr(APIInterceptor::APIFUNCTION_GDI32_SWAPBUFFERS),
-              nullptr);
-    EXPECT_EQ(D3D8::Utils::get_method_info_ptr(APIInterceptor::APIFUNCTION_GL_GLACCUM),
-              nullptr);
-    EXPECT_EQ(D3D8::Utils::get_method_info_ptr(APIInterceptor::APIFUNCTION_USER32_RELEASEDC),
-              nullptr);
-    EXPECT_EQ(D3D8::Utils::get_method_info_ptr(APIInterceptor::APIFUNCTION_UNKNOWN),
-              nullptr);
+    EXPECT_EQ(Interception::Core::D3D8Utils::get_method_info_ptr(APIInterceptor::APIFUNCTION_D3D8_METHODS_BEGIN),
+                                nullptr);
+    EXPECT_EQ(Interception::Core::D3D8Utils::get_method_info_ptr(APIInterceptor::APIFUNCTION_GDI32_SWAPBUFFERS),
+                                nullptr);
+    EXPECT_EQ(Interception::Core::D3D8Utils::get_method_info_ptr(APIInterceptor::APIFUNCTION_GL_GLACCUM),
+                                nullptr);
+    EXPECT_EQ(Interception::Core::D3D8Utils::get_method_info_ptr(APIInterceptor::APIFUNCTION_USER32_RELEASEDC),
+                                nullptr);
+    EXPECT_EQ(Interception::Core::D3D8Utils::get_method_info_ptr(APIInterceptor::APIFUNCTION_UNKNOWN),
+                                nullptr);
 }
 
 TEST(D3D8Methods, LookupByVtableSlotRoundTrips)
 {
     uint32_t                n_methods   = 0;
-    const D3D8::MethodInfo* methods_ptr = D3D8::Utils::get_method_info_array_ptr(&n_methods);
+    const Interception::Hooks::D3D8::MethodInfo* methods_ptr = Interception::Core::D3D8Utils::get_method_info_array_ptr(&n_methods);
 
     for (uint32_t n_method = 0;
                   n_method < n_methods;
                 ++n_method)
     {
-        EXPECT_EQ(D3D8::Utils::get_api_function(methods_ptr[n_method].interface_type,
-                                                methods_ptr[n_method].vtable_index),
-                  methods_ptr[n_method].function) << methods_ptr[n_method].full_name_ptr;
+        EXPECT_EQ(Interception::Core::D3D8Utils::get_api_function(methods_ptr[n_method].interface_type,
+                                                                  methods_ptr[n_method].vtable_index),
+                                    methods_ptr[n_method].function) << methods_ptr[n_method].full_name_ptr;
     }
 
-    EXPECT_EQ(D3D8::Utils::get_api_function(D3D8::Interface::IDIRECT3DDEVICE8,
-                                            9999),
-              APIInterceptor::APIFUNCTION_UNKNOWN);
-    EXPECT_EQ(D3D8::Utils::get_api_function(D3D8::Interface::IDIRECT3DDEVICE8,
-                                            D3D8::VTABLE_INDEX_IDIRECT3DDEVICE8_PRESENT),
-              APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_PRESENT);
+    EXPECT_EQ(Interception::Core::D3D8Utils::get_api_function(Interception::Hooks::D3D8::Interface::IDIRECT3DDEVICE8,
+                                                                                   9999),
+                                                     APIInterceptor::APIFUNCTION_UNKNOWN);
+    EXPECT_EQ(Interception::Core::D3D8Utils::get_api_function(Interception::Hooks::D3D8::Interface::IDIRECT3DDEVICE8,
+                                                                                   Interception::Hooks::D3D8::VTABLE_INDEX_IDIRECT3DDEVICE8_PRESENT),
+                                                     APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_PRESENT);
 }
 
 TEST(D3D8Methods, NamesAreConsistent)
@@ -140,7 +140,7 @@ TEST(D3D8Methods, NamesAreConsistent)
 
     std::set<std::string>   full_name_set;
     uint32_t                n_methods   = 0;
-    const D3D8::MethodInfo* methods_ptr = D3D8::Utils::get_method_info_array_ptr(&n_methods);
+    const Interception::Hooks::D3D8::MethodInfo* methods_ptr = Interception::Core::D3D8Utils::get_method_info_array_ptr(&n_methods);
 
     ASSERT_EQ(n_methods,
               sizeof(name_check_array) / sizeof(name_check_array[0]) );
@@ -162,7 +162,7 @@ TEST(D3D8Methods, NamesAreConsistent)
         EXPECT_EQ(full_name,
                   std::string(methods_ptr[n_method].full_name_ptr) );
         EXPECT_EQ(std::string(name_check.interface_name_ptr),
-                  std::string(D3D8::Utils::get_interface_name_ptr(methods_ptr[n_method].interface_type) ));
+                  std::string(Interception::Core::D3D8Utils::get_interface_name_ptr(methods_ptr[n_method].interface_type) ));
         EXPECT_EQ(std::string(name_check.method_name_ptr),
                   std::string(methods_ptr[n_method].method_name_ptr) );
 
@@ -173,13 +173,13 @@ TEST(D3D8Methods, NamesAreConsistent)
 TEST(D3D8Methods, VtableSlotsAreContiguousForEveryInterface)
 {
     uint32_t                n_methods   = 0;
-    const D3D8::MethodInfo* methods_ptr = D3D8::Utils::get_method_info_array_ptr(&n_methods);
+    const Interception::Hooks::D3D8::MethodInfo* methods_ptr = Interception::Core::D3D8Utils::get_method_info_array_ptr(&n_methods);
 
     for (uint32_t n_interface = 0;
-                  n_interface < static_cast<uint32_t>(D3D8::Interface::COUNT);
+                  n_interface < static_cast<uint32_t>(Interception::Hooks::D3D8::Interface::COUNT);
                 ++n_interface)
     {
-        const auto            interface_type = static_cast<D3D8::Interface>(n_interface);
+        const auto            interface_type = static_cast<Interception::Hooks::D3D8::Interface>(n_interface);
         std::set<uint32_t>    slot_set;
 
         for (uint32_t n_method = 0;
@@ -194,10 +194,10 @@ TEST(D3D8Methods, VtableSlotsAreContiguousForEveryInterface)
         }
 
         ASSERT_EQ(slot_set.size(),
-                  D3D8::Utils::get_n_methods(interface_type) ) << D3D8::Utils::get_interface_name_ptr(interface_type);
+                  Interception::Core::D3D8Utils::get_n_methods(interface_type) ) << Interception::Core::D3D8Utils::get_interface_name_ptr(interface_type);
         EXPECT_EQ(*slot_set.begin(),
-                  0u)                                 << D3D8::Utils::get_interface_name_ptr(interface_type);
+                  0u)                                 << Interception::Core::D3D8Utils::get_interface_name_ptr(interface_type);
         EXPECT_EQ(*slot_set.rbegin(),
-                  D3D8::Utils::get_n_methods(interface_type) - 1) << D3D8::Utils::get_interface_name_ptr(interface_type);
+                  Interception::Core::D3D8Utils::get_n_methods(interface_type) - 1) << Interception::Core::D3D8Utils::get_interface_name_ptr(interface_type);
     }
 }

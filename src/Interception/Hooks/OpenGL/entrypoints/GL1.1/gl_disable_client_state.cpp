@@ -12,7 +12,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDisableClientState(GLenum array)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDisableClientState(GLenum array)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -24,7 +24,7 @@ void AI_APIENTRY OpenGL::aiDisableClientState(GLenum array)
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glDisableClientState(array=[%s])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(array) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(array) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDISABLECLIENTSTATE,
                                                          &pre_callback_func_ptr,
@@ -47,18 +47,18 @@ void AI_APIENTRY OpenGL::aiDisableClientState(GLenum array)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDISABLECLIENTSTATEPROC>(OpenGL::g_cached_gl_disable_client_state)(array);
+        reinterpret_cast<PFNGLDISABLECLIENTSTATEPROC>(Interception::Hooks::OpenGL::g_cached_gl_disable_client_state)(array);
     }
 
     if (tracker.is_top_level_api_call() )
     {
-        OpenGL::ClientArrayKind kind;
-        auto&                   context = OpenGL::get_context_state();
+        Interception::Hooks::OpenGL::ClientArrayKind kind;
+        auto&                                        context = Interception::Hooks::OpenGL::get_context_state();
 
-        if (OpenGL::ClientArrayManager::get_kind_for_array_enum(array,
+        if (Interception::Hooks::OpenGL::ClientArrayManager::get_kind_for_array_enum(array,
                                                              &kind) )
         {
-            const uint32_t index = (kind == OpenGL::ClientArrayKind::TEX_COORD) ? context.client_array_manager.get_client_active_texture()
+            const uint32_t index = (kind == Interception::Hooks::OpenGL::ClientArrayKind::TEX_COORD) ? context.client_array_manager.get_client_active_texture()
                                                                                 : 0;
 
             context.client_array_manager.set_enabled(kind,

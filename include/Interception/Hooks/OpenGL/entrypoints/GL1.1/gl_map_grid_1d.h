@@ -7,11 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiMapGrid1d(GLint    un,
-                                 GLdouble u1,
-                                 GLdouble u2);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiMapGrid1d(GLint    un,
+                                         GLdouble u1,
+                                         GLdouble u2);
+        }
+    }
 }
 
 #endif /* AI_GL_MAP_GRID_1D_H */

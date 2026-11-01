@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    GLenum AI_APIENTRY aiGetGraphicsResetStatus(void);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            GLenum AI_APIENTRY aiGetGraphicsResetStatus(void);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_GRAPHICS_RESET_STATUS_H */

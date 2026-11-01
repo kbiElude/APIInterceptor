@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiBeginQueryIndexed(GLenum target,
-                                             GLuint index,
-                                             GLuint id)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiBeginQueryIndexed(GLenum target,
+                                                                  GLuint index,
+                                                                  GLuint id)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -25,7 +25,7 @@ void AI_APIENTRY OpenGL::aiBeginQueryIndexed(GLenum target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glBeginQueryIndexed(target=[%s] index=[%u] id=[%u])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  index,
                  id);
 
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiBeginQueryIndexed(GLenum target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLBEGINQUERYINDEXEDPROC>(OpenGL::g_cached_gl_begin_query_indexed)(target,
-                                                                                              index,
-                                                                                              id);
+        reinterpret_cast<PFNGLBEGINQUERYINDEXEDPROC>(Interception::Hooks::OpenGL::g_cached_gl_begin_query_indexed)(target,
+                                                                                                                   index,
+                                                                                                                   id);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBEGINQUERYINDEXED,

@@ -12,25 +12,25 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiClearTexSubImage(GLuint      texture,
-                                            GLint       level,
-                                            GLint       xoffset,
-                                            GLint       yoffset,
-                                            GLint       zoffset,
-                                            GLsizei     width,
-                                            GLsizei     height,
-                                            GLsizei     depth,
-                                            GLenum      format,
-                                            GLenum      type,
-                                            const void* data)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiClearTexSubImage(GLuint      texture,
+                                                                 GLint       level,
+                                                                 GLint       xoffset,
+                                                                 GLint       yoffset,
+                                                                 GLint       zoffset,
+                                                                 GLsizei     width,
+                                                                 GLsizei     height,
+                                                                 GLsizei     depth,
+                                                                 GLenum      format,
+                                                                 GLenum      type,
+                                                                 const void* data)
 {
-    OpenGL::PixelDataChunk                  data_chunk;
-    void*                                   post_callback_func_arg = nullptr;
-    APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
-    void*                                   pre_callback_func_arg  = nullptr;
-    APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
-    bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    Interception::Hooks::OpenGL::PixelDataChunk data_chunk;
+    void*                                       post_callback_func_arg = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC     post_callback_func_ptr = nullptr;
+    void*                                       pre_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC      pre_callback_func_ptr  = nullptr;
+    bool                                        should_pass_through    = true;
+    APIInterceptor::Tracker                     tracker;
 
     if (tracker.is_top_level_api_call() )
     {
@@ -43,13 +43,13 @@ void AI_APIENTRY OpenGL::aiClearTexSubImage(GLuint      texture,
                  static_cast<int32_t>(width),
                  static_cast<int32_t>(height),
                  static_cast<int32_t>(depth),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(format),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(type),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(format),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type),
                  data);
 
-        data_chunk = OpenGL::PixelDataChunk::create_for_texel(data,
-                                                              format,
-                                                              type);
+        data_chunk = Interception::Hooks::OpenGL::PixelDataChunk::create_for_texel(data,
+                                                                                   format,
+                                                                                   type);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCLEARTEXSUBIMAGE,
                                                          &pre_callback_func_ptr,
@@ -82,17 +82,17 @@ void AI_APIENTRY OpenGL::aiClearTexSubImage(GLuint      texture,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLCLEARTEXSUBIMAGEPROC>(OpenGL::g_cached_gl_clear_tex_sub_image)(texture,
-                                                                                              level,
-                                                                                              xoffset,
-                                                                                              yoffset,
-                                                                                              zoffset,
-                                                                                              width,
-                                                                                              height,
-                                                                                              depth,
-                                                                                              format,
-                                                                                              type,
-                                                                                              data);
+        reinterpret_cast<PFNGLCLEARTEXSUBIMAGEPROC>(Interception::Hooks::OpenGL::g_cached_gl_clear_tex_sub_image)(texture,
+                                                                                                                   level,
+                                                                                                                   xoffset,
+                                                                                                                   yoffset,
+                                                                                                                   zoffset,
+                                                                                                                   width,
+                                                                                                                   height,
+                                                                                                                   depth,
+                                                                                                                   format,
+                                                                                                                   type,
+                                                                                                                   data);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCLEARTEXSUBIMAGE,

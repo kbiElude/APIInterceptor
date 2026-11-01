@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    GLboolean AI_APIENTRY aiIsTexture(GLuint texture);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            GLboolean AI_APIENTRY aiIsTexture(GLuint texture);
+        }
+    }
 }
 
 #endif /* AI_GL_IS_TEXTURE_H */

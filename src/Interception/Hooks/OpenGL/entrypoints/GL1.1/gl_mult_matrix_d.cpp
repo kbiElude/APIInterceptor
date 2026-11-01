@@ -11,7 +11,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiMultMatrixd(const GLdouble* m)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiMultMatrixd(const GLdouble* m)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -50,7 +50,7 @@ void AI_APIENTRY OpenGL::aiMultMatrixd(const GLdouble* m)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLMULTMATRIXDPROC>(OpenGL::g_cached_gl_mult_matrix_d)(m);
+        reinterpret_cast<PFNGLMULTMATRIXDPROC>(Interception::Hooks::OpenGL::g_cached_gl_mult_matrix_d)(m);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMULTMATRIXD,

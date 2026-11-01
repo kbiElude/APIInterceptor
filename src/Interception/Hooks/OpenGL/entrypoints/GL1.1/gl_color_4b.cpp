@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiColor4b(GLbyte red,
-                                   GLbyte green,
-                                   GLbyte blue,
-                                   GLbyte alpha)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiColor4b(GLbyte red,
+                                                        GLbyte green,
+                                                        GLbyte blue,
+                                                        GLbyte alpha)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -55,10 +55,10 @@ void AI_APIENTRY OpenGL::aiColor4b(GLbyte red,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLCOLOR4BPROC>(OpenGL::g_cached_gl_color_4b)(red,
-                                                                         green,
-                                                                         blue,
-                                                                         alpha);
+        reinterpret_cast<PFNGLCOLOR4BPROC>(Interception::Hooks::OpenGL::g_cached_gl_color_4b)(red,
+                                                                                              green,
+                                                                                              blue,
+                                                                                              alpha);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCOLOR4B,

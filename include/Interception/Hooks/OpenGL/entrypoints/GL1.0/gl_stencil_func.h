@@ -7,11 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiStencilFunc(GLenum func,
-                                   GLint  ref,
-                                   GLuint mask);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiStencilFunc(GLenum func,
+                                           GLint  ref,
+                                           GLuint mask);
+        }
+    }
 }
 
 #endif /* AI_GL_STENCIL_FUNC_H */

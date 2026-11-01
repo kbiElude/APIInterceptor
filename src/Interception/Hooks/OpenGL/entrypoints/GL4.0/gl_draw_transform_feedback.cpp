@@ -11,8 +11,8 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDrawTransformFeedback(GLenum mode,
-                                                 GLuint id)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDrawTransformFeedback(GLenum mode,
+                                                                      GLuint id)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -24,7 +24,7 @@ void AI_APIENTRY OpenGL::aiDrawTransformFeedback(GLenum mode,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glDrawTransformFeedback(mode=[%s] id=[%u])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(mode),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(mode),
                  id);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDRAWTRANSFORMFEEDBACK,
@@ -49,8 +49,8 @@ void AI_APIENTRY OpenGL::aiDrawTransformFeedback(GLenum mode,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDRAWTRANSFORMFEEDBACKPROC>(OpenGL::g_cached_gl_draw_transform_feedback)(mode,
-                                                                                                      id);
+        reinterpret_cast<PFNGLDRAWTRANSFORMFEEDBACKPROC>(Interception::Hooks::OpenGL::g_cached_gl_draw_transform_feedback)(mode,
+                                                                                                                           id);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDRAWTRANSFORMFEEDBACK,

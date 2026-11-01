@@ -10,10 +10,10 @@
 #include "Interception/Hooks/User32/globals.h"
 #include "Interception/Hooks/User32/entrypoints/create_dc_w.h"
 
-HDC WINAPI User32::create_dc_w(LPCWSTR         in_driver_ptr,
-                               LPCWSTR         in_device_ptr,
-                               LPCWSTR         in_port_ptr,
-                               const DEVMODEW* in_devmode_ptr)
+HDC WINAPI Interception::Hooks::User32::create_dc_w(LPCWSTR         in_driver_ptr,
+                                                    LPCWSTR         in_device_ptr,
+                                                    LPCWSTR         in_port_ptr,
+                                                    const DEVMODEW* in_devmode_ptr)
 {
     APIInterceptor::GateScope               gate_scope;
     void*                                   post_callback_func_arg  = nullptr;
@@ -58,10 +58,10 @@ HDC WINAPI User32::create_dc_w(LPCWSTR         in_driver_ptr,
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<User32::PFNCREATEDCWPROC>(User32::g_cached_create_dc_w_func_ptr)(in_driver_ptr,
-                                                                                                   in_device_ptr,
-                                                                                                   in_port_ptr,
-                                                                                                   in_devmode_ptr);
+        result = reinterpret_cast<Interception::Hooks::User32::PFNCREATEDCWPROC>(Interception::Hooks::User32::g_cached_create_dc_w_func_ptr)(in_driver_ptr,
+                                                                                                                                             in_device_ptr,
+                                                                                                                                             in_port_ptr,
+                                                                                                                                             in_devmode_ptr);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_USER32_CREATEDCW,
@@ -72,8 +72,8 @@ HDC WINAPI User32::create_dc_w(LPCWSTR         in_driver_ptr,
 
         post_callback_func_ptr(APIInterceptor::APIFUNCTION_USER32_CREATEDCW,
                                post_callback_func_arg,
-                               0,       /* in_n_args_out   */
-                               nullptr, /* in_args_out_ptr */
+                               0,       /* in_n_arguments_out   */
+                               nullptr, /* in_arguments_out_ptr */
                               &result_arg);
     }
 

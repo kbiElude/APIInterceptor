@@ -11,8 +11,8 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiClampColor(GLenum target,
-                                      GLenum clamp)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiClampColor(GLenum target,
+                                                           GLenum clamp)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -24,8 +24,8 @@ void AI_APIENTRY OpenGL::aiClampColor(GLenum target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glClampColor(target=[%s] clamp=[%s])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(clamp) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(clamp) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCLAMPCOLOR,
                                                          &pre_callback_func_ptr,
@@ -49,8 +49,8 @@ void AI_APIENTRY OpenGL::aiClampColor(GLenum target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLCLAMPCOLORPROC>(OpenGL::g_cached_gl_clamp_color)(target,
-                                                                               clamp);
+        reinterpret_cast<PFNGLCLAMPCOLORPROC>(Interception::Hooks::OpenGL::g_cached_gl_clamp_color)(target,
+                                                                                                    clamp);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCLAMPCOLOR,

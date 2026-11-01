@@ -10,9 +10,9 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiUniformBlockBinding(GLuint program,
-                                               GLuint uniformBlockIndex,
-                                               GLuint uniformBlockBinding)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiUniformBlockBinding(GLuint program,
+                                                                    GLuint uniformBlockIndex,
+                                                                    GLuint uniformBlockBinding)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -51,9 +51,9 @@ void AI_APIENTRY OpenGL::aiUniformBlockBinding(GLuint program,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLUNIFORMBLOCKBINDINGPROC>(OpenGL::g_cached_gl_uniform_block_binding)(program,
-                                                                                                  uniformBlockIndex,
-                                                                                                  uniformBlockBinding);
+        reinterpret_cast<PFNGLUNIFORMBLOCKBINDINGPROC>(Interception::Hooks::OpenGL::g_cached_gl_uniform_block_binding)(program,
+                                                                                                                       uniformBlockIndex,
+                                                                                                                       uniformBlockBinding);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLUNIFORMBLOCKBINDING,

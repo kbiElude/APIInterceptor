@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiVertex4s(GLshort x,
-                                    GLshort y,
-                                    GLshort z,
-                                    GLshort w)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiVertex4s(GLshort x,
+                                                         GLshort y,
+                                                         GLshort z,
+                                                         GLshort w)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -55,10 +55,10 @@ void AI_APIENTRY OpenGL::aiVertex4s(GLshort x,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLVERTEX4SPROC>(OpenGL::g_cached_gl_vertex_4s)(x,
-                                                                           y,
-                                                                           z,
-                                                                           w);
+        reinterpret_cast<PFNGLVERTEX4SPROC>(Interception::Hooks::OpenGL::g_cached_gl_vertex_4s)(x,
+                                                                                                y,
+                                                                                                z,
+                                                                                                w);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLVERTEX4S,

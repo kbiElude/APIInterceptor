@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetPolygonStipple(GLubyte* mask);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetPolygonStipple(GLubyte* mask);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_POLYGON_STIPPLE_H */

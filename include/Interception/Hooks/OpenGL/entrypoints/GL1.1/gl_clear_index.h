@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiClearIndex(GLfloat c);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiClearIndex(GLfloat c);
+        }
+    }
 }
 
 #endif /* AI_GL_CLEAR_INDEX_H */

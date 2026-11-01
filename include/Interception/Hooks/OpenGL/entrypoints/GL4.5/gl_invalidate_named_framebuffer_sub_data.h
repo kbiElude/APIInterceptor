@@ -7,9 +7,21 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiInvalidateNamedFramebufferSubData(GLuint framebuffer, GLsizei numAttachments, const GLenum* attachments, GLint x, GLint y, GLsizei width, GLsizei height);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiInvalidateNamedFramebufferSubData(GLuint        framebuffer,
+                                                                 GLsizei       numAttachments,
+                                                                 const GLenum* attachments,
+                                                                 GLint         x,
+                                                                 GLint         y,
+                                                                 GLsizei       width,
+                                                                 GLsizei       height);
+        }
+    }
 }
 
 #endif /* AI_GL_INVALIDATE_NAMED_FRAMEBUFFER_SUB_DATA_H */

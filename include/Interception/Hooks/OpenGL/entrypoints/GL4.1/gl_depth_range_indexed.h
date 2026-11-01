@@ -7,9 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiDepthRangeIndexed(GLuint index, GLdouble n, GLdouble f);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiDepthRangeIndexed(GLuint   index,
+                                                 GLdouble n,
+                                                 GLdouble f);
+        }
+    }
 }
 
 #endif /* AI_GL_DEPTH_RANGE_INDEXED_H */

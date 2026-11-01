@@ -11,12 +11,12 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetActiveSubroutineName(GLuint   program,
-                                                   GLenum   shadertype,
-                                                   GLuint   index,
-                                                   GLsizei  bufsize,
-                                                   GLsizei* length,
-                                                   GLchar*  name)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetActiveSubroutineName(GLuint   program,
+                                                                        GLenum   shadertype,
+                                                                        GLuint   index,
+                                                                        GLsizei  bufsize,
+                                                                        GLsizei* length,
+                                                                        GLchar*  name)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -29,7 +29,7 @@ void AI_APIENTRY OpenGL::aiGetActiveSubroutineName(GLuint   program,
     {
         AI_TRACE("glGetActiveSubroutineName(program=[%u] shadertype=[%s] index=[%u] bufsize=[%d] length=[%p] name=[%p])",
                  program,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(shadertype),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(shadertype),
                  index,
                  static_cast<int32_t>(bufsize),
                  length,
@@ -61,12 +61,12 @@ void AI_APIENTRY OpenGL::aiGetActiveSubroutineName(GLuint   program,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETACTIVESUBROUTINENAMEPROC>(OpenGL::g_cached_gl_get_active_subroutine_name)(program,
-                                                                                                           shadertype,
-                                                                                                           index,
-                                                                                                           bufsize,
-                                                                                                           length,
-                                                                                                           name);
+        reinterpret_cast<PFNGLGETACTIVESUBROUTINENAMEPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_active_subroutine_name)(program,
+                                                                                                                                shadertype,
+                                                                                                                                index,
+                                                                                                                                bufsize,
+                                                                                                                                length,
+                                                                                                                                name);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETACTIVESUBROUTINENAME,

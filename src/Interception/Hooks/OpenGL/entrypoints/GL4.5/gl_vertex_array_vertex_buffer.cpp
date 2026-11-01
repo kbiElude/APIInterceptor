@@ -10,11 +10,11 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiVertexArrayVertexBuffer(GLuint   vaobj,
-                                                   GLuint   bindingindex,
-                                                   GLuint   buffer,
-                                                   GLintptr offset,
-                                                   GLsizei  stride)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiVertexArrayVertexBuffer(GLuint   vaobj,
+                                                                        GLuint   bindingindex,
+                                                                        GLuint   buffer,
+                                                                        GLintptr offset,
+                                                                        GLsizei  stride)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -57,11 +57,11 @@ void AI_APIENTRY OpenGL::aiVertexArrayVertexBuffer(GLuint   vaobj,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLVERTEXARRAYVERTEXBUFFERPROC>(OpenGL::g_cached_gl_vertex_array_vertex_buffer)(vaobj,
-                                                                                                          bindingindex,
-                                                                                                          buffer,
-                                                                                                          offset,
-                                                                                                          stride);
+        reinterpret_cast<PFNGLVERTEXARRAYVERTEXBUFFERPROC>(Interception::Hooks::OpenGL::g_cached_gl_vertex_array_vertex_buffer)(vaobj,
+                                                                                                                               bindingindex,
+                                                                                                                               buffer,
+                                                                                                                               offset,
+                                                                                                                               stride);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLVERTEXARRAYVERTEXBUFFER,

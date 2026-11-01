@@ -10,10 +10,10 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetProgramPipelineInfoLog(GLuint   pipeline,
-                                                     GLsizei  bufSize,
-                                                     GLsizei* length,
-                                                     GLchar*  infoLog)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetProgramPipelineInfoLog(GLuint   pipeline,
+                                                                          GLsizei  bufSize,
+                                                                          GLsizei* length,
+                                                                          GLchar*  infoLog)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -54,10 +54,10 @@ void AI_APIENTRY OpenGL::aiGetProgramPipelineInfoLog(GLuint   pipeline,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETPROGRAMPIPELINEINFOLOGPROC>(OpenGL::g_cached_gl_get_program_pipeline_info_log)(pipeline,
-                                                                                                                bufSize,
-                                                                                                                length,
-                                                                                                                infoLog);
+        reinterpret_cast<PFNGLGETPROGRAMPIPELINEINFOLOGPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_program_pipeline_info_log)(pipeline,
+                                                                                                                                     bufSize,
+                                                                                                                                     length,
+                                                                                                                                     infoLog);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETPROGRAMPIPELINEINFOLOG,

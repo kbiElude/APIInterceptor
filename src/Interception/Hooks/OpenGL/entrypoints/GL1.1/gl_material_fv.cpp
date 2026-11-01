@@ -13,12 +13,12 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiMaterialfv(GLenum         face,
-                                      GLenum         pname,
-                                      const GLfloat* params)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiMaterialfv(GLenum         face,
+                                                           GLenum         pname,
+                                                           const GLfloat* params)
 {
     APIInterceptor::MemoryChunk             params_chunk(params,
-                                                         OpenGL::Utils::get_n_material_params(pname),
+                                                         Interception::Hooks::OpenGL::Utils::get_n_material_params(pname),
                                                          sizeof(GLfloat));
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -30,8 +30,8 @@ void AI_APIENTRY OpenGL::aiMaterialfv(GLenum         face,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glMaterialfv(face=[%s], pname=[%s], params=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(face),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(face),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  params);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMATERIALFV,
@@ -57,9 +57,9 @@ void AI_APIENTRY OpenGL::aiMaterialfv(GLenum         face,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLMATERIALFVPROC>(OpenGL::g_cached_gl_material_fv)(face,
-                                                                               pname,
-                                                                               params);
+        reinterpret_cast<PFNGLMATERIALFVPROC>(Interception::Hooks::OpenGL::g_cached_gl_material_fv)(face,
+                                                                                                    pname,
+                                                                                                    params);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMATERIALFV,

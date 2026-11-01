@@ -7,12 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiBindFragDataLocationIndexed(GLuint        program,
-                                                   GLuint        colorNumber,
-                                                   GLuint        index,
-                                                   const GLchar* name);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiBindFragDataLocationIndexed(GLuint        program,
+                                                           GLuint        colorNumber,
+                                                           GLuint        index,
+                                                           const GLchar* name);
+        }
+    }
 }
 
 #endif /* AI_GL_BIND_FRAG_DATA_LOCATION_INDEXED_H */

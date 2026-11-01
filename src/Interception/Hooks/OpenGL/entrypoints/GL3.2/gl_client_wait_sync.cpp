@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-GLenum AI_APIENTRY OpenGL::aiClientWaitSync(GLsync     sync,
-                                            GLbitfield flags,
-                                            GLuint64   timeout)
+GLenum AI_APIENTRY Interception::Hooks::OpenGL::aiClientWaitSync(GLsync     sync,
+                                                                 GLbitfield flags,
+                                                                 GLuint64   timeout)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -27,7 +27,7 @@ GLenum AI_APIENTRY OpenGL::aiClientWaitSync(GLsync     sync,
     {
         AI_TRACE("glClientWaitSync(sync=[%p] flags=[%s] timeout=[%llu])",
                  sync,
-                 OpenGL::Utils::get_raw_string_for_gl_bitfield(OpenGL::BitfieldType::WAIT_SYNC_MASK, flags),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_bitfield(Interception::Hooks::OpenGL::BitfieldType::WAIT_SYNC_MASK, flags),
                  timeout);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCLIENTWAITSYNC,
@@ -51,9 +51,9 @@ GLenum AI_APIENTRY OpenGL::aiClientWaitSync(GLsync     sync,
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNGLCLIENTWAITSYNCPROC>(OpenGL::g_cached_gl_client_wait_sync)(sync,
-                                                                                                  flags,
-                                                                                                  timeout);
+        result = reinterpret_cast<PFNGLCLIENTWAITSYNCPROC>(Interception::Hooks::OpenGL::g_cached_gl_client_wait_sync)(sync,
+                                                                                                                       flags,
+                                                                                                                       timeout);
     }
 
     if (tracker.is_top_level_api_call() )
@@ -66,8 +66,8 @@ GLenum AI_APIENTRY OpenGL::aiClientWaitSync(GLsync     sync,
 
             post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLCLIENTWAITSYNC,
                                    post_callback_func_arg,
-                                   0,       /* in_n_args_out   */
-                                   nullptr, /* in_args_out_ptr */
+                                   0,       /* in_n_arguments_out   */
+                                   nullptr, /* in_arguments_out_ptr */
                                   &result_arg);
         }
     }

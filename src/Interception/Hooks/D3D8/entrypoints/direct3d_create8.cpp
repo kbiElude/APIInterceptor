@@ -10,7 +10,7 @@
 #include "Interception/Hooks/D3D8/globals.h"
 #include "Interception/Hooks/D3D8/hook_table.h"
 
-D3D8::IDirect3D8* __stdcall D3D8::aiDirect3DCreate8(UINT in_sdk_version)
+Interception::Hooks::D3D8::IDirect3D8* __stdcall Interception::Hooks::D3D8::aiDirect3DCreate8(UINT in_sdk_version)
 {
     void*                                   post_callback_function_argument = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_function_ptr      = nullptr;
@@ -63,8 +63,8 @@ D3D8::IDirect3D8* __stdcall D3D8::aiDirect3DCreate8(UINT in_sdk_version)
 
             post_callback_function_ptr(APIInterceptor::APIFUNCTION_D3D8_DIRECT3DCREATE8,
                                        post_callback_function_argument,
-                                       0,       /* in_n_args_out   */
-                                       nullptr, /* in_args_out_ptr */
+                                       0,       /* in_n_arguments_out   */
+                                       nullptr, /* in_arguments_out_ptr */
                                       &result_argument);
         }
     }

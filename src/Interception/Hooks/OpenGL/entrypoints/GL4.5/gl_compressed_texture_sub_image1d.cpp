@@ -12,21 +12,21 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiCompressedTextureSubImage1D(GLuint      texture,
-                                                       GLint       level,
-                                                       GLint       xoffset,
-                                                       GLsizei     width,
-                                                       GLenum      format,
-                                                       GLsizei     imageSize,
-                                                       const void* data)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiCompressedTextureSubImage1D(GLuint      texture,
+                                                                            GLint       level,
+                                                                            GLint       xoffset,
+                                                                            GLsizei     width,
+                                                                            GLenum      format,
+                                                                            GLsizei     imageSize,
+                                                                            const void* data)
 {
-    OpenGL::PixelDataChunk                  pixels_chunk;
-    void*                                   post_callback_func_arg = nullptr;
-    APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
-    void*                                   pre_callback_func_arg  = nullptr;
-    APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
-    bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    Interception::Hooks::OpenGL::PixelDataChunk pixels_chunk;
+    void*                                       post_callback_func_arg = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC     post_callback_func_ptr = nullptr;
+    void*                                       pre_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC      pre_callback_func_ptr  = nullptr;
+    bool                                        should_pass_through    = true;
+    APIInterceptor::Tracker                     tracker;
 
     if (tracker.is_top_level_api_call() )
     {
@@ -35,12 +35,12 @@ void AI_APIENTRY OpenGL::aiCompressedTextureSubImage1D(GLuint      texture,
                  level,
                  xoffset,
                  static_cast<int32_t>(width),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(format),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(format),
                  static_cast<int32_t>(imageSize),
                  data);
 
-        pixels_chunk = OpenGL::PixelDataChunk::create_for_unpack_bytes(data,
-                                                                       static_cast<uint64_t>(imageSize));
+        pixels_chunk = Interception::Hooks::OpenGL::PixelDataChunk::create_for_unpack_bytes(data,
+                                                                                            static_cast<uint64_t>(imageSize));
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCOMPRESSEDTEXTURESUBIMAGE1D,
                                                          &pre_callback_func_ptr,
@@ -69,13 +69,13 @@ void AI_APIENTRY OpenGL::aiCompressedTextureSubImage1D(GLuint      texture,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLCOMPRESSEDTEXTURESUBIMAGE1DPROC>(OpenGL::g_cached_gl_compressed_texture_sub_image1d)(texture,
-                                                                                                                   level,
-                                                                                                                   xoffset,
-                                                                                                                   width,
-                                                                                                                   format,
-                                                                                                                   imageSize,
-                                                                                                                   data);
+        reinterpret_cast<PFNGLCOMPRESSEDTEXTURESUBIMAGE1DPROC>(Interception::Hooks::OpenGL::g_cached_gl_compressed_texture_sub_image1d)(texture,
+                                                                                                                                        level,
+                                                                                                                                        xoffset,
+                                                                                                                                        width,
+                                                                                                                                        format,
+                                                                                                                                        imageSize,
+                                                                                                                                        data);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCOMPRESSEDTEXTURESUBIMAGE1D,

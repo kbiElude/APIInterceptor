@@ -7,11 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiCallLists(GLsizei       n,
-                                 GLenum        type,
-                                 const GLvoid* lists);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiCallLists(GLsizei       n,
+                                         GLenum        type,
+                                         const GLvoid* lists);
+        }
+    }
 }
 
 #endif /* AI_GL_CALL_LISTS_H */

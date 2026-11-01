@@ -7,9 +7,15 @@
 
 #include <windows.h>
 
-namespace WGL
+namespace Interception
 {
-    HDC WINAPI get_current_dc();
+    namespace Hooks
+    {
+        namespace WGL
+        {
+            HDC WINAPI get_current_dc();
+        }
+    }
 }
 
 #endif /* WGL_GET_CURRENT_DC_H */

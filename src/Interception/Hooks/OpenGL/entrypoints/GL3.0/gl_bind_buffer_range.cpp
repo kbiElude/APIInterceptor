@@ -13,11 +13,11 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiBindBufferRange(GLenum     target,
-                                           GLuint     index,
-                                           GLuint     buffer,
-                                           GLintptr   offset,
-                                           GLsizeiptr size)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiBindBufferRange(GLenum     target,
+                                                                GLuint     index,
+                                                                GLuint     buffer,
+                                                                GLintptr   offset,
+                                                                GLsizeiptr size)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -29,7 +29,7 @@ void AI_APIENTRY OpenGL::aiBindBufferRange(GLenum     target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glBindBufferRange(target=[%s] index=[%u] buffer=[%u] offset=[%d] size=[%d])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  index,
                  buffer,
                  static_cast<int32_t>(offset),
@@ -60,22 +60,22 @@ void AI_APIENTRY OpenGL::aiBindBufferRange(GLenum     target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLBINDBUFFERRANGEPROC>(OpenGL::g_cached_gl_bind_buffer_range)(target,
-                                                                                          index,
-                                                                                          buffer,
-                                                                                          offset,
-                                                                                          size);
+        reinterpret_cast<PFNGLBINDBUFFERRANGEPROC>(Interception::Hooks::OpenGL::g_cached_gl_bind_buffer_range)(target,
+                                                                                                               index,
+                                                                                                               buffer,
+                                                                                                               offset,
+                                                                                                               size);
     }
 
     if (tracker.is_top_level_api_call() )
     {
-        OpenGL::BufferBindingTarget binding_target;
+        Interception::Hooks::OpenGL::BufferBindingTarget binding_target;
 
-        if (OpenGL::Utils::get_buffer_binding_target_for_gl_enum(target,
-                                                                &binding_target) )
+        if (Interception::Hooks::OpenGL::Utils::get_buffer_binding_target_for_gl_enum(target,
+                                                                                     &binding_target) )
         {
-            OpenGL::get_context_state().buffer_manager.on_buffer_bound(binding_target,
-                                                                       buffer);
+            Interception::Hooks::OpenGL::get_context_state().buffer_manager.on_buffer_bound(binding_target,
+                                                                                            buffer);
         }
     }
 

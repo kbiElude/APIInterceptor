@@ -7,9 +7,20 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetTextureImage(GLuint texture, GLint level, GLenum format, GLenum type, GLsizei bufSize, void* pixels);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetTextureImage(GLuint  texture,
+                                               GLint   level,
+                                               GLenum  format,
+                                               GLenum  type,
+                                               GLsizei bufSize,
+                                               void*   pixels);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_TEXTURE_IMAGE_H */

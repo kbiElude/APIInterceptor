@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    GLuint AI_APIENTRY aiGenLists(GLsizei range);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            GLuint AI_APIENTRY aiGenLists(GLsizei range);
+        }
+    }
 }
 
 #endif /* AI_GL_GEN_LISTS_H */

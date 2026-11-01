@@ -7,9 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiScissorIndexedv(GLuint index, const GLint* v);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiScissorIndexedv(GLuint       index,
+                                               const GLint* v);
+        }
+    }
 }
 
 #endif /* AI_GL_SCISSOR_INDEXEDV_H */

@@ -10,7 +10,7 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-GLuint AI_APIENTRY OpenGL::aiCreateProgram()
+GLuint AI_APIENTRY Interception::Hooks::OpenGL::aiCreateProgram()
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -40,7 +40,7 @@ GLuint AI_APIENTRY OpenGL::aiCreateProgram()
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNGLCREATEPROGRAMPROC>(OpenGL::g_cached_gl_create_program)();
+        result = reinterpret_cast<PFNGLCREATEPROGRAMPROC>(Interception::Hooks::OpenGL::g_cached_gl_create_program)();
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCREATEPROGRAM,

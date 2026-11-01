@@ -11,10 +11,10 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiProgramUniform2iv(GLuint       program,
-                                             GLint        location,
-                                             GLsizei      count,
-                                             const GLint* value)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiProgramUniform2iv(GLuint       program,
+                                                                  GLint        location,
+                                                                  GLsizei      count,
+                                                                  const GLint* value)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -58,10 +58,10 @@ void AI_APIENTRY OpenGL::aiProgramUniform2iv(GLuint       program,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLPROGRAMUNIFORM2IVPROC>(OpenGL::g_cached_gl_program_uniform2iv)(program,
-                                                                                              location,
-                                                                                              count,
-                                                                                              value);
+        reinterpret_cast<PFNGLPROGRAMUNIFORM2IVPROC>(Interception::Hooks::OpenGL::g_cached_gl_program_uniform2iv)(program,
+                                                                                                                   location,
+                                                                                                                   count,
+                                                                                                                   value);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLPROGRAMUNIFORM2IV,

@@ -9,10 +9,10 @@
 
 TEST(TextureManager, NothingIsBoundInitially)
 {
-    OpenGL::TextureManager manager;
+    Interception::Hooks::OpenGL::TextureManager manager;
 
-    EXPECT_EQ(manager.get_bound_texture(OpenGL::TextureBindingTarget::TEXTURE_2D),
-              0u);
+    EXPECT_EQ(manager.get_bound_texture(Interception::Hooks::OpenGL::TextureBindingTarget::TEXTURE_2D),
+                                   0u);
     EXPECT_EQ(manager.get_level_props(5,
                                       0).width,
               0u);
@@ -20,22 +20,22 @@ TEST(TextureManager, NothingIsBoundInitially)
 
 TEST(TextureManager, BindingsAreTrackedPerTarget)
 {
-    OpenGL::TextureManager manager;
+    Interception::Hooks::OpenGL::TextureManager manager;
 
-    manager.on_texture_bound(OpenGL::TextureBindingTarget::TEXTURE_2D,
-                             4);
-    manager.on_texture_bound(OpenGL::TextureBindingTarget::TEXTURE_3D,
-                             9);
+    manager.on_texture_bound(Interception::Hooks::OpenGL::TextureBindingTarget::TEXTURE_2D,
+                                                  4);
+    manager.on_texture_bound(Interception::Hooks::OpenGL::TextureBindingTarget::TEXTURE_3D,
+                                                  9);
 
-    EXPECT_EQ(manager.get_bound_texture(OpenGL::TextureBindingTarget::TEXTURE_2D),
-              4u);
-    EXPECT_EQ(manager.get_bound_texture(OpenGL::TextureBindingTarget::TEXTURE_3D),
-              9u);
+    EXPECT_EQ(manager.get_bound_texture(Interception::Hooks::OpenGL::TextureBindingTarget::TEXTURE_2D),
+                                   4u);
+    EXPECT_EQ(manager.get_bound_texture(Interception::Hooks::OpenGL::TextureBindingTarget::TEXTURE_3D),
+                                   9u);
 }
 
 TEST(TextureManager, LevelPropsKeepEachDimensionInItsOwnField)
 {
-    OpenGL::TextureManager manager;
+    Interception::Hooks::OpenGL::TextureManager manager;
 
     manager.set_level_props(3,
                             2,
@@ -63,7 +63,7 @@ TEST(TextureManager, LevelPropsKeepEachDimensionInItsOwnField)
 
 TEST(TextureManager, CompressedLevelsRememberTheirSize)
 {
-    OpenGL::TextureManager manager;
+    Interception::Hooks::OpenGL::TextureManager manager;
 
     manager.set_compressed_level_props(3,
                                        0,
@@ -90,13 +90,13 @@ TEST(TextureManager, CompressedLevelsRememberTheirSize)
 
 TEST(TextureManager, DeletingATextureForgetsItsLevelsOnly)
 {
-    OpenGL::TextureManager manager;
+    Interception::Hooks::OpenGL::TextureManager manager;
 
     manager.set_level_props(2, 0, 4, 4, 1);
     manager.set_level_props(2, 1, 2, 2, 1);
     manager.set_level_props(3, 0, 8, 8, 1);
-    manager.on_texture_bound(OpenGL::TextureBindingTarget::TEXTURE_2D,
-                             2);
+    manager.on_texture_bound(Interception::Hooks::OpenGL::TextureBindingTarget::TEXTURE_2D,
+                                                  2);
 
     manager.on_texture_deleted(2);
 
@@ -111,6 +111,6 @@ TEST(TextureManager, DeletingATextureForgetsItsLevelsOnly)
               8u);
 
     /* Deleting a bound texture unbinds it. */
-    EXPECT_EQ(manager.get_bound_texture(OpenGL::TextureBindingTarget::TEXTURE_2D),
-              0u);
+    EXPECT_EQ(manager.get_bound_texture(Interception::Hooks::OpenGL::TextureBindingTarget::TEXTURE_2D),
+                                   0u);
 }

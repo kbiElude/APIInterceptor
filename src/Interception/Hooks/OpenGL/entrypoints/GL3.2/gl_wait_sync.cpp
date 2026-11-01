@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiWaitSync(GLsync     sync,
-                                    GLbitfield flags,
-                                    GLuint64   timeout)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiWaitSync(GLsync     sync,
+                                                         GLbitfield flags,
+                                                         GLuint64   timeout)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiWaitSync(GLsync     sync,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLWAITSYNCPROC>(OpenGL::g_cached_gl_wait_sync)(sync,
-                                                                            flags,
-                                                                            timeout);
+        reinterpret_cast<PFNGLWAITSYNCPROC>(Interception::Hooks::OpenGL::g_cached_gl_wait_sync)(sync,
+                                                                                                 flags,
+                                                                                                 timeout);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLWAITSYNC,

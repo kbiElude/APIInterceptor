@@ -10,9 +10,9 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiInvalidateBufferSubData(GLuint     buffer,
-                                                   GLintptr   offset,
-                                                   GLsizeiptr length)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiInvalidateBufferSubData(GLuint     buffer,
+                                                                        GLintptr   offset,
+                                                                        GLsizeiptr length)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -51,9 +51,9 @@ void AI_APIENTRY OpenGL::aiInvalidateBufferSubData(GLuint     buffer,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLINVALIDATEBUFFERSUBDATAPROC>(OpenGL::g_cached_gl_invalidate_buffer_sub_data)(buffer,
-                                                                                                            offset,
-                                                                                                            length);
+        reinterpret_cast<PFNGLINVALIDATEBUFFERSUBDATAPROC>(Interception::Hooks::OpenGL::g_cached_gl_invalidate_buffer_sub_data)(buffer,
+                                                                                                                                 offset,
+                                                                                                                                 length);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLINVALIDATEBUFFERSUBDATA,

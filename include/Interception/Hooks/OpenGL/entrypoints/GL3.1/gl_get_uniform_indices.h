@@ -7,12 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetUniformIndices(GLuint               program,
-                                         GLsizei              uniformCount,
-                                         const GLchar* const* uniformNames,
-                                         GLuint*              uniformIndices);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetUniformIndices(GLuint               program,
+                                                 GLsizei              uniformCount,
+                                                 const GLchar* const* uniformNames,
+                                                 GLuint*              uniformIndices);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_UNIFORM_INDICES_H */

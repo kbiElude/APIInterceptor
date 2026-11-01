@@ -10,8 +10,8 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiActiveShaderProgram(GLuint pipeline,
-                                               GLuint program)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiActiveShaderProgram(GLuint pipeline,
+                                                                    GLuint program)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -48,8 +48,8 @@ void AI_APIENTRY OpenGL::aiActiveShaderProgram(GLuint pipeline,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLACTIVESHADERPROGRAMPROC>(OpenGL::g_cached_gl_active_shader_program)(pipeline,
-                                                                                                  program);
+        reinterpret_cast<PFNGLACTIVESHADERPROGRAMPROC>(Interception::Hooks::OpenGL::g_cached_gl_active_shader_program)(pipeline,
+                                                                                                                       program);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLACTIVESHADERPROGRAM,

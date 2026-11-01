@@ -16,9 +16,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiFlushMappedNamedBufferRange(GLuint     buffer,
-                                                       GLintptr   offset,
-                                                       GLsizeiptr length)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiFlushMappedNamedBufferRange(GLuint     buffer,
+                                                                            GLintptr   offset,
+                                                                            GLsizeiptr length)
 {
     APIInterceptor::MemoryChunk             flush_chunk(nullptr,
                                                         0,
@@ -37,11 +37,11 @@ void AI_APIENTRY OpenGL::aiFlushMappedNamedBufferRange(GLuint     buffer,
                  static_cast<long long>(offset),
                  static_cast<long long>(length));
 
-        auto& context = OpenGL::get_context_state();
+        auto& context = Interception::Hooks::OpenGL::get_context_state();
 
-        const OpenGL::BufferMappingManager::Region flush_region = context.buffer_mapping_manager.get_flush_region(buffer,
-                                                                                                                  offset,
-                                                                                                                  length);
+        const Interception::Hooks::OpenGL::BufferMappingManager::Region flush_region = context.buffer_mapping_manager.get_flush_region(buffer,
+                                                                                                                                       offset,
+                                                                                                                                       length);
 
         flush_chunk = APIInterceptor::MemoryChunk(flush_region.data_ptr,
                                                   static_cast<int64_t>(flush_region.n_bytes),
@@ -71,9 +71,9 @@ void AI_APIENTRY OpenGL::aiFlushMappedNamedBufferRange(GLuint     buffer,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLFLUSHMAPPEDNAMEDBUFFERRANGEPROC>(OpenGL::g_cached_gl_flush_mapped_named_buffer_range)(buffer,
-                                                                                                                    offset,
-                                                                                                                    length);
+        reinterpret_cast<PFNGLFLUSHMAPPEDNAMEDBUFFERRANGEPROC>(Interception::Hooks::OpenGL::g_cached_gl_flush_mapped_named_buffer_range)(buffer,
+                                                                                                                                         offset,
+                                                                                                                                         length);
     }
 
     if (tracker.is_top_level_api_call() )

@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiMapGrid1f(GLint   un,
-                                     GLfloat u1,
-                                     GLfloat u2)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiMapGrid1f(GLint   un,
+                                                          GLfloat u1,
+                                                          GLfloat u2)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiMapGrid1f(GLint   un,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLMAPGRID1FPROC>(OpenGL::g_cached_gl_map_grid_1f)(un,
-                                                                              u1,
-                                                                              u2);
+        reinterpret_cast<PFNGLMAPGRID1FPROC>(Interception::Hooks::OpenGL::g_cached_gl_map_grid_1f)(un,
+                                                                                                   u1,
+                                                                                                   u2);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMAPGRID1F,

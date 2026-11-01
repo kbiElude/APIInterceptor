@@ -7,9 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiPatchParameterfv(GLenum pname, const GLfloat* values);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiPatchParameterfv(GLenum         pname,
+                                                const GLfloat* values);
+        }
+    }
 }
 
 #endif /* AI_GL_PATCH_PARAMETERFV_H */

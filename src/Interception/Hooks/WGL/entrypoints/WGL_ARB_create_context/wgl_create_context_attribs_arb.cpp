@@ -12,12 +12,12 @@
 #include "Interception/Hooks/WGL/utils.h"
 #include "Interception/Hooks/WGL/utils_trace.h"
 
-HGLRC WINAPI WGL::create_context_attribs_arb(HDC        in_hdc,
-                                             HGLRC      in_share_context_handle,
-                                             const int* in_attrib_list_ptr)
+HGLRC WINAPI Interception::Hooks::WGL::create_context_attribs_arb(HDC        in_hdc,
+                                                                  HGLRC      in_share_context_handle,
+                                                                  const int* in_attrib_list_ptr)
 {
     APIInterceptor::MemoryChunk             attrib_list_chunk(in_attrib_list_ptr,
-                                                              WGL::Utils::get_n_context_attrib_list_ints(in_attrib_list_ptr),
+                                                              Interception::Hooks::WGL::Utils::get_n_context_attrib_list_ints(in_attrib_list_ptr),
                                                               sizeof(int) );
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -35,13 +35,13 @@ HGLRC WINAPI WGL::create_context_attribs_arb(HDC        in_hdc,
                    " in_attrib_list_ptr      = %s)",
                    in_hdc,
                    in_share_context_handle,
-                   WGL::convert_context_attrib_list_to_raw_string(in_attrib_list_ptr) );
+                   Interception::Hooks::WGL::convert_context_attrib_list_to_raw_string(in_attrib_list_ptr) );
 
-        if (WGL::g_cached_create_context_attribs_arb_func_ptr == nullptr)
+        if (Interception::Hooks::WGL::g_cached_create_context_attribs_arb_func_ptr == nullptr)
         {
-            WGL::g_cached_create_context_attribs_arb_func_ptr = reinterpret_cast<PFNWGLGETPROCADDRESSPROC>(WGL::g_cached_get_proc_address_func_ptr)("wglCreateContextAttribsARB");
+            Interception::Hooks::WGL::g_cached_create_context_attribs_arb_func_ptr = reinterpret_cast<PFNWGLGETPROCADDRESSPROC>(Interception::Hooks::WGL::g_cached_get_proc_address_func_ptr)("wglCreateContextAttribsARB");
 
-            AI_ASSERT(WGL::g_cached_create_context_attribs_arb_func_ptr != nullptr);
+            AI_ASSERT(Interception::Hooks::WGL::g_cached_create_context_attribs_arb_func_ptr != nullptr);
         }
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_WGL_WGLCREATECONTEXTATTRIBSARB,
@@ -65,9 +65,9 @@ HGLRC WINAPI WGL::create_context_attribs_arb(HDC        in_hdc,
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNWGLCREATECONTEXTATTRIBSARBPROC>(WGL::g_cached_create_context_attribs_arb_func_ptr)(in_hdc,
-                                                                                                                        in_share_context_handle,
-                                                                                                                        in_attrib_list_ptr);
+        result = reinterpret_cast<PFNWGLCREATECONTEXTATTRIBSARBPROC>(Interception::Hooks::WGL::g_cached_create_context_attribs_arb_func_ptr)(in_hdc,
+                                                                                                                                             in_share_context_handle,
+                                                                                                                                             in_attrib_list_ptr);
     }
 
     if (tracker.is_top_level_api_call() )
@@ -80,8 +80,8 @@ HGLRC WINAPI WGL::create_context_attribs_arb(HDC        in_hdc,
 
             post_callback_func_ptr(APIInterceptor::APIFUNCTION_WGL_WGLCREATECONTEXTATTRIBSARB,
                                    post_callback_func_arg,
-                                   0,       /* in_n_args_out   */
-                               nullptr, /* in_args_out_ptr */
+                                   0,       /* in_n_arguments_out   */
+                               nullptr, /* in_arguments_out_ptr */
                                   &result_arg);
         }
     }

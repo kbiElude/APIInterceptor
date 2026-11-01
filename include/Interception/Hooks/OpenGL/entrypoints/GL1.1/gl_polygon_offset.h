@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiPolygonOffset(GLfloat factor,
-                                     GLfloat units);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiPolygonOffset(GLfloat factor,
+                                             GLfloat units);
+        }
+    }
 }
 
 #endif /* AI_GL_POLYGON_OFFSET_H */

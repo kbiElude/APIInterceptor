@@ -7,12 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiClearBufferfi(GLenum  buffer,
-                                     GLint   drawbuffer,
-                                     GLfloat depth,
-                                     GLint   stencil);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiClearBufferfi(GLenum  buffer,
+                                             GLint   drawbuffer,
+                                             GLfloat depth,
+                                             GLint   stencil);
+        }
+    }
 }
 
 #endif /* AI_GL_CLEAR_BUFFER_FI_H */

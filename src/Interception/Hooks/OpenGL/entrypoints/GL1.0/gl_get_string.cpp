@@ -11,7 +11,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-const GLubyte* APIENTRY OpenGL::aiGetString(GLenum name)
+const GLubyte* APIENTRY Interception::Hooks::OpenGL::aiGetString(GLenum name)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -24,7 +24,7 @@ const GLubyte* APIENTRY OpenGL::aiGetString(GLenum name)
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glGetString(name=[%s])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(name) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(name) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETSTRING,
                                                          &pre_callback_func_ptr,
@@ -47,7 +47,7 @@ const GLubyte* APIENTRY OpenGL::aiGetString(GLenum name)
 
     if (should_pass_through)
     {
-        result_ptr = reinterpret_cast<PFNGLGETSTRINGPROC>(OpenGL::g_cached_gl_get_string)(name);
+        result_ptr = reinterpret_cast<PFNGLGETSTRINGPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_string)(name);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETSTRING,

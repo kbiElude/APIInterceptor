@@ -7,9 +7,15 @@
 
 #include <Windows.h>
 
-namespace GDI32
+namespace Interception
 {
-    int WINAPI get_pixel_format(HDC in_hdc);
+    namespace Hooks
+    {
+        namespace GDI32
+        {
+            int WINAPI get_pixel_format(HDC in_hdc);
+        }
+    }
 }
 
 #endif /* AI_GET_PIXEL_FORMAT_H */

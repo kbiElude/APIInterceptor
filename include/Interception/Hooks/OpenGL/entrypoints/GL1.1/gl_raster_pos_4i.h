@@ -7,12 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiRasterPos4i(GLint x,
-                                   GLint y,
-                                   GLint z,
-                                   GLint w);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiRasterPos4i(GLint x,
+                                           GLint y,
+                                           GLint z,
+                                           GLint w);
+        }
+    }
 }
 
 #endif /* AI_GL_RASTER_POS_4I_H */

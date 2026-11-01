@@ -7,9 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    GLuint AI_APIENTRY aiGetProgramResourceIndex(GLuint program, GLenum programInterface, const GLchar* name);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            GLuint AI_APIENTRY aiGetProgramResourceIndex(GLuint        program,
+                                                         GLenum        programInterface,
+                                                         const GLchar* name);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_PROGRAM_RESOURCE_INDEX_H */

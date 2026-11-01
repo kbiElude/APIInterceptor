@@ -7,9 +7,22 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiCopyTextureSubImage2D(GLuint texture, GLint level, GLint xoffset, GLint yoffset, GLint x, GLint y, GLsizei width, GLsizei height);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiCopyTextureSubImage2D(GLuint  texture,
+                                                     GLint   level,
+                                                     GLint   xoffset,
+                                                     GLint   yoffset,
+                                                     GLint   x,
+                                                     GLint   y,
+                                                     GLsizei width,
+                                                     GLsizei height);
+        }
+    }
 }
 
 #endif /* AI_GL_COPY_TEXTURE_SUB_IMAGE2D_H */

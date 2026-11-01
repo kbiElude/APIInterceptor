@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiVertex2d(GLdouble x,
-                                GLdouble y);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiVertex2d(GLdouble x,
+                                        GLdouble y);
+        }
+    }
 }
 
 #endif /* AI_GL_VERTEX_2D_H */

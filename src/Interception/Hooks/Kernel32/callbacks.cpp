@@ -5,7 +5,7 @@
 #include "Interception/Hooks/Kernel32/callbacks.h"
 #include "Interception/Hooks/Kernel32/globals.h"
 
-void Kernel32::notify_library_loaded(HMODULE in_module)
+void Interception::Hooks::Kernel32::notify_library_loaded(HMODULE in_module)
 {
     std::vector<LibraryLoadedCallback> callback_vec;
 
@@ -26,7 +26,7 @@ void Kernel32::notify_library_loaded(HMODULE in_module)
     }
 }
 
-void Kernel32::notify_process_exiting()
+void Interception::Hooks::Kernel32::notify_process_exiting()
 {
     std::vector<ProcessExitingCallback> callback_vec;
 
@@ -47,8 +47,8 @@ void Kernel32::notify_process_exiting()
     }
 }
 
-void Kernel32::register_for_library_loaded_callback(PFNLIBRARYLOADEDCALLBACKPROC in_function_ptr,
-                                                    void*                        in_user_argument_ptr)
+void Interception::Hooks::Kernel32::register_for_library_loaded_callback(PFNLIBRARYLOADEDCALLBACKPROC in_function_ptr,
+                                                                         void*                        in_user_argument_ptr)
 {
     {
         std::lock_guard<std::mutex> lock(g_library_loaded_callback_mutex);
@@ -57,8 +57,8 @@ void Kernel32::register_for_library_loaded_callback(PFNLIBRARYLOADEDCALLBACKPROC
     }
 }
 
-void Kernel32::register_for_process_exiting_callback(PFNPROCESSEXITINGCALLBACKPROC in_function_ptr,
-                                                     void*                         in_user_argument_ptr)
+void Interception::Hooks::Kernel32::register_for_process_exiting_callback(PFNPROCESSEXITINGCALLBACKPROC in_function_ptr,
+                                                                          void*                         in_user_argument_ptr)
 {
     {
         std::lock_guard<std::mutex> lock(g_process_exiting_callback_mutex);

@@ -10,10 +10,10 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiProgramUniform2d(GLuint   program,
-                                            GLint    location,
-                                            GLdouble v0,
-                                            GLdouble v1)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiProgramUniform2d(GLuint   program,
+                                                                 GLint    location,
+                                                                 GLdouble v0,
+                                                                 GLdouble v1)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -54,10 +54,10 @@ void AI_APIENTRY OpenGL::aiProgramUniform2d(GLuint   program,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLPROGRAMUNIFORM2DPROC>(OpenGL::g_cached_gl_program_uniform2d)(program,
-                                                                                            location,
-                                                                                            v0,
-                                                                                            v1);
+        reinterpret_cast<PFNGLPROGRAMUNIFORM2DPROC>(Interception::Hooks::OpenGL::g_cached_gl_program_uniform2d)(program,
+                                                                                                                 location,
+                                                                                                                 v0,
+                                                                                                                 v1);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLPROGRAMUNIFORM2D,

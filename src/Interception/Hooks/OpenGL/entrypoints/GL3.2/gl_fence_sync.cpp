@@ -11,8 +11,8 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-GLsync AI_APIENTRY OpenGL::aiFenceSync(GLenum     condition,
-                                       GLbitfield flags)
+GLsync AI_APIENTRY Interception::Hooks::OpenGL::aiFenceSync(GLenum     condition,
+                                                            GLbitfield flags)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -25,8 +25,8 @@ GLsync AI_APIENTRY OpenGL::aiFenceSync(GLenum     condition,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glFenceSync(condition=[%s] flags=[%s])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(condition),
-                 OpenGL::Utils::get_raw_string_for_gl_bitfield(OpenGL::BitfieldType::SYNC_CONDITION_MASK, flags) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(condition),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_bitfield(Interception::Hooks::OpenGL::BitfieldType::SYNC_CONDITION_MASK, flags) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLFENCESYNC,
                                                          &pre_callback_func_ptr,
@@ -48,8 +48,8 @@ GLsync AI_APIENTRY OpenGL::aiFenceSync(GLenum     condition,
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNGLFENCESYNCPROC>(OpenGL::g_cached_gl_fence_sync)(condition,
-                                                                                       flags);
+        result = reinterpret_cast<PFNGLFENCESYNCPROC>(Interception::Hooks::OpenGL::g_cached_gl_fence_sync)(condition,
+                                                                                                            flags);
     }
 
     if (tracker.is_top_level_api_call() )
@@ -62,8 +62,8 @@ GLsync AI_APIENTRY OpenGL::aiFenceSync(GLenum     condition,
 
             post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLFENCESYNC,
                                    post_callback_func_arg,
-                                   0,       /* in_n_args_out   */
-                                   nullptr, /* in_args_out_ptr */
+                                   0,       /* in_n_arguments_out   */
+                                   nullptr, /* in_arguments_out_ptr */
                                   &result_arg);
         }
     }

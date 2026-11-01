@@ -7,20 +7,26 @@
 
 #include "Interception/Hooks/Kernel32/types.h"
 
-namespace Kernel32
+namespace Interception
 {
-    /* Calls the registered callbacks. Does nothing for a null module. */
-    void notify_library_loaded(HMODULE in_module);
+    namespace Hooks
+    {
+        namespace Kernel32
+        {
+            /* Calls the registered callbacks. Does nothing for a null module. */
+            void notify_library_loaded(HMODULE in_module);
 
-    /* Calls the registered callbacks, the first time it is called only. */
-    void notify_process_exiting();
+            /* Calls the registered callbacks, the first time it is called only. */
+            void notify_process_exiting();
 
-    void register_for_library_loaded_callback(PFNLIBRARYLOADEDCALLBACKPROC in_function_ptr,
-                                              void*                        in_user_argument_ptr);
+            void register_for_library_loaded_callback(PFNLIBRARYLOADEDCALLBACKPROC in_function_ptr,
+                                                      void*                        in_user_argument_ptr);
 
-    /* The callbacks run before ExitProcess() takes the process down, while other threads are still alive. */
-    void register_for_process_exiting_callback(PFNPROCESSEXITINGCALLBACKPROC in_function_ptr,
-                                               void*                         in_user_argument_ptr);
+            /* The callbacks run before ExitProcess() takes the process down, while other threads are still alive. */
+            void register_for_process_exiting_callback(PFNPROCESSEXITINGCALLBACKPROC in_function_ptr,
+                                                       void*                         in_user_argument_ptr);
+        }
+    }
 }
 
 #endif /* KERNEL32_CALLBACKS_H */

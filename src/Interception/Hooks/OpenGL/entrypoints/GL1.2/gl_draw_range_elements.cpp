@@ -12,20 +12,20 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDrawRangeElements(GLenum      mode,
-                                             GLuint      start,
-                                             GLuint      end,
-                                             GLsizei     count,
-                                             GLenum      type,
-                                             const void* indices)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDrawRangeElements(GLenum      mode,
+                                                                  GLuint      start,
+                                                                  GLuint      end,
+                                                                  GLsizei     count,
+                                                                  GLenum      type,
+                                                                  const void* indices)
 {
-    OpenGL::ClientArrayChunk                client_arrays_chunk;
-    void*                                   post_callback_func_arg = nullptr;
-    APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
-    void*                                   pre_callback_func_arg  = nullptr;
-    APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
-    bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    Interception::Hooks::OpenGL::ClientArrayChunk client_arrays_chunk;
+    void*                                         post_callback_func_arg = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC       post_callback_func_ptr = nullptr;
+    void*                                         pre_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC        pre_callback_func_ptr  = nullptr;
+    bool                                          should_pass_through    = true;
+    APIInterceptor::Tracker                       tracker;
 
     client_arrays_chunk.add_elements(count,
                                      type,
@@ -35,11 +35,11 @@ void AI_APIENTRY OpenGL::aiDrawRangeElements(GLenum      mode,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glDrawRangeElements(mode=[%s] start=[%d] end=[%d] count=[%d] type=[%s] indices=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(mode),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(mode),
                  static_cast<int32_t>(start),
                  static_cast<int32_t>(end),
                  static_cast<int32_t>(count),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(type),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type),
                  indices);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDRAWRANGEELEMENTS,
@@ -69,12 +69,12 @@ void AI_APIENTRY OpenGL::aiDrawRangeElements(GLenum      mode,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDRAWRANGEELEMENTSPROC>(OpenGL::g_cached_gl_draw_range_elements)(mode,
-                                                                                              start,
-                                                                                              end,
-                                                                                              count,
-                                                                                              type,
-                                                                                              indices);
+        reinterpret_cast<PFNGLDRAWRANGEELEMENTSPROC>(Interception::Hooks::OpenGL::g_cached_gl_draw_range_elements)(mode,
+                                                                                                                   start,
+                                                                                                                   end,
+                                                                                                                   count,
+                                                                                                                   type,
+                                                                                                                   indices);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDRAWRANGEELEMENTS,

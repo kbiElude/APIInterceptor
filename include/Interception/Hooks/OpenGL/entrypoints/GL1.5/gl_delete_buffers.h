@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiDeleteBuffers(GLsizei       n,
-                                     const GLuint* buffers);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiDeleteBuffers(GLsizei       n,
+                                             const GLuint* buffers);
+        }
+    }
 }
 
 #endif /* AI_GL_DELETE_BUFFERS_H */

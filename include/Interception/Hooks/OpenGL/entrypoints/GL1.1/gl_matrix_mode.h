@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiMatrixMode(GLenum mode);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiMatrixMode(GLenum mode);
+        }
+    }
 }
 
 #endif /* AI_GL_MATRIX_MODE_H */

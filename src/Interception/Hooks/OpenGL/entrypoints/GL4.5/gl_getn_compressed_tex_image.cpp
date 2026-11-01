@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetnCompressedTexImage(GLenum  target,
-                                                  GLint   lod,
-                                                  GLsizei bufSize,
-                                                  void*   pixels)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetnCompressedTexImage(GLenum  target,
+                                                                       GLint   lod,
+                                                                       GLsizei bufSize,
+                                                                       void*   pixels)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -26,7 +26,7 @@ void AI_APIENTRY OpenGL::aiGetnCompressedTexImage(GLenum  target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glGetnCompressedTexImage(target=[%s] lod=[%d] bufSize=[%d] pixels=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  lod,
                  static_cast<int32_t>(bufSize),
                  pixels);
@@ -55,10 +55,10 @@ void AI_APIENTRY OpenGL::aiGetnCompressedTexImage(GLenum  target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETNCOMPRESSEDTEXIMAGEPROC>(OpenGL::g_cached_gl_getn_compressed_tex_image)(target,
-                                                                                                         lod,
-                                                                                                         bufSize,
-                                                                                                         pixels);
+        reinterpret_cast<PFNGLGETNCOMPRESSEDTEXIMAGEPROC>(Interception::Hooks::OpenGL::g_cached_gl_getn_compressed_tex_image)(target,
+                                                                                                                              lod,
+                                                                                                                              bufSize,
+                                                                                                                              pixels);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETNCOMPRESSEDTEXIMAGE,

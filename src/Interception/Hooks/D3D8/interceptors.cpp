@@ -10,7 +10,7 @@
 #include "Detours/src/detours.h"
 #include "Interception/Hooks/Kernel32/callbacks.h"
 
-void D3D8::attach_to_module(HMODULE in_d3d8_module)
+void Interception::Hooks::D3D8::attach_to_module(HMODULE in_d3d8_module)
 {
     {
         std::lock_guard<std::mutex> lock(g_hook_mutex);
@@ -44,18 +44,18 @@ void D3D8::attach_to_module(HMODULE in_d3d8_module)
     }
 }
 
-void D3D8::on_attach()
+void Interception::Hooks::D3D8::on_attach()
 {
     /* Registered first, so that a load happening right now cannot be missed. */
-    Kernel32::register_for_library_loaded_callback(on_library_loaded,
-                                                   nullptr);
+    Interception::Hooks::Kernel32::register_for_library_loaded_callback(on_library_loaded,
+                                                                        nullptr);
 
     /* Covers d3d8.dll having been loaded already. */
     on_library_loaded(::GetModuleHandleW(L"d3d8.dll"),
                       nullptr);
 }
 
-void D3D8::on_detach()
+void Interception::Hooks::D3D8::on_detach()
 {
     /* Patched vtables are left as is (see D3D8/vtable_registry.h). */
     {
@@ -74,8 +74,8 @@ void D3D8::on_detach()
     }
 }
 
-void D3D8::on_library_loaded(HMODULE in_module,
-                             void*   in_user_argument_ptr)
+void Interception::Hooks::D3D8::on_library_loaded(HMODULE in_module,
+                                                  void*   in_user_argument_ptr)
 {
     bool is_hooked = false;
 

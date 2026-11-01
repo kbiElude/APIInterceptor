@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiPushAttrib(GLbitfield mask);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiPushAttrib(GLbitfield mask);
+        }
+    }
 }
 
 #endif /* AI_GL_PUSH_ATTRIB_H */

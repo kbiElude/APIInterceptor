@@ -10,8 +10,8 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGenProgramPipelines(GLsizei n,
-                                               GLuint* pipelines)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGenProgramPipelines(GLsizei n,
+                                                                    GLuint* pipelines)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -48,8 +48,8 @@ void AI_APIENTRY OpenGL::aiGenProgramPipelines(GLsizei n,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGENPROGRAMPIPELINESPROC>(OpenGL::g_cached_gl_gen_program_pipelines)(n,
-                                                                                                   pipelines);
+        reinterpret_cast<PFNGLGENPROGRAMPIPELINESPROC>(Interception::Hooks::OpenGL::g_cached_gl_gen_program_pipelines)(n,
+                                                                                                                        pipelines);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGENPROGRAMPIPELINES,

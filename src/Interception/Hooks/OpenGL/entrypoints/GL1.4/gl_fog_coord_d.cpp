@@ -11,7 +11,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiFogCoordd(GLdouble coord)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiFogCoordd(GLdouble coord)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -46,7 +46,7 @@ void AI_APIENTRY OpenGL::aiFogCoordd(GLdouble coord)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLFOGCOORDDPROC>(OpenGL::g_cached_gl_fog_coord_d)(coord);
+        reinterpret_cast<PFNGLFOGCOORDDPROC>(Interception::Hooks::OpenGL::g_cached_gl_fog_coord_d)(coord);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLFOGCOORDD,

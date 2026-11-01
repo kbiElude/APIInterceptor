@@ -7,9 +7,20 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiVertexArrayVertexBuffers(GLuint vaobj, GLuint first, GLsizei count, const GLuint* buffers, const GLintptr* offsets, const GLsizei* strides);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiVertexArrayVertexBuffers(GLuint          vaobj,
+                                                        GLuint          first,
+                                                        GLsizei         count,
+                                                        const GLuint*   buffers,
+                                                        const GLintptr* offsets,
+                                                        const GLsizei*  strides);
+        }
+    }
 }
 
 #endif /* AI_GL_VERTEX_ARRAY_VERTEX_BUFFERS_H */

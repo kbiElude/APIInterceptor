@@ -254,7 +254,7 @@ void APIDumpPrinter::print_argument(FILE*                                      i
         {
             fprintf(in_file_handle,
                     "%s",
-                    OpenGL::Utils::get_raw_string_for_gl_enum(static_cast<GLenum>(in_argument.get_i32_glenum() )) );
+                    Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(static_cast<GLenum>(in_argument.get_i32_glenum() )) );
 
             break;
         }
@@ -263,7 +263,7 @@ void APIDumpPrinter::print_argument(FILE*                                      i
         {
             fprintf(in_file_handle,
                     "%s",
-                    OpenGL::Utils::get_raw_string_for_gl_enum(in_argument.get_u32_glenum() ) );
+                    Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(in_argument.get_u32_glenum() ) );
 
             break;
         }

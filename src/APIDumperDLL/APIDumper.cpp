@@ -176,8 +176,8 @@ bool APIDumper::init()
     }
 
     /* The writer thread would not survive the process being taken down, so the app's exit gives it time to finish. */
-    Kernel32::register_for_process_exiting_callback(on_process_exiting,
-                                                    this);
+    Interception::Hooks::Kernel32::register_for_process_exiting_callback(on_process_exiting,
+                                                                         this);
 
     result = true;
 end:

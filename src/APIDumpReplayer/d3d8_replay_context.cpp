@@ -233,7 +233,7 @@ void APIDumpReplayer::D3D8ReplayContext::release_all_objects()
     {
         void* const    object_ptr       = *iterator;
         void** const   vtable_ptr       = *reinterpret_cast<void***>(object_ptr);
-        const auto     release_func_ptr = reinterpret_cast<PFNRELEASEPROC>(vtable_ptr[D3D8::VTABLE_INDEX_IDIRECT3DDEVICE8_RELEASE]);
+        const auto     release_func_ptr = reinterpret_cast<PFNRELEASEPROC>(vtable_ptr[Interception::Hooks::D3D8::VTABLE_INDEX_IDIRECT3DDEVICE8_RELEASE]);
 
         for (size_t n_release = 0;
                     n_release < MAX_N_RELEASES_PER_OBJECT && release_func_ptr(object_ptr) > 0;

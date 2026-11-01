@@ -7,9 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetProgramStageiv(GLuint program, GLenum shadertype, GLenum pname, GLint* values);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetProgramStageiv(GLuint program,
+                                                 GLenum shadertype,
+                                                 GLenum pname,
+                                                 GLint* values);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_PROGRAM_STAGEIV_H */

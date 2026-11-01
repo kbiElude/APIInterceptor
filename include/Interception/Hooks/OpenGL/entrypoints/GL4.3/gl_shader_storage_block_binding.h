@@ -7,9 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiShaderStorageBlockBinding(GLuint program, GLuint storageBlockIndex, GLuint storageBlockBinding);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiShaderStorageBlockBinding(GLuint program,
+                                                         GLuint storageBlockIndex,
+                                                         GLuint storageBlockBinding);
+        }
+    }
 }
 
 #endif /* AI_GL_SHADER_STORAGE_BLOCK_BINDING_H */

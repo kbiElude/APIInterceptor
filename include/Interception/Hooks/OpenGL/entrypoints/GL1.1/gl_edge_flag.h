@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiEdgeFlag(GLboolean flag);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiEdgeFlag(GLboolean flag);
+        }
+    }
 }
 
 #endif /* AI_GL_EDGE_FLAG_H */

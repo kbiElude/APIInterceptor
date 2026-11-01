@@ -7,12 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiBlendFuncSeparate(GLenum sfactorRGB,
-                                         GLenum dfactorRGB,
-                                         GLenum sfactorAlpha,
-                                         GLenum dfactorAlpha);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiBlendFuncSeparate(GLenum sfactorRGB,
+                                                 GLenum dfactorRGB,
+                                                 GLenum sfactorAlpha,
+                                                 GLenum dfactorAlpha);
+        }
+    }
 }
 
 #endif /* AI_GL_BLEND_FUNC_SEPARATE_H */

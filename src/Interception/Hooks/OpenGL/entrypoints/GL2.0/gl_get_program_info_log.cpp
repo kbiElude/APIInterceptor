@@ -10,10 +10,10 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetProgramInfoLog(GLuint   program,
-                                             GLsizei  bufSize,
-                                             GLsizei* length,
-                                             GLchar*  infoLog)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetProgramInfoLog(GLuint   program,
+                                                                  GLsizei  bufSize,
+                                                                  GLsizei* length,
+                                                                  GLchar*  infoLog)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -54,10 +54,10 @@ void AI_APIENTRY OpenGL::aiGetProgramInfoLog(GLuint   program,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETPROGRAMINFOLOGPROC>(OpenGL::g_cached_gl_get_program_info_log)(program,
-                                                                                               bufSize,
-                                                                                               length,
-                                                                                               infoLog);
+        reinterpret_cast<PFNGLGETPROGRAMINFOLOGPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_program_info_log)(program,
+                                                                                                                    bufSize,
+                                                                                                                    length,
+                                                                                                                    infoLog);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETPROGRAMINFOLOG,

@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    GLboolean AI_APIENTRY aiIsVertexArray(GLuint array);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            GLboolean AI_APIENTRY aiIsVertexArray(GLuint array);
+        }
+    }
 }
 
 #endif /* AI_GL_IS_VERTEX_ARRAY_H */

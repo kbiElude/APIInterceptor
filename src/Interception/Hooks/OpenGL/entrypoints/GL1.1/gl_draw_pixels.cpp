@@ -12,28 +12,28 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDrawPixels(GLsizei       width,
-                                      GLsizei       height,
-                                      GLenum        format,
-                                      GLenum        type,
-                                      const GLvoid* pixels)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDrawPixels(GLsizei       width,
+                                                           GLsizei       height,
+                                                           GLenum        format,
+                                                           GLenum        type,
+                                                           const GLvoid* pixels)
 {
-    OpenGL::PixelDataChunk                  pixels_chunk;
-    void*                                   post_callback_func_arg = nullptr;
-    APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
-    void*                                   pre_callback_func_arg  = nullptr;
-    APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
-    bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    Interception::Hooks::OpenGL::PixelDataChunk pixels_chunk;
+    void*                                       post_callback_func_arg = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC     post_callback_func_ptr = nullptr;
+    void*                                       pre_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC      pre_callback_func_ptr  = nullptr;
+    bool                                        should_pass_through    = true;
+    APIInterceptor::Tracker                     tracker;
 
     if (tracker.is_top_level_api_call() )
     {
-        pixels_chunk = OpenGL::PixelDataChunk::create_for_unpack(pixels,
-                                                                 width,
-                                                                 height,
-                                                                 1,
-                                                                 format,
-                                                                 type);
+        pixels_chunk = Interception::Hooks::OpenGL::PixelDataChunk::create_for_unpack(pixels,
+                                                                                      width,
+                                                                                      height,
+                                                                                      1,
+                                                                                      format,
+                                                                                      type);
     }
 
     if (tracker.is_top_level_api_call() )
@@ -41,8 +41,8 @@ void AI_APIENTRY OpenGL::aiDrawPixels(GLsizei       width,
         AI_TRACE("glDrawPixels(width=[%d] height=[%d] format=[%s] type=[%s] pixels=[%p])",
                  width,
                  height,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(format),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(type),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(format),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type),
                  pixels);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDRAWPIXELS,
@@ -70,11 +70,11 @@ void AI_APIENTRY OpenGL::aiDrawPixels(GLsizei       width,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDRAWPIXELSPROC>(OpenGL::g_cached_gl_draw_pixels)(width,
-                                                                               height,
-                                                                               format,
-                                                                               type,
-                                                                               pixels);
+        reinterpret_cast<PFNGLDRAWPIXELSPROC>(Interception::Hooks::OpenGL::g_cached_gl_draw_pixels)(width,
+                                                                                                    height,
+                                                                                                    format,
+                                                                                                    type,
+                                                                                                    pixels);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDRAWPIXELS,

@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiVertexAttrib1s(GLuint  index,
-                                      GLshort x);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiVertexAttrib1s(GLuint  index,
+                                              GLshort x);
+        }
+    }
 }
 
 #endif /* AI_GL_VERTEX_ATTRIB_1S_H */

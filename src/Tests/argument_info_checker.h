@@ -15,8 +15,8 @@ namespace Tests
     {
     public:
         /* Fails the running test if the argument has no description. */
-        static D3D8::ArgumentInfo get_argument_info_or_fail(const APIInterceptor::APIFunction& in_function,
-                                                            const uint32_t&                    in_n_argument);
+        static Interception::Hooks::D3D8::ArgumentInfo get_argument_info_or_fail(const APIInterceptor::APIFunction& in_function,
+                                                                                 const uint32_t&                    in_n_argument);
     };
 }
 

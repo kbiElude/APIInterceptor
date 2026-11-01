@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiColor3ui(GLuint red,
-                                    GLuint green,
-                                    GLuint blue)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiColor3ui(GLuint red,
+                                                         GLuint green,
+                                                         GLuint blue)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -50,9 +50,9 @@ void AI_APIENTRY OpenGL::aiColor3ui(GLuint red,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLCOLOR3UIPROC>(OpenGL::g_cached_gl_color_3ui)(red,
-                                                                           green,
-                                                                           blue);
+        reinterpret_cast<PFNGLCOLOR3UIPROC>(Interception::Hooks::OpenGL::g_cached_gl_color_3ui)(red,
+                                                                                                green,
+                                                                                                blue);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCOLOR3UI,

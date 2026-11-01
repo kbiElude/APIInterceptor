@@ -7,11 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetMultisamplefv(GLenum   pname,
-                                        GLuint   index,
-                                        GLfloat* val);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetMultisamplefv(GLenum   pname,
+                                                GLuint   index,
+                                                GLfloat* val);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_MULTISAMPLEFV_H */

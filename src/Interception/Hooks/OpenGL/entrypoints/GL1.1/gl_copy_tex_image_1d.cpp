@@ -13,13 +13,13 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiCopyTexImage1D(GLenum  target,
-                                          GLint   level,
-                                          GLenum  internalformat,
-                                          GLint   x,
-                                          GLint   y,
-                                          GLsizei width,
-                                          GLint   border)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiCopyTexImage1D(GLenum  target,
+                                                               GLint   level,
+                                                               GLenum  internalformat,
+                                                               GLint   x,
+                                                               GLint   y,
+                                                               GLsizei width,
+                                                               GLint   border)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -31,9 +31,9 @@ void AI_APIENTRY OpenGL::aiCopyTexImage1D(GLenum  target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glCopyTexImage1D(target=[%s] level=[%d] internalformat=[%s] x=[%d] y=[%d] width=[%d] border=[%d])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  level,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(internalformat),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(internalformat),
                  x,
                  y,
                  static_cast<int32_t>(width),
@@ -66,27 +66,33 @@ void AI_APIENTRY OpenGL::aiCopyTexImage1D(GLenum  target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLCOPYTEXIMAGE1DPROC>(OpenGL::g_cached_gl_copy_tex_image_1D)(target,
-                                                                                         level,
-                                                                                         internalformat,
-                                                                                         x,
-                                                                                         y,
-                                                                                         width,
-                                                                                         border);
+        reinterpret_cast<PFNGLCOPYTEXIMAGE1DPROC>(Interception::Hooks::OpenGL::g_cached_gl_copy_tex_image_1D)(target,
+                                                                                                              level,
+                                                                                                              internalformat,
+                                                                                                              x,
+                                                                                                              y,
+                                                                                                              width,
+                                                                                                              border);
 
         TextureBindingTarget binding_target;
 
-        if (tracker.is_top_level_api_call                ()               &&
-            Utils::get_texture_binding_target_for_gl_enum(target,
-                                                         &binding_target) )
-        {
-            auto& context = get_context_state();
+        const bool is_top_level = tracker.is_top_level_api_call();
 
-            context.texture_manager.set_level_props(context.texture_manager.get_bound_texture(binding_target),
-                                            level,
-                                            static_cast<uint32_t>(width),
-                                            1,
-                                            1);
+        if (is_top_level)
+        {
+            const bool is_binding_target_known = Utils::get_texture_binding_target_for_gl_enum(target,
+                                                                                               &binding_target);
+
+            if (is_binding_target_known)
+            {
+                auto& context = get_context_state();
+
+                context.texture_manager.set_level_props(context.texture_manager.get_bound_texture(binding_target),
+                                                level,
+                                                static_cast<uint32_t>(width),
+                                                1,
+                                                1);
+            }
         }
     }
 

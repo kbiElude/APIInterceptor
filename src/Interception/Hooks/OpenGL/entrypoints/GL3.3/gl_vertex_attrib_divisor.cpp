@@ -11,8 +11,8 @@
 #include "Interception/Hooks/OpenGL/state_tracker.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiVertexAttribDivisor(GLuint index,
-                                               GLuint divisor)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiVertexAttribDivisor(GLuint index,
+                                                                    GLuint divisor)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -49,13 +49,13 @@ void AI_APIENTRY OpenGL::aiVertexAttribDivisor(GLuint index,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLVERTEXATTRIBDIVISORPROC>(OpenGL::g_cached_gl_vertex_attrib_divisor)(index,
-                                                                                                   divisor);
+        reinterpret_cast<PFNGLVERTEXATTRIBDIVISORPROC>(Interception::Hooks::OpenGL::g_cached_gl_vertex_attrib_divisor)(index,
+                                                                                                                        divisor);
     }
 
     if (tracker.is_top_level_api_call() )
     {
-        auto& context = OpenGL::get_context_state();
+        auto& context = Interception::Hooks::OpenGL::get_context_state();
 
         context.client_array_manager.set_divisor(index,
                                                divisor);

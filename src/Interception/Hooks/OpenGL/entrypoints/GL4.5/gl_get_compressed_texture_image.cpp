@@ -10,10 +10,10 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetCompressedTextureImage(GLuint  texture,
-                                                     GLint   level,
-                                                     GLsizei bufSize,
-                                                     void*   pixels)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetCompressedTextureImage(GLuint  texture,
+                                                                          GLint   level,
+                                                                          GLsizei bufSize,
+                                                                          void*   pixels)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -54,10 +54,10 @@ void AI_APIENTRY OpenGL::aiGetCompressedTextureImage(GLuint  texture,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETCOMPRESSEDTEXTUREIMAGEPROC>(OpenGL::g_cached_gl_get_compressed_texture_image)(texture,
-                                                                                                               level,
-                                                                                                               bufSize,
-                                                                                                               pixels);
+        reinterpret_cast<PFNGLGETCOMPRESSEDTEXTUREIMAGEPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_compressed_texture_image)(texture,
+                                                                                                                                    level,
+                                                                                                                                    bufSize,
+                                                                                                                                    pixels);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETCOMPRESSEDTEXTUREIMAGE,

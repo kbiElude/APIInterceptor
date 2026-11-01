@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiMaterialf(GLenum  face,
-                                     GLenum  pname,
-                                     GLfloat param)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiMaterialf(GLenum  face,
+                                                          GLenum  pname,
+                                                          GLfloat param)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -25,8 +25,8 @@ void AI_APIENTRY OpenGL::aiMaterialf(GLenum  face,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glMaterialf(face=[%s], pname=[%s], param=[%.4f])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(face),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(face),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  param);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMATERIALF,
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiMaterialf(GLenum  face,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLMATERIALFPROC>(OpenGL::g_cached_gl_material_f)(face,
-                                                                             pname,
-                                                                             param);
+        reinterpret_cast<PFNGLMATERIALFPROC>(Interception::Hooks::OpenGL::g_cached_gl_material_f)(face,
+                                                                                                  pname,
+                                                                                                  param);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMATERIALF,

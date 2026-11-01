@@ -7,18 +7,24 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiMap2f(GLenum         target,
-                             GLfloat        u1,
-                             GLfloat        u2,
-                             GLint          ustride,
-                             GLint          uorder,
-                             GLfloat        v1,
-                             GLfloat        v2,
-                             GLint          vstride,
-                             GLint          vorder,
-                             const GLfloat* points);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiMap2f(GLenum         target,
+                                     GLfloat        u1,
+                                     GLfloat        u2,
+                                     GLint          ustride,
+                                     GLint          uorder,
+                                     GLfloat        v1,
+                                     GLfloat        v2,
+                                     GLint          vstride,
+                                     GLint          vorder,
+                                     const GLfloat* points);
+        }
+    }
 }
 
 #endif /* AI_GL_MAP_2F_H */

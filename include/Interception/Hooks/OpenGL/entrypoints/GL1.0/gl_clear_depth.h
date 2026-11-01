@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiClearDepth(GLdouble depth);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiClearDepth(GLdouble depth);
+        }
+    }
 }
 
 #endif /* AI_GL_CLEAR_DEPTH_H */

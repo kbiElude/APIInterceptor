@@ -10,7 +10,7 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiEndConditionalRender(void)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiEndConditionalRender(void)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -39,7 +39,7 @@ void AI_APIENTRY OpenGL::aiEndConditionalRender(void)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLENDCONDITIONALRENDERPROC>(OpenGL::g_cached_gl_end_conditional_render)();
+        reinterpret_cast<PFNGLENDCONDITIONALRENDERPROC>(Interception::Hooks::OpenGL::g_cached_gl_end_conditional_render)();
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLENDCONDITIONALRENDER,

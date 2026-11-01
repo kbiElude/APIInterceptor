@@ -9,14 +9,14 @@
 /* gl/gl.h provides the compatibility-profile tokens which are absent from glcorearb.h. */
 #include "gl/gl.h"
 
-OpenGL::PixelStoreManager::PixelStoreManager()
+Interception::Hooks::OpenGL::PixelStoreManager::PixelStoreManager()
 {
     /* Stub */
 }
 
-uint64_t OpenGL::PixelStoreManager::get_n_bitmap_bytes(const Params&  in_params,
-                                                       const int64_t& in_width,
-                                                       const int64_t& in_height)
+uint64_t Interception::Hooks::OpenGL::PixelStoreManager::get_n_bitmap_bytes(const Params&  in_params,
+                                                                            const int64_t& in_width,
+                                                                            const int64_t& in_height)
 {
     constexpr uint64_t N_BITS_PER_BYTE = 8;
 
@@ -50,12 +50,12 @@ end:
     return result;
 }
 
-uint64_t OpenGL::PixelStoreManager::get_n_image_bytes(const Params&   in_params,
-                                                      const int64_t&  in_width,
-                                                      const int64_t&  in_height,
-                                                      const int64_t&  in_depth,
-                                                      const uint32_t& in_format,
-                                                      const uint32_t& in_type)
+uint64_t Interception::Hooks::OpenGL::PixelStoreManager::get_n_image_bytes(const Params&   in_params,
+                                                                           const int64_t&  in_width,
+                                                                           const int64_t&  in_height,
+                                                                           const int64_t&  in_depth,
+                                                                           const uint32_t& in_format,
+                                                                           const uint32_t& in_type)
 {
     uint64_t alignment = in_params.alignment;
     uint64_t element_n_bytes;
@@ -113,11 +113,11 @@ end:
     return result;
 }
 
-uint64_t OpenGL::PixelStoreManager::get_n_pack_bytes(const int64_t&  in_width,
-                                                     const int64_t&  in_height,
-                                                     const int64_t&  in_depth,
-                                                     const uint32_t& in_format,
-                                                     const uint32_t& in_type) const
+uint64_t Interception::Hooks::OpenGL::PixelStoreManager::get_n_pack_bytes(const int64_t&  in_width,
+                                                                          const int64_t&  in_height,
+                                                                          const int64_t&  in_depth,
+                                                                          const uint32_t& in_format,
+                                                                          const uint32_t& in_type) const
 {
     return get_n_image_bytes(m_pack_params,
                              in_width,
@@ -127,19 +127,19 @@ uint64_t OpenGL::PixelStoreManager::get_n_pack_bytes(const int64_t&  in_width,
                              in_type);
 }
 
-uint64_t OpenGL::PixelStoreManager::get_n_unpack_bitmap_bytes(const int64_t& in_width,
-                                                              const int64_t& in_height) const
+uint64_t Interception::Hooks::OpenGL::PixelStoreManager::get_n_unpack_bitmap_bytes(const int64_t& in_width,
+                                                                                   const int64_t& in_height) const
 {
     return get_n_bitmap_bytes(m_unpack_params,
                               in_width,
                               in_height);
 }
 
-uint64_t OpenGL::PixelStoreManager::get_n_unpack_bytes(const int64_t&  in_width,
-                                                       const int64_t&  in_height,
-                                                       const int64_t&  in_depth,
-                                                       const uint32_t& in_format,
-                                                       const uint32_t& in_type) const
+uint64_t Interception::Hooks::OpenGL::PixelStoreManager::get_n_unpack_bytes(const int64_t&  in_width,
+                                                                            const int64_t&  in_height,
+                                                                            const int64_t&  in_depth,
+                                                                            const uint32_t& in_format,
+                                                                            const uint32_t& in_type) const
 {
     return get_n_image_bytes(m_unpack_params,
                              in_width,
@@ -149,8 +149,8 @@ uint64_t OpenGL::PixelStoreManager::get_n_unpack_bytes(const int64_t&  in_width,
                              in_type);
 }
 
-void OpenGL::PixelStoreManager::on_pixel_store(const uint32_t& in_pname,
-                                               const int32_t&  in_value)
+void Interception::Hooks::OpenGL::PixelStoreManager::on_pixel_store(const uint32_t& in_pname,
+                                                                    const int32_t&  in_value)
 {
     /* Negative values are errors, and change nothing. */
     if (in_value >= 0)

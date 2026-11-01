@@ -7,9 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiProgramParameteri(GLuint program, GLenum pname, GLint value);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiProgramParameteri(GLuint program,
+                                                 GLenum pname,
+                                                 GLint  value);
+        }
+    }
 }
 
 #endif /* AI_GL_PROGRAM_PARAMETERI_H */

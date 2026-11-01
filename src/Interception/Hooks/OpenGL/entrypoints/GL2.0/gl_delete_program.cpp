@@ -10,7 +10,7 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDeleteProgram(GLuint program)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDeleteProgram(GLuint program)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -45,7 +45,7 @@ void AI_APIENTRY OpenGL::aiDeleteProgram(GLuint program)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDELETEPROGRAMPROC>(OpenGL::g_cached_gl_delete_program)(program);
+        reinterpret_cast<PFNGLDELETEPROGRAMPROC>(Interception::Hooks::OpenGL::g_cached_gl_delete_program)(program);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDELETEPROGRAM,

@@ -11,7 +11,7 @@
 #include "Interception/Hooks/OpenGL/state_tracker.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDisableVertexAttribArray(GLuint index)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDisableVertexAttribArray(GLuint index)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -46,14 +46,14 @@ void AI_APIENTRY OpenGL::aiDisableVertexAttribArray(GLuint index)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDISABLEVERTEXATTRIBARRAYPROC>(OpenGL::g_cached_gl_disable_vertex_attrib_array)(index);
+        reinterpret_cast<PFNGLDISABLEVERTEXATTRIBARRAYPROC>(Interception::Hooks::OpenGL::g_cached_gl_disable_vertex_attrib_array)(index);
     }
 
     if (tracker.is_top_level_api_call() )
     {
-        auto& context = OpenGL::get_context_state();
+        auto& context = Interception::Hooks::OpenGL::get_context_state();
 
-        context.client_array_manager.set_enabled(OpenGL::ClientArrayKind::GENERIC,
+        context.client_array_manager.set_enabled(Interception::Hooks::OpenGL::ClientArrayKind::GENERIC,
                                                index,
                                                false);  /* in_is_enabled */
     }

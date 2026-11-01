@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiDeleteSync(GLsync sync);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiDeleteSync(GLsync sync);
+        }
+    }
 }
 
 #endif /* AI_GL_DELETE_SYNC_H */

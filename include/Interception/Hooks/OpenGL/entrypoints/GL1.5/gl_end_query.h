@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiEndQuery(GLenum target);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiEndQuery(GLenum target);
+        }
+    }
 }
 
 #endif /* AI_GL_END_QUERY_H */

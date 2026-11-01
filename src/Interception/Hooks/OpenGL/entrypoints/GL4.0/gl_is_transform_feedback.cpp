@@ -10,7 +10,7 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-GLboolean AI_APIENTRY OpenGL::aiIsTransformFeedback(GLuint id)
+GLboolean AI_APIENTRY Interception::Hooks::OpenGL::aiIsTransformFeedback(GLuint id)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -44,7 +44,7 @@ GLboolean AI_APIENTRY OpenGL::aiIsTransformFeedback(GLuint id)
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNGLISTRANSFORMFEEDBACKPROC>(OpenGL::g_cached_gl_is_transform_feedback)(id);
+        result = reinterpret_cast<PFNGLISTRANSFORMFEEDBACKPROC>(Interception::Hooks::OpenGL::g_cached_gl_is_transform_feedback)(id);
     }
 
     if (tracker.is_top_level_api_call() )

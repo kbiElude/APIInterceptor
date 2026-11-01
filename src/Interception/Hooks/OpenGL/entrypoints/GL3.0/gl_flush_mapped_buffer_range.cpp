@@ -16,9 +16,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiFlushMappedBufferRange(GLenum     target,
-                                                  GLintptr   offset,
-                                                  GLsizeiptr length)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiFlushMappedBufferRange(GLenum     target,
+                                                                       GLintptr   offset,
+                                                                       GLsizeiptr length)
 {
     GLuint                                  buffer_id              = 0;
     APIInterceptor::MemoryChunk             flush_chunk(nullptr,
@@ -34,25 +34,25 @@ void AI_APIENTRY OpenGL::aiFlushMappedBufferRange(GLenum     target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glFlushMappedBufferRange(target=[%s] offset=[%lld] length=[%lld])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  static_cast<long long>(offset),
                  static_cast<long long>(length));
 
-        auto& context = OpenGL::get_context_state();
+        auto& context = Interception::Hooks::OpenGL::get_context_state();
 
         {
-            OpenGL::BufferBindingTarget binding_target;
-            const bool                  is_known_target = OpenGL::Utils::get_buffer_binding_target_for_gl_enum(target,
-                                                                                                               &binding_target);
+            Interception::Hooks::OpenGL::BufferBindingTarget binding_target;
+            const bool                                       is_known_target = Interception::Hooks::OpenGL::Utils::get_buffer_binding_target_for_gl_enum(target,
+                                                                                                                                    &binding_target);
 
             AI_ASSERT(is_known_target);
 
             buffer_id = context.buffer_manager.get_bound_buffer(binding_target);
         }
 
-        const OpenGL::BufferMappingManager::Region flush_region = context.buffer_mapping_manager.get_flush_region(buffer_id,
-                                                                                                                  offset,
-                                                                                                                  length);
+        const Interception::Hooks::OpenGL::BufferMappingManager::Region flush_region = context.buffer_mapping_manager.get_flush_region(buffer_id,
+                                                                                                                                       offset,
+                                                                                                                                       length);
 
         flush_chunk = APIInterceptor::MemoryChunk(flush_region.data_ptr,
                                                   static_cast<int64_t>(flush_region.n_bytes),
@@ -82,9 +82,9 @@ void AI_APIENTRY OpenGL::aiFlushMappedBufferRange(GLenum     target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLFLUSHMAPPEDBUFFERRANGEPROC>(OpenGL::g_cached_gl_flush_mapped_buffer_range)(target,
-                                                                                                         offset,
-                                                                                                         length);
+        reinterpret_cast<PFNGLFLUSHMAPPEDBUFFERRANGEPROC>(Interception::Hooks::OpenGL::g_cached_gl_flush_mapped_buffer_range)(target,
+                                                                                                                              offset,
+                                                                                                                              length);
     }
 
     if (tracker.is_top_level_api_call() )

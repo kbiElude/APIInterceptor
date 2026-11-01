@@ -11,12 +11,12 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiOrtho(GLdouble left,
-                                 GLdouble right,
-                                 GLdouble bottom,
-                                 GLdouble top,
-                                 GLdouble zNear,
-                                 GLdouble zFar)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiOrtho(GLdouble left,
+                                                      GLdouble right,
+                                                      GLdouble bottom,
+                                                      GLdouble top,
+                                                      GLdouble zNear,
+                                                      GLdouble zFar)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -61,12 +61,12 @@ void AI_APIENTRY OpenGL::aiOrtho(GLdouble left,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLORTHOPROC>(OpenGL::g_cached_gl_ortho)(left,
-                                                                    right,
-                                                                    bottom,
-                                                                    top,
-                                                                    zNear,
-                                                                    zFar);
+        reinterpret_cast<PFNGLORTHOPROC>(Interception::Hooks::OpenGL::g_cached_gl_ortho)(left,
+                                                                                         right,
+                                                                                         bottom,
+                                                                                         top,
+                                                                                         zNear,
+                                                                                         zFar);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLORTHO,

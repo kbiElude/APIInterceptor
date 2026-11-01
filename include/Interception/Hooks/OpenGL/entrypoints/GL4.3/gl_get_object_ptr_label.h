@@ -7,9 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetObjectPtrLabel(const void* ptr, GLsizei bufSize, GLsizei* length, GLchar* label);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetObjectPtrLabel(const void* ptr,
+                                                 GLsizei     bufSize,
+                                                 GLsizei*    length,
+                                                 GLchar*     label);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_OBJECT_PTR_LABEL_H */

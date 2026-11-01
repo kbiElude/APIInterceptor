@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiLineWidth(GLfloat width);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiLineWidth(GLfloat width);
+        }
+    }
 }
 
 #endif /* AI_GL_LINE_WIDTH_H */

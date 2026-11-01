@@ -7,9 +7,15 @@
 
 #include <windows.h>
 
-namespace User32
+namespace Interception
 {
-    HDC WINAPI get_dc(HWND in_hwnd);
+    namespace Hooks
+    {
+        namespace User32
+        {
+            HDC WINAPI get_dc(HWND in_hwnd);
+        }
+    }
 }
 
 #endif /* AI_GET_DC_H */

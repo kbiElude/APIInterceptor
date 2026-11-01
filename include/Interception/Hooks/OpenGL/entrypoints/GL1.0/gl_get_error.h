@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    GLenum AI_APIENTRY aiGetError();
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            GLenum AI_APIENTRY aiGetError();
+        }
+    }
 }
 
 #endif /* AI_GL_GET_ERROR_H */

@@ -10,11 +10,11 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiViewportIndexedf(GLuint  index,
-                                            GLfloat x,
-                                            GLfloat y,
-                                            GLfloat w,
-                                            GLfloat h)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiViewportIndexedf(GLuint  index,
+                                                                 GLfloat x,
+                                                                 GLfloat y,
+                                                                 GLfloat w,
+                                                                 GLfloat h)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -57,11 +57,11 @@ void AI_APIENTRY OpenGL::aiViewportIndexedf(GLuint  index,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLVIEWPORTINDEXEDFPROC>(OpenGL::g_cached_gl_viewport_indexedf)(index,
-                                                                                            x,
-                                                                                            y,
-                                                                                            w,
-                                                                                            h);
+        reinterpret_cast<PFNGLVIEWPORTINDEXEDFPROC>(Interception::Hooks::OpenGL::g_cached_gl_viewport_indexedf)(index,
+                                                                                                                 x,
+                                                                                                                 y,
+                                                                                                                 w,
+                                                                                                                 h);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLVIEWPORTINDEXEDF,

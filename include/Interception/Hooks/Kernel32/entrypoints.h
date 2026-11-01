@@ -10,18 +10,24 @@
 
 #include <Windows.h>
 
-namespace Kernel32
+namespace Interception
 {
-    DECLSPEC_NORETURN void WINAPI aiExitProcess(UINT uExitCode);
+    namespace Hooks
+    {
+        namespace Kernel32
+        {
+            DECLSPEC_NORETURN void WINAPI aiExitProcess(UINT uExitCode);
 
-    HMODULE WINAPI aiLoadLibraryA  (LPCSTR  lpLibFileName);
-    HMODULE WINAPI aiLoadLibraryExA(LPCSTR  lpLibFileName,
-                                    HANDLE  hFile,
-                                    DWORD   dwFlags);
-    HMODULE WINAPI aiLoadLibraryExW(LPCWSTR lpLibFileName,
-                                    HANDLE  hFile,
-                                    DWORD   dwFlags);
-    HMODULE WINAPI aiLoadLibraryW  (LPCWSTR lpLibFileName);
+            HMODULE WINAPI aiLoadLibraryA  (LPCSTR  lpLibFileName);
+            HMODULE WINAPI aiLoadLibraryExA(LPCSTR  lpLibFileName,
+                                            HANDLE  hFile,
+                                            DWORD   dwFlags);
+            HMODULE WINAPI aiLoadLibraryExW(LPCWSTR lpLibFileName,
+                                            HANDLE  hFile,
+                                            DWORD   dwFlags);
+            HMODULE WINAPI aiLoadLibraryW  (LPCWSTR lpLibFileName);
+        }
+    }
 }
 
 #endif /* KERNEL32_ENTRYPOINTS_H */

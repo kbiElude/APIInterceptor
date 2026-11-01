@@ -7,11 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiFogCoordPointer(GLenum        type,
-                                       GLsizei       stride,
-                                       const GLvoid* pointer);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiFogCoordPointer(GLenum        type,
+                                               GLsizei       stride,
+                                               const GLvoid* pointer);
+        }
+    }
 }
 
 #endif /* AI_GL_FOG_COORD_POINTER_H */

@@ -9,7 +9,7 @@
 #include "Interception/Hooks/WGL/globals.h"
 #include "Interception/Hooks/WGL/entrypoints/wgl_create_context.h"
 
-HGLRC WINAPI WGL::create_context(HDC in_hdc)
+HGLRC WINAPI Interception::Hooks::WGL::create_context(HDC in_hdc)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -43,7 +43,7 @@ HGLRC WINAPI WGL::create_context(HDC in_hdc)
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNWGLCREATECONTEXTPROC>(WGL::g_cached_create_context_func_ptr)(in_hdc);
+        result = reinterpret_cast<PFNWGLCREATECONTEXTPROC>(Interception::Hooks::WGL::g_cached_create_context_func_ptr)(in_hdc);
     }
 
     if (tracker.is_top_level_api_call() )
@@ -56,8 +56,8 @@ HGLRC WINAPI WGL::create_context(HDC in_hdc)
 
             post_callback_func_ptr(APIInterceptor::APIFUNCTION_WGL_WGLCREATECONTEXT,
                                    post_callback_func_arg,
-                                   0,       /* in_n_args_out   */
-                                   nullptr, /* in_args_out_ptr */
+                                   0,       /* in_n_arguments_out   */
+                                   nullptr, /* in_arguments_out_ptr */
                                   &result_arg);
         }
     }

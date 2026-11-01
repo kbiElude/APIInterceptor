@@ -7,9 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetTransformFeedbacki_v(GLuint xfb, GLenum pname, GLuint index, GLint* param);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetTransformFeedbacki_v(GLuint xfb,
+                                                       GLenum pname,
+                                                       GLuint index,
+                                                       GLint* param);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_TRANSFORM_FEEDBACKI_V_H */

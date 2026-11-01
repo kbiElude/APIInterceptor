@@ -12,11 +12,11 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-GLuint AI_APIENTRY OpenGL::aiGetProgramResourceIndex(GLuint        program,
-                                                     GLenum        programInterface,
-                                                     const GLchar* name)
+GLuint AI_APIENTRY Interception::Hooks::OpenGL::aiGetProgramResourceIndex(GLuint        program,
+                                                                          GLenum        programInterface,
+                                                                          const GLchar* name)
 {
-    OpenGL::StringChunk                     name_chunk(name);
+    Interception::Hooks::OpenGL::StringChunk                     name_chunk(name);
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;
@@ -29,7 +29,7 @@ GLuint AI_APIENTRY OpenGL::aiGetProgramResourceIndex(GLuint        program,
     {
         AI_TRACE("glGetProgramResourceIndex(program=[%u] programInterface=[%s] name=[%s])",
                  program,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(programInterface),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(programInterface),
                  name);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETPROGRAMRESOURCEINDEX,
@@ -53,9 +53,9 @@ GLuint AI_APIENTRY OpenGL::aiGetProgramResourceIndex(GLuint        program,
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNGLGETPROGRAMRESOURCEINDEXPROC>(OpenGL::g_cached_gl_get_program_resource_index)(program,
-                                                                                                                     programInterface,
-                                                                                                                     name);
+        result = reinterpret_cast<PFNGLGETPROGRAMRESOURCEINDEXPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_program_resource_index)(program,
+                                                                                                                                          programInterface,
+                                                                                                                                          name);
     }
 
     if (tracker.is_top_level_api_call() )

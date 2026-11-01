@@ -13,30 +13,30 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiTexSubImage3D(GLenum      target,
-                                         GLint       level,
-                                         GLint       xoffset,
-                                         GLint       yoffset,
-                                         GLint       zoffset,
-                                         GLsizei     width,
-                                         GLsizei     height,
-                                         GLsizei     depth,
-                                         GLenum      format,
-                                         GLenum      type,
-                                         const void* pixels)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiTexSubImage3D(GLenum      target,
+                                                              GLint       level,
+                                                              GLint       xoffset,
+                                                              GLint       yoffset,
+                                                              GLint       zoffset,
+                                                              GLsizei     width,
+                                                              GLsizei     height,
+                                                              GLsizei     depth,
+                                                              GLenum      format,
+                                                              GLenum      type,
+                                                              const void* pixels)
 {
-    OpenGL::PixelDataChunk                  pixels_chunk;
-    void*                                   post_callback_func_arg = nullptr;
-    APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
-    void*                                   pre_callback_func_arg  = nullptr;
-    APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
-    bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    Interception::Hooks::OpenGL::PixelDataChunk pixels_chunk;
+    void*                                       post_callback_func_arg = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC     post_callback_func_ptr = nullptr;
+    void*                                       pre_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC      pre_callback_func_ptr  = nullptr;
+    bool                                        should_pass_through    = true;
+    APIInterceptor::Tracker                     tracker;
 
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glTexSubImage3D(target=[%s] level=[%d] xoffset=[%d] yoffset=[%d] zoffset=[%d] width=[%d] height=[%d] depth=[%d] format=[%s] type=[%s] pixels=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  level,
                  xoffset,
                  yoffset,
@@ -44,16 +44,16 @@ void AI_APIENTRY OpenGL::aiTexSubImage3D(GLenum      target,
                  static_cast<int32_t>(width),
                  static_cast<int32_t>(height),
                  static_cast<int32_t>(depth),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(format),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(type),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(format),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type),
                  pixels);
 
-        pixels_chunk = OpenGL::PixelDataChunk::create_for_unpack(pixels,
-                                                                 static_cast<uint32_t>(width),
-                                                                 static_cast<uint32_t>(height),
-                                                                 static_cast<uint32_t>(depth),
-                                                                 format,
-                                                                 type);
+        pixels_chunk = Interception::Hooks::OpenGL::PixelDataChunk::create_for_unpack(pixels,
+                                                                                      static_cast<uint32_t>(width),
+                                                                                      static_cast<uint32_t>(height),
+                                                                                      static_cast<uint32_t>(depth),
+                                                                                      format,
+                                                                                      type);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTEXSUBIMAGE3D,
                                                          &pre_callback_func_ptr,
@@ -86,17 +86,17 @@ void AI_APIENTRY OpenGL::aiTexSubImage3D(GLenum      target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLTEXSUBIMAGE3DPROC>(OpenGL::g_cached_gl_tex_sub_image_3D)(target,
-                                                                                       level,
-                                                                                       xoffset,
-                                                                                       yoffset,
-                                                                                       zoffset,
-                                                                                       width,
-                                                                                       height,
-                                                                                       depth,
-                                                                                       format,
-                                                                                       type,
-                                                                                       pixels);
+        reinterpret_cast<PFNGLTEXSUBIMAGE3DPROC>(Interception::Hooks::OpenGL::g_cached_gl_tex_sub_image_3D)(target,
+                                                                                                            level,
+                                                                                                            xoffset,
+                                                                                                            yoffset,
+                                                                                                            zoffset,
+                                                                                                            width,
+                                                                                                            height,
+                                                                                                            depth,
+                                                                                                            format,
+                                                                                                            type,
+                                                                                                            pixels);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTEXSUBIMAGE3D,

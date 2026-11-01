@@ -21,20 +21,32 @@
 #include "Common/types.h"
 #include "Interception/Hooks/OpenGL/types_enums.h"
 
-namespace OpenGL
+namespace Interception
 {
-    /* Forward declarations */
-    class  Context;
-    struct DispatchTable;
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            /* Forward declarations */
+            class  Context;
+            struct DispatchTable;
+        }
+    }
 }
 
 #include "Interception/Hooks/OpenGL/types_typedefs.h"
 #include "Interception/Hooks/OpenGL/types_structs.h"
 #include "Interception/Hooks/OpenGL/types_interfaces.h"
 
-namespace OpenGL
+namespace Interception
 {
-    typedef std::unique_ptr<ContextState> ContextStateUniquePtr;
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            typedef std::unique_ptr<ContextState> ContextStateUniquePtr;
+        }
+    }
 }
 
 #endif /* AI_TYPES_H */

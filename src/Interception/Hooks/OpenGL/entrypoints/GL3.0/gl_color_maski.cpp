@@ -10,11 +10,11 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiColorMaski(GLuint    index,
-                                      GLboolean r,
-                                      GLboolean g,
-                                      GLboolean b,
-                                      GLboolean a)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiColorMaski(GLuint    index,
+                                                           GLboolean r,
+                                                           GLboolean g,
+                                                           GLboolean b,
+                                                           GLboolean a)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -57,11 +57,11 @@ void AI_APIENTRY OpenGL::aiColorMaski(GLuint    index,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLCOLORMASKIPROC>(OpenGL::g_cached_gl_color_maski)(index,
-                                                                               r,
-                                                                               g,
-                                                                               b,
-                                                                               a);
+        reinterpret_cast<PFNGLCOLORMASKIPROC>(Interception::Hooks::OpenGL::g_cached_gl_color_maski)(index,
+                                                                                                    r,
+                                                                                                    g,
+                                                                                                    b,
+                                                                                                    a);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCOLORMASKI,

@@ -11,7 +11,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiClear(GLbitfield mask)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiClear(GLbitfield mask)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -23,7 +23,7 @@ void AI_APIENTRY OpenGL::aiClear(GLbitfield mask)
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glClear(mask=[%s])",
-                 OpenGL::Utils::get_raw_string_for_gl_bitfield(OpenGL::BitfieldType::CLEAR_BUFFER_MASK, mask) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_bitfield(Interception::Hooks::OpenGL::BitfieldType::CLEAR_BUFFER_MASK, mask) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCLEAR,
                                                          &pre_callback_func_ptr,
@@ -46,7 +46,7 @@ void AI_APIENTRY OpenGL::aiClear(GLbitfield mask)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLCLEARPROC>(OpenGL::g_cached_gl_clear)(mask);
+        reinterpret_cast<PFNGLCLEARPROC>(Interception::Hooks::OpenGL::g_cached_gl_clear)(mask);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCLEAR,

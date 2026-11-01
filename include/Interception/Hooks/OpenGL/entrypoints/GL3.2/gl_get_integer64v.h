@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetInteger64v(GLenum   pname,
-                                     GLint64* data);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetInteger64v(GLenum   pname,
+                                             GLint64* data);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_INTEGER64V_H */

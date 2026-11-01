@@ -11,9 +11,9 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiInvalidateNamedFramebufferData(GLuint        framebuffer,
-                                                          GLsizei       numAttachments,
-                                                          const GLenum* attachments)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiInvalidateNamedFramebufferData(GLuint        framebuffer,
+                                                                               GLsizei       numAttachments,
+                                                                               const GLenum* attachments)
 {
     APIInterceptor::MemoryChunk             attachments_chunk(attachments,
                                                               numAttachments,
@@ -55,9 +55,9 @@ void AI_APIENTRY OpenGL::aiInvalidateNamedFramebufferData(GLuint        framebuf
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLINVALIDATENAMEDFRAMEBUFFERDATAPROC>(OpenGL::g_cached_gl_invalidate_named_framebuffer_data)(framebuffer,
-                                                                                                                        numAttachments,
-                                                                                                                        attachments);
+        reinterpret_cast<PFNGLINVALIDATENAMEDFRAMEBUFFERDATAPROC>(Interception::Hooks::OpenGL::g_cached_gl_invalidate_named_framebuffer_data)(framebuffer,
+                                                                                                                                             numAttachments,
+                                                                                                                                             attachments);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLINVALIDATENAMEDFRAMEBUFFERDATA,

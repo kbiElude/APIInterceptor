@@ -11,12 +11,12 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDebugMessageInsert(GLenum        source,
-                                              GLenum        type,
-                                              GLuint        id,
-                                              GLenum        severity,
-                                              GLsizei       length,
-                                              const GLchar* buf)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDebugMessageInsert(GLenum        source,
+                                                                   GLenum        type,
+                                                                   GLuint        id,
+                                                                   GLenum        severity,
+                                                                   GLsizei       length,
+                                                                   const GLchar* buf)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -28,10 +28,10 @@ void AI_APIENTRY OpenGL::aiDebugMessageInsert(GLenum        source,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glDebugMessageInsert(source=[%s] type=[%s] id=[%u] severity=[%s] length=[%d] buf=[%s])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(source),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(type),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(source),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type),
                  id,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(severity),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(severity),
                  static_cast<int32_t>(length),
                  buf);
 
@@ -61,12 +61,12 @@ void AI_APIENTRY OpenGL::aiDebugMessageInsert(GLenum        source,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDEBUGMESSAGEINSERTPROC>(OpenGL::g_cached_gl_debug_message_insert)(source,
-                                                                                                 type,
-                                                                                                 id,
-                                                                                                 severity,
-                                                                                                 length,
-                                                                                                 buf);
+        reinterpret_cast<PFNGLDEBUGMESSAGEINSERTPROC>(Interception::Hooks::OpenGL::g_cached_gl_debug_message_insert)(source,
+                                                                                                                      type,
+                                                                                                                      id,
+                                                                                                                      severity,
+                                                                                                                      length,
+                                                                                                                      buf);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDEBUGMESSAGEINSERT,

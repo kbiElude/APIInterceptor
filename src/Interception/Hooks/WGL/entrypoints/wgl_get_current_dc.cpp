@@ -9,7 +9,7 @@
 #include "Interception/Hooks/WGL/globals.h"
 #include "Interception/Hooks/WGL/entrypoints/wgl_get_current_dc.h"
 
-HDC WINAPI WGL::get_current_dc()
+HDC WINAPI Interception::Hooks::WGL::get_current_dc()
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -28,8 +28,8 @@ HDC WINAPI WGL::get_current_dc()
                                                          &pre_callback_func_arg) )
         {
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_WGL_WGLGETCURRENTDC,
-                                  0,       /* in_n_args   */
-                                  nullptr, /* in_args_ptr */
+                                  0,       /* in_n_arguments   */
+                                  nullptr, /* in_arguments_ptr */
                                   pre_callback_func_arg,
                                  &should_pass_through);
         }
@@ -37,7 +37,7 @@ HDC WINAPI WGL::get_current_dc()
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNWGLGETCURRENTDCPROC>(WGL::g_cached_get_current_dc_func_ptr)();
+        result = reinterpret_cast<PFNWGLGETCURRENTDCPROC>(Interception::Hooks::WGL::g_cached_get_current_dc_func_ptr)();
     }
 
     if (tracker.is_top_level_api_call() )
@@ -50,8 +50,8 @@ HDC WINAPI WGL::get_current_dc()
 
             post_callback_func_ptr(APIInterceptor::APIFUNCTION_WGL_WGLGETCURRENTDC,
                                    post_callback_func_arg,
-                                   0,       /* in_n_args_out   */
-                               nullptr, /* in_args_out_ptr */
+                                   0,       /* in_n_arguments_out   */
+                               nullptr, /* in_arguments_out_ptr */
                                   &result_arg);
         }
     }

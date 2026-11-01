@@ -10,7 +10,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-GLenum AI_APIENTRY OpenGL::aiGetError(void)
+GLenum AI_APIENTRY Interception::Hooks::OpenGL::aiGetError(void)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -29,8 +29,8 @@ GLenum AI_APIENTRY OpenGL::aiGetError(void)
                                                          &pre_callback_func_arg) )
         {
             pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETERROR,
-                                  0,       /* in_n_args   */
-                                  nullptr, /* in_args_ptr */
+                                  0,       /* in_n_arguments   */
+                                  nullptr, /* in_arguments_ptr */
                                   pre_callback_func_arg,
                                  &should_pass_through);
         }
@@ -38,7 +38,7 @@ GLenum AI_APIENTRY OpenGL::aiGetError(void)
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNGLGETERRORPROC>(OpenGL::g_cached_gl_get_error)();
+        result = reinterpret_cast<PFNGLGETERRORPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_error)();
     }
 
     if (tracker.is_top_level_api_call() )
@@ -51,8 +51,8 @@ GLenum AI_APIENTRY OpenGL::aiGetError(void)
 
             post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLGETERROR,
                                    post_callback_func_arg,
-                                   0,       /* in_n_args_out   */
-                                   nullptr, /* in_args_out_ptr */
+                                   0,       /* in_n_arguments_out   */
+                                   nullptr, /* in_arguments_out_ptr */
                                   &result_arg);
         }
     }

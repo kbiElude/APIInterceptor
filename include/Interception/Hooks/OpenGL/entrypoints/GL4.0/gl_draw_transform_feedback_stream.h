@@ -7,9 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiDrawTransformFeedbackStream(GLenum mode, GLuint id, GLuint stream);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiDrawTransformFeedbackStream(GLenum mode,
+                                                           GLuint id,
+                                                           GLuint stream);
+        }
+    }
 }
 
 #endif /* AI_GL_DRAW_TRANSFORM_FEEDBACK_STREAM_H */

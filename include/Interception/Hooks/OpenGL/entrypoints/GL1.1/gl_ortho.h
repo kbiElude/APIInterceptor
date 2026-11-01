@@ -7,14 +7,20 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiOrtho(GLdouble left,
-                             GLdouble right,
-                             GLdouble bottom,
-                             GLdouble top,
-                             GLdouble zNear,
-                             GLdouble zFar);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiOrtho(GLdouble left,
+                                     GLdouble right,
+                                     GLdouble bottom,
+                                     GLdouble top,
+                                     GLdouble zNear,
+                                     GLdouble zFar);
+        }
+    }
 }
 
 #endif /* AI_GL_ORTHO_H */

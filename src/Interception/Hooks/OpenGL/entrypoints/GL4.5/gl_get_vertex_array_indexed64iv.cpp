@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetVertexArrayIndexed64iv(GLuint   vaobj,
-                                                     GLuint   index,
-                                                     GLenum   pname,
-                                                     GLint64* param)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetVertexArrayIndexed64iv(GLuint   vaobj,
+                                                                          GLuint   index,
+                                                                          GLenum   pname,
+                                                                          GLint64* param)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -28,7 +28,7 @@ void AI_APIENTRY OpenGL::aiGetVertexArrayIndexed64iv(GLuint   vaobj,
         AI_TRACE("glGetVertexArrayIndexed64iv(vaobj=[%u] index=[%u] pname=[%s] param=[%p])",
                  vaobj,
                  index,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  param);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETVERTEXARRAYINDEXED64IV,
@@ -55,10 +55,10 @@ void AI_APIENTRY OpenGL::aiGetVertexArrayIndexed64iv(GLuint   vaobj,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETVERTEXARRAYINDEXED64IVPROC>(OpenGL::g_cached_gl_get_vertex_array_indexed64iv)(vaobj,
-                                                                                                               index,
-                                                                                                               pname,
-                                                                                                               param);
+        reinterpret_cast<PFNGLGETVERTEXARRAYINDEXED64IVPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_vertex_array_indexed64iv)(vaobj,
+                                                                                                                                    index,
+                                                                                                                                    pname,
+                                                                                                                                    param);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETVERTEXARRAYINDEXED64IV,

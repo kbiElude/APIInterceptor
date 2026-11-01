@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetNamedFramebufferAttachmentParameteriv(GLuint framebuffer,
-                                                                    GLenum attachment,
-                                                                    GLenum pname,
-                                                                    GLint* params)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetNamedFramebufferAttachmentParameteriv(GLuint framebuffer,
+                                                                                         GLenum attachment,
+                                                                                         GLenum pname,
+                                                                                         GLint* params)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -27,8 +27,8 @@ void AI_APIENTRY OpenGL::aiGetNamedFramebufferAttachmentParameteriv(GLuint frame
     {
         AI_TRACE("glGetNamedFramebufferAttachmentParameteriv(framebuffer=[%u] attachment=[%s] pname=[%s] params=[%p])",
                  framebuffer,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(attachment),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(attachment),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  params);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETNAMEDFRAMEBUFFERATTACHMENTPARAMETERIV,
@@ -55,10 +55,10 @@ void AI_APIENTRY OpenGL::aiGetNamedFramebufferAttachmentParameteriv(GLuint frame
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETNAMEDFRAMEBUFFERATTACHMENTPARAMETERIVPROC>(OpenGL::g_cached_gl_get_named_framebuffer_attachment_parameteriv)(framebuffer,
-                                                                                                                                             attachment,
-                                                                                                                                             pname,
-                                                                                                                                             params);
+        reinterpret_cast<PFNGLGETNAMEDFRAMEBUFFERATTACHMENTPARAMETERIVPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_named_framebuffer_attachment_parameteriv)(framebuffer,
+                                                                                                                                                                  attachment,
+                                                                                                                                                                  pname,
+                                                                                                                                                                  params);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETNAMEDFRAMEBUFFERATTACHMENTPARAMETERIV,

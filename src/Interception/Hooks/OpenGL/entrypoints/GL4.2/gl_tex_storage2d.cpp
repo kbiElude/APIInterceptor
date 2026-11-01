@@ -15,11 +15,11 @@
 #include <algorithm>
 #include <algorithm>
 
-void AI_APIENTRY OpenGL::aiTexStorage2D(GLenum  target,
-                                        GLsizei levels,
-                                        GLenum  internalformat,
-                                        GLsizei width,
-                                        GLsizei height)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiTexStorage2D(GLenum  target,
+                                                             GLsizei levels,
+                                                             GLenum  internalformat,
+                                                             GLsizei width,
+                                                             GLsizei height)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -31,9 +31,9 @@ void AI_APIENTRY OpenGL::aiTexStorage2D(GLenum  target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glTexStorage2D(target=[%s] levels=[%d] internalformat=[%s] width=[%d] height=[%d])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  static_cast<int32_t>(levels),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(internalformat),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(internalformat),
                  static_cast<int32_t>(width),
                  static_cast<int32_t>(height) );
 
@@ -62,37 +62,43 @@ void AI_APIENTRY OpenGL::aiTexStorage2D(GLenum  target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLTEXSTORAGE2DPROC>(OpenGL::g_cached_gl_tex_storage2d)(target,
-                                                                                    levels,
-                                                                                    internalformat,
-                                                                                    width,
-                                                                                    height);
+        reinterpret_cast<PFNGLTEXSTORAGE2DPROC>(Interception::Hooks::OpenGL::g_cached_gl_tex_storage2d)(target,
+                                                                                                         levels,
+                                                                                                         internalformat,
+                                                                                                         width,
+                                                                                                         height);
 
         TextureBindingTarget binding_target;
 
-        if (tracker.is_top_level_api_call                 ()              &&
-            Utils::get_texture_binding_target_for_gl_enum(target,
-                                                         &binding_target) )
+        const bool is_top_level = tracker.is_top_level_api_call();
+
+        if (is_top_level)
         {
-            auto&          context    = get_context_state();
-            const GLuint   texture_id = context.texture_manager.get_bound_texture(binding_target);
-            uint32_t       mip_width  = static_cast<uint32_t>(width);
-            uint32_t       mip_height = static_cast<uint32_t>(height);
+            const bool is_binding_target_known = Utils::get_texture_binding_target_for_gl_enum(target,
+                                                                                               &binding_target);
 
-            for (GLsizei level = 0;
-                         level < levels;
-                       ++level)
+            if (is_binding_target_known)
             {
-                context.texture_manager.set_level_props(texture_id,
-                                                level,
-                                                mip_width,
-                                                mip_height,
-                                                1);
+                auto&          context    = get_context_state();
+                const GLuint   texture_id = context.texture_manager.get_bound_texture(binding_target);
+                uint32_t       mip_width  = static_cast<uint32_t>(width);
+                uint32_t       mip_height = static_cast<uint32_t>(height);
 
-                mip_width  = (std::max)(1u,
-                                      static_cast<uint32_t>(mip_width  / 2u) );
-                mip_height = (std::max)(1u,
-                                      static_cast<uint32_t>(mip_height / 2u) );
+                for (GLsizei level = 0;
+                             level < levels;
+                           ++level)
+                {
+                    context.texture_manager.set_level_props(texture_id,
+                                                    level,
+                                                    mip_width,
+                                                    mip_height,
+                                                    1);
+
+                    mip_width  = (std::max)(1u,
+                                          static_cast<uint32_t>(mip_width  / 2u) );
+                    mip_height = (std::max)(1u,
+                                          static_cast<uint32_t>(mip_height / 2u) );
+                }
             }
         }
     }

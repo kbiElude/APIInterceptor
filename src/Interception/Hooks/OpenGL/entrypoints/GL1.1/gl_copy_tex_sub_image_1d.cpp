@@ -11,12 +11,12 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiCopyTexSubImage1D(GLenum  target,
-                                             GLint   level,
-                                             GLint   xoffset,
-                                             GLint   x,
-                                             GLint   y,
-                                             GLsizei width)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiCopyTexSubImage1D(GLenum  target,
+                                                                  GLint   level,
+                                                                  GLint   xoffset,
+                                                                  GLint   x,
+                                                                  GLint   y,
+                                                                  GLsizei width)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -28,7 +28,7 @@ void AI_APIENTRY OpenGL::aiCopyTexSubImage1D(GLenum  target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glCopyTexSubImage1D(target=[%s] level=[%d] xoffset=[%d] x=[%d] y=[%d] width=[%d])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  level,
                  xoffset,
                  x,
@@ -61,12 +61,12 @@ void AI_APIENTRY OpenGL::aiCopyTexSubImage1D(GLenum  target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLCOPYTEXSUBIMAGE1DPROC>(OpenGL::g_cached_gl_copy_tex_sub_image_1D)(target,
-                                                                                                level,
-                                                                                                xoffset,
-                                                                                                x,
-                                                                                                y,
-                                                                                                width);
+        reinterpret_cast<PFNGLCOPYTEXSUBIMAGE1DPROC>(Interception::Hooks::OpenGL::g_cached_gl_copy_tex_sub_image_1D)(target,
+                                                                                                                     level,
+                                                                                                                     xoffset,
+                                                                                                                     x,
+                                                                                                                     y,
+                                                                                                                     width);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCOPYTEXSUBIMAGE1D,

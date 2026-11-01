@@ -11,11 +11,11 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiBindVertexBuffers(GLuint          first,
-                                             GLsizei         count,
-                                             const GLuint*   buffers,
-                                             const GLintptr* offsets,
-                                             const GLsizei*  strides)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiBindVertexBuffers(GLuint          first,
+                                                                  GLsizei         count,
+                                                                  const GLuint*   buffers,
+                                                                  const GLintptr* offsets,
+                                                                  const GLsizei*  strides)
 {
     APIInterceptor::MemoryChunk             buffers_chunk(buffers,
                                                           count,
@@ -67,11 +67,11 @@ void AI_APIENTRY OpenGL::aiBindVertexBuffers(GLuint          first,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLBINDVERTEXBUFFERSPROC>(OpenGL::g_cached_gl_bind_vertex_buffers)(first,
-                                                                                               count,
-                                                                                               buffers,
-                                                                                               offsets,
-                                                                                               strides);
+        reinterpret_cast<PFNGLBINDVERTEXBUFFERSPROC>(Interception::Hooks::OpenGL::g_cached_gl_bind_vertex_buffers)(first,
+                                                                                                                    count,
+                                                                                                                    buffers,
+                                                                                                                    offsets,
+                                                                                                                    strides);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBINDVERTEXBUFFERS,

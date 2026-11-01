@@ -10,9 +10,9 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDispatchCompute(GLuint num_groups_x,
-                                           GLuint num_groups_y,
-                                           GLuint num_groups_z)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDispatchCompute(GLuint num_groups_x,
+                                                                GLuint num_groups_y,
+                                                                GLuint num_groups_z)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -51,9 +51,9 @@ void AI_APIENTRY OpenGL::aiDispatchCompute(GLuint num_groups_x,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDISPATCHCOMPUTEPROC>(OpenGL::g_cached_gl_dispatch_compute)(num_groups_x,
-                                                                                          num_groups_y,
-                                                                                          num_groups_z);
+        reinterpret_cast<PFNGLDISPATCHCOMPUTEPROC>(Interception::Hooks::OpenGL::g_cached_gl_dispatch_compute)(num_groups_x,
+                                                                                                               num_groups_y,
+                                                                                                               num_groups_z);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDISPATCHCOMPUTE,

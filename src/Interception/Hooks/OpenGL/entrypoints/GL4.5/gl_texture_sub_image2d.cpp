@@ -13,23 +13,23 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiTextureSubImage2D(GLuint      texture,
-                                             GLint       level,
-                                             GLint       xoffset,
-                                             GLint       yoffset,
-                                             GLsizei     width,
-                                             GLsizei     height,
-                                             GLenum      format,
-                                             GLenum      type,
-                                             const void* pixels)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiTextureSubImage2D(GLuint      texture,
+                                                                  GLint       level,
+                                                                  GLint       xoffset,
+                                                                  GLint       yoffset,
+                                                                  GLsizei     width,
+                                                                  GLsizei     height,
+                                                                  GLenum      format,
+                                                                  GLenum      type,
+                                                                  const void* pixels)
 {
-    OpenGL::PixelDataChunk                  pixels_chunk;
-    void*                                   post_callback_func_arg = nullptr;
-    APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
-    void*                                   pre_callback_func_arg  = nullptr;
-    APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
-    bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    Interception::Hooks::OpenGL::PixelDataChunk pixels_chunk;
+    void*                                       post_callback_func_arg = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC     post_callback_func_ptr = nullptr;
+    void*                                       pre_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC      pre_callback_func_ptr  = nullptr;
+    bool                                        should_pass_through    = true;
+    APIInterceptor::Tracker                     tracker;
 
     if (tracker.is_top_level_api_call() )
     {
@@ -40,16 +40,16 @@ void AI_APIENTRY OpenGL::aiTextureSubImage2D(GLuint      texture,
                  yoffset,
                  static_cast<int32_t>(width),
                  static_cast<int32_t>(height),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(format),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(type),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(format),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type),
                  pixels);
 
-        pixels_chunk = OpenGL::PixelDataChunk::create_for_unpack(pixels,
-                                                                 static_cast<uint32_t>(width),
-                                                                 static_cast<uint32_t>(height),
-                                                                 1,
-                                                                 format,
-                                                                 type);
+        pixels_chunk = Interception::Hooks::OpenGL::PixelDataChunk::create_for_unpack(pixels,
+                                                                                      static_cast<uint32_t>(width),
+                                                                                      static_cast<uint32_t>(height),
+                                                                                      1,
+                                                                                      format,
+                                                                                      type);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTEXTURESUBIMAGE2D,
                                                          &pre_callback_func_ptr,
@@ -80,15 +80,15 @@ void AI_APIENTRY OpenGL::aiTextureSubImage2D(GLuint      texture,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLTEXTURESUBIMAGE2DPROC>(OpenGL::g_cached_gl_texture_sub_image2d)(texture,
-                                                                                              level,
-                                                                                              xoffset,
-                                                                                              yoffset,
-                                                                                              width,
-                                                                                              height,
-                                                                                              format,
-                                                                                              type,
-                                                                                              pixels);
+        reinterpret_cast<PFNGLTEXTURESUBIMAGE2DPROC>(Interception::Hooks::OpenGL::g_cached_gl_texture_sub_image2d)(texture,
+                                                                                                                   level,
+                                                                                                                   xoffset,
+                                                                                                                   yoffset,
+                                                                                                                   width,
+                                                                                                                   height,
+                                                                                                                   format,
+                                                                                                                   type,
+                                                                                                                   pixels);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTEXTURESUBIMAGE2D,

@@ -11,7 +11,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDrawBuffer(GLenum buf)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDrawBuffer(GLenum buf)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -23,7 +23,7 @@ void AI_APIENTRY OpenGL::aiDrawBuffer(GLenum buf)
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glDrawBuffer(buf=[%s])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(buf) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(buf) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDRAWBUFFER,
                                                          &pre_callback_func_ptr,
@@ -46,7 +46,7 @@ void AI_APIENTRY OpenGL::aiDrawBuffer(GLenum buf)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDRAWBUFFERPROC>(OpenGL::g_cached_gl_draw_buffer)(buf);
+        reinterpret_cast<PFNGLDRAWBUFFERPROC>(Interception::Hooks::OpenGL::g_cached_gl_draw_buffer)(buf);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDRAWBUFFER,

@@ -7,9 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetDoublei_v(GLenum target, GLuint index, GLdouble* data);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetDoublei_v(GLenum    target,
+                                            GLuint    index,
+                                            GLdouble* data);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_DOUBLEI_V_H */

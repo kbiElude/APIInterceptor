@@ -7,11 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetUniformuiv(GLuint  program,
-                                     GLint   location,
-                                     GLuint* params);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetUniformuiv(GLuint  program,
+                                             GLint   location,
+                                             GLuint* params);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_UNIFORMUIV_H */

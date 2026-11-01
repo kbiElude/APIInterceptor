@@ -11,17 +11,17 @@
 
 TEST(TexelBytes, ComponentsTimesTypeSize)
 {
-    EXPECT_EQ(OpenGL::Utils::get_n_texel_bytes(GL_RGBA,
-                                               GL_FLOAT),
-              16u);
-    EXPECT_EQ(OpenGL::Utils::get_n_texel_bytes(GL_RED,
-                                               GL_UNSIGNED_BYTE),
-              1u);
+    EXPECT_EQ(Interception::Hooks::OpenGL::Utils::get_n_texel_bytes(GL_RGBA,
+                                                                    GL_FLOAT),
+                                   16u);
+    EXPECT_EQ(Interception::Hooks::OpenGL::Utils::get_n_texel_bytes(GL_RED,
+                                                                    GL_UNSIGNED_BYTE),
+                                   1u);
 }
 
 TEST(TexelBytes, PackedTypeIsOneElement)
 {
-    EXPECT_EQ(OpenGL::Utils::get_n_texel_bytes(GL_RGB,
-                                               GL_UNSIGNED_SHORT_5_6_5),
-              2u);
+    EXPECT_EQ(Interception::Hooks::OpenGL::Utils::get_n_texel_bytes(GL_RGB,
+                                                                    GL_UNSIGNED_SHORT_5_6_5),
+                                   2u);
 }

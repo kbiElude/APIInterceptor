@@ -6,14 +6,14 @@
 #include "Interception/Hooks/OpenGL/state_tracker.h"
 #include "Interception/Hooks/OpenGL/utils.h"
 
-OpenGL::PixelDataChunk::PixelDataChunk()
+Interception::Hooks::OpenGL::PixelDataChunk::PixelDataChunk()
 {
     /* Stub */
 }
 
-OpenGL::PixelDataChunk::PixelDataChunk(const void*     in_pixels_ptr,
-                                       const uint64_t& in_n_bytes,
-                                       const bool&     in_is_buffer_offset)
+Interception::Hooks::OpenGL::PixelDataChunk::PixelDataChunk(const void*     in_pixels_ptr,
+                                                            const uint64_t& in_n_bytes,
+                                                            const bool&     in_is_buffer_offset)
     :BufferOffsetOrMemoryChunk(in_pixels_ptr,
                                in_n_bytes,
                                in_is_buffer_offset)
@@ -21,12 +21,12 @@ OpenGL::PixelDataChunk::PixelDataChunk(const void*     in_pixels_ptr,
     /* Stub */
 }
 
-OpenGL::PixelDataChunk OpenGL::PixelDataChunk::create_for_pack(const void*     in_pixels_ptr,
-                                                               const int64_t&  in_width,
-                                                               const int64_t&  in_height,
-                                                               const int64_t&  in_depth,
-                                                               const uint32_t& in_format,
-                                                               const uint32_t& in_type)
+Interception::Hooks::OpenGL::PixelDataChunk Interception::Hooks::OpenGL::PixelDataChunk::create_for_pack(const void*     in_pixels_ptr,
+                                                                                                         const int64_t&  in_width,
+                                                                                                         const int64_t&  in_height,
+                                                                                                         const int64_t&  in_depth,
+                                                                                                         const uint32_t& in_format,
+                                                                                                         const uint32_t& in_type)
 {
     auto& context = get_context_state();
 
@@ -39,22 +39,22 @@ OpenGL::PixelDataChunk OpenGL::PixelDataChunk::create_for_pack(const void*     i
                           context.buffer_manager.get_bound_buffer(BufferBindingTarget::PIXEL_PACK_BUFFER) != 0);
 }
 
-OpenGL::PixelDataChunk OpenGL::PixelDataChunk::create_for_texel(const void*     in_texel_ptr,
-                                                                const uint32_t& in_format,
-                                                                const uint32_t& in_type)
+Interception::Hooks::OpenGL::PixelDataChunk Interception::Hooks::OpenGL::PixelDataChunk::create_for_texel(const void*     in_texel_ptr,
+                                                                                                          const uint32_t& in_format,
+                                                                                                          const uint32_t& in_type)
 {
     return PixelDataChunk(in_texel_ptr,
-                          OpenGL::Utils::get_n_texel_bytes(in_format,
-                                                           in_type),
+                          Interception::Hooks::OpenGL::Utils::get_n_texel_bytes(in_format,
+                                                                                in_type),
                           false /* in_is_buffer_offset */);
 }
 
-OpenGL::PixelDataChunk OpenGL::PixelDataChunk::create_for_unpack(const void*     in_pixels_ptr,
-                                                                 const int64_t&  in_width,
-                                                                 const int64_t&  in_height,
-                                                                 const int64_t&  in_depth,
-                                                                 const uint32_t& in_format,
-                                                                 const uint32_t& in_type)
+Interception::Hooks::OpenGL::PixelDataChunk Interception::Hooks::OpenGL::PixelDataChunk::create_for_unpack(const void*     in_pixels_ptr,
+                                                                                                           const int64_t&  in_width,
+                                                                                                           const int64_t&  in_height,
+                                                                                                           const int64_t&  in_depth,
+                                                                                                           const uint32_t& in_format,
+                                                                                                           const uint32_t& in_type)
 {
     auto& context = get_context_state();
 
@@ -67,9 +67,9 @@ OpenGL::PixelDataChunk OpenGL::PixelDataChunk::create_for_unpack(const void*    
                           context.buffer_manager.get_bound_buffer(BufferBindingTarget::PIXEL_UNPACK_BUFFER) != 0);
 }
 
-OpenGL::PixelDataChunk OpenGL::PixelDataChunk::create_for_unpack_bitmap(const void*    in_bitmap_ptr,
-                                                                        const int64_t& in_width,
-                                                                        const int64_t& in_height)
+Interception::Hooks::OpenGL::PixelDataChunk Interception::Hooks::OpenGL::PixelDataChunk::create_for_unpack_bitmap(const void*    in_bitmap_ptr,
+                                                                                                                  const int64_t& in_width,
+                                                                                                                  const int64_t& in_height)
 {
     auto& context = get_context_state();
 
@@ -79,8 +79,8 @@ OpenGL::PixelDataChunk OpenGL::PixelDataChunk::create_for_unpack_bitmap(const vo
                           context.buffer_manager.get_bound_buffer(BufferBindingTarget::PIXEL_UNPACK_BUFFER) != 0);
 }
 
-OpenGL::PixelDataChunk OpenGL::PixelDataChunk::create_for_unpack_bytes(const void*     in_pixels_ptr,
-                                                                       const uint64_t& in_n_bytes)
+Interception::Hooks::OpenGL::PixelDataChunk Interception::Hooks::OpenGL::PixelDataChunk::create_for_unpack_bytes(const void*     in_pixels_ptr,
+                                                                                                                 const uint64_t& in_n_bytes)
 {
     auto& context = get_context_state();
 

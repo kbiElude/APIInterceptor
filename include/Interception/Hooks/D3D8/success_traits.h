@@ -9,23 +9,29 @@
 
 #include "Interception/Hooks/D3D8/types.h"
 
-namespace D3D8
+namespace Interception
 {
-    template<typename T>
-    struct SuccessTraits
+    namespace Hooks
     {
-        static bool is_success(const T& in_value);
-    };
+        namespace D3D8
+        {
+            template<typename T>
+            struct SuccessTraits
+            {
+                static bool is_success(const T& in_value);
+            };
 
-    template<>
-    struct SuccessTraits<long>
-    {
-        static bool is_success(const long& in_value);
-    };
+            template<>
+            struct SuccessTraits<long>
+            {
+                static bool is_success(const long& in_value);
+            };
+        }
+    }
 }
 
 template<typename T>
-bool D3D8::SuccessTraits<T>::is_success(const T& in_value)
+bool Interception::Hooks::D3D8::SuccessTraits<T>::is_success(const T& in_value)
 {
     (void) in_value;
 

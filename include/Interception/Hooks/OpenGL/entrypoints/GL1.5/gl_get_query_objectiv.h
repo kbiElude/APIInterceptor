@@ -7,11 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetQueryObjectiv(GLuint id,
-                                        GLenum pname,
-                                        GLint* params);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetQueryObjectiv(GLuint id,
+                                                GLenum pname,
+                                                GLint* params);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_QUERY_OBJECTIV_H */

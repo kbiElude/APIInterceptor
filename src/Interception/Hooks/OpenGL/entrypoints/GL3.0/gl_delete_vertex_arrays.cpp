@@ -11,8 +11,8 @@
 #include "Interception/Hooks/OpenGL/state_tracker.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDeleteVertexArrays(GLsizei       n,
-                                              const GLuint* arrays)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDeleteVertexArrays(GLsizei       n,
+                                                                   const GLuint* arrays)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -53,13 +53,13 @@ void AI_APIENTRY OpenGL::aiDeleteVertexArrays(GLsizei       n,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDELETEVERTEXARRAYSPROC>(OpenGL::g_cached_gl_delete_vertex_arrays)(n,
-                                                                                                arrays);
+        reinterpret_cast<PFNGLDELETEVERTEXARRAYSPROC>(Interception::Hooks::OpenGL::g_cached_gl_delete_vertex_arrays)(n,
+                                                                                                                     arrays);
     }
 
     if (tracker.is_top_level_api_call() )
     {
-        auto& context = OpenGL::get_context_state();
+        auto& context = Interception::Hooks::OpenGL::get_context_state();
 
         for (GLsizei n_array = 0;
                      n_array < n;

@@ -13,13 +13,13 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiTexStorage3DMultisample(GLenum    target,
-                                                   GLsizei   samples,
-                                                   GLenum    internalformat,
-                                                   GLsizei   width,
-                                                   GLsizei   height,
-                                                   GLsizei   depth,
-                                                   GLboolean fixedsamplelocations)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiTexStorage3DMultisample(GLenum    target,
+                                                                        GLsizei   samples,
+                                                                        GLenum    internalformat,
+                                                                        GLsizei   width,
+                                                                        GLsizei   height,
+                                                                        GLsizei   depth,
+                                                                        GLboolean fixedsamplelocations)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -31,9 +31,9 @@ void AI_APIENTRY OpenGL::aiTexStorage3DMultisample(GLenum    target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glTexStorage3DMultisample(target=[%s] samples=[%d] internalformat=[%s] width=[%d] height=[%d] depth=[%d] fixedsamplelocations=[%u])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  static_cast<int32_t>(samples),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(internalformat),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(internalformat),
                  static_cast<int32_t>(width),
                  static_cast<int32_t>(height),
                  static_cast<int32_t>(depth),
@@ -66,27 +66,33 @@ void AI_APIENTRY OpenGL::aiTexStorage3DMultisample(GLenum    target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLTEXSTORAGE3DMULTISAMPLEPROC>(OpenGL::g_cached_gl_tex_storage3d_multisample)(target,
-                                                                                                           samples,
-                                                                                                           internalformat,
-                                                                                                           width,
-                                                                                                           height,
-                                                                                                           depth,
-                                                                                                           fixedsamplelocations);
+        reinterpret_cast<PFNGLTEXSTORAGE3DMULTISAMPLEPROC>(Interception::Hooks::OpenGL::g_cached_gl_tex_storage3d_multisample)(target,
+                                                                                                                                samples,
+                                                                                                                                internalformat,
+                                                                                                                                width,
+                                                                                                                                height,
+                                                                                                                                depth,
+                                                                                                                                fixedsamplelocations);
 
         TextureBindingTarget binding_target;
 
-        if (tracker.is_top_level_api_call                 ()              &&
-            Utils::get_texture_binding_target_for_gl_enum(target,
-                                                         &binding_target) )
-        {
-            auto& context = get_context_state();
+        const bool is_top_level = tracker.is_top_level_api_call();
 
-            context.texture_manager.set_level_props(context.texture_manager.get_bound_texture(binding_target),
-                                            0, /* multisample textures have a single implicit level */
-                                            static_cast<uint32_t>(width),
-                                            static_cast<uint32_t>(height),
-                                            static_cast<uint32_t>(depth));
+        if (is_top_level)
+        {
+            const bool is_binding_target_known = Utils::get_texture_binding_target_for_gl_enum(target,
+                                                                                               &binding_target);
+
+            if (is_binding_target_known)
+            {
+                auto& context = get_context_state();
+
+                context.texture_manager.set_level_props(context.texture_manager.get_bound_texture(binding_target),
+                                                0, /* multisample textures have a single implicit level */
+                                                static_cast<uint32_t>(width),
+                                                static_cast<uint32_t>(height),
+                                                static_cast<uint32_t>(depth));
+            }
         }
     }
 

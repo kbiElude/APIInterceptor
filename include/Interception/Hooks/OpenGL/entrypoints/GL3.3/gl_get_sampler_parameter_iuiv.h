@@ -7,11 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetSamplerParameterIuiv(GLuint  sampler,
-                                               GLenum  pname,
-                                               GLuint* params);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetSamplerParameterIuiv(GLuint  sampler,
+                                                       GLenum  pname,
+                                                       GLuint* params);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_SAMPLER_PARAMETER_IUIV_H */

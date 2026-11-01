@@ -10,8 +10,8 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDeleteRenderbuffers(GLsizei       n,
-                                               const GLuint* renderbuffers)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDeleteRenderbuffers(GLsizei       n,
+                                                                    const GLuint* renderbuffers)
 {
     void*                                   post_callback_func_arg   = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr   = nullptr;
@@ -52,8 +52,8 @@ void AI_APIENTRY OpenGL::aiDeleteRenderbuffers(GLsizei       n,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDELETERENDERBUFFERSPROC>(OpenGL::g_cached_gl_delete_renderbuffers)(n,
-                                                                                                 renderbuffers);
+        reinterpret_cast<PFNGLDELETERENDERBUFFERSPROC>(Interception::Hooks::OpenGL::g_cached_gl_delete_renderbuffers)(n,
+                                                                                                                      renderbuffers);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDELETERENDERBUFFERS,

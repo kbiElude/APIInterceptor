@@ -7,15 +7,21 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiBitmap(GLsizei        width,
-                              GLsizei        height,
-                              GLfloat        xorig,
-                              GLfloat        yorig,
-                              GLfloat        xmove,
-                              GLfloat        ymove,
-                              const GLubyte* bitmap);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiBitmap(GLsizei        width,
+                                      GLsizei        height,
+                                      GLfloat        xorig,
+                                      GLfloat        yorig,
+                                      GLfloat        xmove,
+                                      GLfloat        ymove,
+                                      const GLubyte* bitmap);
+        }
+    }
 }
 
 #endif /* AI_GL_BITMAP_H */

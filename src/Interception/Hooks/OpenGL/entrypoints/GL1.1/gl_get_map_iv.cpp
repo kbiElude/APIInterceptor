@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiGetMapiv(GLenum target,
-                                    GLenum query,
-                                    GLint* v)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiGetMapiv(GLenum target,
+                                                         GLenum query,
+                                                         GLint* v)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -25,8 +25,8 @@ void AI_APIENTRY OpenGL::aiGetMapiv(GLenum target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glGetMapiv(target=[%s], query=[%s], v=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(query),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(query),
                  v);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETMAPIV,
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiGetMapiv(GLenum target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLGETMAPIVPROC>(OpenGL::g_cached_gl_get_map_iv)(target,
-                                                                            query,
-                                                                            v);
+        reinterpret_cast<PFNGLGETMAPIVPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_map_iv)(target,
+                                                                                                 query,
+                                                                                                 v);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETMAPIV,

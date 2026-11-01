@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiArrayElement(GLint i);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiArrayElement(GLint i);
+        }
+    }
 }
 
 #endif /* AI_GL_ARRAY_ELEMENT_H */

@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiClampColor(GLenum target,
-                                  GLenum clamp);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiClampColor(GLenum target,
+                                          GLenum clamp);
+        }
+    }
 }
 
 #endif /* AI_GL_CLAMP_COLOR_H */

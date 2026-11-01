@@ -4,7 +4,7 @@
  */
 #include "Interception/Hooks/WGL/utils.h"
 
-uint32_t WGL::Utils::get_n_context_attrib_list_ints(const int* in_attrib_list_ptr)
+uint32_t Interception::Hooks::WGL::Utils::get_n_context_attrib_list_ints(const int* in_attrib_list_ptr)
 {
     /* A list which does not end is a sign of a bad pointer; none of the real ones comes anywhere near this. */
     constexpr uint32_t MAX_N_PAIRS = 1024;

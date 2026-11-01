@@ -13,8 +13,8 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiPatchParameterfv(GLenum         pname,
-                                            const GLfloat* values)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiPatchParameterfv(GLenum         pname,
+                                                                 const GLfloat* values)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -23,13 +23,13 @@ void AI_APIENTRY OpenGL::aiPatchParameterfv(GLenum         pname,
     bool                                    should_pass_through    = true;
     APIInterceptor::Tracker                 tracker;
     APIInterceptor::MemoryChunk             values_chunk(values,
-                                                         OpenGL::Utils::get_n_patch_parameter_values(pname),
+                                                         Interception::Hooks::OpenGL::Utils::get_n_patch_parameter_values(pname),
                                                          sizeof(GLfloat));
 
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glPatchParameterfv(pname=[%s] values=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(pname),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),
                  values);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLPATCHPARAMETERFV,
@@ -54,8 +54,8 @@ void AI_APIENTRY OpenGL::aiPatchParameterfv(GLenum         pname,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLPATCHPARAMETERFVPROC>(OpenGL::g_cached_gl_patch_parameterfv)(pname,
-                                                                                           values);
+        reinterpret_cast<PFNGLPATCHPARAMETERFVPROC>(Interception::Hooks::OpenGL::g_cached_gl_patch_parameterfv)(pname,
+                                                                                                                values);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLPATCHPARAMETERFV,

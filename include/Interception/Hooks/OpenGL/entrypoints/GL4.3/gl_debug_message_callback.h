@@ -7,9 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiDebugMessageCallback(GLDEBUGPROC callback, const void* userParam);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiDebugMessageCallback(GLDEBUGPROC callback,
+                                                    const void* userParam);
+        }
+    }
 }
 
 #endif /* AI_GL_DEBUG_MESSAGE_CALLBACK_H */

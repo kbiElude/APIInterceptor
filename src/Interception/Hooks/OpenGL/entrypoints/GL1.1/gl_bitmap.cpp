@@ -12,27 +12,27 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiBitmap(GLsizei        width,
-                                  GLsizei        height,
-                                  GLfloat        xorig,
-                                  GLfloat        yorig,
-                                  GLfloat        xmove,
-                                  GLfloat        ymove,
-                                  const GLubyte* bitmapef)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiBitmap(GLsizei        width,
+                                                       GLsizei        height,
+                                                       GLfloat        xorig,
+                                                       GLfloat        yorig,
+                                                       GLfloat        xmove,
+                                                       GLfloat        ymove,
+                                                       const GLubyte* bitmapef)
 {
-    OpenGL::PixelDataChunk                  pixels_chunk;
-    void*                                   post_callback_func_arg = nullptr;
-    APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
-    void*                                   pre_callback_func_arg  = nullptr;
-    APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
-    bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    Interception::Hooks::OpenGL::PixelDataChunk pixels_chunk;
+    void*                                       post_callback_func_arg = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC     post_callback_func_ptr = nullptr;
+    void*                                       pre_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC      pre_callback_func_ptr  = nullptr;
+    bool                                        should_pass_through    = true;
+    APIInterceptor::Tracker                     tracker;
 
     if (tracker.is_top_level_api_call() )
     {
-        pixels_chunk = OpenGL::PixelDataChunk::create_for_unpack_bitmap(bitmapef,
-                                                                        width,
-                                                                        height);
+        pixels_chunk = Interception::Hooks::OpenGL::PixelDataChunk::create_for_unpack_bitmap(bitmapef,
+                                                                                             width,
+                                                                                             height);
     }
 
     if (tracker.is_top_level_api_call() )
@@ -73,13 +73,13 @@ void AI_APIENTRY OpenGL::aiBitmap(GLsizei        width,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLBITMAPPROC>(OpenGL::g_cached_gl_bitmap)(width,
-                                                                      height,
-                                                                      xorig,
-                                                                      yorig,
-                                                                      xmove,
-                                                                      ymove,
-                                                                      bitmapef);
+        reinterpret_cast<PFNGLBITMAPPROC>(Interception::Hooks::OpenGL::g_cached_gl_bitmap)(width,
+                                                                                           height,
+                                                                                           xorig,
+                                                                                           yorig,
+                                                                                           xmove,
+                                                                                           ymove,
+                                                                                           bitmapef);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBITMAP,

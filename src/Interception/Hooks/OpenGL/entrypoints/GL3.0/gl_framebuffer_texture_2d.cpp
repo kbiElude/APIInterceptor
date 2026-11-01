@@ -11,11 +11,11 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiFramebufferTexture2D(GLenum target,
-                                                GLenum attachment,
-                                                GLenum textarget,
-                                                GLuint texture,
-                                                GLint  level)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiFramebufferTexture2D(GLenum target,
+                                                                     GLenum attachment,
+                                                                     GLenum textarget,
+                                                                     GLuint texture,
+                                                                     GLint  level)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -27,9 +27,9 @@ void AI_APIENTRY OpenGL::aiFramebufferTexture2D(GLenum target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glFramebufferTexture2D(target=[%s] attachment=[%s] textarget=[%s] texture=[%u] level=[%d])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(attachment),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(textarget),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(attachment),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(textarget),
                  texture,
                  level);
 
@@ -58,11 +58,11 @@ void AI_APIENTRY OpenGL::aiFramebufferTexture2D(GLenum target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLFRAMEBUFFERTEXTURE2DPROC>(OpenGL::g_cached_gl_framebuffer_texture_2D)(target,
-                                                                                                    attachment,
-                                                                                                    textarget,
-                                                                                                    texture,
-                                                                                                    level);
+        reinterpret_cast<PFNGLFRAMEBUFFERTEXTURE2DPROC>(Interception::Hooks::OpenGL::g_cached_gl_framebuffer_texture_2D)(target,
+                                                                                                                         attachment,
+                                                                                                                         textarget,
+                                                                                                                         texture,
+                                                                                                                         level);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLFRAMEBUFFERTEXTURE2D,

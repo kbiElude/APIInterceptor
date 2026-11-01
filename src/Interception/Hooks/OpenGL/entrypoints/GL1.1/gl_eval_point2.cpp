@@ -11,8 +11,8 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiEvalPoint2(GLint i,
-                                      GLint j)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiEvalPoint2(GLint i,
+                                                           GLint j)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -49,8 +49,8 @@ void AI_APIENTRY OpenGL::aiEvalPoint2(GLint i,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLEVALPOINT2PROC>(OpenGL::g_cached_gl_eval_point2)(i,
-                                                                               j);
+        reinterpret_cast<PFNGLEVALPOINT2PROC>(Interception::Hooks::OpenGL::g_cached_gl_eval_point2)(i,
+                                                                                                    j);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLEVALPOINT2,

@@ -7,9 +7,15 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiLogicOp(GLenum opcode);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiLogicOp(GLenum opcode);
+        }
+    }
 }
 
 #endif /* AI_GL_LOGIC_OP_H */

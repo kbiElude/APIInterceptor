@@ -10,8 +10,8 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDepthRange(GLdouble n,
-                                      GLdouble f)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDepthRange(GLdouble n,
+                                                           GLdouble f)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -48,8 +48,8 @@ void AI_APIENTRY OpenGL::aiDepthRange(GLdouble n,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDEPTHRANGEPROC>(OpenGL::g_cached_gl_depth_range)(n,
-                                                                               f);
+        reinterpret_cast<PFNGLDEPTHRANGEPROC>(Interception::Hooks::OpenGL::g_cached_gl_depth_range)(n,
+                                                                                                    f);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDEPTHRANGE,

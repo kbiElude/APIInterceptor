@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDrawTransformFeedbackStream(GLenum mode,
-                                                       GLuint id,
-                                                       GLuint stream)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDrawTransformFeedbackStream(GLenum mode,
+                                                                            GLuint id,
+                                                                            GLuint stream)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -25,7 +25,7 @@ void AI_APIENTRY OpenGL::aiDrawTransformFeedbackStream(GLenum mode,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glDrawTransformFeedbackStream(mode=[%s] id=[%u] stream=[%u])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(mode),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(mode),
                  id,
                  stream);
 
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiDrawTransformFeedbackStream(GLenum mode,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDRAWTRANSFORMFEEDBACKSTREAMPROC>(OpenGL::g_cached_gl_draw_transform_feedback_stream)(mode,
-                                                                                                                   id,
-                                                                                                                   stream);
+        reinterpret_cast<PFNGLDRAWTRANSFORMFEEDBACKSTREAMPROC>(Interception::Hooks::OpenGL::g_cached_gl_draw_transform_feedback_stream)(mode,
+                                                                                                                                        id,
+                                                                                                                                        stream);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDRAWTRANSFORMFEEDBACKSTREAM,

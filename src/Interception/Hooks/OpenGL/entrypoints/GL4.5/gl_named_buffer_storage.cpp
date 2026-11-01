@@ -13,10 +13,10 @@
 #include "Interception/Hooks/OpenGL/utils.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiNamedBufferStorage(GLuint      buffer,
-                                              GLsizeiptr  size,
-                                              const void* data,
-                                              GLbitfield  flags)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiNamedBufferStorage(GLuint      buffer,
+                                                                   GLsizeiptr  size,
+                                                                   const void* data,
+                                                                   GLbitfield  flags)
 {
     APIInterceptor::MemoryChunk             data_chunk(data,
                                                        size,
@@ -60,14 +60,14 @@ void AI_APIENTRY OpenGL::aiNamedBufferStorage(GLuint      buffer,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLNAMEDBUFFERSTORAGEPROC>(OpenGL::g_cached_gl_named_buffer_storage)(buffer,
-                                                                                                size,
-                                                                                                data,
-                                                                                                flags);
+        reinterpret_cast<PFNGLNAMEDBUFFERSTORAGEPROC>(Interception::Hooks::OpenGL::g_cached_gl_named_buffer_storage)(buffer,
+                                                                                                                     size,
+                                                                                                                     data,
+                                                                                                                     flags);
 
         if (tracker.is_top_level_api_call() )
         {
-            auto& context          = OpenGL::get_context_state();
+            auto& context          = Interception::Hooks::OpenGL::get_context_state();
 
             context.buffer_manager.set_size(buffer,
                                             static_cast<uint64_t>(size) );

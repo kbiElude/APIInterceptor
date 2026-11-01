@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiLightModeliv(GLenum       pname,
-                                    const GLint* params);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiLightModeliv(GLenum       pname,
+                                            const GLint* params);
+        }
+    }
 }
 
 #endif /* AI_GL_LIGHT_MODEL_IV_H */

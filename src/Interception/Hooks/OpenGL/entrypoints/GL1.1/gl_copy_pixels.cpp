@@ -11,11 +11,11 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiCopyPixels(GLint   x,
-                                      GLint   y,
-                                      GLsizei width,
-                                      GLsizei height,
-                                      GLenum  type)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiCopyPixels(GLint   x,
+                                                           GLint   y,
+                                                           GLsizei width,
+                                                           GLsizei height,
+                                                           GLenum  type)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -31,7 +31,7 @@ void AI_APIENTRY OpenGL::aiCopyPixels(GLint   x,
                  y,
                  width,
                  height,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(type) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCOPYPIXELS,
                                                          &pre_callback_func_ptr,
@@ -58,11 +58,11 @@ void AI_APIENTRY OpenGL::aiCopyPixels(GLint   x,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLCOPYPIXELSPROC>(OpenGL::g_cached_gl_copy_pixels)(x,
-                                                                               y,
-                                                                               width,
-                                                                               height,
-                                                                               type);
+        reinterpret_cast<PFNGLCOPYPIXELSPROC>(Interception::Hooks::OpenGL::g_cached_gl_copy_pixels)(x,
+                                                                                                    y,
+                                                                                                    width,
+                                                                                                    height,
+                                                                                                    type);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCOPYPIXELS,

@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGetPixelMapuiv(GLenum  map,
-                                      GLuint* values);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGetPixelMapuiv(GLenum  map,
+                                              GLuint* values);
+        }
+    }
 }
 
 #endif /* AI_GL_GET_PIXEL_MAP_UIV_H */

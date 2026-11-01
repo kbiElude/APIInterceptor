@@ -10,9 +10,9 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiPrioritizeTextures(GLsizei         n,
-                                              const GLuint*   textures,
-                                              const GLclampf* priorities)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiPrioritizeTextures(GLsizei         n,
+                                                                   const GLuint*   textures,
+                                                                   const GLclampf* priorities)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -59,9 +59,9 @@ void AI_APIENTRY OpenGL::aiPrioritizeTextures(GLsizei         n,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLPRIORITIZETEXTURESEXTPROC>(OpenGL::g_cached_prioritize_textures_ext)(n,
-                                                                                                   textures,
-                                                                                                   priorities);
+        reinterpret_cast<PFNGLPRIORITIZETEXTURESEXTPROC>(Interception::Hooks::OpenGL::g_cached_prioritize_textures_ext)(n,
+                                                                                                                        textures,
+                                                                                                                        priorities);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLPRIORITIZETEXTURES,

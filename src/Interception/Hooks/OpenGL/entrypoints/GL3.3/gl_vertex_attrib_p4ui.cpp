@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiVertexAttribP4ui(GLuint    index,
-                                            GLenum    type,
-                                            GLboolean normalized,
-                                            GLuint    value)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiVertexAttribP4ui(GLuint    index,
+                                                                 GLenum    type,
+                                                                 GLboolean normalized,
+                                                                 GLuint    value)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -27,7 +27,7 @@ void AI_APIENTRY OpenGL::aiVertexAttribP4ui(GLuint    index,
     {
         AI_TRACE("glVertexAttribP4ui(index=[%u] type=[%s] normalized=[%u] value=[%u])",
                  index,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(type),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type),
                  static_cast<uint32_t>(normalized),
                  value);
 
@@ -55,10 +55,10 @@ void AI_APIENTRY OpenGL::aiVertexAttribP4ui(GLuint    index,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLVERTEXATTRIBP4UIPROC>(OpenGL::g_cached_gl_vertex_attrib_p4ui)(index,
-                                                                                             type,
-                                                                                             normalized,
-                                                                                             value);
+        reinterpret_cast<PFNGLVERTEXATTRIBP4UIPROC>(Interception::Hooks::OpenGL::g_cached_gl_vertex_attrib_p4ui)(index,
+                                                                                                                  type,
+                                                                                                                  normalized,
+                                                                                                                  value);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLVERTEXATTRIBP4UI,

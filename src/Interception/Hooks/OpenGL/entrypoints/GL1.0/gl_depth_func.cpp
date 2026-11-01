@@ -11,7 +11,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDepthFunc(GLenum func)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDepthFunc(GLenum func)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -23,7 +23,7 @@ void AI_APIENTRY OpenGL::aiDepthFunc(GLenum func)
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glDepthFunc(func=[%s])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(func) );
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(func) );
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDEPTHFUNC,
                                                          &pre_callback_func_ptr,
@@ -46,7 +46,7 @@ void AI_APIENTRY OpenGL::aiDepthFunc(GLenum func)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDEPTHFUNCPROC>(OpenGL::g_cached_gl_depth_func)(func);
+        reinterpret_cast<PFNGLDEPTHFUNCPROC>(Interception::Hooks::OpenGL::g_cached_gl_depth_func)(func);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDEPTHFUNC,

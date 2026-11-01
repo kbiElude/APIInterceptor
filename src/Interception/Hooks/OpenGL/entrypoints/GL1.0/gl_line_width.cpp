@@ -10,7 +10,7 @@
 #include "Interception/Hooks/OpenGL/globals.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiLineWidth(GLfloat width)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiLineWidth(GLfloat width)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -45,7 +45,7 @@ void AI_APIENTRY OpenGL::aiLineWidth(GLfloat width)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLLINEWIDTHPROC>(OpenGL::g_cached_gl_line_width)(width);
+        reinterpret_cast<PFNGLLINEWIDTHPROC>(Interception::Hooks::OpenGL::g_cached_gl_line_width)(width);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLLINEWIDTH,

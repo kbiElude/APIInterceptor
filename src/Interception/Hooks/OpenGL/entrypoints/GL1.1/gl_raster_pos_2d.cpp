@@ -11,8 +11,8 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiRasterPos2d(GLdouble x,
-                                       GLdouble y)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiRasterPos2d(GLdouble x,
+                                                            GLdouble y)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -49,8 +49,8 @@ void AI_APIENTRY OpenGL::aiRasterPos2d(GLdouble x,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLRASTERPOS2DPROC>(OpenGL::g_cached_gl_raster_pos_2d)(x,
-                                                                                  y);
+        reinterpret_cast<PFNGLRASTERPOS2DPROC>(Interception::Hooks::OpenGL::g_cached_gl_raster_pos_2d)(x,
+                                                                                                       y);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLRASTERPOS2D,

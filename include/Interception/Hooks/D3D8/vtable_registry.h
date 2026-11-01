@@ -13,33 +13,39 @@
 #include <unordered_map>
 #include <vector>
 
-namespace D3D8
+namespace Interception
 {
-    class VTableRegistry
+    namespace Hooks
     {
-    public:
-        /* Returns nullptr if the slot has not been hooked. */
-        void* get_original_function_ptr(const void*     in_object_ptr,
-                                        const uint32_t& in_vtable_index);
-
-        /* Hooks the slots in the object's vtable, skipping those already hooked. Returns false for a null object. */
-        bool patch_vtable(const Interface& in_interface,
-                          const void*      in_object_ptr,
-                          const HookEntry* in_hook_entry_array_ptr,
-                          uint32_t         in_n_hook_entries);
-
-        static VTableRegistry* get_ptr();
-
-    private:
-        struct PatchedVtable
+        namespace D3D8
         {
-            Interface          interface_type;
-            std::vector<void*> original_function_ptr_vec; /* indexed by vtable slot; nullptr = not hooked */
-        };
+            class VTableRegistry
+            {
+            public:
+                /* Returns nullptr if the slot has not been hooked. */
+                void* get_original_function_ptr(const void*     in_object_ptr,
+                                                const uint32_t& in_vtable_index);
 
-        std::mutex                                m_mutex;
-        std::unordered_map<void**, PatchedVtable> m_patched_vtable_map;
-    };
+                /* Hooks the slots in the object's vtable, skipping those already hooked. Returns false for a null object. */
+                bool patch_vtable(const Interface& in_interface,
+                                  const void*      in_object_ptr,
+                                  const HookEntry* in_hook_entry_array_ptr,
+                                  uint32_t         in_n_hook_entries);
+
+                static VTableRegistry* get_ptr();
+
+            private:
+                struct PatchedVtable
+                {
+                    Interface          interface_type;
+                    std::vector<void*> original_function_ptr_vec; /* indexed by vtable slot; nullptr = not hooked */
+                };
+
+                std::mutex                                m_mutex;
+                std::unordered_map<void**, PatchedVtable> m_patched_vtable_map;
+            };
+        }
+    }
 }
 
 #endif /* D3D8_VTABLE_REGISTRY_H */

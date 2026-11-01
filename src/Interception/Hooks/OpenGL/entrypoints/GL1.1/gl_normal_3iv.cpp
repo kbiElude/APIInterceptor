@@ -11,7 +11,7 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiNormal3iv(const GLint* v)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiNormal3iv(const GLint* v)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -50,7 +50,7 @@ void AI_APIENTRY OpenGL::aiNormal3iv(const GLint* v)
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLNORMAL3IVPROC>(OpenGL::g_cached_gl_normal_3iv)(v);
+        reinterpret_cast<PFNGLNORMAL3IVPROC>(Interception::Hooks::OpenGL::g_cached_gl_normal_3iv)(v);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLNORMAL3IV,

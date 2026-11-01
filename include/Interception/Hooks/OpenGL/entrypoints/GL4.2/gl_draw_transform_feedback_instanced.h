@@ -7,11 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiDrawTransformFeedbackInstanced(GLenum  mode,
-                                                      GLuint  id,
-                                                      GLsizei instancecount);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiDrawTransformFeedbackInstanced(GLenum  mode,
+                                                              GLuint  id,
+                                                              GLsizei instancecount);
+        }
+    }
 }
 
 #endif /* AI_GL_DRAW_TRANSFORM_FEEDBACK_INSTANCED_H */

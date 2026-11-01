@@ -13,7 +13,7 @@ const char* APIDumpPrinter::get_function_name(const APIInterceptor::APIFunction&
     {
         case APIDumpLoader::APIGroup::D3D8:
         {
-            result_ptr = D3D8::Utils::get_function_name_ptr(in_function);
+            result_ptr = Interception::Core::D3D8Utils::get_function_name_ptr(in_function);
 
             break;
         }

@@ -11,8 +11,8 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiBindRenderbuffer(GLenum target,
-                                            GLuint renderbuffer)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiBindRenderbuffer(GLenum target,
+                                                                 GLuint renderbuffer)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -24,7 +24,7 @@ void AI_APIENTRY OpenGL::aiBindRenderbuffer(GLenum target,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glBindRenderbuffer(target=[%s] renderbuffer=[%u])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(target),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
                  renderbuffer);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBINDRENDERBUFFER,
@@ -49,8 +49,8 @@ void AI_APIENTRY OpenGL::aiBindRenderbuffer(GLenum target,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLBINDRENDERBUFFERPROC>(OpenGL::g_cached_gl_bind_renderbuffer)(target,
-                                                                                           renderbuffer);
+        reinterpret_cast<PFNGLBINDRENDERBUFFERPROC>(Interception::Hooks::OpenGL::g_cached_gl_bind_renderbuffer)(target,
+                                                                                                                renderbuffer);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBINDRENDERBUFFER,

@@ -11,10 +11,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiPushDebugGroup(GLenum        source,
-                                          GLuint        id,
-                                          GLsizei       length,
-                                          const GLchar* message)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiPushDebugGroup(GLenum        source,
+                                                               GLuint        id,
+                                                               GLsizei       length,
+                                                               const GLchar* message)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -26,7 +26,7 @@ void AI_APIENTRY OpenGL::aiPushDebugGroup(GLenum        source,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glPushDebugGroup(source=[%s] id=[%u] length=[%d] message=[%s])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(source),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(source),
                  id,
                  static_cast<int32_t>(length),
                  message);
@@ -55,10 +55,10 @@ void AI_APIENTRY OpenGL::aiPushDebugGroup(GLenum        source,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLPUSHDEBUGGROUPPROC>(OpenGL::g_cached_gl_push_debug_group)(source,
-                                                                                         id,
-                                                                                         length,
-                                                                                         message);
+        reinterpret_cast<PFNGLPUSHDEBUGGROUPPROC>(Interception::Hooks::OpenGL::g_cached_gl_push_debug_group)(source,
+                                                                                                              id,
+                                                                                                              length,
+                                                                                                              message);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLPUSHDEBUGGROUP,

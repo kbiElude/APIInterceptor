@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiUniform1f(GLint   location,
-                                 GLfloat v0);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiUniform1f(GLint   location,
+                                         GLfloat v0);
+        }
+    }
 }
 
 #endif /* AI_GL_UNIFORM_1F_H */

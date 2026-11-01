@@ -7,11 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiTexEnvf(GLenum  target,
-                               GLenum  pname,
-                               GLfloat param);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiTexEnvf(GLenum  target,
+                                       GLenum  pname,
+                                       GLfloat param);
+        }
+    }
 }
 
 #endif /* AI_GL_TEX_ENV_F_H */

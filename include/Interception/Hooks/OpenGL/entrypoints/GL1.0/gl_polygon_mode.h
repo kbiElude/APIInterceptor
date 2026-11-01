@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiPolygonMode(GLenum face,
-                                   GLenum mode);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiPolygonMode(GLenum face,
+                                           GLenum mode);
+        }
+    }
 }
 
 #endif /* AI_GL_POLYGON_MODE_H */

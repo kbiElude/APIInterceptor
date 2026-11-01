@@ -12,10 +12,10 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiVertexPointer(GLint         size,
-                                         GLenum        type,
-                                         GLsizei       stride,
-                                         const GLvoid* pointer)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiVertexPointer(GLint         size,
+                                                              GLenum        type,
+                                                              GLsizei       stride,
+                                                              const GLvoid* pointer)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -28,7 +28,7 @@ void AI_APIENTRY OpenGL::aiVertexPointer(GLint         size,
     {
         AI_TRACE("glVertexPointer(size={%d], type=[%s], stride=[%d], pointer=[%p])",
                  size,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(type),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type),
                  stride,
                  pointer);
 
@@ -56,23 +56,23 @@ void AI_APIENTRY OpenGL::aiVertexPointer(GLint         size,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLVERTEXPOINTERPROC>(OpenGL::g_cached_gl_vertex_pointer)(size,
-                                                                                     type,
-                                                                                     stride,
-                                                                                     pointer);
+        reinterpret_cast<PFNGLVERTEXPOINTERPROC>(Interception::Hooks::OpenGL::g_cached_gl_vertex_pointer)(size,
+                                                                                                          type,
+                                                                                                          stride,
+                                                                                                          pointer);
     }
 
     if (tracker.is_top_level_api_call() )
     {
-        auto& context = OpenGL::get_context_state();
+        auto& context = Interception::Hooks::OpenGL::get_context_state();
 
-        context.client_array_manager.set_pointer(OpenGL::ClientArrayKind::VERTEX,
+        context.client_array_manager.set_pointer(Interception::Hooks::OpenGL::ClientArrayKind::VERTEX,
                                                0,
                                                size,
                                                type,
                                                stride,
                                                pointer,
-                                               context.buffer_manager.get_bound_buffer(OpenGL::BufferBindingTarget::ARRAY_BUFFER),
+                                               context.buffer_manager.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ARRAY_BUFFER),
                                                false,  /* in_is_integer    */
                                                false,  /* in_is_long       */
                                                false); /* in_is_normalized */

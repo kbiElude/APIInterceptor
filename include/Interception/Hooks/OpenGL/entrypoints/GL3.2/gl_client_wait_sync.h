@@ -7,11 +7,17 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    GLenum AI_APIENTRY aiClientWaitSync(GLsync     sync,
-                                        GLbitfield flags,
-                                        GLuint64   timeout);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            GLenum AI_APIENTRY aiClientWaitSync(GLsync     sync,
+                                                GLbitfield flags,
+                                                GLuint64   timeout);
+        }
+    }
 }
 
 #endif /* AI_GL_CLIENT_WAIT_SYNC_H */

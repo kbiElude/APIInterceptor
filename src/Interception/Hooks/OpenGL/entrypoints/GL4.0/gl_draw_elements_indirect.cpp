@@ -12,28 +12,28 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiDrawElementsIndirect(GLenum      mode,
-                                                GLenum      type,
-                                                const void* indirect)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiDrawElementsIndirect(GLenum      mode,
+                                                                     GLenum      type,
+                                                                     const void* indirect)
 {
-    OpenGL::IndirectCommandChunk            indirect_chunk;
-    void*                                   post_callback_func_arg = nullptr;
-    APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
-    void*                                   pre_callback_func_arg  = nullptr;
-    APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
-    bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    Interception::Hooks::OpenGL::IndirectCommandChunk indirect_chunk;
+    void*                                             post_callback_func_arg = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC           post_callback_func_ptr = nullptr;
+    void*                                             pre_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC            pre_callback_func_ptr  = nullptr;
+    bool                                              should_pass_through    = true;
+    APIInterceptor::Tracker                           tracker;
 
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glDrawElementsIndirect(mode=[%s] type=[%s] indirect=[%p])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(mode),
-                 OpenGL::Utils::get_raw_string_for_gl_enum(type),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(mode),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type),
                  indirect);
 
-        indirect_chunk = OpenGL::IndirectCommandChunk::create_for_draw_elements(indirect,
-                                                                                1,
-                                                                                0);
+        indirect_chunk = Interception::Hooks::OpenGL::IndirectCommandChunk::create_for_draw_elements(indirect,
+                                                                                                     1,
+                                                                                                     0);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDRAWELEMENTSINDIRECT,
                                                          &pre_callback_func_ptr,
@@ -58,9 +58,9 @@ void AI_APIENTRY OpenGL::aiDrawElementsIndirect(GLenum      mode,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLDRAWELEMENTSINDIRECTPROC>(OpenGL::g_cached_gl_draw_elements_indirect)(mode,
-                                                                                                    type,
-                                                                                                    indirect);
+        reinterpret_cast<PFNGLDRAWELEMENTSINDIRECTPROC>(Interception::Hooks::OpenGL::g_cached_gl_draw_elements_indirect)(mode,
+                                                                                                                         type,
+                                                                                                                         indirect);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDRAWELEMENTSINDIRECT,

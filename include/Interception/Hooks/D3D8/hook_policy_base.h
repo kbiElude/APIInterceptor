@@ -9,32 +9,38 @@
 
 #include "Interception/Hooks/D3D8/types.h"
 
-namespace D3D8
+namespace Interception
 {
-    struct HookPolicyBase
+    namespace Hooks
     {
-        static const uint32_t n_extra_arguments = 0;
+        namespace D3D8
+        {
+            struct HookPolicyBase
+            {
+                static const uint32_t n_extra_arguments = 0;
 
-        template<typename... Arguments>
-        static void create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
-                                           const Arguments&...                  in_arguments);
+                template<typename... Arguments>
+                static void create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
+                                                   const Arguments&...                  in_arguments);
 
-        template<typename... Arguments>
-        static void on_call_finished(const bool&         in_is_success,
-                                     const Arguments&... in_arguments);
-    };
+                template<typename... Arguments>
+                static void on_call_finished(const bool& in_is_success,
+                                             const Arguments&... in_arguments);
+            };
+        }
+    }
 }
 
 template<typename... Arguments>
-void D3D8::HookPolicyBase::create_extra_arguments(APIInterceptor::APIFunctionArgument*,
-                                                  const Arguments&...)
+void Interception::Hooks::D3D8::HookPolicyBase::create_extra_arguments(APIInterceptor::APIFunctionArgument*,
+                                                                       const Arguments&...)
 {
     /* Stub */
 }
 
 template<typename... Arguments>
-void D3D8::HookPolicyBase::on_call_finished(const bool&,
-                                            const Arguments&...)
+void Interception::Hooks::D3D8::HookPolicyBase::on_call_finished(const bool&,
+                                                                 const Arguments&...)
 {
     /* Stub */
 }

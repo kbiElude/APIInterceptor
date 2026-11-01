@@ -7,14 +7,20 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiMap1d(GLenum          target,
-                             GLdouble        u1,
-                             GLdouble        u2,
-                             GLint           stride,
-                             GLint           order,
-                             const GLdouble* points);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiMap1d(GLenum          target,
+                                     GLdouble        u1,
+                                     GLdouble        u2,
+                                     GLint           stride,
+                                     GLint           order,
+                                     const GLdouble* points);
+        }
+    }
 }
 
 #endif /* AI_GL_MAP_1D_H */

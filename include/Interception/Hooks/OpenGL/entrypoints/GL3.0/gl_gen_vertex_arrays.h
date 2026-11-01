@@ -7,10 +7,16 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiGenVertexArrays(GLsizei n,
-                                       GLuint* arrays);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiGenVertexArrays(GLsizei n,
+                                               GLuint* arrays);
+        }
+    }
 }
 
 #endif /* AI_GL_GEN_VERTEX_ARRAYS_H */

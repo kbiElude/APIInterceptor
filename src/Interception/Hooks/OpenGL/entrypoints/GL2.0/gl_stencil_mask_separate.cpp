@@ -11,8 +11,8 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiStencilMaskSeparate(GLenum face,
-                                               GLuint mask)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiStencilMaskSeparate(GLenum face,
+                                                                    GLuint mask)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -24,7 +24,7 @@ void AI_APIENTRY OpenGL::aiStencilMaskSeparate(GLenum face,
     if (tracker.is_top_level_api_call() )
     {
         AI_TRACE("glStencilMaskSeparate(face=[%s] mask=[%u])",
-                 OpenGL::Utils::get_raw_string_for_gl_enum(face),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(face),
                  mask);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLSTENCILMASKSEPARATE,
@@ -49,8 +49,8 @@ void AI_APIENTRY OpenGL::aiStencilMaskSeparate(GLenum face,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLSTENCILMASKSEPARATEPROC>(OpenGL::g_cached_gl_stencil_mask_separate)(face,
-                                                                                                  mask);
+        reinterpret_cast<PFNGLSTENCILMASKSEPARATEPROC>(Interception::Hooks::OpenGL::g_cached_gl_stencil_mask_separate)(face,
+                                                                                                                       mask);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLSTENCILMASKSEPARATE,

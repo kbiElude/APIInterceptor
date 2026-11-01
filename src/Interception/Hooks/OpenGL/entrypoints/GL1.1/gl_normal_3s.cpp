@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiNormal3s(GLshort nx,
-                                    GLshort ny,
-                                    GLshort nz)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiNormal3s(GLshort nx,
+                                                         GLshort ny,
+                                                         GLshort nz)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiNormal3s(GLshort nx,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLNORMAL3SPROC>(OpenGL::g_cached_gl_normal_3s)(nx,
-                                                                           ny,
-                                                                           nz);
+        reinterpret_cast<PFNGLNORMAL3SPROC>(Interception::Hooks::OpenGL::g_cached_gl_normal_3s)(nx,
+                                                                                                ny,
+                                                                                                nz);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLNORMAL3S,

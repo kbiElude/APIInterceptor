@@ -4,11 +4,11 @@
  */
 #include "Interception/Core/D3D8Utils/surface_layout.h"
 
-void D3D8::Utils::get_surface_region_layout(const D3DFORMAT& in_format,
-                                            const uint32_t&  in_width,
-                                            const uint32_t&  in_height,
-                                            uint32_t*        out_n_rows_ptr,
-                                            uint32_t*        out_n_row_bytes_ptr)
+void Interception::Core::D3D8Utils::get_surface_region_layout(const Interception::Hooks::D3D8::D3DFORMAT& in_format,
+                                                              const uint32_t&                             in_width,
+                                                              const uint32_t&                             in_height,
+                                                              uint32_t*                                   out_n_rows_ptr,
+                                                              uint32_t*                                   out_n_row_bytes_ptr)
 {
     constexpr uint32_t BLOCK_N_PIXELS_PER_SIDE = 4; /* compressed formats are made of 4x4 blocks */
     constexpr uint32_t DXT1_BLOCK_N_BYTES      = 8;
@@ -22,56 +22,56 @@ void D3D8::Utils::get_surface_region_layout(const D3DFORMAT& in_format,
 
     switch (in_format)
     {
-        case D3DFMT_DXT1:
+        case Interception::Hooks::D3D8::D3DFMT_DXT1:
         {
             n_block_bytes = DXT1_BLOCK_N_BYTES;
 
             break;
         }
 
-        case D3DFMT_DXT2:
-        case D3DFMT_DXT3:
-        case D3DFMT_DXT4:
-        case D3DFMT_DXT5:
+        case Interception::Hooks::D3D8::D3DFMT_DXT2:
+        case Interception::Hooks::D3D8::D3DFMT_DXT3:
+        case Interception::Hooks::D3D8::D3DFMT_DXT4:
+        case Interception::Hooks::D3D8::D3DFMT_DXT5:
         {
             n_block_bytes = DXT2_TO_5_BLOCK_N_BYTES;
 
             break;
         }
 
-        case D3DFMT_A8:
-        case D3DFMT_A4L4:
-        case D3DFMT_L8:
-        case D3DFMT_P8:
-        case D3DFMT_R3G3B2:
+        case Interception::Hooks::D3D8::D3DFMT_A8:
+        case Interception::Hooks::D3D8::D3DFMT_A4L4:
+        case Interception::Hooks::D3D8::D3DFMT_L8:
+        case Interception::Hooks::D3D8::D3DFMT_P8:
+        case Interception::Hooks::D3D8::D3DFMT_R3G3B2:
         {
             n_pixel_bytes = sizeof(uint8_t);
 
             break;
         }
 
-        case D3DFMT_A1R5G5B5:
-        case D3DFMT_A4R4G4B4:
-        case D3DFMT_A8L8:
-        case D3DFMT_A8P8:
-        case D3DFMT_A8R3G3B2:
-        case D3DFMT_D15S1:
-        case D3DFMT_D16:
-        case D3DFMT_D16_LOCKABLE:
-        case D3DFMT_L6V5U5:
-        case D3DFMT_R5G6B5:
-        case D3DFMT_UYVY:
-        case D3DFMT_V8U8:
-        case D3DFMT_X1R5G5B5:
-        case D3DFMT_X4R4G4B4:
-        case D3DFMT_YUY2:
+        case Interception::Hooks::D3D8::D3DFMT_A1R5G5B5:
+        case Interception::Hooks::D3D8::D3DFMT_A4R4G4B4:
+        case Interception::Hooks::D3D8::D3DFMT_A8L8:
+        case Interception::Hooks::D3D8::D3DFMT_A8P8:
+        case Interception::Hooks::D3D8::D3DFMT_A8R3G3B2:
+        case Interception::Hooks::D3D8::D3DFMT_D15S1:
+        case Interception::Hooks::D3D8::D3DFMT_D16:
+        case Interception::Hooks::D3D8::D3DFMT_D16_LOCKABLE:
+        case Interception::Hooks::D3D8::D3DFMT_L6V5U5:
+        case Interception::Hooks::D3D8::D3DFMT_R5G6B5:
+        case Interception::Hooks::D3D8::D3DFMT_UYVY:
+        case Interception::Hooks::D3D8::D3DFMT_V8U8:
+        case Interception::Hooks::D3D8::D3DFMT_X1R5G5B5:
+        case Interception::Hooks::D3D8::D3DFMT_X4R4G4B4:
+        case Interception::Hooks::D3D8::D3DFMT_YUY2:
         {
             n_pixel_bytes = sizeof(uint16_t);
 
             break;
         }
 
-        case D3DFMT_R8G8B8:
+        case Interception::Hooks::D3D8::D3DFMT_R8G8B8:
         {
             n_pixel_bytes = PIXEL_N_BYTES_24BIT;
 

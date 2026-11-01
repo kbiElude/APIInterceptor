@@ -7,7 +7,7 @@
 #include <string>
 #include <sstream>
 
-const char* GDI32::convert_pixel_format_descriptor_to_raw_string(const PIXELFORMATDESCRIPTOR* in_pixel_format_descriptor_ptr)
+const char* Interception::Hooks::GDI32::convert_pixel_format_descriptor_to_raw_string(const PIXELFORMATDESCRIPTOR* in_pixel_format_descriptor_ptr)
 {
     static AI_THREADLOCAL char cache[MAX_PER_FUNC_LOCAL_HELPER_STORAGE_SIZE];
     std::stringstream          result_sstream;

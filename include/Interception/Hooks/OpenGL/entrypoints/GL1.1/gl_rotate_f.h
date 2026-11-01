@@ -7,12 +7,18 @@
 
 #include "Interception/Hooks/OpenGL/types.h"
 
-namespace OpenGL
+namespace Interception
 {
-    void AI_APIENTRY aiRotatef(GLfloat angle,
-                               GLfloat x,
-                               GLfloat y,
-                               GLfloat z);
+    namespace Hooks
+    {
+        namespace OpenGL
+        {
+            void AI_APIENTRY aiRotatef(GLfloat angle,
+                                       GLfloat x,
+                                       GLfloat y,
+                                       GLfloat z);
+        }
+    }
 }
 
 #endif /* AI_GL_ROTATE_F_H */

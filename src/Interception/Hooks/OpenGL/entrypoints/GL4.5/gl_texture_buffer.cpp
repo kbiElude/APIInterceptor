@@ -11,9 +11,9 @@
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include "Interception/Hooks/WGL/globals.h"
 
-void AI_APIENTRY OpenGL::aiTextureBuffer(GLuint texture,
-                                         GLenum internalformat,
-                                         GLuint buffer)
+void AI_APIENTRY Interception::Hooks::OpenGL::aiTextureBuffer(GLuint texture,
+                                                              GLenum internalformat,
+                                                              GLuint buffer)
 {
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
@@ -26,7 +26,7 @@ void AI_APIENTRY OpenGL::aiTextureBuffer(GLuint texture,
     {
         AI_TRACE("glTextureBuffer(texture=[%u] internalformat=[%s] buffer=[%u])",
                  texture,
-                 OpenGL::Utils::get_raw_string_for_gl_enum(internalformat),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(internalformat),
                  buffer);
 
         if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTEXTUREBUFFER,
@@ -52,9 +52,9 @@ void AI_APIENTRY OpenGL::aiTextureBuffer(GLuint texture,
 
     if (should_pass_through)
     {
-        reinterpret_cast<PFNGLTEXTUREBUFFERPROC>(OpenGL::g_cached_gl_texture_buffer)(texture,
-                                                                                     internalformat,
-                                                                                     buffer);
+        reinterpret_cast<PFNGLTEXTUREBUFFERPROC>(Interception::Hooks::OpenGL::g_cached_gl_texture_buffer)(texture,
+                                                                                                          internalformat,
+                                                                                                          buffer);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLTEXTUREBUFFER,

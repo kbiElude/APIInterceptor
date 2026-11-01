@@ -22,39 +22,45 @@
 #include <array>
 #include <utility>
 
-namespace D3D8
+namespace Interception
 {
-    template<typename FunctionPtr, APIInterceptor::APIFunction function, uint32_t vtable_index>
-    struct GenericHook;
-
-    template<typename ReturnType, typename... Arguments, APIInterceptor::APIFunction function, uint32_t vtable_index>
-    struct GenericHook<ReturnType (__stdcall*)(Arguments...), function, vtable_index>
+    namespace Hooks
     {
-        typedef std::array<APIInterceptor::APIFunctionArgument, sizeof...(Arguments) + HookPolicy<function>::n_extra_arguments> ArgumentArray;
-        typedef std::array<APIInterceptor::APIFunctionArgument, sizeof...(Arguments)>                                           HeadArray;
+        namespace D3D8
+        {
+            template<typename FunctionPtr, APIInterceptor::APIFunction function, uint32_t vtable_index>
+            struct GenericHook;
 
-        static ReturnType __stdcall invoke(Arguments... in_arguments);
+            template<typename ReturnType, typename... Arguments, APIInterceptor::APIFunction function, uint32_t vtable_index>
+            struct GenericHook<ReturnType (__stdcall*)(Arguments...), function, vtable_index>
+            {
+                typedef std::array<APIInterceptor::APIFunctionArgument, sizeof...(Arguments) + HookPolicy<function>::n_extra_arguments> ArgumentArray;
+                typedef std::array<APIInterceptor::APIFunctionArgument, sizeof...(Arguments)>                                           HeadArray;
 
-    private:
-        template<size_t... Indices>
-        static HeadArray create_post_arguments(const ArgumentArray&  in_pre_argument_array,
-                                               const bool&           in_is_pre_argument_valid,
-                                               std::index_sequence<Indices...>,
-                                               const Arguments&...   in_arguments);
+                static ReturnType __stdcall invoke(Arguments... in_arguments);
 
-        template<typename Self, typename... Rest>
-        static const void* get_object_ptr(const Self& in_self,
-                                          const Rest&...);
-    };
+            private:
+                template<size_t... Indices>
+                static HeadArray create_post_arguments(const ArgumentArray& in_pre_argument_array,
+                                                       const bool&          in_is_pre_argument_valid,
+                                                       std::index_sequence<Indices...>,
+                                                       const Arguments&...   in_arguments);
+
+                template<typename Self, typename... Rest>
+                static const void* get_object_ptr(const Self& in_self,
+                                                  const Rest&...);
+            };
+        }
+    }
 }
 
 template<typename ReturnType, typename... Arguments, APIInterceptor::APIFunction function, uint32_t vtable_index>
 template<size_t... Indices>
-typename D3D8::GenericHook<ReturnType (__stdcall*)(Arguments...), function, vtable_index>::HeadArray
-D3D8::GenericHook<ReturnType (__stdcall*)(Arguments...), function, vtable_index>::create_post_arguments(const ArgumentArray&  in_pre_argument_array,
-                                                                                                        const bool&           in_is_pre_argument_valid,
-                                                                                                        std::index_sequence<Indices...>,
-                                                                                                        const Arguments&...   in_arguments)
+typename Interception::Hooks::D3D8::GenericHook<ReturnType (__stdcall*)(Arguments...), function, vtable_index>::HeadArray
+Interception::Hooks::D3D8::GenericHook<ReturnType (__stdcall*)(Arguments...), function, vtable_index>::create_post_arguments(const ArgumentArray&  in_pre_argument_array,
+                                                                                                                             const bool&           in_is_pre_argument_valid,
+                                                                                                                             std::index_sequence<Indices...>,
+                                                                                                                             const Arguments&...   in_arguments)
 {
     return {{ArgumentCapture<Arguments>::create_post_argument(in_arguments,
                                                               in_pre_argument_array.at(Indices),
@@ -63,14 +69,14 @@ D3D8::GenericHook<ReturnType (__stdcall*)(Arguments...), function, vtable_index>
 
 template<typename ReturnType, typename... Arguments, APIInterceptor::APIFunction function, uint32_t vtable_index>
 template<typename Self, typename... Rest>
-const void* D3D8::GenericHook<ReturnType (__stdcall*)(Arguments...), function, vtable_index>::get_object_ptr(const Self& in_self,
-                                                                                                             const Rest&...)
+const void* Interception::Hooks::D3D8::GenericHook<ReturnType (__stdcall*)(Arguments...), function, vtable_index>::get_object_ptr(const Self& in_self,
+                                                                                                                                  const Rest&...)
 {
     return in_self;
 }
 
 template<typename ReturnType, typename... Arguments, APIInterceptor::APIFunction function, uint32_t vtable_index>
-ReturnType __stdcall D3D8::GenericHook<ReturnType (__stdcall*)(Arguments...), function, vtable_index>::invoke(Arguments... in_arguments)
+ReturnType __stdcall Interception::Hooks::D3D8::GenericHook<ReturnType (__stdcall*)(Arguments...), function, vtable_index>::invoke(Arguments... in_arguments)
 {
     typedef ReturnType (__stdcall* OriginalFunctionPtr)(Arguments...);
 
