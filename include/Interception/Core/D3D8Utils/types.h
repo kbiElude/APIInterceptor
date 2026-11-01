@@ -46,6 +46,23 @@ namespace Interception
                 VOLUME_TEXTURE
             };
 
+            /* What a D3DPRESENT_PARAMETERS holds, whatever the pointer size of the dumped process (hDeviceWindow is left out). */
+            struct PresentParameters
+            {
+                Interception::Hooks::D3D8::D3DFORMAT           auto_depth_stencil_format         = Interception::Hooks::D3D8::D3DFMT_UNKNOWN;
+                uint32_t            back_buffer_count                 = 0;
+                Interception::Hooks::D3D8::D3DFORMAT           back_buffer_format                = Interception::Hooks::D3D8::D3DFMT_UNKNOWN;
+                uint32_t            back_buffer_height                = 0;
+                uint32_t            back_buffer_width                 = 0;
+                bool                enable_auto_depth_stencil         = false;
+                uint32_t            flags                             = 0;
+                uint32_t            full_screen_presentation_interval = 0;
+                uint32_t            full_screen_refresh_rate_in_hz    = 0;
+                Interception::Hooks::D3D8::D3DMULTISAMPLE_TYPE multi_sample_type                 = Interception::Hooks::D3D8::D3DMULTISAMPLE_NONE;
+                Interception::Hooks::D3D8::D3DSWAPEFFECT       swap_effect                       = Interception::Hooks::D3D8::D3DSWAPEFFECT_DISCARD;
+                bool                windowed                          = false;
+            };
+
             /* D3D8 interfaces. Interface::UNKNOWN means the interface has no entry in the method table. */
             template<typename T>
             struct InterfaceTraits
