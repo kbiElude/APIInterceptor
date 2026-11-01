@@ -67,3 +67,32 @@ TEST(MemoryChunk, IsEmptyWhenThereIsNothingToCopy)
     EXPECT_TRUE(get_chunk_contents(no_pointer_chunk.get_id() ).empty() );
     EXPECT_TRUE(get_chunk_contents(zero_count_chunk.get_id() ).empty() );
 }
+
+TEST(MemoryChunk, TakingOneChunkEmptiesItAndKeepsTheNumbersGoing)
+{
+    const uint32_t       values_u32vec2[] = {5, 6};
+    std::vector<uint8_t> taken_u8vec;
+
+    APIInterceptor::MemoryChunk first_chunk (values_u32vec2,
+                                             2,
+                                             sizeof(uint32_t) );
+    APIInterceptor::MemoryChunk second_chunk(values_u32vec2,
+                                             2,
+                                             sizeof(uint32_t) );
+
+    const auto first_id        = first_chunk.get_id();
+    const auto second_id       = second_chunk.get_id();
+    const auto n_chunks_before = APIInterceptor::get_n_data_chunks();
+
+    EXPECT_TRUE(APIInterceptor::take_data_chunk(first_id,
+                                               &taken_u8vec) );
+    EXPECT_EQ(taken_u8vec.size(),
+              sizeof(values_u32vec2) );
+    EXPECT_FALSE(APIInterceptor::take_data_chunk(first_id,
+                                                &taken_u8vec) );
+    EXPECT_TRUE(get_chunk_contents(first_id).empty() );
+    EXPECT_EQ(get_chunk_contents(second_id).size(),
+              sizeof(values_u32vec2) );
+    EXPECT_EQ(APIInterceptor::get_n_data_chunks(),
+              n_chunks_before);
+}

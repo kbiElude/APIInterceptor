@@ -11,16 +11,16 @@ namespace APIInterceptor
 {
     /* Callback done prior to the API call being invoked. */
     typedef void (*PFNPRECALLBACKFUNCPROC)(APIFunction                in_api_func,
-                                           uint32_t                   in_n_args,
-                                           const APIFunctionArgument* in_args_ptr,
+                                           uint32_t                   in_n_arguments,
+                                           const APIFunctionArgument* in_arguments_ptr,
                                            void*                      in_user_arg_ptr,
                                            bool*                      out_should_pass_through_ptr);
 
     /* Callback done after the API call is invoked. */
     typedef void (*PFNPOSTCALLBACKFUNCPROC)(APIFunction                in_api_func,
                                             void*                      in_user_arg_ptr,
-                                            uint32_t                   in_n_args_out,
-                                            const APIFunctionArgument* in_args_out_ptr,
+                                            uint32_t                   in_n_arguments_out,
+                                            const APIFunctionArgument* in_arguments_out_ptr,
                                             const APIFunctionArgument* out_returned_value_ptr);
 
     void disable_callbacks_for_this_thread();
@@ -44,6 +44,12 @@ namespace APIInterceptor
     DataChunkID register_data_chunk(const void*        in_data_ptr,
                                     const uint32_t&    in_n_bytes);
     void        release_data_chunk (const DataChunkID& in_data_chunk_id);
+
+    /* Moves the contents of one data chunk out of the store: the vector and the chunk change contents, so nothing is allocated. Returns
+     * false if there is no such chunk (it was taken, or released, or never made), and the vector is left as it is.
+     */
+    bool take_data_chunk(const DataChunkID&    in_data_chunk_id,
+                         std::vector<uint8_t>* out_data_chunk_ptr);
 
     /* Moves the contents of the data chunks out of the store, in one go. A chunk which is not there comes out empty. */
     void take_data_chunks(const DataChunkID&                  in_first_data_chunk_id,

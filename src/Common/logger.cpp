@@ -101,22 +101,22 @@ void APIInterceptor::Logger::log(const LogLevel& in_log_level,
                                  const char*     in_message_template,
                                  ...)
 {
-    va_list args;
+    va_list arguments;
     char    temp_i8vec4096[MAX_PER_FUNC_LOCAL_HELPER_STORAGE_SIZE];
 
-    if (!g_logging_enabled)
+    if (g_logging_enabled == false)
     {
         goto end;
     }
 
-    va_start(args,
+    va_start(arguments,
              in_message_template);
     {
         vsprintf_s<sizeof(temp_i8vec4096)>(temp_i8vec4096,
                                  in_message_template,
-                                 args);
+                                 arguments);
     }
-    va_end(args);
+    va_end(arguments);
 
     {
         std::lock_guard<std::mutex> lock           (m_mutex);
@@ -175,7 +175,7 @@ void APIInterceptor::Logger::on_frame_presented()
     {
         std::lock_guard<std::mutex> lock(m_mutex);
 
-        if (!g_logging_enabled)
+        if (g_logging_enabled == false)
         {
             goto end;
         }
