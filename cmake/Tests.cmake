@@ -1,0 +1,33 @@
+# The tests.
+if (APIINTERCEPTOR_BUILD_TESTS)
+    add_subdirectory(deps/gtest)
+
+    file(GLOB APIInterceptorTestsSources CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/src/Tests/*.cpp")
+
+    # Sources under test which are not part of a library.
+    add_executable(APIInterceptorTests ${APIInterceptorTestsSources}
+                                       "${APIInterceptor_SOURCE_DIR}/src/APIDumpReplayer/call_context.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/APIDumpReplayer/call_walker.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/APIDumpReplayer/frame_pacer.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/APIDumpReplayer/gl_index_replayer.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/APIDumpReplayer/gl_replay_context.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/APIDumpReplayer/object_remapper.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/Common/callbacks.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/Common/memory_chunk.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/OpenGL/buffer_manager.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/OpenGL/buffer_mapping_manager.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/OpenGL/client_array_manager.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/OpenGL/param_counts.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/OpenGL/pixel_store_manager.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/OpenGL/string_array_chunk.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/OpenGL/string_chunk.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/OpenGL/texture_manager.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/OpenGL/utils.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/WGL/utils.cpp")
+
+    target_include_directories(APIInterceptorTests PRIVATE "${APIInterceptor_SOURCE_DIR}/src/APIDumpReplayer")
+    target_link_libraries(APIInterceptorTests gtest_main APIDumpLoader APIDumpReplayer D3D8Utils)
+
+    enable_testing()
+    add_test(NAME APIInterceptorTests COMMAND APIInterceptorTests)
+endif()
