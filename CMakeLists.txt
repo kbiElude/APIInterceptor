@@ -40,7 +40,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${APIInterceptor_BINARY_DIR}/bin")
 include_directories("${APIInterceptor_BINARY_DIR}"
                     "${APIInterceptor_SOURCE_DIR}/deps"
                     "${APIInterceptor_SOURCE_DIR}/include"
-                    "${APIInterceptor_SOURCE_DIR}/include/Khronos")
+                    "${APIInterceptor_SOURCE_DIR}/deps/Khronos")
 
 file(GLOB CommonIncludes "${APIInterceptor_SOURCE_DIR}/include/Common/*.h")
 file(GLOB CommonSources  "${APIInterceptor_SOURCE_DIR}/src/Common/*.cpp")
@@ -78,8 +78,8 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
                                 ${Kernel32Sources}
                                 ${Kernel32Includes})
 
-    FILE(GLOB KhronosIncludes "${APIInterceptor_SOURCE_DIR}/include/Khronos/GL/*.h"
-                              "${APIInterceptor_SOURCE_DIR}/include/Khronos/KHR/*.h")
+    FILE(GLOB KhronosIncludes "${APIInterceptor_SOURCE_DIR}/deps/Khronos/GL/*.h"
+                              "${APIInterceptor_SOURCE_DIR}/deps/Khronos/KHR/*.h")
 
     FILE(GLOB OpenGL32EntrypointsIncludes_GL1_0  "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL1.0/*.h")
     FILE(GLOB OpenGL32EntrypointsIncludes_GL1_1  "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL1.1/*.h")

@@ -1,0 +1,8 @@
+Third-party software bundled with API Interceptor (see deps/). Each component is used under its own licence, whose
+full text is kept in the component's directory.
+
+Detours           (deps/Detours)   MIT License            Copyright (c) Microsoft Corporation
+Dear ImGui        (deps/imgui)     MIT License            Copyright (c) 2014-2026 Omar Cornut
+Google Test       (deps/gtest)     BSD 3-Clause License   Copyright 2008, Google Inc.
+Zstandard         (deps/zstd)      BSD 3-Clause License   Copyright (c) Meta Platforms, Inc. and affiliates.
+                                   (Zstandard is dual-licensed under BSD and GPLv2; it is used under the BSD licence.)
