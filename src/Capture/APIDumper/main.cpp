@@ -4,203 +4,7 @@
  */
 #include <Windows.h>
 #include <string>
-#include "Detours/src/detours.h"
-#include "launcher.h"
-
-bool APIDumperLauncher::get_target_architecture(const char*         in_filename_ptr,
-                                                TargetArchitecture* out_architecture_ptr,
-                                                std::string*        out_error_ptr)
-{
-    IMAGE_DOS_HEADER  dos_header   = {};
-    IMAGE_FILE_HEADER file_header  = {};
-    FILE*             file_handle  = ::fopen(in_filename_ptr,
-                                             "rb");
-    uint32_t          pe_signature = 0;
-    bool              result       = false;
-
-    *out_architecture_ptr = TargetArchitecture::UNKNOWN;
-
-    if (file_handle == nullptr)
-    {
-        *out_error_ptr = "Could not open the file for reading.";
-
-        goto end;
-    }
-
-    if (::fread(&dos_header,
-                sizeof(dos_header),
-                1,
-                file_handle) != 1)
-    {
-        *out_error_ptr = "Not a valid PE executable (no MZ header).";
-
-        goto end;
-    }
-
-    if (dos_header.e_magic != IMAGE_DOS_SIGNATURE)
-    {
-        *out_error_ptr = "Not a valid PE executable (no MZ header).";
-
-        goto end;
-    }
-
-    if (::fseek(file_handle,
-                dos_header.e_lfanew,
-                SEEK_SET) != 0)
-    {
-        *out_error_ptr = "Not a valid PE executable (no PE header).";
-
-        goto end;
-    }
-
-    if (::fread(&pe_signature,
-                sizeof(pe_signature),
-                1,
-                file_handle) != 1)
-    {
-        *out_error_ptr = "Not a valid PE executable (no PE header).";
-
-        goto end;
-    }
-
-    if (::fread(&file_header,
-                sizeof(file_header),
-                1,
-                file_handle) != 1)
-    {
-        *out_error_ptr = "Not a valid PE executable (no PE header).";
-
-        goto end;
-    }
-
-    if (pe_signature != IMAGE_NT_SIGNATURE)
-    {
-        *out_error_ptr = "Not a valid PE executable (no PE header).";
-
-        goto end;
-    }
-
-    switch (file_header.Machine)
-    {
-        case IMAGE_FILE_MACHINE_I386:
-        {
-            *out_architecture_ptr = TargetArchitecture::X86;
-             result               = true;
-
-             break;
-        }
-
-        case IMAGE_FILE_MACHINE_AMD64:
-        {
-            *out_architecture_ptr = TargetArchitecture::X64;
-             result               = true;
-
-             break;
-        }
-
-        default:
-        {
-            char error_buffer_i8vec128[128];
-
-            snprintf(error_buffer_i8vec128,
-                     sizeof(error_buffer_i8vec128),
-                     "Unsupported target architecture (PE machine type 0x%04X). Only x86 and x64 are supported.",
-                     static_cast<uint32_t>(file_header.Machine) );
-
-            *out_error_ptr = error_buffer_i8vec128;
-            break;
-        }
-    }
-
-end:
-    if (file_handle != nullptr)
-    {
-        ::fclose(file_handle);
-    }
-
-    return result;
-}
-
-bool APIDumperLauncher::launch_with_apc_injection(const char*          in_command_line_ptr,
-                                                  const char*          in_working_directory_ptr,
-                                                  const char*          in_dll_path_ptr,
-                                                  PROCESS_INFORMATION* out_process_info_ptr)
-{
-    std::string command_line       (in_command_line_ptr);
-    DWORD       last_error         = ERROR_SUCCESS;
-    bool        is_process_created = false;
-    size_t      n_path_bytes       = ::strlen(in_dll_path_ptr) + 1;
-    void*       remote_path_ptr    = nullptr;
-    bool        result             = false;
-    STARTUPINFO startup_info       = {};
-
-    startup_info.cb       = sizeof(startup_info);
-    *out_process_info_ptr = {};
-
-    if (::CreateProcessA(nullptr,
-                         &command_line[0],
-                         nullptr,                                   /* lpProcessAttributes */
-                         nullptr,                                   /* lpThreadAttributes  */
-                         FALSE,                                     /* bInheritHandles     */
-                         CREATE_SUSPENDED | CREATE_DEFAULT_ERROR_MODE,
-                         nullptr,                                   /* lpEnvironment       */
-                         in_working_directory_ptr,
-                        &startup_info,
-                         out_process_info_ptr) == FALSE)
-    {
-        goto end;
-    }
-
-    is_process_created = true;
-
-    remote_path_ptr = ::VirtualAllocEx(out_process_info_ptr->hProcess,
-                                       nullptr,
-                                       n_path_bytes,
-                                       MEM_COMMIT | MEM_RESERVE,
-                                       PAGE_READWRITE);
-
-    if (remote_path_ptr == nullptr)
-    {
-        goto end;
-    }
-
-    if (::WriteProcessMemory(out_process_info_ptr->hProcess,
-                             remote_path_ptr,
-                             in_dll_path_ptr,
-                             n_path_bytes,
-                             nullptr) == FALSE)
-    {
-        goto end;
-    }
-
-    /* kernel32 is mapped at the same address in every process of the same bitness. */
-    if (::QueueUserAPC(reinterpret_cast<PAPCFUNC>(::GetProcAddress(::GetModuleHandleA("kernel32.dll"),
-                                                                   "LoadLibraryA") ),
-                       out_process_info_ptr->hThread,
-                       reinterpret_cast<ULONG_PTR>(remote_path_ptr) ) == 0)
-    {
-        goto end;
-    }
-
-    if (::ResumeThread(out_process_info_ptr->hThread) == static_cast<DWORD>(-1) )
-    {
-        goto end;
-    }
-
-    result = true;
-end:
-    if (result            == false &&
-        is_process_created)
-    {
-        last_error = ::GetLastError();
-
-        ::TerminateProcess(out_process_info_ptr->hProcess,
-                           EXIT_FAILURE);
-        ::SetLastError    (last_error);
-    }
-
-    return result;
-}
+#include "Capture/InjectionLauncher/launcher.h"
 
 int main(int   in_argc,
          char* in_argv[])
@@ -339,14 +143,14 @@ int main(int   in_argc,
 
     /* Now look for the dumper dll .. The DLL must match the target's architecture, not ours. */
     {
-        char                                  dll_dir_raw_i8vec260    [MAX_PATH] = {};
-        std::string                           target_architecture_error;
-        APIDumperLauncher::TargetArchitecture target_architecture       = APIDumperLauncher::TargetArchitecture::UNKNOWN;
-        char                                  working_dir_raw_i8vec260[MAX_PATH] = {};
+        char                                          dll_dir_raw_i8vec260    [MAX_PATH] = {};
+        std::string                                   target_architecture_error;
+        Capture::InjectionLauncher::TargetArchitecture target_architecture                = Capture::InjectionLauncher::TargetArchitecture::UNKNOWN;
+        char                                          working_dir_raw_i8vec260[MAX_PATH] = {};
 
-        if (!APIDumperLauncher::get_target_architecture(filename_ptr,
-                                                       &target_architecture,
-                                                       &target_architecture_error) )
+        if (Capture::InjectionLauncher::Launcher::get_target_architecture(filename_ptr,
+                                                                         &target_architecture,
+                                                                         &target_architecture_error) == false)
         {
             fprintf(stderr,
                     "[!] Could not determine architecture of [%s]: %s\n",
@@ -356,19 +160,15 @@ int main(int   in_argc,
             goto end;
         }
 
-        #if defined(_WIN64)
-            constexpr APIDumperLauncher::TargetArchitecture launcher_architecture = APIDumperLauncher::TargetArchitecture::X64;
-        #else
-            constexpr APIDumperLauncher::TargetArchitecture launcher_architecture = APIDumperLauncher::TargetArchitecture::X86;
-        #endif
+        const Capture::InjectionLauncher::TargetArchitecture launcher_architecture = Capture::InjectionLauncher::Launcher::get_own_architecture();
 
         /* Detours cannot inject across architectures when launching a process this way. */
         if (target_architecture != launcher_architecture)
         {
-            const char* target_architecture_string   = (target_architecture   == APIDumperLauncher::TargetArchitecture::X86) ? "x86"
-                                                                                                                             : "x64";
-            const char* launcher_architecture_string = (launcher_architecture == APIDumperLauncher::TargetArchitecture::X86) ? "x86"
-                                                                                                                             : "x64";
+            const char* target_architecture_string   = (target_architecture   == Capture::InjectionLauncher::TargetArchitecture::X86) ? "x86"
+                                                                                                                                     : "x64";
+            const char* launcher_architecture_string = (launcher_architecture == Capture::InjectionLauncher::TargetArchitecture::X86) ? "x86"
+                                                                                                                                     : "x64";
 
             fprintf(stderr,
                     "[!] [%s] is an %s executable but this is the %s APIDumper. Use APIDumper_%s.exe instead.\n",
@@ -380,8 +180,8 @@ int main(int   in_argc,
             goto end;
         }
 
-        apidumper_dll_file_name = (target_architecture == APIDumperLauncher::TargetArchitecture::X86) ? "APIDumperDLL_x86.dll"
-                                                                                                      : "APIDumperDLL_x64.dll";
+        apidumper_dll_file_name = (target_architecture == Capture::InjectionLauncher::TargetArchitecture::X86) ? "APIDumperDLL_x86.dll"
+                                                                                                              : "APIDumperDLL_x64.dll";
 
         if (::GetCurrentDirectory(sizeof(working_dir_raw_i8vec260),
                                   working_dir_raw_i8vec260) == 0)
@@ -417,8 +217,8 @@ int main(int   in_argc,
             fprintf(stderr,
                     "[!] [%s] is an %s executable but [%s] was not found.\n",
                     filename_ptr,
-                    (target_architecture == APIDumperLauncher::TargetArchitecture::X86) ? "x86"
-                                                                                        : "x64",
+                    (target_architecture == Capture::InjectionLauncher::TargetArchitecture::X86) ? "x86"
+                                                                                                : "x64",
                     apidumper_dll_file_name.c_str() );
 
             goto end;
@@ -476,76 +276,36 @@ int main(int   in_argc,
 
     // Launch the process with APIDumper attached.
     {
-        std::string         filename_with_args = std::string(filename_ptr);
-        PROCESS_INFORMATION process_info;
-        STARTUPINFO         startup_info;
+        Capture::InjectionLauncher::LaunchRequest request;
+        PROCESS_INFORMATION                      process_info;
+        std::string                              launch_error;
 
-        memset(&process_info,
-               0,
-               sizeof(process_info) );
-        memset(&startup_info,
-               0,
-               sizeof(startup_info) );
-
-        startup_info.cb = sizeof(startup_info);
+        request.dll_path          = apidumper_dll_file_name;
+        request.executable_path   = filename_ptr;
+        request.working_directory = working_dir;
 
         {
             uint32_t n_current_arg = n_file_path_cmd_line_arg + 1;
 
             while (n_current_arg < static_cast<uint32_t>(in_argc) )
             {
-                filename_with_args += std::string(" ") + in_argv[n_current_arg];
+                request.arguments += (request.arguments.empty() ) ? std::string()
+                                                                  : std::string(" ");
+                request.arguments += in_argv[n_current_arg];
 
                 n_current_arg++;
             }
         }
 
-        if (::DetourCreateProcessWithDll(nullptr,
-                                         const_cast<LPSTR>(filename_with_args.c_str() ),
-                                         nullptr,                          /* lpProcessAttributes */
-                                         nullptr,                          /* lpThreadAttributes  */
-                                         FALSE,                            /* bInheritHandles     */
-                                         CREATE_DEFAULT_ERROR_MODE,
-                                         nullptr,                          /* lpEnvironment       */
-                                         working_dir.c_str(),              /* lpCurrentDirectory  */
-                                        &startup_info,
-                                        &process_info,
-                                         apidumper_dll_file_name.c_str(),
-                                         nullptr) != TRUE)                 /* pfCreateProcessA    */
+        if (Capture::InjectionLauncher::Launcher::launch(request,
+                                                        &process_info,
+                                                        &launch_error) == false)
         {
-            const DWORD last_error = ::GetLastError();
+            fprintf(stderr,
+                    "[!] %s\n",
+                    launch_error.c_str() );
 
-            /* Detours rejects PEs with non-standard headers (e.g. packed ones). */
-            if (last_error == ERROR_INVALID_OPERATION)
-            {
-                fprintf(stderr,
-                        "[*] Detours cannot patch [%s]; injecting via APC instead.\n",
-                        filename_ptr);
-
-                if (APIDumperLauncher::launch_with_apc_injection(filename_with_args.c_str(),
-                                                                 working_dir.c_str(),
-                                                                 apidumper_dll_file_name.c_str(),
-                                                                &process_info) == false)
-                {
-                    fprintf(stderr,
-                            "[!] Could not launch [%s] with [%s] attached (error %lu).\n",
-                            filename_ptr,
-                            apidumper_dll_file_name.c_str(),
-                            ::GetLastError() );
-
-                    goto end;
-                }
-            }
-            else
-            {
-                fprintf(stderr,
-                        "[!] Could not launch [%s] with [%s] attached (error %lu).\n",
-                        filename_ptr,
-                        apidumper_dll_file_name.c_str(),
-                        last_error);
-
-                goto end;
-            }
+            goto end;
         }
 
         #if defined(_DEBUG)

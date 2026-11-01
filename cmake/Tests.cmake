@@ -28,8 +28,10 @@ if (APIINTERCEPTOR_BUILD_TESTS)
                                        "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/OpenGL/utils.cpp"
                                        "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/WGL/utils.cpp")
 
-    target_include_directories(APIInterceptorTests PRIVATE "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL")
-    target_link_libraries(APIInterceptorTests gtest_main APIDumpLoader ReplayEngineDLL D3D8Utils)
+    target_include_directories(APIInterceptorTests PRIVATE "${APIInterceptor_SOURCE_DIR}/src"
+                                                           "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL")
+    target_compile_definitions(APIInterceptorTests PRIVATE APIINTERCEPTOR_TESTS_DATA_DIR="${APIInterceptor_SOURCE_DIR}/src/Tests/data")
+    target_link_libraries(APIInterceptorTests gtest_main APIDumpLoader ReplayEngineDLL D3D8Utils InjectionLauncher)
 
     enable_testing()
     add_test(NAME APIInterceptorTests COMMAND APIInterceptorTests)

@@ -23,6 +23,20 @@ if (APIINTERCEPTOR_BUILD_LIBS)
 
     target_link_libraries(APIDumpLoader PUBLIC Zstd)
 
+    # The launcher needs Detours, which the interceptor builds.
+    if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
+        file(GLOB InjectionLauncherIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Capture/InjectionLauncher/*.h")
+        file(GLOB InjectionLauncherSources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Capture/InjectionLauncher/*.cpp")
+
+        # Starting an application with a DLL in it: shared by the dumper and the programs which build on this project.
+        add_library(InjectionLauncher STATIC ${InjectionLauncherIncludes} ${InjectionLauncherSources})
+
+        target_link_libraries(InjectionLauncher PUBLIC Detours)
+
+        source_group ("InjectionLauncher include files" FILES ${InjectionLauncherIncludes})
+        source_group ("InjectionLauncher source files"  FILES ${InjectionLauncherSources})
+    endif()
+
     source_group ("APIDump Loader include files"  FILES ${APIDumpLoaderIncludes})
     source_group ("APIDump Loader source files"   FILES ${APIDumpLoaderSources})
 

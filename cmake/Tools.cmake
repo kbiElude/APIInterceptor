@@ -8,7 +8,7 @@ if (APIINTERCEPTOR_BUILD_TOOLS)
     add_executable(APIDumpPrinter      ${APIDumpPrinterSources})
     add_library   (APIDumperDLL SHARED ${APIDumperDLLIncludes} ${APIDumperDLLSources})
 
-    target_link_libraries(APIDumper      Detours)
+    target_link_libraries(APIDumper      InjectionLauncher)
     target_link_libraries(APIDumperDLL   APIInterceptor Zstd)
     target_link_libraries(APIDumpPrinter APIDumpLoader D3D8Utils OpenGLUtils)
 
