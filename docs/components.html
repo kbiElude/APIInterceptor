@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Components</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site"><nav>
+  <a class="brand" href="index.html">API Interceptor</a>
+  <a href="index.html">Overview</a>
+  <a href="capture.html">Capture</a>
+  <a class="current" href="components.html">Components</a>
+  <a href="building.html">Building</a>
+</nav></header>
+<main>
+<h1>Components</h1>
+<p class="lead">What each project is for, grouped as the source tree is. The pages before this one follow the jobs; this one follows the code, for the reader who has a project name and wants to know where it fits.</p>
+
+<p>A project is one of three kinds. A <strong>library</strong> is linked into others. A <strong>DLL</strong> is loaded into a process, usually injected into the program that is being studied. A <strong>program</strong> is started by a person. The ones a person starts are <code>APIDumper</code> and <code>APIDumpPrinter</code>. The rest is used by those, and by any project that has this one as a submodule and builds on its libraries.</p>
+
+<ol class="toc">
+  <li><a href="#interception">Interception: hooks and core</a></li>
+  <li><a href="#capture">Capture</a></li>
+  <li><a href="#replay">Replay</a></li>
+  <li><a href="#support">Tests and third-party code</a></li>
+</ol>
+
+<h2 id="interception">Interception: hooks and core</h2>
+<p>These are the parts that sit inside the program that is studied. A hook is the replacement of an entry point of an API: it calls the callbacks registered for it, then the real function, then the callbacks again. What the callbacks do (write a dump, or whatever a project that builds on this one needs) is for the DLL that registers them, not for the hooks. Each hooked entry point is named <code>ai&lt;ApiName&gt;</code>.</p>
+
+<h3>APIInterceptor (<code>Common</code>)</h3>
+<p><em>Library of objects, compiled into every DLL that hooks.</em> The machinery that does not depend on an API: the registry of callbacks that run before and after each function, the gate that stops the interceptor from seeing its own calls, the store of the data chunks that a call carries, the logger, the failure of unsupported values (<code>AI_FAIL_UNSUPPORTED</code>), and the types of the workload file. Its namespace is <code>APIInterceptor</code>.</p>
+
+<h3>D3D8, OpenGL, WGL, GDI32, User32, Kernel32</h3>
+<p><em>Libraries, one for each set of entry points.</em></p>
+<ul>
+  <li><code>D3D8</code> hooks Direct3D 8 through the tables of methods of its objects. Besides the entry points it has the policy of what is hooked, the construction and modification of typed arguments, and the tracker of locks, so that the data a program writes into a buffer or a surface is known when it is unlocked.</li>
+  <li><code>OpenGL</code> hooks the functions of each version and extension, a directory for each. It keeps the state that is per context in a registry of contexts.</li>
+  <li><code>WGL</code> hooks the creation and the use of OpenGL contexts on Windows.</li>
+  <li><code>GDI32</code> hooks the choice of the pixel format and the swap of buffers; <code>User32</code> hooks the creation of windows and device contexts. Together with <code>WGL</code> they are what a workload needs to put the window and the context back at replay. They do not draw.</li>
+  <li><code>Kernel32</code> hooks <code>LoadLibrary</code> and <code>ExitProcess</code>: the first to notice an API that is loaded after the program starts, the second to know when the process ends.</li>
+</ul>
+
+<h3>D3D8Utils and OpenGLUtils</h3>
+<p><em>Libraries, in <code>Interception/Core</code>.</em> The knowledge of an API that is not a hook. <code>D3D8Utils</code> describes the Direct3D 8 interfaces and methods (the table of methods, the traits and kinds of arguments, readers of values, the layout of the pixels of a surface). The hooks, the printer and any project that reads a workload all read it, so that none of them keeps its own list. <code>OpenGLUtils</code> is the corresponding, smaller helper for the enums of OpenGL.</p>
+
+<h2 id="capture">Capture</h2>
+<p>Recording what a program does into a workload file. See <a href="capture.html">Capture</a>.</p>
+
+<h3>APIDumper</h3>
+<p><em>Program.</em> Starts a program with <code>APIDumperDLL</code> injected. It does not record anything itself.</p>
+
+<h3>APIDumperDLL</h3>
+<p><em>DLL.</em> Registers callbacks on the hooks and records every call with its arguments and data chunks, and the images of the back buffer of Direct3D 8 (<code>d3d8_swapchain_reader</code>). The calls are cut into segments and compressed with Zstd by a writer thread, so that a program is not slowed down by the disk.</p>
+
+<h3>APIDumpLoader</h3>
+<p><em>Library.</em> Reads a workload. <code>WorkloadReader</code> takes it segment by segment, so that a workload larger than memory can be read; <code>api_info</code> says which API group a call belongs to and which calls end a frame. The replay engine and the printer read workloads through it.</p>
+
+<h3>APIDumpPrinter</h3>
+<p><em>Program.</em> Prints a workload as text, every call with every argument. It has the names of the calls and enums of each API, and a decoder of the arguments. It is for reading what a program did, and nothing else.</p>
+
+<h3>InjectionLauncher</h3>
+<p><em>Library.</em> Starting an application with a DLL in it, used by the dumper, and by any project that has to start a program with a DLL in it. It reads the executable to know its architecture, injects with Detours while the application is suspended.</p>
+
+<h2 id="replay">Replay</h2>
+<p>Executing the calls of a workload again, without the program: to check that a capture is complete, and as a test of the captures that the dumper makes.</p>
+
+<h3>ReplayEngineDLL</h3>
+<p><em>DLL, built for 32 and 64 bits.</em> The replay engine. It walks the calls of a workload and hands each to the executor of its API (Direct3D 8, OpenGL, Win32 windows, or one that does nothing). It remaps the objects of the dump onto the live ones, restores the arguments a call needs, replays locks and client arrays, and paces the frames. The executors are the parts that depend on an API.</p>
+
+<h3>ReplayPlayer</h3>
+<p><em>Program.</em> A control window (Dear ImGui) around the replay engine: choose a workload, play and pause. A 64-bit player starts the 32-bit one for a 32-bit workload.</p>
+
+<h2 id="support">Tests and third-party code</h2>
+
+<h3>APIInterceptorTests</h3>
+<p><em>Program.</em> The tests, with googletest, of every library above. The helpers shared with a project which builds on this one (the path of the program that runs the tests, the names of sessions) are <code>Tests::Fixtures</code>, a library of their own, <code>APIInterceptorTestSupport</code>. See <a href="building.html#tests">Building</a>.</p>
+
+<h3>deps</h3>
+<p>Detours (built by <code>Detours_AI</code>) for hooking and injection; Dear ImGui for the window of the player; Zstd for the compression of workloads; googletest; and the Khronos headers of OpenGL.</p>
+</main>
+</body>
+</html>

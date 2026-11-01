@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Building</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site"><nav>
+  <a class="brand" href="index.html">API Interceptor</a>
+  <a href="index.html">Overview</a>
+  <a href="capture.html">Capture</a>
+  <a href="components.html">Components</a>
+  <a class="current" href="building.html">Building</a>
+</nav></header>
+<main>
+<h1>Building &amp; testing</h1>
+<p class="lead">CMake, MSVC, C++14. Two builds (32-bit and 64-bit) are needed because the programs that are studied are often 32-bit, so the injected parts have a build of each.</p>
+
+<h2>Build</h2>
+<pre><code>build.bat                    :: incremental, x86 + x64, outputs in build_final\
+build.bat --from-scratch     :: wipe, configure, build
+build.bat --debug            :: Debug instead of Release</code></pre>
+<p>Third-party code is in <code>deps/</code> (Detours, Dear ImGui, googletest, Zstd; the Khronos headers of OpenGL). The project can also be built as a subproject of another one: see <a href="#subproject">Used by another project</a>.</p>
+
+<h2 id="release">The collected build</h2>
+<p><code>build_final\</code> is what a release is, so that it can be zipped as it is and unpacked anywhere. <code>build.bat</code> empties it at the start of its collecting step, so nothing of an earlier build or of the other configuration stays in it, and then installs both build trees into it (<code>cmake --install</code> with <code>--prefix build_final</code>, once for <code>build_x86</code> and once for <code>build_x64</code>):</p>
+<ul>
+  <li><code>tools\APIDumper\</code>: the dumper and its DLL, of both architectures, and the printer of a capture;</li>
+  <li><code>tools\Replay\</code>: the replay engine and the replay player, of both architectures.</li>
+</ul>
+<p>Where a program has both architectures, the 64-bit one has the suffix <code>_x64</code> and the 32-bit one <code>_x86</code>. A program looks for the ones it starts or loads next to itself (the dumper for its DLL, the 64-bit replay player for its 32-bit pair), which is why a group is installed as a whole. What goes where, and under which name, is written in <code>cmake/Install.cmake</code>, as an install rule for each program. Only the programs named there are installed, so a program that is not a target any more (after a rename, say) cannot end up in <code>build_final</code>, and a program that is missing makes the install fail instead of leaving a hole.</p>
+<p>Nothing else is installed: no libraries and no debug information. A Release build writes no <code>.pdb</code> files at all; a Debug build writes them next to its programs in the build tree, and they are not installed. The installing needs CMake 3.15 or newer (<code>cmake --install</code>).</p>
+<p>Test data is in <code>src/Tests/data</code> and is not collected.</p>
+
+<h2>Source layout</h2>
+<p>Public headers are in <code>include/</code> and sources in <code>src/</code>; both have the same groups, and a module is <code>include/&lt;Group&gt;/&lt;Module&gt;</code> and <code>src/&lt;Group&gt;/&lt;Module&gt;</code>. An include names the group: <code>#include "Interception/Hooks/D3D8/types.h"</code>. The namespaces follow the same path: a class of the D3D8 module is <code>Interception::Hooks::D3D8::Foo</code>, one of the replay engine is <code>Replay::ReplayEngineDLL::Foo</code>. The exceptions are <code>Common</code>, whose namespace is <code>APIInterceptor</code>, and the tests, in <code>Tests</code>. The two utility modules of the interceptor core have namespaces of their own, <code>Interception::Core::D3D8Utils</code> and <code>Interception::Core::OpenGLUtils</code>.</p>
+<table>
+<tr><th>Group</th><th>Modules</th></tr>
+<tr><td><code>Interception/Hooks</code></td><td>D3D8, GDI32, Kernel32, OpenGL, User32, WGL</td></tr>
+<tr><td><code>Interception/Core</code></td><td>D3D8Utils, OpenGLUtils</td></tr>
+<tr><td><code>Capture</code></td><td>APIDumper, APIDumperDLL, APIDumpLoader, APIDumpPrinter, InjectionLauncher</td></tr>
+<tr><td><code>Replay</code></td><td>ReplayEngineDLL, ReplayPlayer</td></tr>
+<tr><td><code>Common</code>, <code>Tests</code></td><td>the types and the interceptor core everything shares; the tests (in <code>src/</code> only)</td></tr>
+</table>
+<p>Programs have sources only; the third-party Khronos headers are in <code>deps/Khronos</code>.</p>
+
+<h2>CMake layout</h2>
+<p>The root <code>CMakeLists.txt</code> holds the options and the settings every project shares, then includes one file per group from <code>cmake/</code>, in this order: <code>Interception.cmake</code> (hooks and the interceptor core), <code>Libraries.cmake</code> (the loader of workloads and the launcher of an injected program), <code>Tools.cmake</code> (the dumper and the printer), <code>Usage.cmake</code> (what a project which builds on this one needs to compile against it), <code>Tests.cmake</code>, <code>Install.cmake</code> (what the release holds, with the helpers of <code>InstallHelpers.cmake</code>) and <code>Folders.cmake</code> (the folders of the solution, with the helpers of <code>FolderHelpers.cmake</code>). The order matters: the files share variables, and a target must exist before it is given a folder.</p>
+
+<h2>Solution layout</h2>
+<p>The generated Visual Studio solution groups projects in folders: <em>Interception</em> (Hooks, Core), <em>Capture</em>, <em>Tests</em>, <em>Third party</em>. File lists are globbed with <code>CONFIGURE_DEPENDS</code>, so a new file is picked up by the next build.</p>
+
+<h2 id="tests">Tests</h2>
+<p>One test program, <code>APIInterceptorTests</code>, with googletest. Shared helpers (<code>Tests::Fixtures</code>) live in <code>src/Tests/fixtures.*</code>, which are a library of their own, <code>APIInterceptorTestSupport</code>, so that a project which builds on this one can use them.</p>
+
+<h2 id="subproject">Used by another project</h2>
+<p>The libraries can be built by a project that has this one as a submodule (<code>add_subdirectory(deps/APIInterceptor EXCLUDE_FROM_ALL)</code>, with the <code>APIINTERCEPTOR_BUILD_*</code> options set before it). Each library carries the include directories it needs (<code>Usage.cmake</code>), so the project includes headers by the same names; <code>Install.cmake</code> does nothing then, since the project has a release of its own. The script <code>build.bat</code> takes <code>--source-dir &lt;dir&gt;</code>, and builds and collects that project instead. <a href="#tests">The test support</a> and googletest are available to its tests when <code>APIINTERCEPTOR_BUILD_TESTS</code> is on.</p>
+
+<h2 id="package">Installed package</h2>
+<p>The static libraries can also be installed and found by <code>find_package(APIInterceptor)</code>:</p>
+<pre>cmake --install &lt;build dir&gt; --config Release --component Development --prefix &lt;prefix&gt;</pre>
+<p>The package exports <code>APIInterceptor::APIDumpLoader</code>, <code>APIInterceptor::D3D8Utils</code>, <code>APIInterceptor::InjectionLauncher</code> (and the Detours and Zstd libraries they use), with their headers. The hooks themselves (the <code>APIInterceptor</code> object library) are built through <code>add_subdirectory</code>, since a DLL that is injected has to contain them.</p>
+
+<h2 id="conventions">Code conventions</h2>
+<ul>
+  <li>There are no anonymous namespaces: helpers of a class are private static members, helpers of a test file are file-scope static functions, and test doubles that more than one test file needs are in <code>src/Tests/test_doubles.*</code>.</li>
+  <li>Everything is in a named namespace; definitions are written qualified (<code>Ret NS::f()</code>) rather than inside namespace blocks.</li>
+  <li>Names: <code>_ptr</code> for pointers, <code>_vec</code>, <code>_set</code>, <code>_map</code> for containers, <code>_func</code> for callables, <code>_f32mat</code> for matrices, <code>_fp32vecN</code> / <code>_u8vecN</code> for fixed arrays; constants are <code>constexpr UPPER_CASE</code>.</li>
+  <li>Functions, members, variables and struct fields are in alphabetical order. Static <code>create_ptr()</code> is the first function declared in a class header.</li>
+  <li>One return per function (<code>goto end</code> for early exits), one action and one condition per line in <code>if</code>, <code>== false</code> rather than <code>!</code>, <code>else</code> and <code>if</code> on separate lines, mutex locks in their own block.</li>
+  <li>A function call that is one of several conditions of an <code>if</code> is made before it, into a variable, and the <code>if</code>s are nested in the order the conditions were evaluated, so that a call is made only when the conditions before it hold. Accessors, getters and lookups (<code>size()</code>, <code>at()</code>, <code>empty()</code>, <code>find()</code>) stay in the condition.</li>
+  <li>Consecutive statements are aligned in runs: the <code>=</code>, the opening parenthesis of each call (<code>reader.read_u64 ();</code> under <code>reader.read_bool();</code>), and in a condition the <code>&amp;&amp;</code> column, the comparison operators and their right operands. A blank line starts a new run, so one long declaration does not widen the others.</li>
+  <li>A list or an expression that gets long (about 140 columns) is broken with one element or operand per line, not wrapped at the margin.</li>
+  <li>A <code>default</code> of a switch that means "this value is not supported yet" calls <code>AI_FAIL_UNSUPPORTED(value)</code>, which ends the process in every build.</li>
+  <li>Comments say why or state a contract; they are short.</li>
+</ul>
+</main>
+</body>
+</html>

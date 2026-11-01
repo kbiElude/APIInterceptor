@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Capture</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site"><nav>
+  <a class="brand" href="index.html">API Interceptor</a>
+  <a href="index.html">Overview</a>
+  <a class="current" href="capture.html">Capture</a>
+  <a href="components.html">Components</a>
+  <a href="building.html">Building</a>
+</nav></header>
+<main>
+<h1>Capture</h1>
+<p class="lead">Every call a program makes to the graphics API is seen and written down with its data, in a workload file that another program can read.</p>
+
+<h2>What happens to one call</h2>
+<figure>
+<svg viewBox="0 0 900 200" role="img" aria-label="Order of events for one intercepted call">
+  <defs><marker id="arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z"/></marker></defs>
+  <rect class="box4" x="10" y="70" width="110" height="50" rx="6"/><text x="65" y="100" text-anchor="middle">Program</text>
+  <rect class="box" x="170" y="70" width="120" height="50" rx="6"/><text x="230" y="92" text-anchor="middle">hook</text><text class="small" x="230" y="108" text-anchor="middle">ai&lt;ApiName&gt;</text>
+  <rect class="box" x="340" y="30" width="150" height="40" rx="6"/><text x="415" y="55" text-anchor="middle">pre callbacks</text>
+  <rect class="box" x="340" y="80" width="150" height="40" rx="6"/><text x="415" y="105" text-anchor="middle">original call</text>
+  <rect class="box" x="340" y="130" width="150" height="40" rx="6"/><text x="415" y="155" text-anchor="middle">post callbacks</text>
+  <rect class="box3" x="560" y="30" width="140" height="50" rx="6"/><text x="630" y="52" text-anchor="middle">data chunks</text><text class="small" x="630" y="68" text-anchor="middle">one per struct argument</text>
+  <rect class="box3" x="560" y="120" width="140" height="50" rx="6"/><text x="630" y="142" text-anchor="middle">call record</text><text class="small" x="630" y="158" text-anchor="middle">args in / out / result</text>
+  <rect class="box2" x="760" y="75" width="130" height="50" rx="6"/><text x="825" y="97" text-anchor="middle">workload file</text><text class="small" x="825" y="113" text-anchor="middle">compressed (Zstd)</text>
+  <path class="arrow" d="M120 95H168"/><path class="arrow" d="M290 85L338 55"/><path class="arrow" d="M290 100L338 100"/><path class="arrow" d="M290 110L338 150"/>
+  <path class="arrow" d="M490 50H558"/><path class="arrow" d="M490 150H558"/>
+  <path class="arrow" d="M700 55L758 90"/><path class="arrow" d="M700 145L758 110"/>
+</svg>
+<figcaption>The hook runs the pre callbacks, makes the original call, then the post callbacks. Structures that the call reads or writes are copied into data chunks, and the record refers to them by number.</figcaption>
+</figure>
+
+<h3>Data chunks</h3>
+<p><code>DataChunkStore</code> keeps the chunks. A chunk is registered when a call is made and given a number which is never used again. The store holds only the chunks from the oldest one that is neither taken nor released, so it does not grow while the program runs. A consumer takes a chunk once (<code>take_data_chunk</code>, or <code>take_data_chunks</code> for a run of them); taking moves the contents out.</p>
+
+<h3>Callbacks and the gate</h3>
+<p><code>CallbackRegistry</code> holds the pre and post callbacks of each function (registered at start-up, never changed after). <code>ApiCallGate</code> lets the dumper hold other threads back from entering intercepted calls while it cuts a segment of the workload. All three are process-wide objects that are never destroyed, since hooks can still run while the process shuts down; the free functions in <code>Common/callbacks.h</code> forward to them.</p>
+
+<h3>Calls the interceptor makes itself</h3>
+<p>A program that builds on the interceptor (one that changes the calls, or plays them back) has to call the API too. Those calls go through <code>OwnCallScope</code>, which keeps the hooks from recording them as the program's.</p>
+
+<h2>The tools</h2>
+<table>
+<tr><th>Tool</th><th>Use</th></tr>
+<tr><td><code>APIDumper</code></td><td>Starts a program with <code>APIDumperDLL</code> injected; the DLL writes the workload.</td></tr>
+<tr><td><code>APIDumpPrinter</code></td><td>Prints a workload as text, verbosely: every input and result; <code>[out:]</code> marks an argument the call changed by reference.</td></tr>
+<tr><td><code>ReplayPlayer</code></td><td>Plays a workload again in a window, with the replay engine, without the program.</td></tr>
+</table>
+
+<h2>The replay engine</h2>
+<p><code>ReplayEngineDLL</code> reads calls from a workload (in segments if it is large; see <code>WorkloadReader</code>) and executes each through an <code>ICallExecutor</code>. Observers (<code>IReplayObserver</code>) hear about frames and calls, and the pacing of the frames is one.</p>
+<div class="note">Each API has an executor of its own, registered by its API group: today Direct3D 8, OpenGL and the Win32 windowing calls (GDI32, User32, WGL), and another API is added with its own. There is no translation of one API to another.</div>
+</main>
+</body>
+</html>
