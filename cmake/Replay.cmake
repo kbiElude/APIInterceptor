@@ -1,15 +1,15 @@
 # The replayer and the programs which play a workload.
 # The replayer needs the D3D8 description of the interceptor (D3D8Utils).
 if (APIINTERCEPTOR_BUILD_INTERCEPTOR AND APIINTERCEPTOR_BUILD_LIBS)
-    file(GLOB APIDumpReplayerIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Replay/ReplayEngineDLL/*.h")
-    file(GLOB APIDumpReplayerSources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL/*.cpp"
+    file(GLOB ReplayEngineDLLIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Replay/ReplayEngineDLL/*.h")
+    file(GLOB ReplayEngineDLLSources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL/*.cpp"
                                                         "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL/*.h")
 
-    add_library(APIDumpReplayer SHARED ${APIDumpReplayerIncludes} ${APIDumpReplayerSources})
+    add_library(ReplayEngineDLL SHARED ${ReplayEngineDLLIncludes} ${ReplayEngineDLLSources})
 
-    target_compile_definitions(APIDumpReplayer PRIVATE APIDUMPREPLAYER_BUILDING_DLL)
-    target_include_directories(APIDumpReplayer PRIVATE "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL")
-    target_link_libraries     (APIDumpReplayer APIDumpLoader D3D8Utils gdi32 opengl32 user32 winmm)
+    target_compile_definitions(ReplayEngineDLL PRIVATE REPLAYENGINEDLL_BUILDING_DLL)
+    target_include_directories(ReplayEngineDLL PRIVATE "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL")
+    target_link_libraries     (ReplayEngineDLL APIDumpLoader D3D8Utils gdi32 opengl32 user32 winmm)
 
     # The control window of the player. Win32 + Direct3D 11 backends of Dear ImGui.
     add_library(ImGui STATIC "${APIInterceptor_SOURCE_DIR}/deps/imgui/imgui.cpp"
@@ -23,19 +23,19 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR AND APIINTERCEPTOR_BUILD_LIBS)
                                             "${APIInterceptor_SOURCE_DIR}/deps/imgui/backends")
     target_link_libraries     (ImGui d3d11 d3dcompiler dxgi dwmapi)
 
-    file(GLOB APIDumpPlayerSources CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayPlayer/*.cpp"
+    file(GLOB ReplayPlayerSources CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayPlayer/*.cpp"
                                                      "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayPlayer/*.h")
 
-    add_executable(APIDumpPlayer ${APIDumpPlayerSources})
+    add_executable(ReplayPlayer ${ReplayPlayerSources})
 
-    target_link_libraries(APIDumpPlayer APIDumpLoader APIDumpReplayer ImGui comdlg32)
+    target_link_libraries(ReplayPlayer APIDumpLoader ReplayEngineDLL ImGui comdlg32)
 
     # The 32-bit pair has its own names, so that the 64-bit player can find it next to itself (see PlayerLauncher).
     if (CMAKE_SIZEOF_VOID_P EQUAL 4)
-        set_target_properties(APIDumpPlayer   PROPERTIES OUTPUT_NAME "APIDumpPlayer_x86")
-        set_target_properties(APIDumpReplayer PROPERTIES OUTPUT_NAME "APIDumpReplayer_x86")
+        set_target_properties(ReplayPlayer   PROPERTIES OUTPUT_NAME "ReplayPlayer_x86")
+        set_target_properties(ReplayEngineDLL PROPERTIES OUTPUT_NAME "ReplayEngineDLL_x86")
     endif()
 
-    source_group ("APIDump Replayer include files" FILES ${APIDumpReplayerIncludes})
-    source_group ("APIDump Replayer source files"  FILES ${APIDumpReplayerSources})
+    source_group ("Replay Engine include files" FILES ${ReplayEngineDLLIncludes})
+    source_group ("Replay Engine source files"  FILES ${ReplayEngineDLLSources})
 endif()

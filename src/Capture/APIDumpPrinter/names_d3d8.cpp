@@ -13,9 +13,9 @@
 
 #define D3D8_TABLE(array) array, static_cast<uint32_t>(sizeof(array) / sizeof(array[0]) )
 
-bool APIDumpPrinter::get_flag_name_table(const Interception::Hooks::D3D8::ValueKind& in_kind,
-                                                              const FlagNameEntry**  out_table_ptr_ptr,
-                                                              uint32_t*              out_n_entries_ptr)
+bool Capture::APIDumpPrinter::get_flag_name_table(const Interception::Hooks::D3D8::ValueKind& in_kind,
+                                                                        const FlagNameEntry**  out_table_ptr_ptr,
+                                                                        uint32_t*              out_n_entries_ptr)
 {
     static const FlagNameEntry clear_flag_name_array[] =
     {
@@ -106,8 +106,8 @@ bool APIDumpPrinter::get_flag_name_table(const Interception::Hooks::D3D8::ValueK
     return result;
 }
 
-bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state,
-                                                 StateValueInfo* out_info_ptr)
+bool Capture::APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state,
+                                                           StateValueInfo* out_info_ptr)
 {
     static const ValueNameEntry z_buffer_type_name_array[] =
     {
@@ -399,8 +399,8 @@ bool APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state
     return result;
 }
 
-bool APIDumpPrinter::get_texture_stage_state_value_info(const uint32_t& in_texture_stage_state,
-                                                        StateValueInfo* out_info_ptr)
+bool Capture::APIDumpPrinter::get_texture_stage_state_value_info(const uint32_t& in_texture_stage_state,
+                                                                  StateValueInfo* out_info_ptr)
 {
     static const ValueNameEntry texture_op_name_array[] =
     {
@@ -574,9 +574,9 @@ bool APIDumpPrinter::get_texture_stage_state_value_info(const uint32_t& in_textu
     return result;
 }
 
-bool APIDumpPrinter::get_value_name_table(const Interception::Hooks::D3D8::ValueKind& in_kind,
-                                                               const ValueNameEntry** out_table_ptr_ptr,
-                                                               uint32_t*              out_n_entries_ptr)
+bool Capture::APIDumpPrinter::get_value_name_table(const Interception::Hooks::D3D8::ValueKind& in_kind,
+                                                                         const ValueNameEntry** out_table_ptr_ptr,
+                                                                         uint32_t*              out_n_entries_ptr)
 {
     static const ValueNameEntry back_buffer_type_name_array[] =
     {

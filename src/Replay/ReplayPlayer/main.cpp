@@ -18,34 +18,37 @@
 #include <vector>
 #include <Windows.h>
 
-namespace APIDumpPlayer
+namespace Replay
 {
-    /* Reports what happens to the replay on the console, and how steady the frames come. */
-    class ConsoleObserver : public APIDumpReplayer::IReplayObserver
+    namespace ReplayPlayer
     {
-    public:
-        ConsoleObserver();
+        /* Reports what happens to the replay on the console, and how steady the frames come. */
+        class ConsoleObserver : public Replay::ReplayEngineDLL::IReplayObserver
+        {
+        public:
+            ConsoleObserver();
 
-        void on_error          (const std::string&                    in_message) override;
-        void on_frame_presented(const uint32_t&                       in_n_frame) override;
-        void on_state_changed  (const APIDumpReplayer::PlaybackState& in_old_state,
-                                const APIDumpReplayer::PlaybackState& in_new_state) override;
-        void on_window_placed  (const APIDumpReplayer::WindowPlacement& in_placement) override;
+            void on_error          (const std::string&                    in_message) override;
+            void on_frame_presented(const uint32_t&                       in_n_frame) override;
+            void on_state_changed  (const Replay::ReplayEngineDLL::PlaybackState& in_old_state,
+                                            const Replay::ReplayEngineDLL::PlaybackState& in_new_state) override;
+            void on_window_placed  (const Replay::ReplayEngineDLL::WindowPlacement& in_placement) override;
 
-    private:
-        void print_frame_times();
+        private:
+            void print_frame_times();
 
-        std::vector<double> m_frame_time_ms_vec;
-        double              m_last_frame_ms;
-        double              m_ms_per_tick;
-    };
+            std::vector<double> m_frame_time_ms_vec;
+            double              m_last_frame_ms;
+            double              m_ms_per_tick;
+        };
 
-    int  run        (int                                   in_argc,
-                  char*                                 in_argv[]);
-    void run_console(APIDumpReplayer::IPlaybackController* in_controller_ptr);
+        int  run        (int                                   in_argc,
+                      char*                                 in_argv[]);
+        void run_console(Replay::ReplayEngineDLL::IPlaybackController* in_controller_ptr);
+    }
 }
 
-APIDumpPlayer::ConsoleObserver::ConsoleObserver()
+Replay::ReplayPlayer::ConsoleObserver::ConsoleObserver()
     :m_last_frame_ms(0.0),
      m_ms_per_tick  (0.0)
 {
@@ -56,14 +59,14 @@ APIDumpPlayer::ConsoleObserver::ConsoleObserver()
     m_ms_per_tick = 1000.0 / static_cast<double>(frequency.QuadPart);
 }
 
-void APIDumpPlayer::ConsoleObserver::on_error(const std::string& in_message)
+void Replay::ReplayPlayer::ConsoleObserver::on_error(const std::string& in_message)
 {
     fprintf(stderr,
             "[!] %s\n",
             in_message.c_str() );
 }
 
-void APIDumpPlayer::ConsoleObserver::on_frame_presented(const uint32_t& in_n_frame)
+void Replay::ReplayPlayer::ConsoleObserver::on_frame_presented(const uint32_t& in_n_frame)
 {
     LARGE_INTEGER ticks;
 
@@ -81,8 +84,8 @@ void APIDumpPlayer::ConsoleObserver::on_frame_presented(const uint32_t& in_n_fra
     m_last_frame_ms = now_ms;
 }
 
-void APIDumpPlayer::ConsoleObserver::on_state_changed(const APIDumpReplayer::PlaybackState& in_old_state,
-                                                      const APIDumpReplayer::PlaybackState& in_new_state)
+void Replay::ReplayPlayer::ConsoleObserver::on_state_changed(const Replay::ReplayEngineDLL::PlaybackState& in_old_state,
+                                                                     const Replay::ReplayEngineDLL::PlaybackState& in_new_state)
 {
     (void) in_old_state;
 
@@ -91,7 +94,7 @@ void APIDumpPlayer::ConsoleObserver::on_state_changed(const APIDumpReplayer::Pla
             StateNames::get_state_name_ptr(in_new_state) );
 
     /* A pause, or the end, closes a stretch of frames; the time to the next one does not count. */
-    if (in_new_state != APIDumpReplayer::PlaybackState::PLAYING)
+    if (in_new_state != Replay::ReplayEngineDLL::PlaybackState::PLAYING)
     {
         print_frame_times();
 
@@ -101,12 +104,12 @@ void APIDumpPlayer::ConsoleObserver::on_state_changed(const APIDumpReplayer::Pla
     }
 }
 
-void APIDumpPlayer::ConsoleObserver::on_window_placed(const APIDumpReplayer::WindowPlacement& in_placement)
+void Replay::ReplayPlayer::ConsoleObserver::on_window_placed(const Replay::ReplayEngineDLL::WindowPlacement& in_placement)
 {
     (void) in_placement;
 }
 
-void APIDumpPlayer::ConsoleObserver::print_frame_times()
+void Replay::ReplayPlayer::ConsoleObserver::print_frame_times()
 {
     constexpr size_t N_PERCENT = 100;
 
@@ -126,11 +129,11 @@ void APIDumpPlayer::ConsoleObserver::print_frame_times()
     }
 }
 
-int APIDumpPlayer::run(int   in_argc,
-                       char* in_argv[])
+int Replay::ReplayPlayer::run(int   in_argc,
+                              char* in_argv[])
 {
-    APIDumpReplayer::IPlaybackController* controller_ptr  = nullptr;
-    APIDumpReplayer::IReplayEngine*       engine_ptr      = nullptr;
+    Replay::ReplayEngineDLL::IPlaybackController* controller_ptr  = nullptr;
+    Replay::ReplayEngineDLL::IReplayEngine*       engine_ptr      = nullptr;
     std::string                           error;
     int                                   exit_code       = EXIT_FAILURE;
     bool                                  is_console      = false;
@@ -161,7 +164,7 @@ int APIDumpPlayer::run(int   in_argc,
     if (is_usage_error)
     {
         fprintf(stderr,
-                "Usage: APIDumpPlayer [--console] [file.workload]\n"
+                "Usage: ReplayPlayer [--console] [file.workload]\n"
                 "Without a file, a window asks for one. The window has the play / pause and reset buttons. With --console,\n"
                 "the commands are typed instead:\n"
                 "p = play / pause, r = reset, s = status, x <speed> = speed (1 = the recorded pace, 0 = unlimited), q = quit\n");
@@ -200,7 +203,7 @@ int APIDumpPlayer::run(int   in_argc,
         goto end;
     }
 
-    engine_ptr = APIDumpReplayer::aiCreateReplayEngine();
+    engine_ptr = Replay::ReplayEngineDLL::aiCreateReplayEngine();
 
     engine_ptr->add_replay_observer(&observer);
 
@@ -255,13 +258,13 @@ end:
     {
         engine_ptr->remove_replay_observer(&observer);
 
-        APIDumpReplayer::aiDestroyReplayEngine(engine_ptr);
+        Replay::ReplayEngineDLL::aiDestroyReplayEngine(engine_ptr);
     }
 
     return result;
 }
 
-void APIDumpPlayer::run_console(APIDumpReplayer::IPlaybackController* in_controller_ptr)
+void Replay::ReplayPlayer::run_console(Replay::ReplayEngineDLL::IPlaybackController* in_controller_ptr)
 {
     for (std::string command; std::getline(std::cin,
                                            command); )
@@ -275,7 +278,7 @@ void APIDumpPlayer::run_console(APIDumpReplayer::IPlaybackController* in_control
         {
             const auto status = in_controller_ptr->get_status();
 
-            if (status.state == APIDumpReplayer::PlaybackState::PLAYING)
+            if (status.state == Replay::ReplayEngineDLL::PlaybackState::PLAYING)
             {
                 in_controller_ptr->pause();
             }
@@ -313,6 +316,6 @@ void APIDumpPlayer::run_console(APIDumpReplayer::IPlaybackController* in_control
 int main(int   in_argc,
          char* in_argv[])
 {
-    return APIDumpPlayer::run(in_argc,
-                              in_argv);
+    return Replay::ReplayPlayer::run(in_argc,
+                                     in_argv);
 }

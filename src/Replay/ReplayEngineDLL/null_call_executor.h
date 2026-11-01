@@ -2,25 +2,28 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
-#ifndef APIDUMPREPLAYER_NULL_CALL_EXECUTOR_H
-#define APIDUMPREPLAYER_NULL_CALL_EXECUTOR_H
+#ifndef REPLAYENGINEDLL_NULL_CALL_EXECUTOR_H
+#define REPLAYENGINEDLL_NULL_CALL_EXECUTOR_H
 
 #include "i_call_executor.h"
 
-namespace APIDumpReplayer
+namespace Replay
 {
-    /* Accepts every call and does nothing with it: stands in for the APIs which have no executor yet. */
-    class NullCallExecutor : public ICallExecutor
+    namespace ReplayEngineDLL
     {
-    public:
-        NullCallExecutor();
+        /* Accepts every call and does nothing with it: stands in for the APIs which have no executor yet. */
+        class NullCallExecutor : public ICallExecutor
+        {
+        public:
+            NullCallExecutor();
 
-        bool execute           (const APIDumpLoader::DumpedAPICall& in_call,
-                                const CallWalker&                   in_walker,
-                                std::string*                        out_error_ptr) override;
-        void on_frame_presented() override;
-        void reset             () override;
-    };
+            bool execute           (const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                             const CallWalker&                   in_walker,
+                                             std::string*                        out_error_ptr) override;
+            void on_frame_presented() override;
+            void reset             () override;
+        };
+    }
 }
 
-#endif /* APIDUMPREPLAYER_NULL_CALL_EXECUTOR_H */
+#endif /* REPLAYENGINEDLL_NULL_CALL_EXECUTOR_H */

@@ -7,7 +7,7 @@
 #include "d3d8_replay_invoker.h"
 #include <string.h>
 
-APIDumpReplayer::D3D8CallExecutor::D3D8CallExecutor(ObjectRemapper* in_remapper_ptr)
+Replay::ReplayEngineDLL::D3D8CallExecutor::D3D8CallExecutor(ObjectRemapper* in_remapper_ptr)
     :m_context      (in_remapper_ptr),
      m_d3d8_module  (nullptr),
      m_lock_replayer(&m_context)
@@ -29,13 +29,13 @@ APIDumpReplayer::D3D8CallExecutor::D3D8CallExecutor(ObjectRemapper* in_remapper_
     #undef D3D8_METHOD
 }
 
-APIDumpReplayer::D3D8CallExecutor::~D3D8CallExecutor()
+Replay::ReplayEngineDLL::D3D8CallExecutor::~D3D8CallExecutor()
 {
     /* The objects belong to the replay thread: reset() has released them already. */
 }
 
-bool APIDumpReplayer::D3D8CallExecutor::create_direct3d8(const APIDumpLoader::DumpedAPICall& in_call,
-                                                         std::string*                        out_error_ptr)
+bool Replay::ReplayEngineDLL::D3D8CallExecutor::create_direct3d8(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                                          std::string*                        out_error_ptr)
 {
     typedef void* (__stdcall* PFNDIRECT3DCREATE8PROC)(UINT);
 
@@ -86,9 +86,9 @@ end:
     return result;
 }
 
-bool APIDumpReplayer::D3D8CallExecutor::execute(const APIDumpLoader::DumpedAPICall& in_call,
-                                                const CallWalker&                   in_walker,
-                                                std::string*                        out_error_ptr)
+bool Replay::ReplayEngineDLL::D3D8CallExecutor::execute(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                                 const CallWalker&                   in_walker,
+                                                                 std::string*                        out_error_ptr)
 {
     const auto invoker_iterator = m_invoker_map.find(in_call.func);
     bool       result           = false;
@@ -146,7 +146,7 @@ end:
     return result;
 }
 
-bool APIDumpReplayer::D3D8CallExecutor::is_ignored_method(const char* in_method_name_ptr)
+bool Replay::ReplayEngineDLL::D3D8CallExecutor::is_ignored_method(const char* in_method_name_ptr)
 {
     static const char* const IGNORED_METHOD_NAME_ARRAY[] =
     {
@@ -179,12 +179,12 @@ bool APIDumpReplayer::D3D8CallExecutor::is_ignored_method(const char* in_method_
     return result;
 }
 
-void APIDumpReplayer::D3D8CallExecutor::on_frame_presented()
+void Replay::ReplayEngineDLL::D3D8CallExecutor::on_frame_presented()
 {
     /* Stub */
 }
 
-bool APIDumpReplayer::D3D8CallExecutor::release(const APIDumpLoader::DumpedAPICall& in_call)
+bool Replay::ReplayEngineDLL::D3D8CallExecutor::release(const Capture::APIDumpLoader::DumpedAPICall& in_call)
 {
     typedef ULONG (__stdcall* PFNRELEASEPROC)(void*);
 
@@ -208,7 +208,7 @@ bool APIDumpReplayer::D3D8CallExecutor::release(const APIDumpLoader::DumpedAPICa
     return true;
 }
 
-void APIDumpReplayer::D3D8CallExecutor::reset()
+void Replay::ReplayEngineDLL::D3D8CallExecutor::reset()
 {
     m_lock_replayer.reset();
     m_context.release_all_objects();

@@ -12,10 +12,10 @@
 #include <Windows.h>
 #include <mmsystem.h>
 
-APIDumpReplayer::ReplayEngine::ReplayEngine()
+Replay::ReplayEngineDLL::ReplayEngine::ReplayEngine()
     :m_is_loaded(false)
 {
-    for (const auto& group : APIDumpLoader::get_api_groups() )
+    for (const auto& group : Capture::APIDumpLoader::get_api_groups() )
     {
         m_executor_ptr_map[group] = std::make_shared<NullCallExecutor>();
     }
@@ -27,16 +27,16 @@ APIDumpReplayer::ReplayEngine::ReplayEngine()
                                                                                  notify_window_placed(in_placement);
                                                                              });
 
-        m_executor_ptr_map[APIDumpLoader::APIGroup::GDI32]  = win32_executor_ptr;
-        m_executor_ptr_map[APIDumpLoader::APIGroup::USER32] = win32_executor_ptr;
-        m_executor_ptr_map[APIDumpLoader::APIGroup::WGL]    = win32_executor_ptr;
+        m_executor_ptr_map[Capture::APIDumpLoader::APIGroup::GDI32]  = win32_executor_ptr;
+        m_executor_ptr_map[Capture::APIDumpLoader::APIGroup::USER32] = win32_executor_ptr;
+        m_executor_ptr_map[Capture::APIDumpLoader::APIGroup::WGL]    = win32_executor_ptr;
     }
 
-    m_executor_ptr_map[APIDumpLoader::APIGroup::D3D8] = std::make_shared<D3D8CallExecutor>(&m_remapper);
-    m_executor_ptr_map[APIDumpLoader::APIGroup::GL]   = std::make_shared<GlCallExecutor>(&m_remapper);
+    m_executor_ptr_map[Capture::APIDumpLoader::APIGroup::D3D8] = std::make_shared<D3D8CallExecutor>(&m_remapper);
+    m_executor_ptr_map[Capture::APIDumpLoader::APIGroup::GL]   = std::make_shared<GlCallExecutor>(&m_remapper);
 }
 
-APIDumpReplayer::ReplayEngine::~ReplayEngine()
+Replay::ReplayEngineDLL::ReplayEngine::~ReplayEngine()
 {
     {
         std::lock_guard<std::mutex> lock(m_control.mutex);
@@ -52,21 +52,21 @@ APIDumpReplayer::ReplayEngine::~ReplayEngine()
     }
 }
 
-void APIDumpReplayer::ReplayEngine::add_call_interceptor(ICallInterceptor* in_interceptor_ptr)
+void Replay::ReplayEngineDLL::ReplayEngine::add_call_interceptor(ICallInterceptor* in_interceptor_ptr)
 {
     std::lock_guard<std::mutex> lock(m_listeners.mutex);
 
     m_listeners.interceptor_ptr_vec.push_back(in_interceptor_ptr);
 }
 
-void APIDumpReplayer::ReplayEngine::add_replay_observer(IReplayObserver* in_observer_ptr)
+void Replay::ReplayEngineDLL::ReplayEngine::add_replay_observer(IReplayObserver* in_observer_ptr)
 {
     std::lock_guard<std::mutex> lock(m_listeners.mutex);
 
     m_listeners.observer_ptr_vec.push_back(in_observer_ptr);
 }
 
-bool APIDumpReplayer::ReplayEngine::execute_call(const APIDumpLoader::DumpedAPICall& in_call)
+bool Replay::ReplayEngineDLL::ReplayEngine::execute_call(const Capture::APIDumpLoader::DumpedAPICall& in_call)
 {
     std::string                    error;
     std::vector<ICallInterceptor*> interceptor_ptr_vec;
@@ -98,7 +98,7 @@ bool APIDumpReplayer::ReplayEngine::execute_call(const APIDumpLoader::DumpedAPIC
 
     if (should_execute)
     {
-        const auto executor_iterator = m_executor_ptr_map.find(APIDumpLoader::get_api_group(in_call.func) );
+        const auto executor_iterator = m_executor_ptr_map.find(Capture::APIDumpLoader::get_api_group(in_call.func) );
 
         if (executor_iterator == m_executor_ptr_map.end() )
         {
@@ -136,7 +136,7 @@ end:
     return result;
 }
 
-void APIDumpReplayer::ReplayEngine::fail(const std::string& in_message)
+void Replay::ReplayEngineDLL::ReplayEngine::fail(const std::string& in_message)
 {
     {
         std::lock_guard<std::mutex> lock(m_control.mutex);
@@ -149,7 +149,7 @@ void APIDumpReplayer::ReplayEngine::fail(const std::string& in_message)
     notify_error(in_message);
 }
 
-std::vector<APIDumpReplayer::ICallExecutor*> APIDumpReplayer::ReplayEngine::get_executor_ptr_vec() const
+std::vector<Replay::ReplayEngineDLL::ICallExecutor*> Replay::ReplayEngineDLL::ReplayEngine::get_executor_ptr_vec() const
 {
     std::vector<ICallExecutor*> result_vec;
 
@@ -169,19 +169,19 @@ std::vector<APIDumpReplayer::ICallExecutor*> APIDumpReplayer::ReplayEngine::get_
     return result_vec;
 }
 
-std::vector<APIDumpReplayer::IReplayObserver*> APIDumpReplayer::ReplayEngine::get_observer_ptr_vec() const
+std::vector<Replay::ReplayEngineDLL::IReplayObserver*> Replay::ReplayEngineDLL::ReplayEngine::get_observer_ptr_vec() const
 {
     std::lock_guard<std::mutex> lock(m_listeners.mutex);
 
     return m_listeners.observer_ptr_vec;
 }
 
-APIDumpReplayer::IPlaybackController* APIDumpReplayer::ReplayEngine::get_playback_controller_ptr()
+Replay::ReplayEngineDLL::IPlaybackController* Replay::ReplayEngineDLL::ReplayEngine::get_playback_controller_ptr()
 {
     return this;
 }
 
-APIDumpReplayer::PlaybackStatus APIDumpReplayer::ReplayEngine::get_status() const
+Replay::ReplayEngineDLL::PlaybackStatus Replay::ReplayEngineDLL::ReplayEngine::get_status() const
 {
     PlaybackStatus result;
 
@@ -197,8 +197,8 @@ APIDumpReplayer::PlaybackStatus APIDumpReplayer::ReplayEngine::get_status() cons
     return result;
 }
 
-bool APIDumpReplayer::ReplayEngine::load(const char*  in_filename_ptr,
-                                         std::string* out_error_ptr)
+bool Replay::ReplayEngineDLL::ReplayEngine::load(const char*  in_filename_ptr,
+                                                 std::string* out_error_ptr)
 {
     bool result = false;
 
@@ -227,7 +227,7 @@ end:
     return result;
 }
 
-void APIDumpReplayer::ReplayEngine::notify_error(const std::string& in_message)
+void Replay::ReplayEngineDLL::ReplayEngine::notify_error(const std::string& in_message)
 {
     const auto observer_ptr_vec = get_observer_ptr_vec();
 
@@ -237,7 +237,7 @@ void APIDumpReplayer::ReplayEngine::notify_error(const std::string& in_message)
     }
 }
 
-void APIDumpReplayer::ReplayEngine::notify_frame_presented(const uint32_t& in_n_frame)
+void Replay::ReplayEngineDLL::ReplayEngine::notify_frame_presented(const uint32_t& in_n_frame)
 {
     const auto observer_ptr_vec = get_observer_ptr_vec();
 
@@ -247,7 +247,7 @@ void APIDumpReplayer::ReplayEngine::notify_frame_presented(const uint32_t& in_n_
     }
 }
 
-void APIDumpReplayer::ReplayEngine::notify_idle()
+void Replay::ReplayEngineDLL::ReplayEngine::notify_idle()
 {
     for (const auto executor_ptr : get_executor_ptr_vec() )
     {
@@ -255,7 +255,7 @@ void APIDumpReplayer::ReplayEngine::notify_idle()
     }
 }
 
-void APIDumpReplayer::ReplayEngine::notify_window_placed(const WindowPlacement& in_placement)
+void Replay::ReplayEngineDLL::ReplayEngine::notify_window_placed(const WindowPlacement& in_placement)
 {
     const auto observer_ptr_vec = get_observer_ptr_vec();
 
@@ -265,14 +265,14 @@ void APIDumpReplayer::ReplayEngine::notify_window_placed(const WindowPlacement& 
     }
 }
 
-void APIDumpReplayer::ReplayEngine::pause()
+void Replay::ReplayEngineDLL::ReplayEngine::pause()
 {
     std::lock_guard<std::mutex> lock(m_control.mutex);
 
     m_control.should_play = false;
 }
 
-void APIDumpReplayer::ReplayEngine::play()
+void Replay::ReplayEngineDLL::ReplayEngine::play()
 {
     {
         std::lock_guard<std::mutex> lock(m_control.mutex);
@@ -283,7 +283,7 @@ void APIDumpReplayer::ReplayEngine::play()
     m_control.cv.notify_all();
 }
 
-void APIDumpReplayer::ReplayEngine::play_until_frame_boundary()
+void Replay::ReplayEngineDLL::ReplayEngine::play_until_frame_boundary()
 {
     bool is_done = false;
 
@@ -294,7 +294,7 @@ void APIDumpReplayer::ReplayEngine::play_until_frame_boundary()
 
     while (is_done == false)
     {
-        const APIDumpLoader::DumpedAPICall* call_ptr = nullptr;
+        const Capture::APIDumpLoader::DumpedAPICall* call_ptr = nullptr;
 
         if (m_walker.read_next_call(&call_ptr) == false)
         {
@@ -311,7 +311,7 @@ void APIDumpReplayer::ReplayEngine::play_until_frame_boundary()
             continue;
         }
 
-        const bool is_frame_boundary = APIDumpLoader::is_frame_boundary(call_ptr->func);
+        const bool is_frame_boundary = Capture::APIDumpLoader::is_frame_boundary(call_ptr->func);
 
         if (is_frame_boundary)
         {
@@ -365,7 +365,7 @@ void APIDumpReplayer::ReplayEngine::play_until_frame_boundary()
     }
 }
 
-void APIDumpReplayer::ReplayEngine::remove_call_interceptor(ICallInterceptor* in_interceptor_ptr)
+void Replay::ReplayEngineDLL::ReplayEngine::remove_call_interceptor(ICallInterceptor* in_interceptor_ptr)
 {
     std::lock_guard<std::mutex> lock(m_listeners.mutex);
 
@@ -375,7 +375,7 @@ void APIDumpReplayer::ReplayEngine::remove_call_interceptor(ICallInterceptor* in
                                           m_listeners.interceptor_ptr_vec.end() );
 }
 
-void APIDumpReplayer::ReplayEngine::remove_replay_observer(IReplayObserver* in_observer_ptr)
+void Replay::ReplayEngineDLL::ReplayEngine::remove_replay_observer(IReplayObserver* in_observer_ptr)
 {
     std::lock_guard<std::mutex> lock(m_listeners.mutex);
 
@@ -385,7 +385,7 @@ void APIDumpReplayer::ReplayEngine::remove_replay_observer(IReplayObserver* in_o
                                        m_listeners.observer_ptr_vec.end() );
 }
 
-void APIDumpReplayer::ReplayEngine::reset()
+void Replay::ReplayEngineDLL::ReplayEngine::reset()
 {
     {
         std::lock_guard<std::mutex> lock(m_control.mutex);
@@ -397,7 +397,7 @@ void APIDumpReplayer::ReplayEngine::reset()
     m_control.cv.notify_all();
 }
 
-void APIDumpReplayer::ReplayEngine::reset_executors(const bool& in_is_final)
+void Replay::ReplayEngineDLL::ReplayEngine::reset_executors(const bool& in_is_final)
 {
     /* The executors which came later depend on the ones which came earlier (a device needs its window). */
     const auto executor_ptr_vec = get_executor_ptr_vec();
@@ -419,7 +419,7 @@ void APIDumpReplayer::ReplayEngine::reset_executors(const bool& in_is_final)
     m_remapper.clear();
 }
 
-bool APIDumpReplayer::ReplayEngine::rewind()
+bool Replay::ReplayEngineDLL::ReplayEngine::rewind()
 {
     std::string error;
     const bool  is_rewound = m_walker.rewind(&error);
@@ -442,12 +442,12 @@ bool APIDumpReplayer::ReplayEngine::rewind()
     return is_rewound;
 }
 
-void APIDumpReplayer::ReplayEngine::set_speed(const double& in_speed)
+void Replay::ReplayEngineDLL::ReplayEngine::set_speed(const double& in_speed)
 {
     m_pacer.set_speed(in_speed);
 }
 
-void APIDumpReplayer::ReplayEngine::set_state(const PlaybackState& in_state)
+void Replay::ReplayEngineDLL::ReplayEngine::set_state(const PlaybackState& in_state)
 {
     PlaybackState old_state;
 
@@ -470,7 +470,7 @@ void APIDumpReplayer::ReplayEngine::set_state(const PlaybackState& in_state)
     }
 }
 
-void APIDumpReplayer::ReplayEngine::thread_main()
+void Replay::ReplayEngineDLL::ReplayEngine::thread_main()
 {
     constexpr std::chrono::milliseconds IDLE_INTERVAL(10);
 

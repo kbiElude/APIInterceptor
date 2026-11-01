@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <Windows.h>
 
-APIDumpReplayer::FramePacer::FramePacer()
+Replay::ReplayEngineDLL::FramePacer::FramePacer()
     :m_average_gap_seconds(0.0),
      m_is_anchored       (false),
      m_last_timestamp_qpc(0),
@@ -16,7 +16,7 @@ APIDumpReplayer::FramePacer::FramePacer()
     /* Stub */
 }
 
-uint64_t APIDumpReplayer::FramePacer::get_wall_frequency()
+uint64_t Replay::ReplayEngineDLL::FramePacer::get_wall_frequency()
 {
     LARGE_INTEGER frequency;
 
@@ -25,7 +25,7 @@ uint64_t APIDumpReplayer::FramePacer::get_wall_frequency()
     return static_cast<uint64_t>(frequency.QuadPart);
 }
 
-uint64_t APIDumpReplayer::FramePacer::get_wall_ticks()
+uint64_t Replay::ReplayEngineDLL::FramePacer::get_wall_ticks()
 {
     LARGE_INTEGER ticks;
 
@@ -34,19 +34,19 @@ uint64_t APIDumpReplayer::FramePacer::get_wall_ticks()
     return static_cast<uint64_t>(ticks.QuadPart);
 }
 
-void APIDumpReplayer::FramePacer::reset()
+void Replay::ReplayEngineDLL::FramePacer::reset()
 {
     m_average_gap_seconds = 0.0;
     m_is_anchored         = false;
 }
 
-void APIDumpReplayer::FramePacer::set_speed(const double& in_speed)
+void Replay::ReplayEngineDLL::FramePacer::set_speed(const double& in_speed)
 {
     m_speed = in_speed;
 }
 
-void APIDumpReplayer::FramePacer::wait_for_frame(const uint64_t& in_timestamp_qpc,
-                                                 const uint64_t& in_qpc_frequency)
+void Replay::ReplayEngineDLL::FramePacer::wait_for_frame(const uint64_t& in_timestamp_qpc,
+                                                         const uint64_t& in_qpc_frequency)
 {
     /* Sleep() is exact to a millisecond at best; the rest of the wait is spent spinning. */
     constexpr double GAP_AVERAGE_FACTOR    = 4.0;

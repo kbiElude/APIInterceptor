@@ -4,8 +4,8 @@
  */
 #include "function_name_table.h"
 
-APIDumpPrinter::FunctionNameTable::FunctionNameTable(const FunctionNameEntry* in_entry_array_ptr,
-                                                     size_t                   in_n_entries)
+Capture::APIDumpPrinter::FunctionNameTable::FunctionNameTable(const FunctionNameEntry* in_entry_array_ptr,
+                                                               size_t                   in_n_entries)
 {
     for (size_t n_entry = 0;
                 n_entry < in_n_entries;
@@ -15,7 +15,7 @@ APIDumpPrinter::FunctionNameTable::FunctionNameTable(const FunctionNameEntry* in
     }
 }
 
-const char* APIDumpPrinter::FunctionNameTable::get_name(const APIInterceptor::APIFunction& in_function) const
+const char* Capture::APIDumpPrinter::FunctionNameTable::get_name(const APIInterceptor::APIFunction& in_function) const
 {
     const auto  iterator   = m_name_map.find(static_cast<uint32_t>(in_function) );
     const char* result_ptr = nullptr;

@@ -2,19 +2,22 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
-#ifndef APIDUMPPLAYER_STATE_NAMES_H
-#define APIDUMPPLAYER_STATE_NAMES_H
+#ifndef REPLAYPLAYER_STATE_NAMES_H
+#define REPLAYPLAYER_STATE_NAMES_H
 
 #include "Replay/ReplayEngineDLL/types.h"
 
-namespace APIDumpPlayer
+namespace Replay
 {
-    /* How the front-ends of the player call the states of the playback. */
-    class StateNames
+    namespace ReplayPlayer
     {
-    public:
-        static const char* get_state_name_ptr(const APIDumpReplayer::PlaybackState& in_state);
-    };
+        /* How the front-ends of the player call the states of the playback. */
+        class StateNames
+        {
+        public:
+            static const char* get_state_name_ptr(const Replay::ReplayEngineDLL::PlaybackState& in_state);
+        };
+    }
 }
 
-#endif /* APIDUMPPLAYER_STATE_NAMES_H */
+#endif /* REPLAYPLAYER_STATE_NAMES_H */

@@ -18,8 +18,8 @@
 #include "formatter.h"
 #include "printer.h"
 
-bool APIDumpPrinter::parse_api_list(const char* in_argument_ptr,
-                                    Options*    inout_options_ptr)
+bool Capture::APIDumpPrinter::parse_api_list(const char* in_argument_ptr,
+                                              Options*    inout_options_ptr)
 {
     std::string list(in_argument_ptr);
     bool        result = true;
@@ -32,10 +32,10 @@ bool APIDumpPrinter::parse_api_list(const char* in_argument_ptr,
         const auto              group_name         = list.substr(start,
                                                                  (separator_position == std::string::npos) ? std::string::npos
                                                                                                            : (separator_position - start) );
-        APIDumpLoader::APIGroup group;
+        Capture::APIDumpLoader::APIGroup group;
 
-        if (!APIDumpLoader::parse_api_group_name(group_name.c_str(),
-                                                &group) )
+        if (!Capture::APIDumpLoader::parse_api_group_name(group_name.c_str(),
+                                                         &group) )
         {
             result = false;
 
@@ -59,9 +59,9 @@ bool APIDumpPrinter::parse_api_list(const char* in_argument_ptr,
     return result;
 }
 
-bool APIDumpPrinter::parse_arguments(int      in_argc,
-                                     char*    in_argv[],
-                                     Options* out_options_ptr)
+bool Capture::APIDumpPrinter::parse_arguments(int      in_argc,
+                                               char*    in_argv[],
+                                               Options* out_options_ptr)
 {
     bool result = false;
 
@@ -153,8 +153,8 @@ end:
     return result;
 }
 
-bool APIDumpPrinter::parse_frame_range(const char* in_argument_ptr,
-                                       Options*    inout_options_ptr)
+bool Capture::APIDumpPrinter::parse_frame_range(const char* in_argument_ptr,
+                                                 Options*    inout_options_ptr)
 {
     unsigned int first_value = 0;
     unsigned int last_value  = 0;
@@ -187,11 +187,11 @@ bool APIDumpPrinter::parse_frame_range(const char* in_argument_ptr,
     return result;
 }
 
-void APIDumpPrinter::print_statistics(const std::map<APIInterceptor::APIFunction, uint32_t>& in_call_count_map,
-                                      const std::map<APIDumpLoader::APIGroup, uint32_t>&     in_group_count_map,
-                                      const uint32_t&                                        in_n_calls_selected,
-                                      const uint32_t&                                        in_n_frames_total,
-                                      const WorkloadTotals&                                  in_totals)
+void Capture::APIDumpPrinter::print_statistics(const std::map<APIInterceptor::APIFunction, uint32_t>& in_call_count_map,
+                                                const std::map<Capture::APIDumpLoader::APIGroup, uint32_t>&     in_group_count_map,
+                                                const uint32_t&                                        in_n_calls_selected,
+                                                const uint32_t&                                        in_n_frames_total,
+                                                const WorkloadTotals&                                  in_totals)
 {
     std::vector<std::pair<uint32_t, APIInterceptor::APIFunction> > sorted_vec;
 
@@ -234,7 +234,7 @@ void APIDumpPrinter::print_statistics(const std::map<APIInterceptor::APIFunction
     {
         fprintf(stdout,
                 "  %-8s %u\n",
-                APIDumpLoader::get_api_group_name(item.first),
+                Capture::APIDumpLoader::get_api_group_name(item.first),
                 item.second);
     }
 
@@ -250,7 +250,7 @@ void APIDumpPrinter::print_statistics(const std::map<APIInterceptor::APIFunction
     }
 }
 
-void APIDumpPrinter::print_usage()
+void Capture::APIDumpPrinter::print_usage()
 {
     fprintf(stdout,
             "Usage:\n"
@@ -274,22 +274,22 @@ void APIDumpPrinter::print_usage()
             "If any surface dumps are included in the workload, they will be stored in the working directory.\n");
 }
 
-int APIDumpPrinter::run(int   in_argc,
-                        char* in_argv[])
+int Capture::APIDumpPrinter::run(int   in_argc,
+                                  char* in_argv[])
 {
     std::map<APIInterceptor::APIFunction, uint32_t> call_count_map;
     D3D8Decoder                                     d3d8_decoder;
-    std::map<APIDumpLoader::APIGroup, uint32_t>     group_count_map;
+    std::map<Capture::APIDumpLoader::APIGroup, uint32_t>     group_count_map;
     uint32_t                                        last_header_frame = UINT32_MAX;
     uint32_t                                        n_calls_selected  = 0;
     uint32_t                                        n_chunks_written  = 0;
     uint32_t                                        n_frame           = 0;
     Options                                         options;
     std::string                                     reader_error;
-    APIDumpLoader::WorkloadReaderUniquePtr          reader_ptr;
+    Capture::APIDumpLoader::WorkloadReaderUniquePtr          reader_ptr;
     std::set<APIInterceptor::DataChunkID>           referenced_chunk_set;
     int                                             result            = EXIT_FAILURE;
-    APIDumpLoader::Workload                         segment;
+    Capture::APIDumpLoader::Workload                         segment;
     WorkloadTotals                                  totals;
 
     if (!parse_arguments(in_argc,
@@ -301,8 +301,8 @@ int APIDumpPrinter::run(int   in_argc,
         goto end;
     }
 
-    reader_ptr = APIDumpLoader::WorkloadReader::create(options.workload_filename_ptr,
-                                                      &reader_error);
+    reader_ptr = Capture::APIDumpLoader::WorkloadReader::create(options.workload_filename_ptr,
+                                                               &reader_error);
 
     if (reader_ptr == nullptr)
     {
@@ -319,14 +319,14 @@ int APIDumpPrinter::run(int   in_argc,
         /* Walk through the calls, tracking frames. */
         for (const auto& current_api_call : *segment.dumped_api_call_vec_ptr)
         {
-            const auto api_group         = APIDumpLoader::get_api_group(current_api_call.func);
+            const auto api_group         = Capture::APIDumpLoader::get_api_group(current_api_call.func);
             const bool is_in_frame_range = (n_frame >= options.first_frame &&
                                             n_frame <= options.last_frame);
             const bool is_api_allowed    = options.allowed_api_group_set.empty() ||
                                            options.allowed_api_group_set.find(api_group) != options.allowed_api_group_set.end();
 
             /* Objects are named in the order they are created, whether or not their creation is printed. */
-            if (api_group == APIDumpLoader::APIGroup::D3D8)
+            if (api_group == Capture::APIDumpLoader::APIGroup::D3D8)
             {
                 d3d8_decoder.register_created_objects(current_api_call);
             }
@@ -362,7 +362,7 @@ int APIDumpPrinter::run(int   in_argc,
             }
 
             /* A frame boundary is detected regardless of --api, so that frame numbering stays stable. */
-            if (APIDumpLoader::is_frame_boundary(current_api_call.func) )
+            if (Capture::APIDumpLoader::is_frame_boundary(current_api_call.func) )
             {
                 n_frame++;
             }
@@ -433,9 +433,9 @@ end:
     return result;
 }
 
-uint32_t APIDumpPrinter::write_chunks(const std::string&                           in_directory,
-                                      const APIDumpLoader::Workload&               in_workload,
-                                      const std::set<APIInterceptor::DataChunkID>& in_chunk_id_set)
+uint32_t Capture::APIDumpPrinter::write_chunks(const std::string&                           in_directory,
+                                                const Capture::APIDumpLoader::Workload&               in_workload,
+                                                const std::set<APIInterceptor::DataChunkID>& in_chunk_id_set)
 {
     uint32_t result = 0;
 
@@ -456,8 +456,8 @@ uint32_t APIDumpPrinter::write_chunks(const std::string&                        
 
     for (const auto& chunk_id : in_chunk_id_set)
     {
-        const std::vector<uint8_t>* chunk_u8_vec_ptr = APIDumpLoader::get_data_chunk_ptr(in_workload,
-                                                                                         chunk_id);
+        const std::vector<uint8_t>* chunk_u8_vec_ptr = Capture::APIDumpLoader::get_data_chunk_ptr(in_workload,
+                                                                                                  chunk_id);
         char                        filename_i8vec260[MAX_PATH];
         FILE*                       file_handle      = nullptr;
 
@@ -501,8 +501,8 @@ end:
     return result;
 }
 
-void APIDumpPrinter::write_surfaces(const APIDumpLoader::Workload& in_workload,
-                                    const uint32_t&                in_first_surface_index)
+void Capture::APIDumpPrinter::write_surfaces(const Capture::APIDumpLoader::Workload& in_workload,
+                                                       const uint32_t&                in_first_surface_index)
 {
     std::string target_directory;
 
@@ -553,6 +553,6 @@ void APIDumpPrinter::write_surfaces(const APIDumpLoader::Workload& in_workload,
 int main(int   in_argc,
          char* in_argv[])
 {
-    return APIDumpPrinter::run(in_argc,
-                               in_argv);
+    return Capture::APIDumpPrinter::run(in_argc,
+                                         in_argv);
 }

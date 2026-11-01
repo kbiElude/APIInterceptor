@@ -5,19 +5,22 @@
  * The DLL exports plain C functions (their names are not decorated, whatever the namespace); the interfaces are C++ classes, so the DLL and its users must be built with the
  * same compiler and runtime.
  */
-#ifndef APIDUMPREPLAYER_ENTRYPOINTS_H
-#define APIDUMPREPLAYER_ENTRYPOINTS_H
+#ifndef REPLAYENGINEDLL_ENTRYPOINTS_H
+#define REPLAYENGINEDLL_ENTRYPOINTS_H
 
 #include "Replay/ReplayEngineDLL/export.h"
 #include "Replay/ReplayEngineDLL/i_replay_engine.h"
 
-namespace APIDumpReplayer
+namespace Replay
 {
-    extern "C"
+    namespace ReplayEngineDLL
     {
-        APIDUMPREPLAYER_API IReplayEngine* aiCreateReplayEngine ();
-        APIDUMPREPLAYER_API void           aiDestroyReplayEngine(IReplayEngine* in_engine_ptr);
+        extern "C"
+        {
+            REPLAYENGINEDLL_API IReplayEngine* aiCreateReplayEngine ();
+            REPLAYENGINEDLL_API void           aiDestroyReplayEngine(IReplayEngine* in_engine_ptr);
+        }
     }
 }
 
-#endif /* APIDUMPREPLAYER_ENTRYPOINTS_H */
+#endif /* REPLAYENGINEDLL_ENTRYPOINTS_H */

@@ -10,9 +10,9 @@
 #include <algorithm>
 #include <vector>
 
-bool APIDumpPrinter::are_arguments_identical(const APIInterceptor::APIFunctionArgument& in_argument_a,
-                                             const APIInterceptor::APIFunctionArgument& in_argument_b,
-                                             const APIDumpLoader::Workload&             in_workload)
+bool Capture::APIDumpPrinter::are_arguments_identical(const APIInterceptor::APIFunctionArgument& in_argument_a,
+                                                       const APIInterceptor::APIFunctionArgument& in_argument_b,
+                                                       const Capture::APIDumpLoader::Workload&             in_workload)
 {
     std::vector<uint8_t> a_u8_vec;
     std::vector<uint8_t> b_u8_vec;
@@ -26,10 +26,10 @@ bool APIDumpPrinter::are_arguments_identical(const APIInterceptor::APIFunctionAr
             const auto chunk_id_a = in_argument_a.get_data_chunk_id();
             const auto chunk_id_b = in_argument_b.get_data_chunk_id();
 
-            const auto chunk_a_ptr = APIDumpLoader::get_data_chunk_ptr(in_workload,
-                                                                       chunk_id_a);
-            const auto chunk_b_ptr = APIDumpLoader::get_data_chunk_ptr(in_workload,
-                                                                       chunk_id_b);
+            const auto chunk_a_ptr = Capture::APIDumpLoader::get_data_chunk_ptr(in_workload,
+                                                                                chunk_id_a);
+            const auto chunk_b_ptr = Capture::APIDumpLoader::get_data_chunk_ptr(in_workload,
+                                                                                chunk_id_b);
 
             if (chunk_a_ptr != nullptr &&
                 chunk_b_ptr != nullptr)
@@ -49,9 +49,9 @@ bool APIDumpPrinter::are_arguments_identical(const APIInterceptor::APIFunctionAr
     return result;
 }
 
-void APIDumpPrinter::print_argument(FILE*                                      in_file_handle,
-                                    const APIInterceptor::APIFunctionArgument& in_argument,
-                                    const APIDumpLoader::Workload&             in_workload)
+void Capture::APIDumpPrinter::print_argument(FILE*                                      in_file_handle,
+                                              const APIInterceptor::APIFunctionArgument& in_argument,
+                                              const Capture::APIDumpLoader::Workload&             in_workload)
 {
     switch (in_argument.type)
     {
@@ -230,8 +230,8 @@ void APIDumpPrinter::print_argument(FILE*                                      i
         case APIInterceptor::ARGTYPE_DATA_CHUNK_ID:
         {
             const auto chunk_id  = in_argument.get_data_chunk_id();
-            const auto chunk_ptr = APIDumpLoader::get_data_chunk_ptr(in_workload,
-                                                                     chunk_id);
+            const auto chunk_ptr = Capture::APIDumpLoader::get_data_chunk_ptr(in_workload,
+                                                                              chunk_id);
 
             if (chunk_ptr != nullptr)
             {
@@ -281,16 +281,16 @@ void APIDumpPrinter::print_argument(FILE*                                      i
     }
 }
 
-void APIDumpPrinter::print_call(FILE*                                  in_file_handle,
-                                const APIDumpLoader::DumpedAPICall&    in_call,
-                                const APIDumpLoader::Workload&         in_workload,
-                                uint32_t                               in_n_hexdump_bytes,
-                                std::set<APIInterceptor::DataChunkID>* inout_referenced_chunk_set_ptr,
-                                D3D8Decoder*                           inout_d3d8_decoder_ptr)
+void Capture::APIDumpPrinter::print_call(FILE*                                  in_file_handle,
+                                          const Capture::APIDumpLoader::DumpedAPICall&    in_call,
+                                          const Capture::APIDumpLoader::Workload&         in_workload,
+                                          uint32_t                               in_n_hexdump_bytes,
+                                          std::set<APIInterceptor::DataChunkID>* inout_referenced_chunk_set_ptr,
+                                          D3D8Decoder*                           inout_d3d8_decoder_ptr)
 {
     std::vector<APIInterceptor::DataChunkID> call_chunk_id_vec;
     const bool                               is_d3d8_call = (inout_d3d8_decoder_ptr != nullptr                   &&
-                                                             APIDumpLoader::get_api_group(in_call.func) == APIDumpLoader::APIGroup::D3D8);
+                                                             Capture::APIDumpLoader::get_api_group(in_call.func) == Capture::APIDumpLoader::APIGroup::D3D8);
 
     /* D3D8 arguments are decoded by the decoder, if it knows them. */
     const auto print_call_argument_func = [&](const uint32_t&                            in_n_argument,
@@ -435,8 +435,8 @@ void APIDumpPrinter::print_call(FILE*                                  in_file_h
             inout_referenced_chunk_set_ptr->insert(chunk_id);
         }
 
-        const auto chunk_ptr = APIDumpLoader::get_data_chunk_ptr(in_workload,
-                                                                 chunk_id);
+        const auto chunk_ptr = Capture::APIDumpLoader::get_data_chunk_ptr(in_workload,
+                                                                          chunk_id);
 
         if (in_n_hexdump_bytes != 0       &&
             chunk_ptr          != nullptr)
@@ -452,9 +452,9 @@ void APIDumpPrinter::print_call(FILE*                                  in_file_h
     }
 }
 
-void APIDumpPrinter::print_hexdump(FILE*                       in_file_handle,
-                                   const std::vector<uint8_t>& in_chunk_u8_vec,
-                                   uint32_t                    in_n_bytes_max)
+void Capture::APIDumpPrinter::print_hexdump(FILE*                       in_file_handle,
+                                             const std::vector<uint8_t>& in_chunk_u8_vec,
+                                             uint32_t                    in_n_bytes_max)
 {
     const uint32_t n_bytes_to_print = std::min<uint32_t>(in_n_bytes_max,
                                                          static_cast<uint32_t>(in_chunk_u8_vec.size() ));
@@ -507,9 +507,9 @@ void APIDumpPrinter::print_hexdump(FILE*                       in_file_handle,
     }
 }
 
-void APIDumpPrinter::print_ptr(FILE*       in_file_handle,
-                               const char* in_type_prefix_ptr,
-                               const void* in_ptr)
+void Capture::APIDumpPrinter::print_ptr(FILE*       in_file_handle,
+                                         const char* in_type_prefix_ptr,
+                                         const void* in_ptr)
 {
     if (in_ptr == nullptr)
     {

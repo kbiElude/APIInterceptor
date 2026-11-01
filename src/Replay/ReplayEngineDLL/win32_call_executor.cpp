@@ -7,13 +7,13 @@
 #include <string.h>
 
 /* The window class of the windows whose class the dump does not name (an atom). */
-static const wchar_t DEFAULT_WINDOW_CLASS_NAME[] = L"APIDumpReplayerWindow";
+static const wchar_t DEFAULT_WINDOW_CLASS_NAME[] = L"ReplayEngineDLLWindow";
 
 typedef HGLRC (WINAPI* PFNWGLCREATECONTEXTATTRIBSARBPROC)(HDC, HGLRC, const int*);
 typedef BOOL  (WINAPI* PFNWGLSWAPINTERVALEXTPROC)        (int);
 
-APIDumpReplayer::Win32CallExecutor::Win32CallExecutor(ObjectRemapper*         in_remapper_ptr,
-                                                      const WindowPlacedFunc& in_window_placed_func)
+Replay::ReplayEngineDLL::Win32CallExecutor::Win32CallExecutor(ObjectRemapper*         in_remapper_ptr,
+                                                              const WindowPlacedFunc& in_window_placed_func)
     :m_has_last_placement(false),
      m_remapper_ptr      (in_remapper_ptr),
      m_window_placed_func(in_window_placed_func)
@@ -57,15 +57,15 @@ APIDumpReplayer::Win32CallExecutor::Win32CallExecutor(ObjectRemapper*         in
     }
 }
 
-APIDumpReplayer::Win32CallExecutor::~Win32CallExecutor()
+Replay::ReplayEngineDLL::Win32CallExecutor::~Win32CallExecutor()
 {
     /* The windows and the contexts belong to the replay thread: shutdown() has released them already. */
 }
 
-bool APIDumpReplayer::Win32CallExecutor::create_window_ex(const APIDumpLoader::DumpedAPICall& in_call,
-                                                          const CallWalker&                   in_walker,
-                                                          const bool&                         in_is_wide,
-                                                          std::string*                        out_error_ptr)
+bool Replay::ReplayEngineDLL::Win32CallExecutor::create_window_ex(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                                           const CallWalker&                   in_walker,
+                                                                           const bool&                         in_is_wide,
+                                                                           std::string*                        out_error_ptr)
 {
     constexpr size_t N_ARGUMENTS         = 12;
     constexpr size_t N_ARGUMENT_EX_STYLE = 0;
@@ -209,7 +209,7 @@ end:
     return result;
 }
 
-void APIDumpReplayer::Win32CallExecutor::destroy_parked_windows()
+void Replay::ReplayEngineDLL::Win32CallExecutor::destroy_parked_windows()
 {
     for (const auto& parked : m_parked_window_map)
     {
@@ -219,9 +219,9 @@ void APIDumpReplayer::Win32CallExecutor::destroy_parked_windows()
     m_parked_window_map.clear();
 }
 
-bool APIDumpReplayer::Win32CallExecutor::execute(const APIDumpLoader::DumpedAPICall& in_call,
-                                                 const CallWalker&                   in_walker,
-                                                 std::string*                        out_error_ptr)
+bool Replay::ReplayEngineDLL::Win32CallExecutor::execute(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                                  const CallWalker&                   in_walker,
+                                                                  std::string*                        out_error_ptr)
 {
     const auto handler_iterator = m_handler_func_ptr_map.find(in_call.func);
     bool       result           = false;
@@ -241,10 +241,10 @@ end:
     return result;
 }
 
-bool APIDumpReplayer::Win32CallExecutor::get_live_handle(const ObjectKind&                          in_kind,
-                                                         const APIInterceptor::APIFunctionArgument& in_argument,
-                                                         void**                                     out_live_handle_ptr,
-                                                         std::string*                               out_error_ptr) const
+bool Replay::ReplayEngineDLL::Win32CallExecutor::get_live_handle(const ObjectKind&                          in_kind,
+                                                                 const APIInterceptor::APIFunctionArgument& in_argument,
+                                                                 void**                                     out_live_handle_ptr,
+                                                                 std::string*                               out_error_ptr) const
 {
     uint64_t live_value = 0;
     bool     result     = m_remapper_ptr->get(in_kind,
@@ -263,8 +263,8 @@ bool APIDumpReplayer::Win32CallExecutor::get_live_handle(const ObjectKind&      
     return result;
 }
 
-void* APIDumpReplayer::Win32CallExecutor::get_wgl_function_ptr(const HDC&  in_hdc,
-                                                               const char* in_name_ptr) const
+void* Replay::ReplayEngineDLL::Win32CallExecutor::get_wgl_function_ptr(const HDC&  in_hdc,
+                                                                       const char* in_name_ptr) const
 {
     void* result_ptr = reinterpret_cast<void*>(::wglGetProcAddress(in_name_ptr) );
 
@@ -290,8 +290,8 @@ void* APIDumpReplayer::Win32CallExecutor::get_wgl_function_ptr(const HDC&  in_hd
     return result_ptr;
 }
 
-std::wstring APIDumpReplayer::Win32CallExecutor::get_wide_string(const APIDumpLoader::DataChunk& in_chunk,
-                                                                 const bool&                     in_is_wide)
+std::wstring Replay::ReplayEngineDLL::Win32CallExecutor::get_wide_string(const Capture::APIDumpLoader::DataChunk& in_chunk,
+                                                                                  const bool&                     in_is_wide)
 {
     std::wstring result;
 
@@ -331,10 +331,10 @@ std::wstring APIDumpReplayer::Win32CallExecutor::get_wide_string(const APIDumpLo
     return result;
 }
 
-void APIDumpReplayer::Win32CallExecutor::make_non_scalable(const DWORD& in_ex_style,
-                                                           DWORD*       inout_style_ptr,
-                                                           int*         inout_width_ptr,
-                                                           int*         inout_height_ptr)
+void Replay::ReplayEngineDLL::Win32CallExecutor::make_non_scalable(const DWORD& in_ex_style,
+                                                                   DWORD*       inout_style_ptr,
+                                                                   int*         inout_width_ptr,
+                                                                   int*         inout_height_ptr)
 {
     RECT        new_frame = {};
     const DWORD new_style = *inout_style_ptr & ~(WS_MAXIMIZEBOX | WS_THICKFRAME);
@@ -362,9 +362,9 @@ void APIDumpReplayer::Win32CallExecutor::make_non_scalable(const DWORD& in_ex_st
     }
 }
 
-bool APIDumpReplayer::Win32CallExecutor::on_copy_context(const APIDumpLoader::DumpedAPICall& in_call,
-                                                         const CallWalker&                   in_walker,
-                                                         std::string*                        out_error_ptr)
+bool Replay::ReplayEngineDLL::Win32CallExecutor::on_copy_context(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                                          const CallWalker&                   in_walker,
+                                                                          std::string*                        out_error_ptr)
 {
     HGLRC destination = nullptr;
     bool  result      = false;
@@ -398,9 +398,9 @@ end:
     return result;
 }
 
-bool APIDumpReplayer::Win32CallExecutor::on_create_context(const APIDumpLoader::DumpedAPICall& in_call,
-                                                           const CallWalker&                   in_walker,
-                                                           std::string*                        out_error_ptr)
+bool Replay::ReplayEngineDLL::Win32CallExecutor::on_create_context(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                                            const CallWalker&                   in_walker,
+                                                                            std::string*                        out_error_ptr)
 {
     HDC   live_hdc = nullptr;
     HGLRC live_rc  = nullptr;
@@ -440,9 +440,9 @@ end:
     return result;
 }
 
-bool APIDumpReplayer::Win32CallExecutor::on_create_context_attribs_arb(const APIDumpLoader::DumpedAPICall& in_call,
-                                                                       const CallWalker&                   in_walker,
-                                                                       std::string*                        out_error_ptr)
+bool Replay::ReplayEngineDLL::Win32CallExecutor::on_create_context_attribs_arb(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                                                        const CallWalker&                   in_walker,
+                                                                                        std::string*                        out_error_ptr)
 {
     const int*                        attrib_list_ptr = nullptr;
     PFNWGLCREATECONTEXTATTRIBSARBPROC create_func_ptr = nullptr;
@@ -513,9 +513,9 @@ end:
     return result;
 }
 
-bool APIDumpReplayer::Win32CallExecutor::on_create_layer_context(const APIDumpLoader::DumpedAPICall& in_call,
-                                                                 const CallWalker&                   in_walker,
-                                                                 std::string*                        out_error_ptr)
+bool Replay::ReplayEngineDLL::Win32CallExecutor::on_create_layer_context(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                                                  const CallWalker&                   in_walker,
+                                                                                  std::string*                        out_error_ptr)
 {
     HDC   live_hdc = nullptr;
     HGLRC live_rc  = nullptr;
@@ -556,9 +556,9 @@ end:
     return result;
 }
 
-bool APIDumpReplayer::Win32CallExecutor::on_create_window_ex_a(const APIDumpLoader::DumpedAPICall& in_call,
-                                                               const CallWalker&                   in_walker,
-                                                               std::string*                        out_error_ptr)
+bool Replay::ReplayEngineDLL::Win32CallExecutor::on_create_window_ex_a(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                                                const CallWalker&                   in_walker,
+                                                                                std::string*                        out_error_ptr)
 {
     return create_window_ex(in_call,
                             in_walker,
@@ -566,9 +566,9 @@ bool APIDumpReplayer::Win32CallExecutor::on_create_window_ex_a(const APIDumpLoad
                             out_error_ptr);
 }
 
-bool APIDumpReplayer::Win32CallExecutor::on_create_window_ex_w(const APIDumpLoader::DumpedAPICall& in_call,
-                                                               const CallWalker&                   in_walker,
-                                                               std::string*                        out_error_ptr)
+bool Replay::ReplayEngineDLL::Win32CallExecutor::on_create_window_ex_w(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                                                const CallWalker&                   in_walker,
+                                                                                std::string*                        out_error_ptr)
 {
     return create_window_ex(in_call,
                             in_walker,
@@ -576,9 +576,9 @@ bool APIDumpReplayer::Win32CallExecutor::on_create_window_ex_w(const APIDumpLoad
                             out_error_ptr);
 }
 
-bool APIDumpReplayer::Win32CallExecutor::on_delete_context(const APIDumpLoader::DumpedAPICall& in_call,
-                                                           const CallWalker&                   in_walker,
-                                                           std::string*                        out_error_ptr)
+bool Replay::ReplayEngineDLL::Win32CallExecutor::on_delete_context(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                                            const CallWalker&                   in_walker,
+                                                                            std::string*                        out_error_ptr)
 {
     HGLRC live_rc = nullptr;
     bool  result  = false;
@@ -609,7 +609,7 @@ end:
     return result;
 }
 
-void APIDumpReplayer::Win32CallExecutor::on_frame_presented()
+void Replay::ReplayEngineDLL::Win32CallExecutor::on_frame_presented()
 {
     pump_messages();
 
@@ -617,9 +617,9 @@ void APIDumpReplayer::Win32CallExecutor::on_frame_presented()
     destroy_parked_windows();
 }
 
-bool APIDumpReplayer::Win32CallExecutor::on_get_dc(const APIDumpLoader::DumpedAPICall& in_call,
-                                                   const CallWalker&                   in_walker,
-                                                   std::string*                        out_error_ptr)
+bool Replay::ReplayEngineDLL::Win32CallExecutor::on_get_dc(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                                    const CallWalker&                   in_walker,
+                                                                    std::string*                        out_error_ptr)
 {
     HDC  live_hdc  = nullptr;
     HWND live_hwnd = nullptr;
@@ -659,14 +659,14 @@ end:
     return result;
 }
 
-void APIDumpReplayer::Win32CallExecutor::on_idle()
+void Replay::ReplayEngineDLL::Win32CallExecutor::on_idle()
 {
     pump_messages();
 }
 
-bool APIDumpReplayer::Win32CallExecutor::on_ignored_call(const APIDumpLoader::DumpedAPICall& in_call,
-                                                         const CallWalker&                   in_walker,
-                                                         std::string*                        out_error_ptr)
+bool Replay::ReplayEngineDLL::Win32CallExecutor::on_ignored_call(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                                          const CallWalker&                   in_walker,
+                                                                          std::string*                        out_error_ptr)
 {
     (void) in_call;
     (void) in_walker;
@@ -675,9 +675,9 @@ bool APIDumpReplayer::Win32CallExecutor::on_ignored_call(const APIDumpLoader::Du
     return true;
 }
 
-bool APIDumpReplayer::Win32CallExecutor::on_make_current(const APIDumpLoader::DumpedAPICall& in_call,
-                                                         const CallWalker&                   in_walker,
-                                                         std::string*                        out_error_ptr)
+bool Replay::ReplayEngineDLL::Win32CallExecutor::on_make_current(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                                          const CallWalker&                   in_walker,
+                                                                          std::string*                        out_error_ptr)
 {
     HDC   live_hdc = nullptr;
     HGLRC live_rc  = nullptr;
@@ -715,9 +715,9 @@ end:
     return result;
 }
 
-bool APIDumpReplayer::Win32CallExecutor::on_release_dc(const APIDumpLoader::DumpedAPICall& in_call,
-                                                       const CallWalker&                   in_walker,
-                                                       std::string*                        out_error_ptr)
+bool Replay::ReplayEngineDLL::Win32CallExecutor::on_release_dc(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                                        const CallWalker&                   in_walker,
+                                                                        std::string*                        out_error_ptr)
 {
     uint64_t live_hdc  = 0;
     uint64_t live_hwnd = 0;
@@ -756,9 +756,9 @@ end:
     return result;
 }
 
-bool APIDumpReplayer::Win32CallExecutor::on_set_pixel_format(const APIDumpLoader::DumpedAPICall& in_call,
-                                                             const CallWalker&                   in_walker,
-                                                             std::string*                        out_error_ptr)
+bool Replay::ReplayEngineDLL::Win32CallExecutor::on_set_pixel_format(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                                              const CallWalker&                   in_walker,
+                                                                              std::string*                        out_error_ptr)
 {
     int                   live_format = 0;
     HDC                   live_hdc    = nullptr;
@@ -810,9 +810,9 @@ end:
     return result;
 }
 
-bool APIDumpReplayer::Win32CallExecutor::on_share_lists(const APIDumpLoader::DumpedAPICall& in_call,
-                                                        const CallWalker&                   in_walker,
-                                                        std::string*                        out_error_ptr)
+bool Replay::ReplayEngineDLL::Win32CallExecutor::on_share_lists(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                                         const CallWalker&                   in_walker,
+                                                                         std::string*                        out_error_ptr)
 {
     HGLRC first  = nullptr;
     bool  result = false;
@@ -845,9 +845,9 @@ end:
     return result;
 }
 
-bool APIDumpReplayer::Win32CallExecutor::on_swap_buffers(const APIDumpLoader::DumpedAPICall& in_call,
-                                                         const CallWalker&                   in_walker,
-                                                         std::string*                        out_error_ptr)
+bool Replay::ReplayEngineDLL::Win32CallExecutor::on_swap_buffers(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                                          const CallWalker&                   in_walker,
+                                                                          std::string*                        out_error_ptr)
 {
     HDC  live_hdc = nullptr;
     bool result   = false;
@@ -870,9 +870,9 @@ end:
     return result;
 }
 
-bool APIDumpReplayer::Win32CallExecutor::on_swap_interval_ext(const APIDumpLoader::DumpedAPICall& in_call,
-                                                              const CallWalker&                   in_walker,
-                                                              std::string*                        out_error_ptr)
+bool Replay::ReplayEngineDLL::Win32CallExecutor::on_swap_interval_ext(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                                               const CallWalker&                   in_walker,
+                                                                               std::string*                        out_error_ptr)
 {
     const HDC                 live_hdc      = ::wglGetCurrentDC();
     bool                      result        = true;
@@ -896,9 +896,9 @@ bool APIDumpReplayer::Win32CallExecutor::on_swap_interval_ext(const APIDumpLoade
     return result;
 }
 
-bool APIDumpReplayer::Win32CallExecutor::on_swap_layer_buffers(const APIDumpLoader::DumpedAPICall& in_call,
-                                                               const CallWalker&                   in_walker,
-                                                               std::string*                        out_error_ptr)
+bool Replay::ReplayEngineDLL::Win32CallExecutor::on_swap_layer_buffers(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                                                const CallWalker&                   in_walker,
+                                                                                std::string*                        out_error_ptr)
 {
     HDC  live_hdc = nullptr;
     bool result   = false;
@@ -922,7 +922,7 @@ end:
     return result;
 }
 
-void APIDumpReplayer::Win32CallExecutor::place_window(const HWND& in_window)
+void Replay::ReplayEngineDLL::Win32CallExecutor::place_window(const HWND& in_window)
 {
     constexpr int N_PARTS_TO_CENTER = 2;
 
@@ -990,7 +990,7 @@ void APIDumpReplayer::Win32CallExecutor::place_window(const HWND& in_window)
     }
 }
 
-void APIDumpReplayer::Win32CallExecutor::pump_messages()
+void Replay::ReplayEngineDLL::Win32CallExecutor::pump_messages()
 {
     MSG message;
 
@@ -1005,7 +1005,7 @@ void APIDumpReplayer::Win32CallExecutor::pump_messages()
     }
 }
 
-bool APIDumpReplayer::Win32CallExecutor::register_window_class(const std::wstring& in_name)
+bool Replay::ReplayEngineDLL::Win32CallExecutor::register_window_class(const std::wstring& in_name)
 {
     bool        result       = true;
     WNDCLASSEXW window_class = {};
@@ -1033,7 +1033,7 @@ bool APIDumpReplayer::Win32CallExecutor::register_window_class(const std::wstrin
     return result;
 }
 
-void APIDumpReplayer::Win32CallExecutor::reset()
+void Replay::ReplayEngineDLL::Win32CallExecutor::reset()
 {
     ::wglMakeCurrent(nullptr,
                      nullptr);
@@ -1086,15 +1086,15 @@ void APIDumpReplayer::Win32CallExecutor::reset()
     m_window_signature_map.clear();
 }
 
-void APIDumpReplayer::Win32CallExecutor::shutdown()
+void Replay::ReplayEngineDLL::Win32CallExecutor::shutdown()
 {
     reset();
 
     destroy_parked_windows();
 }
 
-bool APIDumpReplayer::Win32CallExecutor::take_parked_window(const WindowSignature& in_signature,
-                                                            HWND*                  out_window_ptr)
+bool Replay::ReplayEngineDLL::Win32CallExecutor::take_parked_window(const WindowSignature& in_signature,
+                                                                    HWND*                  out_window_ptr)
 {
     bool result = false;
 
@@ -1122,10 +1122,10 @@ bool APIDumpReplayer::Win32CallExecutor::take_parked_window(const WindowSignatur
     return result;
 }
 
-LRESULT CALLBACK APIDumpReplayer::Win32CallExecutor::window_proc(HWND   in_hwnd,
-                                                                 UINT   in_message,
-                                                                 WPARAM in_wparam,
-                                                                 LPARAM in_lparam)
+LRESULT CALLBACK Replay::ReplayEngineDLL::Win32CallExecutor::window_proc(HWND   in_hwnd,
+                                                                         UINT   in_message,
+                                                                         WPARAM in_wparam,
+                                                                         LPARAM in_lparam)
 {
     LRESULT result = 0;
 

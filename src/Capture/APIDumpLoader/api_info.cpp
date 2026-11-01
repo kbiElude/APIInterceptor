@@ -5,7 +5,7 @@
 #include "Capture/APIDumpLoader/api_info.h"
 #include <string.h>
 
-APIDumpLoader::APIGroup APIDumpLoader::get_api_group(const APIInterceptor::APIFunction& in_function)
+Capture::APIDumpLoader::APIGroup Capture::APIDumpLoader::get_api_group(const APIInterceptor::APIFunction& in_function)
 {
     APIGroup result = APIGroup::UNKNOWN;
 
@@ -42,7 +42,7 @@ APIDumpLoader::APIGroup APIDumpLoader::get_api_group(const APIInterceptor::APIFu
     return result;
 }
 
-const char* APIDumpLoader::get_api_group_name(const APIGroup& in_group)
+const char* Capture::APIDumpLoader::get_api_group_name(const APIGroup& in_group)
 {
     const char* result_ptr = "unknown";
 
@@ -92,7 +92,7 @@ const char* APIDumpLoader::get_api_group_name(const APIGroup& in_group)
     return result_ptr;
 }
 
-const std::vector<APIDumpLoader::APIGroup>& APIDumpLoader::get_api_groups()
+const std::vector<Capture::APIDumpLoader::APIGroup>& Capture::APIDumpLoader::get_api_groups()
 {
     static const std::vector<APIGroup> result_vec =
     {
@@ -106,7 +106,7 @@ const std::vector<APIDumpLoader::APIGroup>& APIDumpLoader::get_api_groups()
     return result_vec;
 }
 
-bool APIDumpLoader::is_frame_boundary(const APIInterceptor::APIFunction& in_function)
+bool Capture::APIDumpLoader::is_frame_boundary(const APIInterceptor::APIFunction& in_function)
 {
     bool result = false;
 
@@ -120,8 +120,8 @@ bool APIDumpLoader::is_frame_boundary(const APIInterceptor::APIFunction& in_func
     return result;
 }
 
-bool APIDumpLoader::parse_api_group_name(const char* in_name_ptr,
-                                         APIGroup*   out_group_ptr)
+bool Capture::APIDumpLoader::parse_api_group_name(const char* in_name_ptr,
+                                                  APIGroup*   out_group_ptr)
 {
     bool result = false;
 

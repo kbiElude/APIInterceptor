@@ -16,12 +16,12 @@ namespace
     constexpr uint32_t N_FRAMES          = 3;
 
     /* Pauses the replay, or skips the calls, as told. */
-    class TestInterceptor : public APIDumpReplayer::ICallInterceptor
+    class TestInterceptor : public Replay::ReplayEngineDLL::ICallInterceptor
     {
     public:
-        TestInterceptor(APIDumpReplayer::IPlaybackController* in_controller_ptr,
-                        const bool&                           in_should_pause_on_first_call,
-                        const bool&                           in_should_skip_calls)
+        TestInterceptor(Replay::ReplayEngineDLL::IPlaybackController* in_controller_ptr,
+                                const bool&                           in_should_pause_on_first_call,
+                                const bool&                           in_should_skip_calls)
             :m_controller_ptr            (in_controller_ptr),
              m_should_pause_on_first_call(in_should_pause_on_first_call),
              m_should_skip_calls         (in_should_skip_calls)
@@ -29,9 +29,9 @@ namespace
             /* Stub */
         }
 
-        void on_call_replayed(const APIDumpLoader::DumpedAPICall& in_call,
-                              const uint32_t&                     in_n_frame,
-                              const bool&                         in_was_executed) override
+        void on_call_replayed(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                       const uint32_t&                     in_n_frame,
+                                       const bool&                         in_was_executed) override
         {
             (void) in_call;
             (void) in_was_executed;
@@ -43,8 +43,8 @@ namespace
             }
         }
 
-        bool should_execute_call(const APIDumpLoader::DumpedAPICall& in_call,
-                                 const uint32_t&                     in_n_frame) override
+        bool should_execute_call(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                          const uint32_t&                     in_n_frame) override
         {
             (void) in_call;
             (void) in_n_frame;
@@ -53,7 +53,7 @@ namespace
         }
 
     private:
-        APIDumpReplayer::IPlaybackController* m_controller_ptr;
+        Replay::ReplayEngineDLL::IPlaybackController* m_controller_ptr;
         bool                                  m_should_pause_on_first_call;
         bool                                  m_should_skip_calls;
     };
@@ -70,17 +70,17 @@ namespace
                                                      N_CALLS_PER_FRAME);
             Tests::WorkloadFileBuilder::write_file  (file_u8_vec);
 
-            m_engine_ptr = APIDumpReplayer::aiCreateReplayEngine();
+            m_engine_ptr = Replay::ReplayEngineDLL::aiCreateReplayEngine();
         }
 
         void TearDown() override
         {
-            APIDumpReplayer::aiDestroyReplayEngine(m_engine_ptr);
+            Replay::ReplayEngineDLL::aiDestroyReplayEngine(m_engine_ptr);
             ::remove(Tests::WorkloadFileBuilder::get_filename_ptr() );
         }
 
         /* Polls: the replay runs on a thread of its own. */
-        bool wait_for_state(const APIDumpReplayer::PlaybackState& in_state)
+        bool wait_for_state(const Replay::ReplayEngineDLL::PlaybackState& in_state)
         {
             constexpr auto TIMEOUT = std::chrono::seconds(10);
 
@@ -102,7 +102,7 @@ namespace
             return result;
         }
 
-        APIDumpReplayer::IReplayEngine* m_engine_ptr = nullptr;
+        Replay::ReplayEngineDLL::IReplayEngine* m_engine_ptr = nullptr;
     };
 }
 
@@ -123,11 +123,11 @@ TEST_F(ReplayEngineTest, PlaysTheWholeWorkload)
     auto* controller_ptr = m_engine_ptr->get_playback_controller_ptr();
 
     EXPECT_EQ(controller_ptr->get_status().state,
-              APIDumpReplayer::PlaybackState::IDLE);
+              Replay::ReplayEngineDLL::PlaybackState::IDLE);
 
     controller_ptr->play();
 
-    ASSERT_TRUE(wait_for_state(APIDumpReplayer::PlaybackState::FINISHED) );
+    ASSERT_TRUE(wait_for_state(Replay::ReplayEngineDLL::PlaybackState::FINISHED) );
 
     EXPECT_EQ(controller_ptr->get_status().n_calls_executed,
               static_cast<uint64_t>(N_FRAMES * (N_CALLS_PER_FRAME + 1) ));
@@ -149,7 +149,7 @@ TEST_F(ReplayEngineTest, PausesAtTheNextFrameBoundary)
 
     controller_ptr->play();
 
-    ASSERT_TRUE(wait_for_state(APIDumpReplayer::PlaybackState::PAUSED) );
+    ASSERT_TRUE(wait_for_state(Replay::ReplayEngineDLL::PlaybackState::PAUSED) );
 
     /* The first frame was replayed in full, and nothing of the second one. */
     EXPECT_EQ(controller_ptr->get_status().n_calls_executed,
@@ -159,7 +159,7 @@ TEST_F(ReplayEngineTest, PausesAtTheNextFrameBoundary)
 
     controller_ptr->play();
 
-    ASSERT_TRUE(wait_for_state(APIDumpReplayer::PlaybackState::FINISHED) );
+    ASSERT_TRUE(wait_for_state(Replay::ReplayEngineDLL::PlaybackState::FINISHED) );
 
     EXPECT_EQ(controller_ptr->get_status().n_frames_presented,
               N_FRAMES);
@@ -176,12 +176,12 @@ TEST_F(ReplayEngineTest, ResetShowsTheFirstFrameAndWaits)
 
     controller_ptr->play();
 
-    ASSERT_TRUE(wait_for_state(APIDumpReplayer::PlaybackState::FINISHED) );
+    ASSERT_TRUE(wait_for_state(Replay::ReplayEngineDLL::PlaybackState::FINISHED) );
 
     controller_ptr->reset();
 
     /* The first frame is replayed, and the replay waits for play(). */
-    ASSERT_TRUE(wait_for_state(APIDumpReplayer::PlaybackState::PAUSED) );
+    ASSERT_TRUE(wait_for_state(Replay::ReplayEngineDLL::PlaybackState::PAUSED) );
 
     EXPECT_EQ(controller_ptr->get_status().n_calls_executed,
               static_cast<uint64_t>(N_CALLS_PER_FRAME + 1) );
@@ -190,7 +190,7 @@ TEST_F(ReplayEngineTest, ResetShowsTheFirstFrameAndWaits)
 
     controller_ptr->play();
 
-    ASSERT_TRUE(wait_for_state(APIDumpReplayer::PlaybackState::FINISHED) );
+    ASSERT_TRUE(wait_for_state(Replay::ReplayEngineDLL::PlaybackState::FINISHED) );
 
     EXPECT_EQ(controller_ptr->get_status().n_frames_presented,
               N_FRAMES);
@@ -210,7 +210,7 @@ TEST_F(ReplayEngineTest, SkippedCallsAreNotExecuted)
 
     controller_ptr->play();
 
-    ASSERT_TRUE(wait_for_state(APIDumpReplayer::PlaybackState::FINISHED) );
+    ASSERT_TRUE(wait_for_state(Replay::ReplayEngineDLL::PlaybackState::FINISHED) );
 
     EXPECT_EQ(controller_ptr->get_status().n_calls_executed,
               0u);

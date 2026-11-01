@@ -4,34 +4,34 @@
  */
 #include "call_walker.h"
 
-APIDumpReplayer::CallWalker::CallWalker()
+Replay::ReplayEngineDLL::CallWalker::CallWalker()
     :m_n_next_call(0)
 {
     /* Stub */
 }
 
-APIDumpReplayer::CallWalker::~CallWalker()
+Replay::ReplayEngineDLL::CallWalker::~CallWalker()
 {
     stop_prefetching();
 }
 
-const APIDumpLoader::DataChunk* APIDumpReplayer::CallWalker::get_data_chunk_ptr(const uint32_t& in_data_chunk_id) const
+const Capture::APIDumpLoader::DataChunk* Replay::ReplayEngineDLL::CallWalker::get_data_chunk_ptr(const uint32_t& in_data_chunk_id) const
 {
-    return APIDumpLoader::get_data_chunk_ptr(m_segment,
-                                             in_data_chunk_id);
+    return Capture::APIDumpLoader::get_data_chunk_ptr(m_segment,
+                                                      in_data_chunk_id);
 }
 
-const APIDumpLoader::Workload& APIDumpReplayer::CallWalker::get_segment() const
+const Capture::APIDumpLoader::Workload& Replay::ReplayEngineDLL::CallWalker::get_segment() const
 {
     return m_segment;
 }
 
-bool APIDumpReplayer::CallWalker::open(const char*  in_filename_ptr,
-                                       std::string* out_error_ptr)
+bool Replay::ReplayEngineDLL::CallWalker::open(const char*  in_filename_ptr,
+                                               std::string* out_error_ptr)
 {
     std::string                            error;
-    APIDumpLoader::WorkloadReaderUniquePtr reader_ptr = APIDumpLoader::WorkloadReader::create(in_filename_ptr,
-                                                                                              &error);
+    Capture::APIDumpLoader::WorkloadReaderUniquePtr reader_ptr = Capture::APIDumpLoader::WorkloadReader::create(in_filename_ptr,
+                                                                                                       &error);
     bool                                   result     = false;
 
     if (reader_ptr == nullptr)
@@ -49,7 +49,7 @@ bool APIDumpReplayer::CallWalker::open(const char*  in_filename_ptr,
     m_filename    = in_filename_ptr;
     m_n_next_call = 0;
     m_reader_ptr  = std::move(reader_ptr);
-    m_segment     = APIDumpLoader::Workload();
+    m_segment     = Capture::APIDumpLoader::Workload();
 
     {
         std::lock_guard<std::mutex> lock(m_prefetch.mutex);
@@ -57,7 +57,7 @@ bool APIDumpReplayer::CallWalker::open(const char*  in_filename_ptr,
         m_prefetch.is_finished       = false;
         m_prefetch.is_ready          = false;
         m_prefetch.is_stop_requested = false;
-        m_prefetch.segment           = APIDumpLoader::Workload();
+        m_prefetch.segment           = Capture::APIDumpLoader::Workload();
     }
 
     m_prefetch_thread = std::thread(&CallWalker::prefetch_main,
@@ -68,14 +68,14 @@ end:
     return result;
 }
 
-void APIDumpReplayer::CallWalker::prefetch_main()
+void Replay::ReplayEngineDLL::CallWalker::prefetch_main()
 {
     bool is_done = false;
 
     while (is_done == false)
     {
-        APIDumpLoader::Workload next_segment;
-        APIDumpLoader::Workload old_segment;
+        Capture::APIDumpLoader::Workload next_segment;
+        Capture::APIDumpLoader::Workload old_segment;
         bool                    is_read = false;
 
         {
@@ -98,7 +98,7 @@ void APIDumpReplayer::CallWalker::prefetch_main()
         }
 
         /* Free the memory of the old segment (it takes a while), then read the next one. */
-        old_segment = APIDumpLoader::Workload();
+        old_segment = Capture::APIDumpLoader::Workload();
         is_read     = m_reader_ptr->read_next_segment(&next_segment);
 
         {
@@ -126,7 +126,7 @@ void APIDumpReplayer::CallWalker::prefetch_main()
     }
 }
 
-bool APIDumpReplayer::CallWalker::read_next_call(const APIDumpLoader::DumpedAPICall** out_call_ptr_ptr)
+bool Replay::ReplayEngineDLL::CallWalker::read_next_call(const Capture::APIDumpLoader::DumpedAPICall** out_call_ptr_ptr)
 {
     bool result = false;
 
@@ -153,7 +153,7 @@ end:
     return result;
 }
 
-bool APIDumpReplayer::CallWalker::read_next_segment()
+bool Replay::ReplayEngineDLL::CallWalker::read_next_segment()
 {
     bool result = false;
 
@@ -185,7 +185,7 @@ bool APIDumpReplayer::CallWalker::read_next_segment()
     return result;
 }
 
-bool APIDumpReplayer::CallWalker::rewind(std::string* out_error_ptr)
+bool Replay::ReplayEngineDLL::CallWalker::rewind(std::string* out_error_ptr)
 {
     const std::string filename = m_filename;
 
@@ -193,7 +193,7 @@ bool APIDumpReplayer::CallWalker::rewind(std::string* out_error_ptr)
                 out_error_ptr);
 }
 
-void APIDumpReplayer::CallWalker::stop_prefetching()
+void Replay::ReplayEngineDLL::CallWalker::stop_prefetching()
 {
     {
         std::lock_guard<std::mutex> lock(m_prefetch.mutex);

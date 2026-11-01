@@ -7,16 +7,16 @@
 #include <Windows.h>
 #include "Khronos/GL/glcorearb.h"
 
-APIDumpReplayer::GlClientArrayReplayer::GlClientArrayReplayer(GlReplayContext* in_context_ptr,
-                                                              ResolveFunc      in_resolve_func)
+Replay::ReplayEngineDLL::GlClientArrayReplayer::GlClientArrayReplayer(GlReplayContext* in_context_ptr,
+                                                                      ResolveFunc      in_resolve_func)
     :m_context_ptr (in_context_ptr),
      m_resolve_func(in_resolve_func)
 {
     /* Stub */
 }
 
-bool APIDumpReplayer::GlClientArrayReplayer::apply(const uint8_t* in_snapshot_ptr,
-                                                   const size_t&  in_n_bytes)
+bool Replay::ReplayEngineDLL::GlClientArrayReplayer::apply(const uint8_t* in_snapshot_ptr,
+                                                           const size_t&  in_n_bytes)
 {
     /* Compatibility-profile token which the core headers do not have. */
     constexpr GLenum COMPAT_GL_CLIENT_ACTIVE_TEXTURE = 0x84E1;
@@ -96,8 +96,8 @@ end:
     return result;
 }
 
-void APIDumpReplayer::GlClientArrayReplayer::apply_array(const SnapshotArray& in_array,
-                                                         const uint8_t*       in_data_ptr)
+void Replay::ReplayEngineDLL::GlClientArrayReplayer::apply_array(const SnapshotArray& in_array,
+                                                                 const uint8_t*       in_data_ptr)
 {
     /* ClientArrayKind (see OpenGL/types_enums.h). */
     enum class ArrayKind : uint32_t
@@ -204,7 +204,7 @@ void APIDumpReplayer::GlClientArrayReplayer::apply_array(const SnapshotArray& in
     }
 }
 
-uint32_t APIDumpReplayer::GlClientArrayReplayer::get_element_stride(const SnapshotArray& in_array)
+uint32_t Replay::ReplayEngineDLL::GlClientArrayReplayer::get_element_stride(const SnapshotArray& in_array)
 {
     uint32_t result = in_array.stride;
 
@@ -217,8 +217,8 @@ uint32_t APIDumpReplayer::GlClientArrayReplayer::get_element_stride(const Snapsh
     return result;
 }
 
-void APIDumpReplayer::GlClientArrayReplayer::point_edge_flag(const SnapshotArray& in_array,
-                                                             const void*          in_pointer)
+void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_edge_flag(const SnapshotArray& in_array,
+                                                                     const void*          in_pointer)
 {
     typedef void (APIENTRY* PFNEDGEFLAGPOINTERPROC)(GLsizei, const void*);
 
@@ -231,8 +231,8 @@ void APIDumpReplayer::GlClientArrayReplayer::point_edge_flag(const SnapshotArray
     }
 }
 
-void APIDumpReplayer::GlClientArrayReplayer::point_generic(const SnapshotArray& in_array,
-                                                           const void*          in_pointer)
+void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_generic(const SnapshotArray& in_array,
+                                                                   const void*          in_pointer)
 {
     /* ClientArrayManager::SNAPSHOT_FLAG_*. */
     constexpr uint32_t FLAG_IS_INTEGER    = 1 << 0;
@@ -301,8 +301,8 @@ void APIDumpReplayer::GlClientArrayReplayer::point_generic(const SnapshotArray& 
     }
 }
 
-void APIDumpReplayer::GlClientArrayReplayer::point_tex_coord(const SnapshotArray& in_array,
-                                                             const void*          in_pointer)
+void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_tex_coord(const SnapshotArray& in_array,
+                                                                     const void*          in_pointer)
 {
     typedef void (APIENTRY* PFNCLIENTACTIVETEXTUREPROC)(GLenum);
     typedef void (APIENTRY* PFNPOINTERWITHSIZEPROC)    (GLint, GLenum, GLsizei, const void*);
@@ -323,9 +323,9 @@ void APIDumpReplayer::GlClientArrayReplayer::point_tex_coord(const SnapshotArray
     }
 }
 
-void APIDumpReplayer::GlClientArrayReplayer::point_with_size(const char*          in_function_name_ptr,
-                                                             const SnapshotArray& in_array,
-                                                             const void*          in_pointer)
+void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_with_size(const char*          in_function_name_ptr,
+                                                                     const SnapshotArray& in_array,
+                                                                     const void*          in_pointer)
 {
     typedef void (APIENTRY* PFNPOINTERWITHSIZEPROC)(GLint, GLenum, GLsizei, const void*);
 
@@ -340,9 +340,9 @@ void APIDumpReplayer::GlClientArrayReplayer::point_with_size(const char*        
     }
 }
 
-void APIDumpReplayer::GlClientArrayReplayer::point_without_size(const char*          in_function_name_ptr,
-                                                                const SnapshotArray& in_array,
-                                                                const void*          in_pointer)
+void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_without_size(const char*          in_function_name_ptr,
+                                                                        const SnapshotArray& in_array,
+                                                                        const void*          in_pointer)
 {
     typedef void (APIENTRY* PFNPOINTERWITHOUTSIZEPROC)(GLenum, GLsizei, const void*);
 

@@ -8,7 +8,7 @@
 #include "Capture/APIDumpLoader/APIDumpLoader.h"
 #include "Capture/APIDumpLoader/WorkloadReader.h"
 
-APIDumpLoader::WorkloadUniquePtr APIDumpLoader::create_workload_from_file(const char* in_filename_ptr)
+Capture::APIDumpLoader::WorkloadUniquePtr Capture::APIDumpLoader::create_workload_from_file(const char* in_filename_ptr)
 {
     WorkloadReaderUniquePtr reader_ptr = WorkloadReader::create(in_filename_ptr);
     WorkloadUniquePtr       result_ptr;
@@ -46,8 +46,8 @@ APIDumpLoader::WorkloadUniquePtr APIDumpLoader::create_workload_from_file(const 
     return result_ptr;
 }
 
-const APIDumpLoader::DataChunk* APIDumpLoader::get_data_chunk_ptr(const Workload& in_workload,
-                                                                  const uint32_t& in_data_chunk_id)
+const Capture::APIDumpLoader::DataChunk* Capture::APIDumpLoader::get_data_chunk_ptr(const Workload& in_workload,
+                                                                           const uint32_t& in_data_chunk_id)
 {
     const DataChunk* result = nullptr;
 

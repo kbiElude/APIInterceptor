@@ -5,12 +5,12 @@
 #include "Replay/ReplayEngineDLL/entrypoints.h"
 #include "replay_engine.h"
 
-APIDumpReplayer::IReplayEngine* APIDumpReplayer::aiCreateReplayEngine()
+Replay::ReplayEngineDLL::IReplayEngine* Replay::ReplayEngineDLL::aiCreateReplayEngine()
 {
     return new ReplayEngine();
 }
 
-void APIDumpReplayer::aiDestroyReplayEngine(IReplayEngine* in_engine_ptr)
+void Replay::ReplayEngineDLL::aiDestroyReplayEngine(IReplayEngine* in_engine_ptr)
 {
     delete in_engine_ptr;
 }

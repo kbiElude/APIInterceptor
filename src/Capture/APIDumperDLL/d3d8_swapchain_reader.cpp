@@ -6,9 +6,9 @@
 #include "d3d8_swapchain_reader.h"
 #include <string.h>
 
-bool APIDumperDLL::D3D8SwapchainReader::read(void*                    in_device_ptr,
-                                             std::array<uint32_t, 2>* out_extents_u32vec2_ptr,
-                                             std::vector<uint8_t>*    out_rgba_u8_vec_ptr)
+bool Capture::APIDumperDLL::D3D8SwapchainReader::read(void*                    in_device_ptr,
+                                                      std::array<uint32_t, 2>* out_extents_u32vec2_ptr,
+                                                      std::vector<uint8_t>*    out_rgba_u8_vec_ptr)
 {
     constexpr uint32_t A1R5G5B5_ALPHA_SHIFT = 15;
     constexpr uint32_t CHANNEL_MAX          = 255;

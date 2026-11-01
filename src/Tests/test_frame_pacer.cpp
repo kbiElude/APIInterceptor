@@ -13,9 +13,9 @@ namespace
     constexpr uint64_t QPC_FREQUENCY = 1000; /* a tick is a millisecond */
 
     /* Waits for n_frames frames, gap_ticks apart. Returns the milliseconds that took. */
-    double wait_for_frames(APIDumpReplayer::FramePacer* inout_pacer_ptr,
-                           const uint32_t&              in_n_frames,
-                           const uint64_t&              in_gap_ticks)
+    double wait_for_frames(Replay::ReplayEngineDLL::FramePacer* inout_pacer_ptr,
+                                   const uint32_t&              in_n_frames,
+                                   const uint64_t&              in_gap_ticks)
     {
         const auto start = std::chrono::steady_clock::now();
 
@@ -33,7 +33,7 @@ namespace
 
 TEST(FramePacer, FramesComeAtTheRecordedPace)
 {
-    APIDumpReplayer::FramePacer pacer;
+    Replay::ReplayEngineDLL::FramePacer pacer;
 
     /* The first frame does not wait: 10 frames, 9 gaps of 10 ms. */
     EXPECT_GE(wait_for_frames(&pacer,
@@ -44,7 +44,7 @@ TEST(FramePacer, FramesComeAtTheRecordedPace)
 
 TEST(FramePacer, TwiceTheSpeedHalvesTheTime)
 {
-    APIDumpReplayer::FramePacer pacer;
+    Replay::ReplayEngineDLL::FramePacer pacer;
 
     pacer.set_speed(2.0);
 
@@ -60,7 +60,7 @@ TEST(FramePacer, TwiceTheSpeedHalvesTheTime)
 
 TEST(FramePacer, ZeroSpeedDoesNotWait)
 {
-    APIDumpReplayer::FramePacer pacer;
+    Replay::ReplayEngineDLL::FramePacer pacer;
 
     pacer.set_speed(0.0);
 
@@ -72,7 +72,7 @@ TEST(FramePacer, ZeroSpeedDoesNotWait)
 
 TEST(FramePacer, ALongGapIsCutShort)
 {
-    APIDumpReplayer::FramePacer pacer;
+    Replay::ReplayEngineDLL::FramePacer pacer;
 
     /* Two frames, 10 seconds apart. */
     EXPECT_LT(wait_for_frames(&pacer,

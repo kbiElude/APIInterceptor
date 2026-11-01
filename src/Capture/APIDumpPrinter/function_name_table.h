@@ -8,21 +8,24 @@
 #include "types.h"
 #include <unordered_map>
 
-namespace APIDumpPrinter
+namespace Capture
 {
-    /* Maps API functions to their names. Built once from a FunctionNameEntry array. */
-    class FunctionNameTable
+    namespace APIDumpPrinter
     {
-    public:
-        FunctionNameTable(const FunctionNameEntry* in_entry_array_ptr,
-                          size_t                   in_n_entries);
+        /* Maps API functions to their names. Built once from a FunctionNameEntry array. */
+        class FunctionNameTable
+        {
+        public:
+            FunctionNameTable(const FunctionNameEntry* in_entry_array_ptr,
+                              size_t                   in_n_entries);
 
-        /* Returns nullptr if the function is not in the table. */
-        const char* get_name(const APIInterceptor::APIFunction& in_function) const;
+            /* Returns nullptr if the function is not in the table. */
+            const char* get_name(const APIInterceptor::APIFunction& in_function) const;
 
-    private:
-        std::unordered_map<uint32_t, const char*> m_name_map;
-    };
+        private:
+            std::unordered_map<uint32_t, const char*> m_name_map;
+        };
+    }
 }
 
 #endif /* APIDUMPPRINTER_FUNCTION_NAME_TABLE_H */

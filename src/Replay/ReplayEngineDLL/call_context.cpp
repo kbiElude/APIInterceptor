@@ -4,7 +4,7 @@
  */
 #include "call_context.h"
 
-APIDumpReplayer::CallContext::CallContext(ObjectRemapper* in_remapper_ptr)
+Replay::ReplayEngineDLL::CallContext::CallContext(ObjectRemapper* in_remapper_ptr)
     :m_call_ptr        (nullptr),
      m_n_head_arguments(0),
      m_remapper_ptr    (in_remapper_ptr),
@@ -13,22 +13,22 @@ APIDumpReplayer::CallContext::CallContext(ObjectRemapper* in_remapper_ptr)
     /* Stub */
 }
 
-void APIDumpReplayer::CallContext::begin_call(const APIDumpLoader::DumpedAPICall* in_call_ptr,
-                                              const CallWalker*                   in_walker_ptr,
-                                              const size_t&                       in_n_head_arguments)
+void Replay::ReplayEngineDLL::CallContext::begin_call(const Capture::APIDumpLoader::DumpedAPICall* in_call_ptr,
+                                                               const CallWalker*                   in_walker_ptr,
+                                                               const size_t&                       in_n_head_arguments)
 {
     m_call_ptr         = in_call_ptr;
     m_n_head_arguments = in_n_head_arguments;
     m_walker_ptr       = in_walker_ptr;
 }
 
-const APIDumpLoader::DumpedAPICall& APIDumpReplayer::CallContext::get_call() const
+const Capture::APIDumpLoader::DumpedAPICall& Replay::ReplayEngineDLL::CallContext::get_call() const
 {
     return *m_call_ptr;
 }
 
-const uint8_t* APIDumpReplayer::CallContext::get_chunk_data_ptr(const APIInterceptor::APIFunctionArgument* in_argument_ptr,
-                                                                size_t*                                    out_n_bytes_ptr) const
+const uint8_t* Replay::ReplayEngineDLL::CallContext::get_chunk_data_ptr(const APIInterceptor::APIFunctionArgument* in_argument_ptr,
+                                                                        size_t*                                    out_n_bytes_ptr) const
 {
     const uint8_t* result_ptr = nullptr;
 
@@ -50,24 +50,24 @@ const uint8_t* APIDumpReplayer::CallContext::get_chunk_data_ptr(const APIInterce
     return result_ptr;
 }
 
-const APIInterceptor::APIFunctionArgument* APIDumpReplayer::CallContext::get_in_argument_ptr(const size_t& in_n_argument) const
+const APIInterceptor::APIFunctionArgument* Replay::ReplayEngineDLL::CallContext::get_in_argument_ptr(const size_t& in_n_argument) const
 {
     return (in_n_argument < m_call_ptr->arg_in_vec.size() ) ? &m_call_ptr->arg_in_vec.at(in_n_argument)
                                                             : nullptr;
 }
 
-size_t APIDumpReplayer::CallContext::get_n_head_arguments() const
+size_t Replay::ReplayEngineDLL::CallContext::get_n_head_arguments() const
 {
     return m_n_head_arguments;
 }
 
-const APIInterceptor::APIFunctionArgument* APIDumpReplayer::CallContext::get_out_argument_ptr(const size_t& in_n_argument) const
+const APIInterceptor::APIFunctionArgument* Replay::ReplayEngineDLL::CallContext::get_out_argument_ptr(const size_t& in_n_argument) const
 {
     return (in_n_argument < m_call_ptr->arg_out_vec.size() ) ? &m_call_ptr->arg_out_vec.at(in_n_argument)
                                                              : nullptr;
 }
 
-APIDumpReplayer::ObjectRemapper* APIDumpReplayer::CallContext::get_remapper_ptr() const
+Replay::ReplayEngineDLL::ObjectRemapper* Replay::ReplayEngineDLL::CallContext::get_remapper_ptr() const
 {
     return m_remapper_ptr;
 }

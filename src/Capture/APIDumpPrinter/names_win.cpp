@@ -5,7 +5,7 @@
 #include "api_info.h"
 #include "function_name_table.h"
 
-const char* APIDumpPrinter::get_win_function_name(const APIInterceptor::APIFunction& in_function)
+const char* Capture::APIDumpPrinter::get_win_function_name(const APIInterceptor::APIFunction& in_function)
 {
     static const FunctionNameEntry name_entry_array[] =
     {

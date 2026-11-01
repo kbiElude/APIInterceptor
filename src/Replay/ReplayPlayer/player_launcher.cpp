@@ -8,7 +8,7 @@
 #include <vector>
 #include <Windows.h>
 
-std::wstring APIDumpPlayer::PlayerLauncher::get_wide_string(const std::string& in_text)
+std::wstring Replay::ReplayPlayer::PlayerLauncher::get_wide_string(const std::string& in_text)
 {
     const int    n_characters = ::MultiByteToWideChar(CP_ACP,
                                                       0, /* flags */
@@ -32,7 +32,7 @@ std::wstring APIDumpPlayer::PlayerLauncher::get_wide_string(const std::string& i
     return result;
 }
 
-bool APIDumpPlayer::PlayerLauncher::is_handover_needed(const char* in_workload_path_ptr)
+bool Replay::ReplayPlayer::PlayerLauncher::is_handover_needed(const char* in_workload_path_ptr)
 {
     constexpr uint32_t N_BYTES_PER_POINTER_X86 = 4;
 
@@ -41,13 +41,13 @@ bool APIDumpPlayer::PlayerLauncher::is_handover_needed(const char* in_workload_p
     /* Only a 32-bit process has D3D8, so a dump of any other kind need not be searched. */
     if (sizeof(void*) != N_BYTES_PER_POINTER_X86)
     {
-        const auto reader_ptr = APIDumpLoader::WorkloadReader::create(in_workload_path_ptr);
+        const auto reader_ptr = Capture::APIDumpLoader::WorkloadReader::create(in_workload_path_ptr);
 
         if (reader_ptr != nullptr)
         {
             if (reader_ptr->get_pointer_n_bytes() == N_BYTES_PER_POINTER_X86)
             {
-                result = reader_ptr->contains_api_group(APIDumpLoader::APIGroup::D3D8);
+                result = reader_ptr->contains_api_group(Capture::APIDumpLoader::APIGroup::D3D8);
             }
         }
     }
@@ -55,12 +55,12 @@ bool APIDumpPlayer::PlayerLauncher::is_handover_needed(const char* in_workload_p
     return result;
 }
 
-bool APIDumpPlayer::PlayerLauncher::run_x86_player(const std::string& in_workload_path,
-                                                   const bool&        in_is_console,
-                                                   int*               out_exit_code_ptr,
-                                                   std::string*       out_error_ptr)
+bool Replay::ReplayPlayer::PlayerLauncher::run_x86_player(const std::string& in_workload_path,
+                                                          const bool&        in_is_console,
+                                                          int*               out_exit_code_ptr,
+                                                          std::string*       out_error_ptr)
 {
-    constexpr const wchar_t* X86_PLAYER_FILE_NAME = L"APIDumpPlayer_x86.exe";
+    constexpr const wchar_t* X86_PLAYER_FILE_NAME = L"ReplayPlayer_x86.exe";
 
     std::wstring                         command_line;
     DWORD                                exit_code           = EXIT_FAILURE;
@@ -90,7 +90,7 @@ bool APIDumpPlayer::PlayerLauncher::run_x86_player(const std::string& in_workloa
 
     if (::GetFileAttributesW(x86_player_path.c_str() ) == INVALID_FILE_ATTRIBUTES)
     {
-        *out_error_ptr = "This workload holds D3D8 calls, which only the 32-bit player can replay, but APIDumpPlayer_x86.exe is not next to this player.";
+        *out_error_ptr = "This workload holds D3D8 calls, which only the 32-bit player can replay, but ReplayPlayer_x86.exe is not next to this player.";
 
         goto end;
     }

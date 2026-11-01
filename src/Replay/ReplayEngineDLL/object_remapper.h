@@ -2,37 +2,40 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
-#ifndef APIDUMPREPLAYER_OBJECT_REMAPPER_H
-#define APIDUMPREPLAYER_OBJECT_REMAPPER_H
+#ifndef REPLAYENGINEDLL_OBJECT_REMAPPER_H
+#define REPLAYENGINEDLL_OBJECT_REMAPPER_H
 
 #include "types.h"
 #include <map>
 #include <stdint.h>
 #include <utility>
 
-namespace APIDumpReplayer
+namespace Replay
 {
-    /* Maps the handles and IDs which the dumped process got from the APIs to the ones that the replay gets. Zero stands
-     * for itself. Used by the replay thread only.
-     */
-    class ObjectRemapper
+    namespace ReplayEngineDLL
     {
-    public:
-        ObjectRemapper();
+        /* Maps the handles and IDs which the dumped process got from the APIs to the ones that the replay gets. Zero stands
+         * for itself. Used by the replay thread only.
+         */
+        class ObjectRemapper
+        {
+        public:
+            ObjectRemapper();
 
-        void add   (const ObjectKind& in_kind,
-                    const uint64_t&   in_dumped_value,
-                    const uint64_t&   in_live_value);
-        void clear ();
-        bool get   (const ObjectKind& in_kind,
-                    const uint64_t&   in_dumped_value,
-                    uint64_t*         out_live_value_ptr) const;
-        void remove(const ObjectKind& in_kind,
-                    const uint64_t&   in_dumped_value);
+            void add   (const ObjectKind& in_kind,
+                        const uint64_t&   in_dumped_value,
+                        const uint64_t&   in_live_value);
+            void clear ();
+            bool get   (const ObjectKind& in_kind,
+                        const uint64_t&   in_dumped_value,
+                        uint64_t*         out_live_value_ptr) const;
+            void remove(const ObjectKind& in_kind,
+                        const uint64_t&   in_dumped_value);
 
-    private:
-        std::map<std::pair<ObjectKind, uint64_t>, uint64_t> m_live_value_map;
-    };
+        private:
+            std::map<std::pair<ObjectKind, uint64_t>, uint64_t> m_live_value_map;
+        };
+    }
 }
 
-#endif /* APIDUMPREPLAYER_OBJECT_REMAPPER_H */
+#endif /* REPLAYENGINEDLL_OBJECT_REMAPPER_H */

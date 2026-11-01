@@ -4,41 +4,41 @@
  */
 #include "state_names.h"
 
-const char* APIDumpPlayer::StateNames::get_state_name_ptr(const APIDumpReplayer::PlaybackState& in_state)
+const char* Replay::ReplayPlayer::StateNames::get_state_name_ptr(const Replay::ReplayEngineDLL::PlaybackState& in_state)
 {
     const char* result_ptr = "unknown";
 
     switch (in_state)
     {
-        case APIDumpReplayer::PlaybackState::FAILED:
+        case Replay::ReplayEngineDLL::PlaybackState::FAILED:
         {
             result_ptr = "failed";
 
             break;
         }
 
-        case APIDumpReplayer::PlaybackState::FINISHED:
+        case Replay::ReplayEngineDLL::PlaybackState::FINISHED:
         {
             result_ptr = "finished";
 
             break;
         }
 
-        case APIDumpReplayer::PlaybackState::IDLE:
+        case Replay::ReplayEngineDLL::PlaybackState::IDLE:
         {
             result_ptr = "idle";
 
             break;
         }
 
-        case APIDumpReplayer::PlaybackState::PAUSED:
+        case Replay::ReplayEngineDLL::PlaybackState::PAUSED:
         {
             result_ptr = "paused";
 
             break;
         }
 
-        case APIDumpReplayer::PlaybackState::PLAYING:
+        case Replay::ReplayEngineDLL::PlaybackState::PLAYING:
         {
             result_ptr = "playing";
 

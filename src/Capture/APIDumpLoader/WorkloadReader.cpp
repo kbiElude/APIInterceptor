@@ -12,7 +12,7 @@ static constexpr size_t   BUFFER_N_BYTES   = 1024 * 1024;
 static constexpr uint32_t MAX_ITEM_N_BYTES = 1u << 30; /* 1 GiB */
 static constexpr size_t   MAX_PEEK_N_BYTES = 64;
 
-APIDumpLoader::WorkloadReader::WorkloadReader()
+Capture::APIDumpLoader::WorkloadReader::WorkloadReader()
     :m_buffer_end         (0),
      m_buffer_start       (0),
      m_compressed_end     (0),
@@ -33,7 +33,7 @@ APIDumpLoader::WorkloadReader::WorkloadReader()
     m_buffer_u8_vec.resize(BUFFER_N_BYTES + MAX_PEEK_N_BYTES);
 }
 
-APIDumpLoader::WorkloadReader::~WorkloadReader()
+Capture::APIDumpLoader::WorkloadReader::~WorkloadReader()
 {
     if (m_decompressor_ptr != nullptr)
     {
@@ -46,7 +46,7 @@ APIDumpLoader::WorkloadReader::~WorkloadReader()
     }
 }
 
-bool APIDumpLoader::WorkloadReader::contains_api_group(const APIGroup& in_group)
+bool Capture::APIDumpLoader::WorkloadReader::contains_api_group(const APIGroup& in_group)
 {
     bool     result = false;
     Workload workload;
@@ -68,8 +68,8 @@ bool APIDumpLoader::WorkloadReader::contains_api_group(const APIGroup& in_group)
     return result;
 }
 
-APIDumpLoader::WorkloadReaderUniquePtr APIDumpLoader::WorkloadReader::create(const char*  in_filename_ptr,
-                                                                             std::string* out_error_ptr)
+Capture::APIDumpLoader::WorkloadReaderUniquePtr Capture::APIDumpLoader::WorkloadReader::create(const char*  in_filename_ptr,
+                                                                                      std::string* out_error_ptr)
 {
     std::string                                        error;
     APIInterceptor::WorkloadFormat::WorkloadFileHeader header;
@@ -144,17 +144,17 @@ end:
     return result_ptr;
 }
 
-uint32_t APIDumpLoader::WorkloadReader::get_pointer_n_bytes() const
+uint32_t Capture::APIDumpLoader::WorkloadReader::get_pointer_n_bytes() const
 {
     return m_pointer_n_bytes;
 }
 
-bool APIDumpLoader::WorkloadReader::is_truncated() const
+bool Capture::APIDumpLoader::WorkloadReader::is_truncated() const
 {
     return m_is_truncated;
 }
 
-size_t APIDumpLoader::WorkloadReader::peek(const size_t& in_n_bytes)
+size_t Capture::APIDumpLoader::WorkloadReader::peek(const size_t& in_n_bytes)
 {
     if (m_buffer_end - m_buffer_start < in_n_bytes)
     {
@@ -178,7 +178,7 @@ size_t APIDumpLoader::WorkloadReader::peek(const size_t& in_n_bytes)
     return m_buffer_end - m_buffer_start;
 }
 
-bool APIDumpLoader::WorkloadReader::read_api_call(DumpedAPICall* out_api_call_ptr)
+bool Capture::APIDumpLoader::WorkloadReader::read_api_call(DumpedAPICall* out_api_call_ptr)
 {
     constexpr size_t   HEADER_N_BYTES           = APIInterceptor::WorkloadFormat::CALL_HEADER_N_BYTES;
     constexpr size_t   MAX_ARGUMENT_N_BYTES     = 16;                                                         /* type and the widest payload */
@@ -282,8 +282,8 @@ end:
     return result;
 }
 
-bool APIDumpLoader::WorkloadReader::read_bytes(void*         out_data_ptr,
-                                               const size_t& in_n_bytes)
+bool Capture::APIDumpLoader::WorkloadReader::read_bytes(void*         out_data_ptr,
+                                                        const size_t& in_n_bytes)
 {
     const size_t n_bytes_buffered = std::min<size_t>(in_n_bytes,
                                                      m_buffer_end - m_buffer_start);
@@ -308,7 +308,7 @@ bool APIDumpLoader::WorkloadReader::read_bytes(void*         out_data_ptr,
     return (n_bytes_read == in_n_bytes);
 }
 
-bool APIDumpLoader::WorkloadReader::read_data_chunk(DataChunk* out_data_chunk_ptr)
+bool Capture::APIDumpLoader::WorkloadReader::read_data_chunk(DataChunk* out_data_chunk_ptr)
 {
     uint32_t n_bytes = 0;
     bool     result  = false;
@@ -337,8 +337,8 @@ end:
     return result;
 }
 
-size_t APIDumpLoader::WorkloadReader::read_decompressed(void*         out_data_ptr,
-                                                        const size_t& in_n_bytes)
+size_t Capture::APIDumpLoader::WorkloadReader::read_decompressed(void*         out_data_ptr,
+                                                                 const size_t& in_n_bytes)
 {
     ZSTD_outBuffer output = {out_data_ptr, in_n_bytes, 0};
 
@@ -389,7 +389,7 @@ size_t APIDumpLoader::WorkloadReader::read_decompressed(void*         out_data_p
     return output.pos;
 }
 
-bool APIDumpLoader::WorkloadReader::read_next_segment(Workload* out_workload_ptr)
+bool Capture::APIDumpLoader::WorkloadReader::read_next_segment(Workload* out_workload_ptr)
 {
     constexpr size_t N_COUNTS = 3; /* API calls, data chunks, surfaces */
 
@@ -504,7 +504,7 @@ end:
     return result;
 }
 
-bool APIDumpLoader::WorkloadReader::read_surface(DumpedSurface* out_surface_ptr)
+bool Capture::APIDumpLoader::WorkloadReader::read_surface(DumpedSurface* out_surface_ptr)
 {
     constexpr size_t N_HEADER_FIELDS = 3; /* width, height, n bytes */
 

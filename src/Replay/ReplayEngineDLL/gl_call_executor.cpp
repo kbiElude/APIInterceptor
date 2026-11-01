@@ -10,7 +10,7 @@
 /* Turns the parenthesized list of the table's entry into the list of an initializer. */
 #define GL_UNPACK_KINDS(...) __VA_ARGS__
 
-APIDumpReplayer::GlCallExecutor::GlCallExecutor(ObjectRemapper* in_remapper_ptr)
+Replay::ReplayEngineDLL::GlCallExecutor::GlCallExecutor(ObjectRemapper* in_remapper_ptr)
     :m_client_array_replayer(&m_context,
                              [this](const char* in_name_ptr)
                              {
@@ -46,18 +46,18 @@ APIDumpReplayer::GlCallExecutor::GlCallExecutor(ObjectRemapper* in_remapper_ptr)
     #undef GL_REPLAY_FUNCTION
 }
 
-APIDumpReplayer::GlCallExecutor::~GlCallExecutor()
+Replay::ReplayEngineDLL::GlCallExecutor::~GlCallExecutor()
 {
     /* The context belongs to the replay thread: reset() has dropped what refers to it already. */
 }
 
-void APIDumpReplayer::GlCallExecutor::add_function(const APIInterceptor::APIFunction& in_function,
-                                                   const char*                        in_name_ptr,
-                                                   const ObjectKind&                  in_return_kind,
-                                                   const std::vector<ObjectKind>&     in_param_kind_vec,
-                                                   const uint32_t&                    in_ignored_param_mask,
-                                                   const InvokeFuncPtr&               in_invoke_func_ptr,
-                                                   const size_t&                      in_n_head_arguments)
+void Replay::ReplayEngineDLL::GlCallExecutor::add_function(const APIInterceptor::APIFunction& in_function,
+                                                           const char*                        in_name_ptr,
+                                                           const ObjectKind&                  in_return_kind,
+                                                           const std::vector<ObjectKind>&     in_param_kind_vec,
+                                                           const uint32_t&                    in_ignored_param_mask,
+                                                           const InvokeFuncPtr&               in_invoke_func_ptr,
+                                                           const size_t&                      in_n_head_arguments)
 {
     FunctionEntry entry;
 
@@ -74,7 +74,7 @@ void APIDumpReplayer::GlCallExecutor::add_function(const APIInterceptor::APIFunc
     m_entry_map[in_function] = entry;
 }
 
-void APIDumpReplayer::GlCallExecutor::after_call(const APIDumpLoader::DumpedAPICall& in_call)
+void Replay::ReplayEngineDLL::GlCallExecutor::after_call(const Capture::APIDumpLoader::DumpedAPICall& in_call)
 {
     int64_t dumped_location = 0;
     uint64_t dumped_program = 0;
@@ -203,9 +203,9 @@ void APIDumpReplayer::GlCallExecutor::after_call(const APIDumpLoader::DumpedAPIC
     m_context.register_returned_name(m_context.get_live_return() );
 }
 
-bool APIDumpReplayer::GlCallExecutor::execute(const APIDumpLoader::DumpedAPICall& in_call,
-                                              const CallWalker&                   in_walker,
-                                              std::string*                        out_error_ptr)
+bool Replay::ReplayEngineDLL::GlCallExecutor::execute(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                               const CallWalker&                   in_walker,
+                                                               std::string*                        out_error_ptr)
 {
     const auto entry_iterator = m_entry_map.find(in_call.func);
     void*      proc_ptr       = nullptr;
@@ -287,7 +287,7 @@ end:
     return result;
 }
 
-void* APIDumpReplayer::GlCallExecutor::get_proc_ptr(const char* in_name_ptr)
+void* Replay::ReplayEngineDLL::GlCallExecutor::get_proc_ptr(const char* in_name_ptr)
 {
     const auto iterator = m_proc_ptr_map.find(in_name_ptr);
     void*      result   = nullptr;
@@ -318,7 +318,7 @@ end:
     return result;
 }
 
-bool APIDumpReplayer::GlCallExecutor::is_valid_proc(const void* in_proc_ptr)
+bool Replay::ReplayEngineDLL::GlCallExecutor::is_valid_proc(const void* in_proc_ptr)
 {
     constexpr uintptr_t MAX_INVALID_PROC_VALUE = 3;
 
@@ -328,14 +328,14 @@ bool APIDumpReplayer::GlCallExecutor::is_valid_proc(const void* in_proc_ptr)
             value != static_cast<uintptr_t>(-1) );
 }
 
-void APIDumpReplayer::GlCallExecutor::on_frame_presented()
+void Replay::ReplayEngineDLL::GlCallExecutor::on_frame_presented()
 {
     /* Stub */
 }
 
-void APIDumpReplayer::GlCallExecutor::register_returned_index(const APIDumpLoader::DumpedAPICall& in_call,
-                                                              const ObjectKind&                   in_kind,
-                                                              const bool&                         in_has_scope)
+void Replay::ReplayEngineDLL::GlCallExecutor::register_returned_index(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                                               const ObjectKind&                   in_kind,
+                                                                               const bool&                         in_has_scope)
 {
     constexpr uint32_t INVALID_INDEX = 0xFFFFFFFFu;
 
@@ -373,7 +373,7 @@ void APIDumpReplayer::GlCallExecutor::register_returned_index(const APIDumpLoade
     }
 }
 
-void APIDumpReplayer::GlCallExecutor::reset()
+void Replay::ReplayEngineDLL::GlCallExecutor::reset()
 {
     m_context.forget_locations();
     m_mapping_replayer.reset();

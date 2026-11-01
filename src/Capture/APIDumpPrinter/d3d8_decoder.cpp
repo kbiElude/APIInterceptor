@@ -9,7 +9,7 @@
 #include <sstream>
 #include <string.h>
 
-std::string APIDumpPrinter::D3D8Decoder::format_boolean(const int32_t& in_value)
+std::string Capture::APIDumpPrinter::D3D8Decoder::format_boolean(const int32_t& in_value)
 {
     std::string result;
 
@@ -40,7 +40,7 @@ std::string APIDumpPrinter::D3D8Decoder::format_boolean(const int32_t& in_value)
     return result;
 }
 
-std::string APIDumpPrinter::D3D8Decoder::format_color(const uint32_t& in_value)
+std::string Capture::APIDumpPrinter::D3D8Decoder::format_color(const uint32_t& in_value)
 {
     char buffer_i8vec16[16];
 
@@ -52,7 +52,7 @@ std::string APIDumpPrinter::D3D8Decoder::format_color(const uint32_t& in_value)
     return buffer_i8vec16;
 }
 
-std::string APIDumpPrinter::D3D8Decoder::format_color_value(const Interception::Hooks::D3D8::D3DCOLORVALUE& in_value)
+std::string Capture::APIDumpPrinter::D3D8Decoder::format_color_value(const Interception::Hooks::D3D8::D3DCOLORVALUE& in_value)
 {
     std::ostringstream stream;
 
@@ -61,8 +61,8 @@ std::string APIDumpPrinter::D3D8Decoder::format_color_value(const Interception::
     return stream.str();
 }
 
-std::string APIDumpPrinter::D3D8Decoder::format_enum(const Interception::Hooks::D3D8::ValueKind& in_kind,
-                                                                          const uint32_t&        in_value)
+std::string Capture::APIDumpPrinter::D3D8Decoder::format_enum(const Interception::Hooks::D3D8::ValueKind& in_kind,
+                                                                                    const uint32_t&        in_value)
 {
     const ValueNameEntry* table_ptr = nullptr;
     uint32_t              n_entries = 0;
@@ -88,8 +88,8 @@ std::string APIDumpPrinter::D3D8Decoder::format_enum(const Interception::Hooks::
     return result;
 }
 
-std::string APIDumpPrinter::D3D8Decoder::format_flags(const Interception::Hooks::D3D8::ValueKind& in_kind,
-                                                                           const uint32_t&        in_value)
+std::string Capture::APIDumpPrinter::D3D8Decoder::format_flags(const Interception::Hooks::D3D8::ValueKind& in_kind,
+                                                                                     const uint32_t&        in_value)
 {
     const FlagNameEntry* table_ptr = nullptr;
     uint32_t             n_entries = 0;
@@ -127,7 +127,7 @@ std::string APIDumpPrinter::D3D8Decoder::format_flags(const Interception::Hooks:
     return result;
 }
 
-std::string APIDumpPrinter::D3D8Decoder::format_fvf(const uint32_t& in_value)
+std::string Capture::APIDumpPrinter::D3D8Decoder::format_fvf(const uint32_t& in_value)
 {
     /* A vertex shader handle has the highest bit set; a FVF never does. */
     constexpr uint32_t VERTEX_SHADER_HANDLE_BIT = 1u << 31;
@@ -212,7 +212,7 @@ std::string APIDumpPrinter::D3D8Decoder::format_fvf(const uint32_t& in_value)
     return result;
 }
 
-std::string APIDumpPrinter::D3D8Decoder::format_hex(const uint32_t& in_value)
+std::string Capture::APIDumpPrinter::D3D8Decoder::format_hex(const uint32_t& in_value)
 {
     char buffer_i8vec16[16];
 
@@ -224,7 +224,7 @@ std::string APIDumpPrinter::D3D8Decoder::format_hex(const uint32_t& in_value)
     return buffer_i8vec16;
 }
 
-std::string APIDumpPrinter::D3D8Decoder::format_hresult(const int32_t& in_value)
+std::string Capture::APIDumpPrinter::D3D8Decoder::format_hresult(const int32_t& in_value)
 {
     /* HRESULTs returned by D3D8. */
     static const ValueNameEntry hresult_name_array[] =
@@ -274,10 +274,10 @@ std::string APIDumpPrinter::D3D8Decoder::format_hresult(const int32_t& in_value)
     return result;
 }
 
-std::string APIDumpPrinter::D3D8Decoder::format_resource_properties(const uint32_t& in_format,
-                                                                    const uint32_t& in_type,
-                                                                    const uint32_t& in_usage,
-                                                                    const uint32_t& in_pool)
+std::string Capture::APIDumpPrinter::D3D8Decoder::format_resource_properties(const uint32_t& in_format,
+                                                                              const uint32_t& in_type,
+                                                                              const uint32_t& in_usage,
+                                                                              const uint32_t& in_pool)
 {
     const std::string format_name = format_enum(Interception::Hooks::D3D8::ValueKind::FORMAT,
                                                                      in_format);
@@ -291,8 +291,8 @@ std::string APIDumpPrinter::D3D8Decoder::format_resource_properties(const uint32
     return "Format=" + format_name + " Type=" + type_name + " Usage=" + usage_names + " Pool=" + pool_name;
 }
 
-std::string APIDumpPrinter::D3D8Decoder::format_state_value(const StateValueInfo& in_info,
-                                                            const uint32_t&       in_value)
+std::string Capture::APIDumpPrinter::D3D8Decoder::format_state_value(const StateValueInfo& in_info,
+                                                                      const uint32_t&       in_value)
 {
     std::string result = std::to_string(in_value);
 
@@ -433,9 +433,9 @@ std::string APIDumpPrinter::D3D8Decoder::format_state_value(const StateValueInfo
     return result;
 }
 
-bool APIDumpPrinter::D3D8Decoder::format_struct(const Interception::Hooks::D3D8::ValueKind&      in_kind,
-                                                                     const std::vector<uint8_t>& in_chunk_u8_vec,
-                                                                     std::string*                out_text_ptr)
+bool Capture::APIDumpPrinter::D3D8Decoder::format_struct(const Interception::Hooks::D3D8::ValueKind&      in_kind,
+                                                                               const std::vector<uint8_t>& in_chunk_u8_vec,
+                                                                               std::string*                out_text_ptr)
 {
     /* The dumped process may be 32- or 64-bit, so the layout of the structures holding pointers differs. */
     constexpr size_t POINTER_N_BYTES_32 = 4;
@@ -1124,8 +1124,8 @@ bool APIDumpPrinter::D3D8Decoder::format_struct(const Interception::Hooks::D3D8:
     return result;
 }
 
-std::string APIDumpPrinter::D3D8Decoder::get_object_name(const void* in_object_ptr,
-                                                         const char* in_type_name_ptr) const
+std::string Capture::APIDumpPrinter::D3D8Decoder::get_object_name(const void* in_object_ptr,
+                                                                   const char* in_type_name_ptr) const
 {
     constexpr size_t OBJECT_ADDRESS_TEXT_N_BYTES = 3 + 16 + 1; /* "@0x", 16 hex digits and NUL */
 
@@ -1157,12 +1157,12 @@ std::string APIDumpPrinter::D3D8Decoder::get_object_name(const void* in_object_p
     return result;
 }
 
-bool APIDumpPrinter::D3D8Decoder::print_argument(FILE*                                      in_file_handle,
-                                                 const APIDumpLoader::DumpedAPICall&        in_call,
-                                                 const uint32_t&                            in_n_argument,
-                                                 const bool&                                in_is_out,
-                                                 const APIInterceptor::APIFunctionArgument& in_argument,
-                                                 const APIDumpLoader::Workload&             in_workload) const
+bool Capture::APIDumpPrinter::D3D8Decoder::print_argument(FILE*                                      in_file_handle,
+                                                           const Capture::APIDumpLoader::DumpedAPICall&        in_call,
+                                                           const uint32_t&                            in_n_argument,
+                                                           const bool&                                in_is_out,
+                                                           const APIInterceptor::APIFunctionArgument& in_argument,
+                                                           const Capture::APIDumpLoader::Workload&             in_workload) const
 {
     Interception::Hooks::D3D8::ArgumentInfo info   = {};
     bool               result = false;
@@ -1354,8 +1354,8 @@ bool APIDumpPrinter::D3D8Decoder::print_argument(FILE*                          
                 goto end;
             }
 
-            const auto chunk_ptr = APIDumpLoader::get_data_chunk_ptr(in_workload,
-                                                                     in_argument.get_data_chunk_id() );
+            const auto chunk_ptr = Capture::APIDumpLoader::get_data_chunk_ptr(in_workload,
+                                                                              in_argument.get_data_chunk_id() );
 
             if (chunk_ptr == nullptr)
             {
@@ -1391,9 +1391,9 @@ end:
     return result;
 }
 
-bool APIDumpPrinter::D3D8Decoder::print_returned_value(FILE*                                      in_file_handle,
-                                                       const APIDumpLoader::DumpedAPICall&        in_call,
-                                                       const APIInterceptor::APIFunctionArgument& in_returned_value) const
+bool Capture::APIDumpPrinter::D3D8Decoder::print_returned_value(FILE*                                      in_file_handle,
+                                                                 const Capture::APIDumpLoader::DumpedAPICall&        in_call,
+                                                                 const APIInterceptor::APIFunctionArgument& in_returned_value) const
 {
     Interception::Hooks::D3D8::ArgumentInfo info   = {};
     bool               result = false;
@@ -1449,7 +1449,7 @@ end:
     return result;
 }
 
-void APIDumpPrinter::D3D8Decoder::register_created_objects(const APIDumpLoader::DumpedAPICall& in_call)
+void Capture::APIDumpPrinter::D3D8Decoder::register_created_objects(const Capture::APIDumpLoader::DumpedAPICall& in_call)
 {
     const auto register_func = [&](const void* in_object_ptr,
                                    const char* in_type_name_ptr,

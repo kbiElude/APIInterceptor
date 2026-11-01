@@ -296,9 +296,9 @@ void APIDumper::on_pre_callback(APIInterceptor::APIFunction                in_ap
         auto          rgba_u8_vec_ptr = std::unique_ptr<std::vector<uint8_t> >(new std::vector<uint8_t>() );
 
         /* The device is the first argument of the call. */
-        if (APIDumperDLL::D3D8SwapchainReader::read(const_cast<void*>(in_args_in_ptr[0].get_ptr() ),
-                                                   &new_surface.extents_u32vec2,
-                                                    rgba_u8_vec_ptr.get() ))
+        if (Capture::APIDumperDLL::D3D8SwapchainReader::read(const_cast<void*>(in_args_in_ptr[0].get_ptr() ),
+                                                            &new_surface.extents_u32vec2,
+                                                             rgba_u8_vec_ptr.get() ))
         {
             new_surface.u8_vec_ptr = std::move(rgba_u8_vec_ptr);
 
@@ -507,7 +507,7 @@ void APIDumper::write_segment(SegmentJobUniquePtr in_job_ptr)
     constexpr size_t N_SURFACE_HEADER_FIELDS = 3; /* width, height, n bytes */
 
     FILE* const                           file_handle = in_job_ptr->file_handle;
-    APIDumperDLL::ZstdFileWriterUniquePtr writer_ptr;
+    Capture::APIDumperDLL::ZstdFileWriterUniquePtr writer_ptr;
 
     /* The writer must not disturb the app, nor be recorded. */
     ::SetThreadPriority(::GetCurrentThread(),
@@ -517,8 +517,8 @@ void APIDumper::write_segment(SegmentJobUniquePtr in_job_ptr)
 
     if (file_handle != nullptr)
     {
-        writer_ptr = APIDumperDLL::ZstdFileWriter::create(file_handle,
-                                                          COMPRESSION_LEVEL);
+        writer_ptr = Capture::APIDumperDLL::ZstdFileWriter::create(file_handle,
+                                                                   COMPRESSION_LEVEL);
     }
 
     if (writer_ptr != nullptr)

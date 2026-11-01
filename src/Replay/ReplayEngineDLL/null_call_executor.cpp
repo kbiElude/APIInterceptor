@@ -4,14 +4,14 @@
  */
 #include "null_call_executor.h"
 
-APIDumpReplayer::NullCallExecutor::NullCallExecutor()
+Replay::ReplayEngineDLL::NullCallExecutor::NullCallExecutor()
 {
     /* Stub */
 }
 
-bool APIDumpReplayer::NullCallExecutor::execute(const APIDumpLoader::DumpedAPICall& in_call,
-                                                const CallWalker&                   in_walker,
-                                                std::string*                        out_error_ptr)
+bool Replay::ReplayEngineDLL::NullCallExecutor::execute(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                                 const CallWalker&                   in_walker,
+                                                                 std::string*                        out_error_ptr)
 {
     (void) in_call;
     (void) in_walker;
@@ -20,12 +20,12 @@ bool APIDumpReplayer::NullCallExecutor::execute(const APIDumpLoader::DumpedAPICa
     return true;
 }
 
-void APIDumpReplayer::NullCallExecutor::on_frame_presented()
+void Replay::ReplayEngineDLL::NullCallExecutor::on_frame_presented()
 {
     /* Stub */
 }
 
-void APIDumpReplayer::NullCallExecutor::reset()
+void Replay::ReplayEngineDLL::NullCallExecutor::reset()
 {
     /* Stub */
 }

@@ -11,30 +11,33 @@
 #include "Common/types.h"
 #include <vector>
 
-namespace APIDumpLoader
+namespace Capture
 {
-    enum class APIGroup
+    namespace APIDumpLoader
     {
-        GDI32,
-        GL,
-        WGL,
-        USER32,
-        D3D8,
+        enum class APIGroup
+        {
+            GDI32,
+            GL,
+            WGL,
+            USER32,
+            D3D8,
 
-        UNKNOWN
-    };
+            UNKNOWN
+        };
 
-    APIGroup    get_api_group     (const APIInterceptor::APIFunction& in_function);
-    const char* get_api_group_name(const APIGroup&                    in_group);
+        APIGroup    get_api_group     (const APIInterceptor::APIFunction& in_function);
+        const char* get_api_group_name(const APIGroup&                    in_group);
 
-    /* Every group but Unknown, in the order of the enum. */
-    const std::vector<APIGroup>& get_api_groups();
+        /* Every group but Unknown, in the order of the enum. */
+        const std::vector<APIGroup>& get_api_groups();
 
-    /* True for calls which end a frame (a swapchain present). */
-    bool is_frame_boundary(const APIInterceptor::APIFunction& in_function);
+        /* True for calls which end a frame (a swapchain present). */
+        bool is_frame_boundary(const APIInterceptor::APIFunction& in_function);
 
-    bool parse_api_group_name(const char* in_name_ptr,
-                              APIGroup*   out_group_ptr);
+        bool parse_api_group_name(const char* in_name_ptr,
+                                  APIGroup*   out_group_ptr);
+    }
 }
 
 #endif /* APIDUMPLOADER_API_INFO_H */

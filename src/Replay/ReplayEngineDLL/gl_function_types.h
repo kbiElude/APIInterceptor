@@ -5,8 +5,8 @@
  * The types of the GL functions (PFNGL...PROC), as the wrappers of the interceptor have them: the core ones, the
  * compatibility ones, and those of the extensions.
  */
-#ifndef APIDUMPREPLAYER_GL_FUNCTION_TYPES_H
-#define APIDUMPREPLAYER_GL_FUNCTION_TYPES_H
+#ifndef REPLAYENGINEDLL_GL_FUNCTION_TYPES_H
+#define REPLAYENGINEDLL_GL_FUNCTION_TYPES_H
 
 #include <Windows.h>
 #include "Khronos/GL/glcorearb.h"
@@ -18,4 +18,4 @@
 
 #include "Interception/Hooks/OpenGL/types_typedefs.h"
 
-#endif /* APIDUMPREPLAYER_GL_FUNCTION_TYPES_H */
+#endif /* REPLAYENGINEDLL_GL_FUNCTION_TYPES_H */

@@ -4,14 +4,14 @@
  */
 #include "zstd_file_writer.h"
 
-APIDumperDLL::ZstdFileWriter::ZstdFileWriter()
+Capture::APIDumperDLL::ZstdFileWriter::ZstdFileWriter()
     :m_compressor_ptr(nullptr),
      m_file_handle   (nullptr)
 {
     /* Stub */
 }
 
-APIDumperDLL::ZstdFileWriter::~ZstdFileWriter()
+Capture::APIDumperDLL::ZstdFileWriter::~ZstdFileWriter()
 {
     if (m_compressor_ptr != nullptr)
     {
@@ -19,9 +19,9 @@ APIDumperDLL::ZstdFileWriter::~ZstdFileWriter()
     }
 }
 
-bool APIDumperDLL::ZstdFileWriter::compress(const void*              in_data_ptr,
-                                            const size_t&            in_n_bytes,
-                                            const ZSTD_EndDirective& in_directive)
+bool Capture::APIDumperDLL::ZstdFileWriter::compress(const void*              in_data_ptr,
+                                                     const size_t&            in_n_bytes,
+                                                     const ZSTD_EndDirective& in_directive)
 {
     ZSTD_inBuffer input             = {in_data_ptr, in_n_bytes, 0};
     size_t        n_bytes_remaining = 0;
@@ -61,8 +61,8 @@ end:
     return result;
 }
 
-APIDumperDLL::ZstdFileWriterUniquePtr APIDumperDLL::ZstdFileWriter::create(FILE*      in_file_handle,
-                                                                           const int& in_compression_level)
+Capture::APIDumperDLL::ZstdFileWriterUniquePtr Capture::APIDumperDLL::ZstdFileWriter::create(FILE*      in_file_handle,
+                                                                                    const int& in_compression_level)
 {
     ZstdFileWriterUniquePtr result_ptr(new ZstdFileWriter() );
 
@@ -90,15 +90,15 @@ end:
     return result_ptr;
 }
 
-bool APIDumperDLL::ZstdFileWriter::finish()
+bool Capture::APIDumperDLL::ZstdFileWriter::finish()
 {
     return compress(nullptr,
                     0,
                     ZSTD_e_end);
 }
 
-bool APIDumperDLL::ZstdFileWriter::write(const void*   in_data_ptr,
-                                         const size_t& in_n_bytes)
+bool Capture::APIDumperDLL::ZstdFileWriter::write(const void*   in_data_ptr,
+                                                  const size_t& in_n_bytes)
 {
     return compress(in_data_ptr,
                     in_n_bytes,

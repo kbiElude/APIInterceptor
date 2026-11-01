@@ -17,13 +17,13 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND   in_window,
                                                              WPARAM in_wparam,
                                                              LPARAM in_lparam);
 
-static constexpr const wchar_t* WINDOW_CLASS_NAME = L"APIDumpPlayerControlWindow";
+static constexpr const wchar_t* WINDOW_CLASS_NAME = L"ReplayPlayerControlWindow";
 
 /* Posted by the replay thread: the window of the replay has been put in place. */
 static constexpr UINT WM_PLACE_BELOW_REPLAY_WINDOW = WM_APP + 1;
 
-APIDumpPlayer::ControlWindow::ControlWindow(APIDumpReplayer::IPlaybackController* in_controller_ptr,
-                                            const std::string&                    in_title)
+Replay::ReplayPlayer::ControlWindow::ControlWindow(Replay::ReplayEngineDLL::IPlaybackController* in_controller_ptr,
+                                                           const std::string&                    in_title)
     :m_content_height        (0),
      m_content_width         (0),
      m_controller_ptr        (in_controller_ptr),
@@ -40,7 +40,7 @@ APIDumpPlayer::ControlWindow::ControlWindow(APIDumpReplayer::IPlaybackController
     /* Stub */
 }
 
-APIDumpPlayer::ControlWindow::~ControlWindow()
+Replay::ReplayPlayer::ControlWindow::~ControlWindow()
 {
     if (m_is_imgui_ready)
     {
@@ -76,7 +76,7 @@ APIDumpPlayer::ControlWindow::~ControlWindow()
                        ::GetModuleHandleW(nullptr) );
 }
 
-bool APIDumpPlayer::ControlWindow::create(std::string* out_error_ptr)
+bool Replay::ReplayPlayer::ControlWindow::create(std::string* out_error_ptr)
 {
     constexpr int   CLIENT_HEIGHT = 150;
     constexpr int   CLIENT_WIDTH  = 420;
@@ -178,7 +178,7 @@ end:
     return result;
 }
 
-bool APIDumpPlayer::ControlWindow::create_device()
+bool Replay::ReplayPlayer::ControlWindow::create_device()
 {
     constexpr UINT N_BUFFERS = 2;
 
@@ -211,7 +211,7 @@ bool APIDumpPlayer::ControlWindow::create_device()
     return result;
 }
 
-void APIDumpPlayer::ControlWindow::create_render_target()
+void Replay::ReplayPlayer::ControlWindow::create_render_target()
 {
     ID3D11Texture2D* back_buffer_ptr = nullptr;
 
@@ -226,7 +226,7 @@ void APIDumpPlayer::ControlWindow::create_render_target()
     }
 }
 
-void APIDumpPlayer::ControlWindow::destroy_render_target()
+void Replay::ReplayPlayer::ControlWindow::destroy_render_target()
 {
     if (m_render_target_view_ptr != nullptr)
     {
@@ -236,7 +236,7 @@ void APIDumpPlayer::ControlWindow::destroy_render_target()
     }
 }
 
-void APIDumpPlayer::ControlWindow::draw_controls()
+void Replay::ReplayPlayer::ControlWindow::draw_controls()
 {
     constexpr float BUTTON_WIDTH_N_EMS = 6.0f;
 
@@ -246,9 +246,9 @@ void APIDumpPlayer::ControlWindow::draw_controls()
     float             max_right    = 0.0f;
     const auto        status       = m_controller_ptr->get_status();
     const ImGuiStyle& style        = ImGui::GetStyle();
-    const bool        is_ended     = (status.state == APIDumpReplayer::PlaybackState::FAILED   ||
-                                      status.state == APIDumpReplayer::PlaybackState::FINISHED);
-    const bool        is_playing   = (status.state == APIDumpReplayer::PlaybackState::PLAYING);
+    const bool        is_ended     = (status.state == Replay::ReplayEngineDLL::PlaybackState::FAILED   ||
+                                              status.state == Replay::ReplayEngineDLL::PlaybackState::FINISHED);
+    const bool        is_playing   = (status.state == Replay::ReplayEngineDLL::PlaybackState::PLAYING);
 
     /* What the window has to hold: the corner of the last item of each kind, found while they are drawn. */
     const auto extend_func = [&]()
@@ -324,7 +324,7 @@ void APIDumpPlayer::ControlWindow::draw_controls()
     extend_func();
 
     /* The message does not make the window wider than the buttons do. */
-    if (status.state == APIDumpReplayer::PlaybackState::FAILED)
+    if (status.state == Replay::ReplayEngineDLL::PlaybackState::FAILED)
     {
         ImGui::PushTextWrapPos(max_right);
         ImGui::TextColored(ImVec4(1.0f,
@@ -344,12 +344,12 @@ void APIDumpPlayer::ControlWindow::draw_controls()
     m_content_width  = static_cast<int>(std::ceil(max_right  + style.WindowPadding.x) );
 }
 
-void APIDumpPlayer::ControlWindow::enable_dpi_awareness()
+void Replay::ReplayPlayer::ControlWindow::enable_dpi_awareness()
 {
     ImGui_ImplWin32_EnableDpiAwareness();
 }
 
-void APIDumpPlayer::ControlWindow::fit_to_content()
+void Replay::ReplayPlayer::ControlWindow::fit_to_content()
 {
     RECT client_rect = {};
     RECT outer_rect  = {};
@@ -387,10 +387,10 @@ void APIDumpPlayer::ControlWindow::fit_to_content()
     }
 }
 
-LRESULT APIDumpPlayer::ControlWindow::handle_message(const HWND&   in_window,
-                                                     const UINT&   in_message,
-                                                     const WPARAM& in_wparam,
-                                                     const LPARAM& in_lparam)
+LRESULT Replay::ReplayPlayer::ControlWindow::handle_message(const HWND&   in_window,
+                                                            const UINT&   in_message,
+                                                            const WPARAM& in_wparam,
+                                                            const LPARAM& in_lparam)
 {
     LRESULT result = 0;
 
@@ -462,24 +462,24 @@ end:
     return result;
 }
 
-void APIDumpPlayer::ControlWindow::on_error(const std::string& in_message)
+void Replay::ReplayPlayer::ControlWindow::on_error(const std::string& in_message)
 {
     (void) in_message;
 }
 
-void APIDumpPlayer::ControlWindow::on_frame_presented(const uint32_t& in_n_frame)
+void Replay::ReplayPlayer::ControlWindow::on_frame_presented(const uint32_t& in_n_frame)
 {
     (void) in_n_frame;
 }
 
-void APIDumpPlayer::ControlWindow::on_state_changed(const APIDumpReplayer::PlaybackState& in_old_state,
-                                                    const APIDumpReplayer::PlaybackState& in_new_state)
+void Replay::ReplayPlayer::ControlWindow::on_state_changed(const Replay::ReplayEngineDLL::PlaybackState& in_old_state,
+                                                                   const Replay::ReplayEngineDLL::PlaybackState& in_new_state)
 {
     (void) in_old_state;
     (void) in_new_state;
 }
 
-void APIDumpPlayer::ControlWindow::on_window_placed(const APIDumpReplayer::WindowPlacement& in_placement)
+void Replay::ReplayPlayer::ControlWindow::on_window_placed(const Replay::ReplayEngineDLL::WindowPlacement& in_placement)
 {
     {
         std::lock_guard<std::mutex> lock(m_replay_window.mutex);
@@ -495,7 +495,7 @@ void APIDumpPlayer::ControlWindow::on_window_placed(const APIDumpReplayer::Windo
                    0);
 }
 
-void APIDumpPlayer::ControlWindow::place_below_replay_window()
+void Replay::ReplayPlayer::ControlWindow::place_below_replay_window()
 {
     constexpr int GAP_N_PIXELS      = 8;
     constexpr int N_PARTS_TO_CENTER = 2;
@@ -503,7 +503,7 @@ void APIDumpPlayer::ControlWindow::place_below_replay_window()
     RECT                             control_rect = {};
     bool                             is_known     = false;
     MONITORINFO                      monitor_info = {};
-    APIDumpReplayer::WindowPlacement placement;
+    Replay::ReplayEngineDLL::WindowPlacement placement;
     RECT                             replay_rect  = {};
     int                              x            = 0;
     int                              y            = 0;
@@ -560,7 +560,7 @@ void APIDumpPlayer::ControlWindow::place_below_replay_window()
     }
 }
 
-void APIDumpPlayer::ControlWindow::render_frame()
+void Replay::ReplayPlayer::ControlWindow::render_frame()
 {
     const float clear_color_fp32vec4[] = {0.1f, 0.1f, 0.12f, 1.0f};
 
@@ -588,8 +588,8 @@ void APIDumpPlayer::ControlWindow::render_frame()
                               0); /* flags         */
 }
 
-void APIDumpPlayer::ControlWindow::resize(const UINT& in_width,
-                                          const UINT& in_height)
+void Replay::ReplayPlayer::ControlWindow::resize(const UINT& in_width,
+                                                 const UINT& in_height)
 {
     if (m_swap_chain_ptr != nullptr)
     {
@@ -605,7 +605,7 @@ void APIDumpPlayer::ControlWindow::resize(const UINT& in_width,
     }
 }
 
-void APIDumpPlayer::ControlWindow::run()
+void Replay::ReplayPlayer::ControlWindow::run()
 {
     constexpr DWORD MINIMIZED_SLEEP_MS = 20;
 
@@ -643,10 +643,10 @@ void APIDumpPlayer::ControlWindow::run()
     }
 }
 
-LRESULT CALLBACK APIDumpPlayer::ControlWindow::window_proc(HWND   in_window,
-                                                           UINT   in_message,
-                                                           WPARAM in_wparam,
-                                                           LPARAM in_lparam)
+LRESULT CALLBACK Replay::ReplayPlayer::ControlWindow::window_proc(HWND   in_window,
+                                                                  UINT   in_message,
+                                                                  WPARAM in_wparam,
+                                                                  LPARAM in_lparam)
 {
     ControlWindow* window_ptr = nullptr;
 

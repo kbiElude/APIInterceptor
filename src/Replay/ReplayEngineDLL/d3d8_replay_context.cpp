@@ -6,16 +6,16 @@
 #include "Interception/Hooks/D3D8/types.h"
 #include <algorithm>
 
-APIDumpReplayer::D3D8ReplayContext::D3D8ReplayContext(ObjectRemapper* in_remapper_ptr)
+Replay::ReplayEngineDLL::D3D8ReplayContext::D3D8ReplayContext(ObjectRemapper* in_remapper_ptr)
     :CallContext           (in_remapper_ptr),
      m_is_creation_expected(false)
 {
     /* Stub */
 }
 
-void APIDumpReplayer::D3D8ReplayContext::begin_call(const APIDumpLoader::DumpedAPICall* in_call_ptr,
-                                                    const CallWalker*                   in_walker_ptr,
-                                                    const size_t&                       in_n_head_arguments)
+void Replay::ReplayEngineDLL::D3D8ReplayContext::begin_call(const Capture::APIDumpLoader::DumpedAPICall* in_call_ptr,
+                                                                     const CallWalker*                   in_walker_ptr,
+                                                                     const size_t&                       in_n_head_arguments)
 {
     CallContext::begin_call(in_call_ptr,
                             in_walker_ptr,
@@ -24,12 +24,12 @@ void APIDumpReplayer::D3D8ReplayContext::begin_call(const APIDumpLoader::DumpedA
     m_is_creation_expected = false;
 }
 
-void APIDumpReplayer::D3D8ReplayContext::expect_creation()
+void Replay::ReplayEngineDLL::D3D8ReplayContext::expect_creation()
 {
     m_is_creation_expected = true;
 }
 
-void APIDumpReplayer::D3D8ReplayContext::forget_object(const uint64_t& in_dumped_value)
+void Replay::ReplayEngineDLL::D3D8ReplayContext::forget_object(const uint64_t& in_dumped_value)
 {
     uint64_t live_value = 0;
 
@@ -47,8 +47,8 @@ void APIDumpReplayer::D3D8ReplayContext::forget_object(const uint64_t& in_dumped
                                in_dumped_value);
 }
 
-const uint8_t* APIDumpReplayer::D3D8ReplayContext::get_extra_data_ptr(const size_t& in_n_argument,
-                                                                      size_t*       out_n_bytes_ptr) const
+const uint8_t* Replay::ReplayEngineDLL::D3D8ReplayContext::get_extra_data_ptr(const size_t& in_n_argument,
+                                                                              size_t*       out_n_bytes_ptr) const
 {
     static const ExtraBinding EXTRA_BINDING_ARRAY[] =
     {
@@ -92,9 +92,9 @@ const uint8_t* APIDumpReplayer::D3D8ReplayContext::get_extra_data_ptr(const size
     return result_ptr;
 }
 
-const APIDumpReplayer::D3D8ReplayContext::HandleBinding* APIDumpReplayer::D3D8ReplayContext::get_handle_binding_ptr(const APIInterceptor::APIFunction& in_function,
-                                                                                                                    const size_t&                      in_n_argument,
-                                                                                                                    const bool&                        in_is_output)
+const Replay::ReplayEngineDLL::D3D8ReplayContext::HandleBinding* Replay::ReplayEngineDLL::D3D8ReplayContext::get_handle_binding_ptr(const APIInterceptor::APIFunction& in_function,
+                                                                                                                            const size_t&                      in_n_argument,
+                                                                                                                            const bool&                        in_is_output)
 {
     static const HandleBinding HANDLE_BINDING_ARRAY[] =
     {
@@ -128,18 +128,18 @@ const APIDumpReplayer::D3D8ReplayContext::HandleBinding* APIDumpReplayer::D3D8Re
     return result_ptr;
 }
 
-bool APIDumpReplayer::D3D8ReplayContext::get_live_handle(const ObjectKind&                          in_kind,
-                                                         const APIInterceptor::APIFunctionArgument& in_argument,
-                                                         uint64_t*                                  out_live_value_ptr) const
+bool Replay::ReplayEngineDLL::D3D8ReplayContext::get_live_handle(const ObjectKind&                          in_kind,
+                                                                 const APIInterceptor::APIFunctionArgument& in_argument,
+                                                                 uint64_t*                                  out_live_value_ptr) const
 {
     return get_remapper_ptr()->get(in_kind,
                                    in_argument.get_ptr_as_u64(),
                                    out_live_value_ptr);
 }
 
-bool APIDumpReplayer::D3D8ReplayContext::get_live_object(const APIInterceptor::APIFunctionArgument& in_argument,
-                                                         void**                                     out_live_object_ptr,
-                                                         std::string*                               out_error_ptr) const
+bool Replay::ReplayEngineDLL::D3D8ReplayContext::get_live_object(const APIInterceptor::APIFunctionArgument& in_argument,
+                                                                 void**                                     out_live_object_ptr,
+                                                                 std::string*                               out_error_ptr) const
 {
     uint64_t live_value = 0;
     bool     result     = get_live_handle(ObjectKind::D3D8_OBJECT,
@@ -158,13 +158,13 @@ bool APIDumpReplayer::D3D8ReplayContext::get_live_object(const APIInterceptor::A
     return result;
 }
 
-bool APIDumpReplayer::D3D8ReplayContext::is_creation_expected() const
+bool Replay::ReplayEngineDLL::D3D8ReplayContext::is_creation_expected() const
 {
     return m_is_creation_expected;
 }
 
-uint32_t APIDumpReplayer::D3D8ReplayContext::map_handle_argument(const size_t&   in_n_argument,
-                                                                 const uint32_t& in_dumped_value) const
+uint32_t Replay::ReplayEngineDLL::D3D8ReplayContext::map_handle_argument(const size_t&   in_n_argument,
+                                                                         const uint32_t& in_dumped_value) const
 {
     const auto binding_ptr = get_handle_binding_ptr(get_call().func,
                                                     in_n_argument,
@@ -185,8 +185,8 @@ uint32_t APIDumpReplayer::D3D8ReplayContext::map_handle_argument(const size_t&  
     return result;
 }
 
-void APIDumpReplayer::D3D8ReplayContext::register_handle(const size_t&   in_n_argument,
-                                                         const uint32_t& in_live_value)
+void Replay::ReplayEngineDLL::D3D8ReplayContext::register_handle(const size_t&   in_n_argument,
+                                                                 const uint32_t& in_live_value)
 {
     const auto binding_ptr = get_handle_binding_ptr(get_call().func,
                                                     in_n_argument,
@@ -202,8 +202,8 @@ void APIDumpReplayer::D3D8ReplayContext::register_handle(const size_t&   in_n_ar
     }
 }
 
-void APIDumpReplayer::D3D8ReplayContext::register_object(const uint64_t& in_dumped_value,
-                                                         void*           in_live_object_ptr)
+void Replay::ReplayEngineDLL::D3D8ReplayContext::register_object(const uint64_t& in_dumped_value,
+                                                                 void*           in_live_object_ptr)
 {
     if (in_dumped_value != 0)
     {
@@ -220,7 +220,7 @@ void APIDumpReplayer::D3D8ReplayContext::register_object(const uint64_t& in_dump
     }
 }
 
-void APIDumpReplayer::D3D8ReplayContext::release_all_objects()
+void Replay::ReplayEngineDLL::D3D8ReplayContext::release_all_objects()
 {
     constexpr size_t MAX_N_RELEASES_PER_OBJECT = 4096; /* sanity limit */
 

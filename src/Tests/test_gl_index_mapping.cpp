@@ -13,12 +13,12 @@ namespace
 
     struct IndexFixture
     {
-        APIDumpLoader::DumpedAPICall     call;
-        APIDumpReplayer::GlFunctionInfo  info;
-        APIDumpReplayer::ObjectRemapper  remapper;
-        APIDumpReplayer::GlReplayContext context;
-        APIDumpReplayer::GlIndexReplayer replayer;
-        APIDumpReplayer::CallWalker      walker;
+        Capture::APIDumpLoader::DumpedAPICall     call;
+        Replay::ReplayEngineDLL::GlFunctionInfo  info;
+        Replay::ReplayEngineDLL::ObjectRemapper  remapper;
+        Replay::ReplayEngineDLL::GlReplayContext context;
+        Replay::ReplayEngineDLL::GlIndexReplayer replayer;
+        Replay::ReplayEngineDLL::CallWalker      walker;
 
         IndexFixture()
             :context (&remapper),
@@ -31,7 +31,7 @@ namespace
             info.has_explicit_program = false;
             info.ignored_param_mask   = 0;
             info.name_ptr             = "glTest";
-            info.return_kind          = APIDumpReplayer::ObjectKind::NONE;
+            info.return_kind          = Replay::ReplayEngineDLL::ObjectKind::NONE;
 
             call.func = APIInterceptor::APIFUNCTION_GL_GLACCUM;
 
@@ -48,44 +48,44 @@ TEST(GlIndexMapping, AnIndexIsMappedOnlyForTheProgramThatHandedItOut)
 {
     IndexFixture fixture;
 
-    fixture.context.register_index(APIDumpReplayer::ObjectKind::UNIFORM_BLOCK_INDEX,
-                                   PROGRAM,
-                                   0, /* in_scope */
-                                   2,
-                                   7);
+    fixture.context.register_index(Replay::ReplayEngineDLL::ObjectKind::UNIFORM_BLOCK_INDEX,
+                                           PROGRAM,
+                                           0, /* in_scope */
+                                           2,
+                                           7);
 
-    EXPECT_EQ(fixture.context.map_index(APIDumpReplayer::ObjectKind::UNIFORM_BLOCK_INDEX,
-                                        PROGRAM,
-                                        0,
-                                        2),
-              7u);
-    EXPECT_EQ(fixture.context.map_index(APIDumpReplayer::ObjectKind::UNIFORM_BLOCK_INDEX,
-                                        PROGRAM + 1,
-                                        0,
-                                        2),
-              2u);
+    EXPECT_EQ(fixture.context.map_index(Replay::ReplayEngineDLL::ObjectKind::UNIFORM_BLOCK_INDEX,
+                                                PROGRAM,
+                                                0,
+                                                2),
+                      7u);
+    EXPECT_EQ(fixture.context.map_index(Replay::ReplayEngineDLL::ObjectKind::UNIFORM_BLOCK_INDEX,
+                                                PROGRAM + 1,
+                                                0,
+                                                2),
+                      2u);
 }
 
 TEST(GlIndexMapping, TheIndicesOfSubroutinesAreThoseOfTheShaderStage)
 {
     IndexFixture fixture;
 
-    fixture.context.register_index(APIDumpReplayer::ObjectKind::SUBROUTINE_INDEX,
-                                   PROGRAM,
-                                   0x8B30, /* a fragment shader */
-                                   1,
-                                   3);
+    fixture.context.register_index(Replay::ReplayEngineDLL::ObjectKind::SUBROUTINE_INDEX,
+                                           PROGRAM,
+                                           0x8B30, /* a fragment shader */
+                                           1,
+                                           3);
 
-    EXPECT_EQ(fixture.context.map_index(APIDumpReplayer::ObjectKind::SUBROUTINE_INDEX,
-                                        PROGRAM,
-                                        0x8B30,
-                                        1),
-              3u);
-    EXPECT_EQ(fixture.context.map_index(APIDumpReplayer::ObjectKind::SUBROUTINE_INDEX,
-                                        PROGRAM,
-                                        0x8B31, /* a vertex shader */
-                                        1),
-              1u);
+    EXPECT_EQ(fixture.context.map_index(Replay::ReplayEngineDLL::ObjectKind::SUBROUTINE_INDEX,
+                                                PROGRAM,
+                                                0x8B30,
+                                                1),
+                      3u);
+    EXPECT_EQ(fixture.context.map_index(Replay::ReplayEngineDLL::ObjectKind::SUBROUTINE_INDEX,
+                                                PROGRAM,
+                                                0x8B31, /* a vertex shader */
+                                                1),
+                      1u);
 }
 
 TEST(GlIndexMapping, ElementsGoToThePositionsOfTheReplay)
@@ -93,20 +93,20 @@ TEST(GlIndexMapping, ElementsGoToThePositionsOfTheReplay)
     IndexFixture fixture;
 
     /* The dump's outputs 0 and 1 are the replay's 1 and 0. */
-    fixture.context.register_index(APIDumpReplayer::ObjectKind::FRAG_DATA_LOCATION,
-                                   PROGRAM,
-                                   0, /* in_scope */
-                                   0,
-                                   1);
-    fixture.context.register_index(APIDumpReplayer::ObjectKind::FRAG_DATA_LOCATION,
-                                   PROGRAM,
-                                   0, /* in_scope */
-                                   1,
-                                   0);
+    fixture.context.register_index(Replay::ReplayEngineDLL::ObjectKind::FRAG_DATA_LOCATION,
+                                           PROGRAM,
+                                           0, /* in_scope */
+                                           0,
+                                           1);
+    fixture.context.register_index(Replay::ReplayEngineDLL::ObjectKind::FRAG_DATA_LOCATION,
+                                           PROGRAM,
+                                           0, /* in_scope */
+                                           1,
+                                           0);
 
     const std::vector<uint32_t> dumped_vec = {100, 200};
     const auto                  live_vec   = fixture.replayer.permute(dumped_vec,
-                                                                      APIDumpReplayer::ObjectKind::FRAG_DATA_LOCATION,
+                                                                      Replay::ReplayEngineDLL::ObjectKind::FRAG_DATA_LOCATION,
                                                                       0, /* in_scope */
                                                                       0);
 
@@ -125,7 +125,7 @@ TEST(GlIndexMapping, ElementsWithoutAMapStayWhereTheyAre)
     const std::vector<uint32_t> dumped_vec = {10, 20, 30};
 
     EXPECT_EQ(fixture.replayer.permute(dumped_vec,
-                                       APIDumpReplayer::ObjectKind::SUBROUTINE_UNIFORM_LOCATION,
+                                       Replay::ReplayEngineDLL::ObjectKind::SUBROUTINE_UNIFORM_LOCATION,
                                        0,
                                        0),
               dumped_vec);
@@ -136,15 +136,15 @@ TEST(GlIndexMapping, AnElementThatTakesAFreePlaceDoesNotRunOverAMappedOne)
     IndexFixture fixture;
 
     /* Only the dump's output 0 is known: the replay's is 1. The output 1 of the dump has to find another place. */
-    fixture.context.register_index(APIDumpReplayer::ObjectKind::FRAG_DATA_LOCATION,
-                                   PROGRAM,
-                                   0, /* in_scope */
-                                   0,
-                                   1);
+    fixture.context.register_index(Replay::ReplayEngineDLL::ObjectKind::FRAG_DATA_LOCATION,
+                                           PROGRAM,
+                                           0, /* in_scope */
+                                           0,
+                                           1);
 
     const std::vector<uint32_t> dumped_vec = {100, 200, 300};
     const auto                  live_vec   = fixture.replayer.permute(dumped_vec,
-                                                                      APIDumpReplayer::ObjectKind::FRAG_DATA_LOCATION,
+                                                                      Replay::ReplayEngineDLL::ObjectKind::FRAG_DATA_LOCATION,
                                                                       0, /* in_scope */
                                                                       0);
 

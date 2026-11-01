@@ -6,7 +6,7 @@
 #include <limits.h>
 #include <string.h>
 
-APIDumpReplayer::GlReplayContext::GlReplayContext(ObjectRemapper* in_remapper_ptr)
+Replay::ReplayEngineDLL::GlReplayContext::GlReplayContext(ObjectRemapper* in_remapper_ptr)
     :CallContext        (in_remapper_ptr),
      m_current_program  (0),
      m_function_info_ptr(nullptr),
@@ -16,31 +16,31 @@ APIDumpReplayer::GlReplayContext::GlReplayContext(ObjectRemapper* in_remapper_pt
     /* Stub */
 }
 
-std::vector<uint8_t>* APIDumpReplayer::GlReplayContext::allocate_scratch(const size_t& in_n_bytes)
+std::vector<uint8_t>* Replay::ReplayEngineDLL::GlReplayContext::allocate_scratch(const size_t& in_n_bytes)
 {
     m_scratch_deque.emplace_back(in_n_bytes);
 
     return &m_scratch_deque.back();
 }
 
-std::string* APIDumpReplayer::GlReplayContext::allocate_string()
+std::string* Replay::ReplayEngineDLL::GlReplayContext::allocate_string()
 {
     m_string_deque.emplace_back();
 
     return &m_string_deque.back();
 }
 
-std::vector<const char*>* APIDumpReplayer::GlReplayContext::allocate_string_pointers()
+std::vector<const char*>* Replay::ReplayEngineDLL::GlReplayContext::allocate_string_pointers()
 {
     m_string_pointers_deque.emplace_back();
 
     return &m_string_pointers_deque.back();
 }
 
-void APIDumpReplayer::GlReplayContext::begin_call(const APIDumpLoader::DumpedAPICall* in_call_ptr,
-                                                  const CallWalker*                   in_walker_ptr,
-                                                  const size_t&                       in_n_head_arguments,
-                                                  const GlFunctionInfo*               in_function_info_ptr)
+void Replay::ReplayEngineDLL::GlReplayContext::begin_call(const Capture::APIDumpLoader::DumpedAPICall* in_call_ptr,
+                                                                   const CallWalker*                   in_walker_ptr,
+                                                                   const size_t&                       in_n_head_arguments,
+                                                                   const GlFunctionInfo*               in_function_info_ptr)
 {
     CallContext::begin_call(in_call_ptr,
                             in_walker_ptr,
@@ -55,7 +55,7 @@ void APIDumpReplayer::GlReplayContext::begin_call(const APIDumpLoader::DumpedAPI
     m_string_pointers_deque.clear();
 }
 
-void APIDumpReplayer::GlReplayContext::forget_locations()
+void Replay::ReplayEngineDLL::GlReplayContext::forget_locations()
 {
     m_attrib_location_map.clear();
     m_current_program = 0;
@@ -64,12 +64,12 @@ void APIDumpReplayer::GlReplayContext::forget_locations()
     m_uniform_location_map.clear();
 }
 
-uint64_t APIDumpReplayer::GlReplayContext::get_current_program() const
+uint64_t Replay::ReplayEngineDLL::GlReplayContext::get_current_program() const
 {
     return m_current_program;
 }
 
-uint64_t APIDumpReplayer::GlReplayContext::get_index_program() const
+uint64_t Replay::ReplayEngineDLL::GlReplayContext::get_index_program() const
 {
     uint64_t result = m_current_program;
 
@@ -89,18 +89,18 @@ uint64_t APIDumpReplayer::GlReplayContext::get_index_program() const
     return result;
 }
 
-uint64_t APIDumpReplayer::GlReplayContext::get_live_return() const
+uint64_t Replay::ReplayEngineDLL::GlReplayContext::get_live_return() const
 {
     return m_live_return;
 }
 
-APIDumpReplayer::ObjectKind APIDumpReplayer::GlReplayContext::get_param_kind(const size_t& in_n_argument) const
+Replay::ReplayEngineDLL::ObjectKind Replay::ReplayEngineDLL::GlReplayContext::get_param_kind(const size_t& in_n_argument) const
 {
     return (in_n_argument < m_function_info_ptr->param_kind_vec.size() ) ? m_function_info_ptr->param_kind_vec.at(in_n_argument)
                                                                          : ObjectKind::NONE;
 }
 
-uint64_t APIDumpReplayer::GlReplayContext::get_uniform_program() const
+uint64_t Replay::ReplayEngineDLL::GlReplayContext::get_uniform_program() const
 {
     uint64_t result = m_current_program;
 
@@ -119,19 +119,19 @@ uint64_t APIDumpReplayer::GlReplayContext::get_uniform_program() const
     return result;
 }
 
-bool APIDumpReplayer::GlReplayContext::is_param_ignored(const size_t& in_n_argument) const
+bool Replay::ReplayEngineDLL::GlReplayContext::is_param_ignored(const size_t& in_n_argument) const
 {
     return (in_n_argument < sizeof(m_function_info_ptr->ignored_param_mask) * CHAR_BIT &&
             (m_function_info_ptr->ignored_param_mask & (1u << in_n_argument)) != 0);
 }
 
-bool APIDumpReplayer::GlReplayContext::is_skipped() const
+bool Replay::ReplayEngineDLL::GlReplayContext::is_skipped() const
 {
     return m_is_skipped;
 }
 
-uint32_t APIDumpReplayer::GlReplayContext::map_argument(const size_t&   in_n_argument,
-                                                        const uint32_t& in_dumped_value) const
+uint32_t Replay::ReplayEngineDLL::GlReplayContext::map_argument(const size_t&   in_n_argument,
+                                                                const uint32_t& in_dumped_value) const
 {
     constexpr uint32_t COMPAT_GL_COLOR = 0x1800;
 
@@ -163,7 +163,7 @@ uint32_t APIDumpReplayer::GlReplayContext::map_argument(const size_t&   in_n_arg
     return result;
 }
 
-uint32_t APIDumpReplayer::GlReplayContext::map_attrib_location(const uint32_t& in_dumped_location) const
+uint32_t Replay::ReplayEngineDLL::GlReplayContext::map_attrib_location(const uint32_t& in_dumped_location) const
 {
     const auto iterator = m_attrib_location_map.find(in_dumped_location);
 
@@ -171,10 +171,10 @@ uint32_t APIDumpReplayer::GlReplayContext::map_attrib_location(const uint32_t& i
                                                       : in_dumped_location;
 }
 
-uint32_t APIDumpReplayer::GlReplayContext::map_index(const ObjectKind& in_kind,
-                                                     const uint64_t&   in_dumped_program,
-                                                     const uint32_t&   in_scope,
-                                                     const uint32_t&   in_dumped_index) const
+uint32_t Replay::ReplayEngineDLL::GlReplayContext::map_index(const ObjectKind& in_kind,
+                                                             const uint64_t&   in_dumped_program,
+                                                             const uint32_t&   in_scope,
+                                                             const uint32_t&   in_dumped_index) const
 {
     const auto iterator = m_index_map.find(IndexKey(in_kind,
                                                     in_dumped_program,
@@ -185,8 +185,8 @@ uint32_t APIDumpReplayer::GlReplayContext::map_index(const ObjectKind& in_kind,
                                             : in_dumped_index;
 }
 
-uint32_t APIDumpReplayer::GlReplayContext::map_name(const ObjectKind& in_kind,
-                                                    const uint32_t&   in_dumped_name) const
+uint32_t Replay::ReplayEngineDLL::GlReplayContext::map_name(const ObjectKind& in_kind,
+                                                            const uint32_t&   in_dumped_name) const
 {
     uint64_t live_value = 0;
     uint32_t result     = in_dumped_name;
@@ -240,7 +240,7 @@ uint32_t APIDumpReplayer::GlReplayContext::map_name(const ObjectKind& in_kind,
     return result;
 }
 
-int32_t APIDumpReplayer::GlReplayContext::map_uniform_location(const int32_t& in_dumped_location) const
+int32_t Replay::ReplayEngineDLL::GlReplayContext::map_uniform_location(const int32_t& in_dumped_location) const
 {
     constexpr uint32_t PROGRAM_SHIFT = 32;
 
@@ -267,17 +267,17 @@ int32_t APIDumpReplayer::GlReplayContext::map_uniform_location(const int32_t& in
     return result;
 }
 
-void APIDumpReplayer::GlReplayContext::register_attrib_location(const uint32_t& in_dumped_location,
-                                                                const uint32_t& in_live_location)
+void Replay::ReplayEngineDLL::GlReplayContext::register_attrib_location(const uint32_t& in_dumped_location,
+                                                                        const uint32_t& in_live_location)
 {
     m_attrib_location_map[in_dumped_location] = in_live_location;
 }
 
-void APIDumpReplayer::GlReplayContext::register_index(const ObjectKind& in_kind,
-                                                      const uint64_t&   in_dumped_program,
-                                                      const uint32_t&   in_scope,
-                                                      const uint32_t&   in_dumped_index,
-                                                      const uint32_t&   in_live_index)
+void Replay::ReplayEngineDLL::GlReplayContext::register_index(const ObjectKind& in_kind,
+                                                              const uint64_t&   in_dumped_program,
+                                                              const uint32_t&   in_scope,
+                                                              const uint32_t&   in_dumped_index,
+                                                              const uint32_t&   in_live_index)
 {
     m_index_map[IndexKey(in_kind,
                          in_dumped_program,
@@ -285,16 +285,16 @@ void APIDumpReplayer::GlReplayContext::register_index(const ObjectKind& in_kind,
                          in_dumped_index)] = in_live_index;
 }
 
-void APIDumpReplayer::GlReplayContext::register_name(const ObjectKind& in_kind,
-                                                     const uint32_t&   in_dumped_name,
-                                                     const uint32_t&   in_live_name)
+void Replay::ReplayEngineDLL::GlReplayContext::register_name(const ObjectKind& in_kind,
+                                                             const uint32_t&   in_dumped_name,
+                                                             const uint32_t&   in_live_name)
 {
     get_remapper_ptr()->add(in_kind,
                             in_dumped_name,
                             in_live_name);
 }
 
-void APIDumpReplayer::GlReplayContext::register_returned_name(const uint64_t& in_live_value)
+void Replay::ReplayEngineDLL::GlReplayContext::register_returned_name(const uint64_t& in_live_value)
 {
     uint64_t    dumped   = 0;
     const auto  kind     = m_function_info_ptr->return_kind;
@@ -345,26 +345,26 @@ void APIDumpReplayer::GlReplayContext::register_returned_name(const uint64_t& in
     }
 }
 
-void APIDumpReplayer::GlReplayContext::register_uniform_location(const uint64_t& in_dumped_program,
-                                                                 const int32_t&  in_dumped_location,
-                                                                 const int32_t&  in_live_location)
+void Replay::ReplayEngineDLL::GlReplayContext::register_uniform_location(const uint64_t& in_dumped_program,
+                                                                         const int32_t&  in_dumped_location,
+                                                                         const int32_t&  in_live_location)
 {
     constexpr uint32_t PROGRAM_SHIFT = 32;
 
     m_uniform_location_map[(in_dumped_program << PROGRAM_SHIFT) | static_cast<uint32_t>(in_dumped_location)] = in_live_location;
 }
 
-void APIDumpReplayer::GlReplayContext::request_skip()
+void Replay::ReplayEngineDLL::GlReplayContext::request_skip()
 {
     m_is_skipped = true;
 }
 
-void APIDumpReplayer::GlReplayContext::set_current_program(const uint64_t& in_dumped_program)
+void Replay::ReplayEngineDLL::GlReplayContext::set_current_program(const uint64_t& in_dumped_program)
 {
     m_current_program = in_dumped_program;
 }
 
-void APIDumpReplayer::GlReplayContext::set_live_return(const uint64_t& in_value)
+void Replay::ReplayEngineDLL::GlReplayContext::set_live_return(const uint64_t& in_value)
 {
     m_live_return = in_value;
 }
