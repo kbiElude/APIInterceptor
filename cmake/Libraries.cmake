@@ -12,7 +12,8 @@ if (APIINTERCEPTOR_BUILD_LIBS)
     add_library(Zstd STATIC ${ZstdSources})
 
     target_compile_definitions(Zstd PRIVATE ZSTD_DISABLE_ASM)
-    target_include_directories(Zstd PUBLIC  "${APIInterceptor_SOURCE_DIR}/deps/zstd/lib")
+    target_include_directories(Zstd PUBLIC  "$<BUILD_INTERFACE:${APIInterceptor_SOURCE_DIR}/deps/zstd/lib>"
+                                           "$<INSTALL_INTERFACE:include>")
 
     file(GLOB APIDumpLoaderIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Capture/APIDumpLoader/*.h")
     file(GLOB APIDumpLoaderSources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Capture/APIDumpLoader/*.cpp"
