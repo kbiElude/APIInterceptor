@@ -176,9 +176,9 @@ TEST(D3D8Arguments, PresentRectanglesAndCapsAreDescribed)
 TEST(D3D8Arguments, PatchesCarryTheirInfoAndSegmentCounts)
 {
     EXPECT_EQ(Interception::Core::D3D8Utils::get_n_arguments(APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_DRAWRECTPATCH),
-                                4u);
+              4u);
     EXPECT_EQ(Interception::Core::D3D8Utils::get_n_arguments(APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_DRAWTRIPATCH),
-                                4u);
+              4u);
 
     EXPECT_EQ(Tests::ArgumentInfoChecker::get_argument_info_or_fail(APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_DRAWRECTPATCH,
                                                                     3).kind,

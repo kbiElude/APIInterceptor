@@ -147,9 +147,9 @@ TEST(BufferMappingManager, FailedMapsAndDeletedBuffersLeaveNothingBehind)
 TEST(BufferMappingManager, AccessTokensStandForMapFlags)
 {
     EXPECT_EQ(Interception::Hooks::OpenGL::BufferMappingManager::get_flags_for_access(GL_READ_ONLY),
-                                   static_cast<uint32_t>(GL_MAP_READ_BIT) );
+              static_cast<uint32_t>(GL_MAP_READ_BIT) );
     EXPECT_EQ(Interception::Hooks::OpenGL::BufferMappingManager::get_flags_for_access(GL_WRITE_ONLY),
-                                   static_cast<uint32_t>(GL_MAP_WRITE_BIT) );
+              static_cast<uint32_t>(GL_MAP_WRITE_BIT) );
     EXPECT_EQ(Interception::Hooks::OpenGL::BufferMappingManager::get_flags_for_access(GL_READ_WRITE),
-                                   static_cast<uint32_t>(GL_MAP_READ_BIT | GL_MAP_WRITE_BIT) );
+              static_cast<uint32_t>(GL_MAP_READ_BIT | GL_MAP_WRITE_BIT) );
 }

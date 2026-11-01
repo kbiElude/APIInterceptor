@@ -95,18 +95,18 @@ TEST(ClientArrayManager, CopiesTheRangeOfAnEnabledClientArray)
     Interception::Hooks::OpenGL::ClientArrayManager state;
 
     state.set_pointer(Interception::Hooks::OpenGL::ClientArrayKind::VERTEX,
-                                           0,
-                                           3,
-                                           GL_FLOAT,
-                                           0,
-                                           vertices_fp32vec12,
-                                           0,
-                                           false,  /* in_is_integer    */
-                                           false,  /* in_is_long       */
-                                           false); /* in_is_normalized */
+                      0,
+                      3,
+                      GL_FLOAT,
+                      0,
+                      vertices_fp32vec12,
+                      0,
+                      false,  /* in_is_integer    */
+                      false,  /* in_is_long       */
+                      false); /* in_is_normalized */
     state.set_enabled(Interception::Hooks::OpenGL::ClientArrayKind::VERTEX,
-                                           0,
-                                           true);  /* in_is_enabled */
+                      0,
+                      true);  /* in_is_enabled */
 
     EXPECT_TRUE(state.has_client_arrays() );
 
@@ -139,18 +139,18 @@ TEST(ClientArrayManager, HonoursTheStride)
     Interception::Hooks::OpenGL::ClientArrayManager state;
 
     state.set_pointer(Interception::Hooks::OpenGL::ClientArrayKind::COLOR,
-                                           0,
-                                           4,
-                                           GL_UNSIGNED_BYTE,
-                                           16,
-                                           data_u8vec32,
-                                           0,
-                                           false,  /* in_is_integer    */
-                                           false,  /* in_is_long       */
-                                           false); /* in_is_normalized */
+                      0,
+                      4,
+                      GL_UNSIGNED_BYTE,
+                      16,
+                      data_u8vec32,
+                      0,
+                      false,  /* in_is_integer    */
+                      false,  /* in_is_long       */
+                      false); /* in_is_normalized */
     state.set_enabled(Interception::Hooks::OpenGL::ClientArrayKind::COLOR,
-                                           0,
-                                           true);  /* in_is_enabled */
+                      0,
+                      true);  /* in_is_enabled */
 
     /* Two elements: the second one starts 16 bytes after the first, and is 4 bytes long. */
     const auto array_vec = parse_snapshot(state.take_snapshot(0,
@@ -174,30 +174,30 @@ TEST(ClientArrayManager, IgnoresArraysInBuffersAndDisabledArrays)
 
     /* In a buffer. */
     state.set_pointer(Interception::Hooks::OpenGL::ClientArrayKind::VERTEX,
-                                           0,
-                                           4,
-                                           GL_FLOAT,
-                                           0,
-                                           nullptr,
-                                           5,      /* in_array_buffer */
-                                           false,  /* in_is_integer    */
-                                           false,  /* in_is_long       */
-                                           false); /* in_is_normalized */
+                      0,
+                      4,
+                      GL_FLOAT,
+                      0,
+                      nullptr,
+                      5,      /* in_array_buffer */
+                      false,  /* in_is_integer    */
+                      false,  /* in_is_long       */
+                      false); /* in_is_normalized */
     state.set_enabled(Interception::Hooks::OpenGL::ClientArrayKind::VERTEX,
-                                           0,
-                                           true);  /* in_is_enabled */
+                      0,
+                      true);  /* in_is_enabled */
 
     /* Not enabled. */
     state.set_pointer(Interception::Hooks::OpenGL::ClientArrayKind::NORMAL,
-                                           0,
-                                           3,
-                                           GL_FLOAT,
-                                           0,
-                                           data_fp32vec4,
-                                           0,      /* in_array_buffer */
-                                           false,  /* in_is_integer    */
-                                           false,  /* in_is_long       */
-                                           false); /* in_is_normalized */
+                      0,
+                      3,
+                      GL_FLOAT,
+                      0,
+                      data_fp32vec4,
+                      0,      /* in_array_buffer */
+                      false,  /* in_is_integer    */
+                      false,  /* in_is_long       */
+                      false); /* in_is_normalized */
 
     EXPECT_FALSE(state.has_client_arrays() );
     EXPECT_TRUE(state.take_snapshot(0,
@@ -213,18 +213,18 @@ TEST(ClientArrayManager, ArraysWithADivisorAreReadByInstance)
     Interception::Hooks::OpenGL::ClientArrayManager state;
 
     state.set_pointer(Interception::Hooks::OpenGL::ClientArrayKind::GENERIC,
-                                           2,
-                                           4,
-                                           GL_FLOAT,
-                                           0,
-                                           data_fp32vec16,
-                                           0,
-                                           false,  /* in_is_integer    */
-                                           false,  /* in_is_long       */
-                                           true);  /* in_is_normalized */
+                      2,
+                      4,
+                      GL_FLOAT,
+                      0,
+                      data_fp32vec16,
+                      0,
+                      false,  /* in_is_integer    */
+                      false,  /* in_is_long       */
+                      true);  /* in_is_normalized */
     state.set_enabled(Interception::Hooks::OpenGL::ClientArrayKind::GENERIC,
-                                           2,
-                                           true);  /* in_is_enabled */
+                      2,
+                      true);  /* in_is_enabled */
     state.set_divisor(2,
                       2);
 
@@ -256,18 +256,18 @@ TEST(ClientArrayManager, NothingIsTrackedWhileAVertexArrayIsBound)
 
     state.set_bound_vertex_array(7);
     state.set_pointer(Interception::Hooks::OpenGL::ClientArrayKind::VERTEX,
-                                           0,
-                                           4,
-                                           GL_FLOAT,
-                                           0,
-                                           data_fp32vec4,
-                                           0,
-                                           false,  /* in_is_integer    */
-                                           false,  /* in_is_long       */
-                                           false); /* in_is_normalized */
+                      0,
+                      4,
+                      GL_FLOAT,
+                      0,
+                      data_fp32vec4,
+                      0,
+                      false,  /* in_is_integer    */
+                      false,  /* in_is_long       */
+                      false); /* in_is_normalized */
     state.set_enabled(Interception::Hooks::OpenGL::ClientArrayKind::VERTEX,
-                                           0,
-                                           true);  /* in_is_enabled */
+                      0,
+                      true);  /* in_is_enabled */
     state.set_bound_vertex_array(0);
 
     EXPECT_FALSE(state.has_client_arrays() );
@@ -315,9 +315,9 @@ TEST(ClientArrayManager, MapsArrayTokensToKinds)
     Interception::Hooks::OpenGL::ClientArrayKind kind;
 
     EXPECT_TRUE(Interception::Hooks::OpenGL::ClientArrayManager::get_kind_for_array_enum(GL_TEXTURE_COORD_ARRAY,
-                                                                                      &kind) );
+                                                                 &kind) );
     EXPECT_EQ(kind,
               Interception::Hooks::OpenGL::ClientArrayKind::TEX_COORD);
     EXPECT_FALSE(Interception::Hooks::OpenGL::ClientArrayManager::get_kind_for_array_enum(GL_LIGHTING,
-                                                                                       &kind) );
+                                                                  &kind) );
 }

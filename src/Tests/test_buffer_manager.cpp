@@ -12,7 +12,7 @@ TEST(BufferManager, NothingIsBoundInitially)
     Interception::Hooks::OpenGL::BufferManager manager;
 
     EXPECT_EQ(manager.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ARRAY_BUFFER),
-                                   0u);
+              0u);
     EXPECT_EQ(manager.get_size(1),
               0u);
 }
@@ -22,14 +22,14 @@ TEST(BufferManager, BindingsAreTrackedPerTarget)
     Interception::Hooks::OpenGL::BufferManager manager;
 
     manager.on_buffer_bound(Interception::Hooks::OpenGL::BufferBindingTarget::ARRAY_BUFFER,
-                                                 7);
+                            7);
     manager.on_buffer_bound(Interception::Hooks::OpenGL::BufferBindingTarget::ELEMENT_ARRAY_BUFFER,
-                                                 8);
+                            8);
 
     EXPECT_EQ(manager.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ARRAY_BUFFER),
-                                   7u);
+              7u);
     EXPECT_EQ(manager.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ELEMENT_ARRAY_BUFFER),
-                                   8u);
+              8u);
 }
 
 TEST(BufferManager, SizesAreNotLimitedTo32Bits)
@@ -50,16 +50,16 @@ TEST(BufferManager, DeletingABufferForgetsItAndUnbindsIt)
     manager.set_size(5,
                      128);
     manager.on_buffer_bound(Interception::Hooks::OpenGL::BufferBindingTarget::ARRAY_BUFFER,
-                                                 5);
+                            5);
     manager.on_buffer_bound(Interception::Hooks::OpenGL::BufferBindingTarget::ELEMENT_ARRAY_BUFFER,
-                                                 6);
+                            6);
 
     manager.on_buffer_deleted(5);
 
     EXPECT_EQ(manager.get_size(5),
               0u);
     EXPECT_EQ(manager.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ARRAY_BUFFER),
-                                   0u);
+              0u);
     EXPECT_EQ(manager.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ELEMENT_ARRAY_BUFFER),
-                                   6u);
+              6u);
 }

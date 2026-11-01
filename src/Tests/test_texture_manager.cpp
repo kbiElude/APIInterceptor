@@ -12,7 +12,7 @@ TEST(TextureManager, NothingIsBoundInitially)
     Interception::Hooks::OpenGL::TextureManager manager;
 
     EXPECT_EQ(manager.get_bound_texture(Interception::Hooks::OpenGL::TextureBindingTarget::TEXTURE_2D),
-                                   0u);
+              0u);
     EXPECT_EQ(manager.get_level_props(5,
                                       0).width,
               0u);
@@ -23,14 +23,14 @@ TEST(TextureManager, BindingsAreTrackedPerTarget)
     Interception::Hooks::OpenGL::TextureManager manager;
 
     manager.on_texture_bound(Interception::Hooks::OpenGL::TextureBindingTarget::TEXTURE_2D,
-                                                  4);
+                             4);
     manager.on_texture_bound(Interception::Hooks::OpenGL::TextureBindingTarget::TEXTURE_3D,
-                                                  9);
+                             9);
 
     EXPECT_EQ(manager.get_bound_texture(Interception::Hooks::OpenGL::TextureBindingTarget::TEXTURE_2D),
-                                   4u);
+              4u);
     EXPECT_EQ(manager.get_bound_texture(Interception::Hooks::OpenGL::TextureBindingTarget::TEXTURE_3D),
-                                   9u);
+              9u);
 }
 
 TEST(TextureManager, LevelPropsKeepEachDimensionInItsOwnField)
@@ -96,7 +96,7 @@ TEST(TextureManager, DeletingATextureForgetsItsLevelsOnly)
     manager.set_level_props(2, 1, 2, 2, 1);
     manager.set_level_props(3, 0, 8, 8, 1);
     manager.on_texture_bound(Interception::Hooks::OpenGL::TextureBindingTarget::TEXTURE_2D,
-                                                  2);
+                             2);
 
     manager.on_texture_deleted(2);
 
@@ -112,5 +112,5 @@ TEST(TextureManager, DeletingATextureForgetsItsLevelsOnly)
 
     /* Deleting a bound texture unbinds it. */
     EXPECT_EQ(manager.get_bound_texture(Interception::Hooks::OpenGL::TextureBindingTarget::TEXTURE_2D),
-                                   0u);
+              0u);
 }
