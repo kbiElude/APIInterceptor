@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 300" role="img" aria-labelledby="t d">
+  <title id="t">What happens to one call</title>
+  <desc id="d">The program calls the API and lands in a hook. The hook runs the pre callbacks, makes the original call, then runs the post callbacks. Structures the call reads or writes are copied into data chunks, and the call record refers to them. Records and chunks go to the workload file.</desc>
+  <style>
+    :root { --fg:#1f2328; --muted:#59636e; --a:#e8f0fb; --as:#4a6fa5; --b:#e6f5ec; --bs:#3c8d5a; --c:#fff3dc; --cs:#c27d12; --line:#59636e; }
+    @media (prefers-color-scheme: dark) {
+      :root { --fg:#e6edf3; --muted:#9198a1; --a:#1c2b42; --as:#6c9ad6; --b:#17301f; --bs:#5cb87f; --c:#3a2c10; --cs:#e0a23a; --line:#9198a1; }
+    }
+    text { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 15px; fill: var(--fg); }
+    .small { font-size: 12.5px; fill: var(--muted); }
+    .a { fill: var(--a); stroke: var(--as); stroke-width: 1.5; }
+    .b { fill: var(--b); stroke: var(--bs); stroke-width: 1.5; }
+    .c { fill: var(--c); stroke: var(--cs); stroke-width: 1.5; }
+    .arrow { stroke: var(--line); stroke-width: 1.6; fill: none; marker-end: url(#h); }
+    .dash { stroke: var(--line); stroke-width: 1.4; fill: none; stroke-dasharray: 5 4; marker-end: url(#h); }
+    .head { fill: var(--line); }
+  </style>
+  <defs>
+    <marker id="h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="head" d="M0 0L10 5L0 10z"/></marker>
+  </defs>
+
+  <rect class="a" x="20" y="40" width="120" height="64" rx="8"/>
+  <text x="80" y="68" text-anchor="middle">Program</text>
+  <text class="small" x="80" y="87" text-anchor="middle">calls the API</text>
+
+  <rect class="b" x="190" y="40" width="130" height="64" rx="8"/>
+  <text x="255" y="68" text-anchor="middle">hook</text>
+  <text class="small" x="255" y="87" text-anchor="middle">ai&lt;ApiName&gt;</text>
+
+  <rect class="a" x="370" y="40" width="130" height="64" rx="8"/>
+  <text x="435" y="68" text-anchor="middle">pre callbacks</text>
+  <text class="small" x="435" y="87" text-anchor="middle">see the arguments</text>
+
+  <rect class="a" x="550" y="40" width="130" height="64" rx="8"/>
+  <text x="615" y="68" text-anchor="middle">original call</text>
+  <text class="small" x="615" y="87" text-anchor="middle">the real API</text>
+
+  <rect class="a" x="730" y="40" width="150" height="64" rx="8"/>
+  <text x="805" y="68" text-anchor="middle">post callbacks</text>
+  <text class="small" x="805" y="87" text-anchor="middle">see the result</text>
+
+  <path class="arrow" d="M140 72H188"/>
+  <path class="arrow" d="M320 72H368"/>
+  <path class="arrow" d="M500 72H548"/>
+  <path class="arrow" d="M680 72H728"/>
+
+  <rect class="c" x="370" y="170" width="190" height="64" rx="8"/>
+  <text x="465" y="198" text-anchor="middle">data chunks</text>
+  <text class="small" x="465" y="217" text-anchor="middle">one per struct argument</text>
+
+  <rect class="c" x="610" y="170" width="150" height="64" rx="8"/>
+  <text x="685" y="198" text-anchor="middle">call record</text>
+  <text class="small" x="685" y="217" text-anchor="middle">args in / out / result</text>
+
+  <rect class="b" x="790" y="170" width="90" height="64" rx="8"/>
+  <text x="835" y="198" text-anchor="middle">workload</text>
+  <text class="small" x="835" y="217" text-anchor="middle">Zstd</text>
+
+  <path class="dash" d="M435 104V168"/>
+  <path class="dash" d="M805 104V138H685V168"/>
+  <path class="arrow" d="M560 202H608"/>
+  <path class="arrow" d="M760 202H788"/>
+
+  <text class="small" x="20" y="268">The record refers to chunks by number; a chunk is taken once, and the store holds only chunks that are still wanted.</text>
+</svg>

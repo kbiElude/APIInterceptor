@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 335" role="img" aria-labelledby="t d">
+  <title id="t">Using API Interceptor from another project</title>
+  <desc id="d">A project either adds this repository as a submodule and builds it with add_subdirectory, getting the hooks and every library, or installs the Development component and links the imported libraries with find_package.</desc>
+  <style>
+    :root { --fg:#1f2328; --muted:#59636e; --a:#e8f0fb; --as:#4a6fa5; --b:#e6f5ec; --bs:#3c8d5a; --c:#fff3dc; --cs:#c27d12; --line:#59636e; }
+    @media (prefers-color-scheme: dark) {
+      :root { --fg:#e6edf3; --muted:#9198a1; --a:#1c2b42; --as:#6c9ad6; --b:#17301f; --bs:#5cb87f; --c:#3a2c10; --cs:#e0a23a; --line:#9198a1; }
+    }
+    text { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 15px; fill: var(--fg); }
+    .code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 12px; }
+    .small { font-size: 12.5px; fill: var(--muted); }
+    .title { font-size: 13px; font-weight: 600; fill: var(--muted); letter-spacing: .04em; }
+    .a { fill: var(--a); stroke: var(--as); stroke-width: 1.5; }
+    .b { fill: var(--b); stroke: var(--bs); stroke-width: 1.5; }
+    .c { fill: var(--c); stroke: var(--cs); stroke-width: 1.5; }
+    .arrow { stroke: var(--line); stroke-width: 1.6; fill: none; marker-end: url(#h); }
+    .head { fill: var(--line); }
+  </style>
+  <defs>
+    <marker id="h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="head" d="M0 0L10 5L0 10z"/></marker>
+  </defs>
+
+  <rect class="c" x="20" y="110" width="170" height="80" rx="8"/>
+  <text x="105" y="146" text-anchor="middle">your project</text>
+  <text class="small" x="105" y="166" text-anchor="middle">CMake, C++14, Windows</text>
+
+  <text class="title" x="260" y="30">AS A SUBMODULE</text>
+  <rect class="a" x="260" y="44" width="290" height="40" rx="6"/>
+  <text class="code" x="405" y="69" text-anchor="middle">add_subdirectory(deps/APIInterceptor)</text>
+  <rect class="b" x="260" y="96" width="290" height="68" rx="6"/>
+  <text x="405" y="122" text-anchor="middle">hooks + every library</text>
+  <text class="small" x="405" y="142" text-anchor="middle">to build a DLL that is injected</text>
+
+  <text class="title" x="260" y="204">AS AN INSTALLED PACKAGE</text>
+  <rect class="a" x="260" y="218" width="290" height="40" rx="6"/>
+  <text class="code" x="405" y="243" text-anchor="middle">find_package(APIInterceptor)</text>
+  <rect class="b" x="590" y="198" width="290" height="82" rx="6"/>
+  <text class="code" x="735" y="226" text-anchor="middle">APIInterceptor::APIDumpLoader</text>
+  <text class="code" x="735" y="246" text-anchor="middle">APIInterceptor::D3D8Utils</text>
+  <text class="code" x="735" y="266" text-anchor="middle">APIInterceptor::InjectionLauncher</text>
+
+  <path class="arrow" d="M190 138L258 66"/>
+  <path class="arrow" d="M190 164L258 236"/>
+  <path class="arrow" d="M550 238H588"/>
+  <text class="small" x="590" y="306">read workloads, describe D3D8 calls,</text>
+  <text class="small" x="590" y="324">start a program with a DLL in it</text>
+</svg>

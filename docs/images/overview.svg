@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 330" role="img" aria-labelledby="t d">
+  <title id="t">Capturing a program and using the capture</title>
+  <desc id="d">APIDumper starts a program with APIDumperDLL injected. The DLL writes a workload file. The printer, the replay engine and the player, and any other project read it through APIDumpLoader.</desc>
+  <style>
+    :root { --fg:#1f2328; --muted:#59636e; --a:#e8f0fb; --as:#4a6fa5; --b:#e6f5ec; --bs:#3c8d5a; --c:#fff3dc; --cs:#c27d12; --line:#59636e; }
+    @media (prefers-color-scheme: dark) {
+      :root { --fg:#e6edf3; --muted:#9198a1; --a:#1c2b42; --as:#6c9ad6; --b:#17301f; --bs:#5cb87f; --c:#3a2c10; --cs:#e0a23a; --line:#9198a1; }
+    }
+    text { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 15px; fill: var(--fg); }
+    .small { font-size: 12.5px; fill: var(--muted); }
+    .title { font-size: 13px; font-weight: 600; fill: var(--muted); letter-spacing: .04em; }
+    .a { fill: var(--a); stroke: var(--as); stroke-width: 1.5; }
+    .b { fill: var(--b); stroke: var(--bs); stroke-width: 1.5; }
+    .c { fill: var(--c); stroke: var(--cs); stroke-width: 1.5; }
+    .arrow { stroke: var(--line); stroke-width: 1.6; fill: none; marker-end: url(#h); }
+    .head { fill: var(--line); }
+  </style>
+  <defs>
+    <marker id="h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="head" d="M0 0L10 5L0 10z"/></marker>
+  </defs>
+
+  <text class="title" x="20" y="28">CAPTURE</text>
+  <rect class="a" x="20" y="50" width="150" height="56" rx="8"/>
+  <text x="95" y="76" text-anchor="middle">APIDumper</text>
+  <text class="small" x="95" y="94" text-anchor="middle">starts the program</text>
+
+  <rect class="a" x="230" y="40" width="210" height="130" rx="8"/>
+  <text x="335" y="68" text-anchor="middle">your program</text>
+  <rect class="b" x="250" y="88" width="170" height="64" rx="6"/>
+  <text x="335" y="114" text-anchor="middle">APIDumperDLL</text>
+  <text class="small" x="335" y="133" text-anchor="middle">hooks every API call</text>
+
+  <rect class="c" x="500" y="60" width="160" height="90" rx="8"/>
+  <text x="580" y="94" text-anchor="middle">workload file</text>
+  <text class="small" x="580" y="114" text-anchor="middle">every call + its data</text>
+  <text class="small" x="580" y="131" text-anchor="middle">compressed in segments</text>
+
+  <path class="arrow" d="M170 78H228"/>
+  <text class="small" x="199" y="68" text-anchor="middle">injects</text>
+  <path class="arrow" d="M440 105H498"/>
+  <text class="small" x="469" y="95" text-anchor="middle">writes</text>
+
+  <text class="title" x="20" y="226">USE THE CAPTURE</text>
+  <rect class="b" x="20" y="246" width="190" height="58" rx="8"/>
+  <text x="115" y="272" text-anchor="middle">APIDumpPrinter</text>
+  <text class="small" x="115" y="290" text-anchor="middle">prints every call as text</text>
+
+  <rect class="b" x="250" y="246" width="210" height="58" rx="8"/>
+  <text x="355" y="272" text-anchor="middle">ReplayEngineDLL + Player</text>
+  <text class="small" x="355" y="290" text-anchor="middle">executes the calls again</text>
+
+  <rect class="b" x="500" y="246" width="230" height="58" rx="8"/>
+  <text x="615" y="272" text-anchor="middle">your project</text>
+  <text class="small" x="615" y="290" text-anchor="middle">links APIDumpLoader to read it</text>
+
+  <path class="arrow" d="M580 150V196H115V244"/>
+  <path class="arrow" d="M580 196H355V244"/>
+  <path class="arrow" d="M580 196H615V244"/>
+</svg>

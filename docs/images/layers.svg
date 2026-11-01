@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 360" role="img" aria-labelledby="t d">
+  <title id="t">How the source tree is layered</title>
+  <desc id="d">Capture and Replay sit on top of Interception, which has the hooks and the core. Common is below everything. Third-party code is at the side.</desc>
+  <style>
+    :root { --fg:#1f2328; --muted:#59636e; --a:#e8f0fb; --as:#4a6fa5; --b:#e6f5ec; --bs:#3c8d5a; --c:#fff3dc; --cs:#c27d12; --d:#f1eefa; --ds:#7b64b3; --line:#59636e; }
+    @media (prefers-color-scheme: dark) {
+      :root { --fg:#e6edf3; --muted:#9198a1; --a:#1c2b42; --as:#6c9ad6; --b:#17301f; --bs:#5cb87f; --c:#3a2c10; --cs:#e0a23a; --d:#2a2342; --ds:#a590d8; --line:#9198a1; }
+    }
+    text { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 15px; fill: var(--fg); }
+    .small { font-size: 12.5px; fill: var(--muted); }
+    .title { font-size: 13px; font-weight: 600; fill: var(--muted); letter-spacing: .04em; }
+    .a { fill: var(--a); stroke: var(--as); stroke-width: 1.5; }
+    .b { fill: var(--b); stroke: var(--bs); stroke-width: 1.5; }
+    .c { fill: var(--c); stroke: var(--cs); stroke-width: 1.5; }
+    .d { fill: var(--d); stroke: var(--ds); stroke-width: 1.5; }
+    .arrow { stroke: var(--line); stroke-width: 1.6; fill: none; marker-end: url(#h); }
+    .head { fill: var(--line); }
+  </style>
+  <defs>
+    <marker id="h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="head" d="M0 0L10 5L0 10z"/></marker>
+  </defs>
+
+  <text class="title" x="20" y="26">SRC / INCLUDE</text>
+
+  <rect class="c" x="20" y="40" width="330" height="100" rx="8"/>
+  <text x="185" y="66" text-anchor="middle">Capture</text>
+  <text class="small" x="185" y="88" text-anchor="middle">APIDumper · APIDumperDLL · APIDumpLoader</text>
+  <text class="small" x="185" y="108" text-anchor="middle">APIDumpPrinter · InjectionLauncher</text>
+
+  <rect class="c" x="370" y="40" width="330" height="100" rx="8"/>
+  <text x="535" y="66" text-anchor="middle">Replay</text>
+  <text class="small" x="535" y="88" text-anchor="middle">ReplayEngineDLL (one executor per API)</text>
+  <text class="small" x="535" y="108" text-anchor="middle">ReplayPlayer</text>
+
+  <rect class="b" x="20" y="170" width="680" height="100" rx="8"/>
+  <text x="360" y="196" text-anchor="middle">Interception</text>
+  <rect class="a" x="40" y="210" width="400" height="44" rx="6"/>
+  <text x="240" y="238" text-anchor="middle">Hooks: D3D8 · OpenGL · WGL · GDI32 · User32 · Kernel32</text>
+  <rect class="a" x="460" y="210" width="220" height="44" rx="6"/>
+  <text x="570" y="238" text-anchor="middle">Core: D3D8Utils · OpenGLUtils</text>
+
+  <rect class="a" x="20" y="296" width="680" height="44" rx="8"/>
+  <text x="360" y="323" text-anchor="middle">Common: callbacks, gate, data chunks, hooking, fatal errors</text>
+
+  <path class="arrow" d="M185 140V168"/>
+  <path class="arrow" d="M535 140V168"/>
+  <path class="arrow" d="M360 270V294"/>
+
+  <rect class="d" x="740" y="40" width="140" height="300" rx="8"/>
+  <text x="810" y="66" text-anchor="middle">deps/</text>
+  <text class="small" x="810" y="110" text-anchor="middle">Detours</text>
+  <text class="small" x="810" y="136" text-anchor="middle">Zstd</text>
+  <text class="small" x="810" y="162" text-anchor="middle">Dear ImGui</text>
+  <text class="small" x="810" y="188" text-anchor="middle">googletest</text>
+  <text class="small" x="810" y="214" text-anchor="middle">Khronos headers</text>
+  <text class="small" x="810" y="300" text-anchor="middle">third party</text>
+</svg>
