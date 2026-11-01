@@ -7,7 +7,7 @@
 #ifndef TESTS_ARGUMENT_INFO_CHECKER_H
 #define TESTS_ARGUMENT_INFO_CHECKER_H
 
-#include "D3D8/types.h"
+#include "Interception/Hooks/D3D8/types.h"
 
 namespace Tests
 {

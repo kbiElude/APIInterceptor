@@ -7,15 +7,15 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
 
     find_package(OpenGL)
 
-    file(GLOB GDI32Includes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/GDI32/*.h"
-                                              "${APIInterceptor_SOURCE_DIR}/include/GDI32/entrypoints/*.h")
-    file(GLOB GDI32Sources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/GDI32/*.cpp"
-                                              "${APIInterceptor_SOURCE_DIR}/src/GDI32/entrypoints/*.cpp")
+    file(GLOB GDI32Includes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/GDI32/*.h"
+                                              "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/GDI32/entrypoints/*.h")
+    file(GLOB GDI32Sources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/GDI32/*.cpp"
+                                              "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/GDI32/entrypoints/*.cpp")
 
-    file(GLOB User32Includes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/User32/*.h"
-                                               "${APIInterceptor_SOURCE_DIR}/include/User32/entrypoints/*.h")
-    file(GLOB User32Sources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/User32/*.cpp"
-                                               "${APIInterceptor_SOURCE_DIR}/src/User32/entrypoints/*.cpp")
+    file(GLOB User32Includes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/User32/*.h"
+                                               "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/User32/entrypoints/*.h")
+    file(GLOB User32Sources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/User32/*.cpp"
+                                               "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/User32/entrypoints/*.cpp")
 
     add_library(GDI32  STATIC ${CommonIncludes}
                               ${GDI32Sources}
@@ -24,9 +24,9 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
                               ${User32Sources}
                               ${User32Includes})
 
-    file(GLOB Kernel32Includes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Kernel32/*.h")
-    file(GLOB Kernel32Sources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Kernel32/*.cpp"
-                                                 "${APIInterceptor_SOURCE_DIR}/src/Kernel32/entrypoints/*.cpp")
+    file(GLOB Kernel32Includes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/Kernel32/*.h")
+    file(GLOB Kernel32Sources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/Kernel32/*.cpp"
+                                                 "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/Kernel32/entrypoints/*.cpp")
 
     add_library(Kernel32 STATIC ${CommonIncludes}
                                 ${Kernel32Sources}
@@ -35,75 +35,75 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
     file(GLOB KhronosIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/deps/Khronos/GL/*.h"
                                                 "${APIInterceptor_SOURCE_DIR}/deps/Khronos/KHR/*.h")
 
-    file(GLOB OpenGL32EntrypointsIncludes_GL1_0 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL1.0/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL1_1 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL1.1/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL1_2 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL1.2/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL1_3 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL1.3/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL1_4 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL1.4/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL1_5 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL1.5/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL2_0 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL2.0/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL2_1 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL2.1/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL3_0 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL3.0/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL3_1 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL3.1/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL3_2 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL3.2/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL3_3 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL3.3/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL4_0 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL4.0/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL4_1 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL4.1/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL4_2 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL4.2/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL4_3 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL4.3/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL4_4 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL4.4/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL4_5 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL4.5/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL1_0 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL1.0/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL1_1 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL1.1/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL1_2 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL1.2/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL1_3 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL1.3/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL1_4 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL1.4/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL1_5 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL1.5/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL2_0 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL2.0/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL2_1 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL2.1/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL3_0 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL3.0/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL3_1 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL3.1/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL3_2 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL3.2/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL3_3 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL3.3/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL4_0 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL4.0/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL4_1 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL4.1/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL4_2 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL4.2/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL4_3 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL4.3/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL4_4 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL4.4/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL4_5 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL4.5/*.h")
 
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_color_buffer_float CONFIGURE_DEPENDS    "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_color_buffer_float/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_copy_buffer CONFIGURE_DEPENDS           "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_copy_buffer/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_depth_buffer_float CONFIGURE_DEPENDS    "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_depth_buffer_float/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_depth_clamp CONFIGURE_DEPENDS           "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_depth_clamp/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_depth_texture CONFIGURE_DEPENDS         "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_depth_texture/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_draw_buffers CONFIGURE_DEPENDS          "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_draw_buffers/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_draw_elements_base_vertex CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_draw_elements_base_vertex/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_draw_instanced CONFIGURE_DEPENDS        "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_draw_instanced/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_fragment_coord_conventions CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_fragment_coord_conventions/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_fragment_program_shadow CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_fragment_program_shadow/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_fragment_shader CONFIGURE_DEPENDS       "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_fragment_shader/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_framebuffer_object CONFIGURE_DEPENDS    "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_framebuffer_object/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_framebuffer_sRGB CONFIGURE_DEPENDS      "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_framebuffer_sRGB/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_half_float_pixel CONFIGURE_DEPENDS      "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_half_float_pixel/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_half_float_vertex CONFIGURE_DEPENDS     "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_half_float_vertex/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_instanced_arrays CONFIGURE_DEPENDS      "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_instanced_arrays/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_map_buffer_range CONFIGURE_DEPENDS      "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_map_buffer_range/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_multisample CONFIGURE_DEPENDS           "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_multisample/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_multitexture CONFIGURE_DEPENDS          "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_multitexture/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_occlusion_query CONFIGURE_DEPENDS       "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_occlusion_query/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_pixel_buffer_object CONFIGURE_DEPENDS   "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_pixel_buffer_object/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_point_parameters CONFIGURE_DEPENDS      "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_point_parameters/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_point_sprite CONFIGURE_DEPENDS          "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_point_sprite/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_provoking_vertex CONFIGURE_DEPENDS      "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_provoking_vertex/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_seamless_cube_map CONFIGURE_DEPENDS     "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_seamless_cube_map/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_shader_texture_lod CONFIGURE_DEPENDS    "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_shader_texture_lod/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_shading_language_100 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_shading_language_100/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_shadow CONFIGURE_DEPENDS                "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_shadow/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_sync CONFIGURE_DEPENDS                  "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_sync/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_texture_border_clamp CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_texture_border_clamp/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_texture_buffer_object CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_texture_buffer_object/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_texture_compression CONFIGURE_DEPENDS   "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_texture_compression/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_texture_compression_rgtc CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_texture_compression_rgtc/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_texture_cube_map CONFIGURE_DEPENDS      "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_texture_cube_map/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_texture_cube_map_array CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_texture_cube_map_array/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_texture_float CONFIGURE_DEPENDS         "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_texture_float/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_texture_gather CONFIGURE_DEPENDS        "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_texture_gather/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_texture_mirrored_repeat CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_texture_mirrored_repeat/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_texture_multisample CONFIGURE_DEPENDS   "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_texture_multisample/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_texture_non_power_of_two CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_texture_non_power_of_two/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_texture_query_lod CONFIGURE_DEPENDS     "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_texture_query_lod/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_texture_rectangle CONFIGURE_DEPENDS     "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_texture_rectangle/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_texture_rg CONFIGURE_DEPENDS            "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_texture_rg/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_uniform_buffer_object CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_uniform_buffer_object/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_vertex_array_bgra CONFIGURE_DEPENDS     "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_vertex_array_bgra/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_vertex_array_object CONFIGURE_DEPENDS   "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_vertex_array_object/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_vertex_buffer_object CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_vertex_buffer_object/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_vertex_program CONFIGURE_DEPENDS        "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_vertex_program/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_vertex_shader CONFIGURE_DEPENDS         "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_ARB_vertex_shader/*.h")
-    file(GLOB OpenGL32EntrypointsIncludes_GL_EXT_texture_object CONFIGURE_DEPENDS        "${APIInterceptor_SOURCE_DIR}/include/OpenGL/entrypoints/GL_EXT_texture_object/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_color_buffer_float CONFIGURE_DEPENDS    "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_color_buffer_float/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_copy_buffer CONFIGURE_DEPENDS           "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_copy_buffer/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_depth_buffer_float CONFIGURE_DEPENDS    "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_depth_buffer_float/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_depth_clamp CONFIGURE_DEPENDS           "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_depth_clamp/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_depth_texture CONFIGURE_DEPENDS         "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_depth_texture/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_draw_buffers CONFIGURE_DEPENDS          "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_draw_buffers/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_draw_elements_base_vertex CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_draw_elements_base_vertex/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_draw_instanced CONFIGURE_DEPENDS        "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_draw_instanced/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_fragment_coord_conventions CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_fragment_coord_conventions/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_fragment_program_shadow CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_fragment_program_shadow/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_fragment_shader CONFIGURE_DEPENDS       "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_fragment_shader/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_framebuffer_object CONFIGURE_DEPENDS    "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_framebuffer_object/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_framebuffer_sRGB CONFIGURE_DEPENDS      "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_framebuffer_sRGB/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_half_float_pixel CONFIGURE_DEPENDS      "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_half_float_pixel/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_half_float_vertex CONFIGURE_DEPENDS     "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_half_float_vertex/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_instanced_arrays CONFIGURE_DEPENDS      "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_instanced_arrays/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_map_buffer_range CONFIGURE_DEPENDS      "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_map_buffer_range/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_multisample CONFIGURE_DEPENDS           "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_multisample/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_multitexture CONFIGURE_DEPENDS          "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_multitexture/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_occlusion_query CONFIGURE_DEPENDS       "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_occlusion_query/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_pixel_buffer_object CONFIGURE_DEPENDS   "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_pixel_buffer_object/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_point_parameters CONFIGURE_DEPENDS      "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_point_parameters/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_point_sprite CONFIGURE_DEPENDS          "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_point_sprite/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_provoking_vertex CONFIGURE_DEPENDS      "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_provoking_vertex/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_seamless_cube_map CONFIGURE_DEPENDS     "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_seamless_cube_map/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_shader_texture_lod CONFIGURE_DEPENDS    "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_shader_texture_lod/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_shading_language_100 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_shading_language_100/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_shadow CONFIGURE_DEPENDS                "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_shadow/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_sync CONFIGURE_DEPENDS                  "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_sync/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_texture_border_clamp CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_texture_border_clamp/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_texture_buffer_object CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_texture_buffer_object/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_texture_compression CONFIGURE_DEPENDS   "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_texture_compression/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_texture_compression_rgtc CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_texture_compression_rgtc/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_texture_cube_map CONFIGURE_DEPENDS      "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_texture_cube_map/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_texture_cube_map_array CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_texture_cube_map_array/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_texture_float CONFIGURE_DEPENDS         "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_texture_float/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_texture_gather CONFIGURE_DEPENDS        "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_texture_gather/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_texture_mirrored_repeat CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_texture_mirrored_repeat/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_texture_multisample CONFIGURE_DEPENDS   "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_texture_multisample/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_texture_non_power_of_two CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_texture_non_power_of_two/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_texture_query_lod CONFIGURE_DEPENDS     "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_texture_query_lod/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_texture_rectangle CONFIGURE_DEPENDS     "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_texture_rectangle/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_texture_rg CONFIGURE_DEPENDS            "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_texture_rg/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_uniform_buffer_object CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_uniform_buffer_object/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_vertex_array_bgra CONFIGURE_DEPENDS     "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_vertex_array_bgra/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_vertex_array_object CONFIGURE_DEPENDS   "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_vertex_array_object/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_vertex_buffer_object CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_vertex_buffer_object/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_vertex_program CONFIGURE_DEPENDS        "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_vertex_program/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_ARB_vertex_shader CONFIGURE_DEPENDS         "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_ARB_vertex_shader/*.h")
+    file(GLOB OpenGL32EntrypointsIncludes_GL_EXT_texture_object CONFIGURE_DEPENDS        "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/entrypoints/GL_EXT_texture_object/*.h")
 
     set(OpenGL32EntrypointsIncludes
         ${OpenGL32EntrypointsIncludes_GL1_0}
@@ -175,24 +175,24 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
         ${OpenGL32EntrypointsIncludes_GL_ARB_vertex_shader}
         ${OpenGL32EntrypointsIncludes_GL_EXT_texture_object})
 
-    file(GLOB OpenGL32EntrypointsSources_GL1_0 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/OpenGL/entrypoints/GL1.0/*.cpp")
-    file(GLOB OpenGL32EntrypointsSources_GL1_1 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/OpenGL/entrypoints/GL1.1/*.cpp")
-    file(GLOB OpenGL32EntrypointsSources_GL1_2 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/OpenGL/entrypoints/GL1.2/*.cpp")
-    file(GLOB OpenGL32EntrypointsSources_GL1_3 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/OpenGL/entrypoints/GL1.3/*.cpp")
-    file(GLOB OpenGL32EntrypointsSources_GL1_4 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/OpenGL/entrypoints/GL1.4/*.cpp")
-    file(GLOB OpenGL32EntrypointsSources_GL1_5 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/OpenGL/entrypoints/GL1.5/*.cpp")
-    file(GLOB OpenGL32EntrypointsSources_GL2_0 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/OpenGL/entrypoints/GL2.0/*.cpp")
-    file(GLOB OpenGL32EntrypointsSources_GL2_1 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/OpenGL/entrypoints/GL2.1/*.cpp")
-    file(GLOB OpenGL32EntrypointsSources_GL3_0 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/OpenGL/entrypoints/GL3.0/*.cpp")
-    file(GLOB OpenGL32EntrypointsSources_GL3_1 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/OpenGL/entrypoints/GL3.1/*.cpp")
-    file(GLOB OpenGL32EntrypointsSources_GL3_2 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/OpenGL/entrypoints/GL3.2/*.cpp")
-    file(GLOB OpenGL32EntrypointsSources_GL3_3 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/OpenGL/entrypoints/GL3.3/*.cpp")
-    file(GLOB OpenGL32EntrypointsSources_GL4_0 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/OpenGL/entrypoints/GL4.0/*.cpp")
-    file(GLOB OpenGL32EntrypointsSources_GL4_1 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/OpenGL/entrypoints/GL4.1/*.cpp")
-    file(GLOB OpenGL32EntrypointsSources_GL4_2 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/OpenGL/entrypoints/GL4.2/*.cpp")
-    file(GLOB OpenGL32EntrypointsSources_GL4_3 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/OpenGL/entrypoints/GL4.3/*.cpp")
-    file(GLOB OpenGL32EntrypointsSources_GL4_4 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/OpenGL/entrypoints/GL4.4/*.cpp")
-    file(GLOB OpenGL32EntrypointsSources_GL4_5 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/OpenGL/entrypoints/GL4.5/*.cpp")
+    file(GLOB OpenGL32EntrypointsSources_GL1_0 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/OpenGL/entrypoints/GL1.0/*.cpp")
+    file(GLOB OpenGL32EntrypointsSources_GL1_1 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/OpenGL/entrypoints/GL1.1/*.cpp")
+    file(GLOB OpenGL32EntrypointsSources_GL1_2 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/OpenGL/entrypoints/GL1.2/*.cpp")
+    file(GLOB OpenGL32EntrypointsSources_GL1_3 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/OpenGL/entrypoints/GL1.3/*.cpp")
+    file(GLOB OpenGL32EntrypointsSources_GL1_4 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/OpenGL/entrypoints/GL1.4/*.cpp")
+    file(GLOB OpenGL32EntrypointsSources_GL1_5 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/OpenGL/entrypoints/GL1.5/*.cpp")
+    file(GLOB OpenGL32EntrypointsSources_GL2_0 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/OpenGL/entrypoints/GL2.0/*.cpp")
+    file(GLOB OpenGL32EntrypointsSources_GL2_1 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/OpenGL/entrypoints/GL2.1/*.cpp")
+    file(GLOB OpenGL32EntrypointsSources_GL3_0 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/OpenGL/entrypoints/GL3.0/*.cpp")
+    file(GLOB OpenGL32EntrypointsSources_GL3_1 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/OpenGL/entrypoints/GL3.1/*.cpp")
+    file(GLOB OpenGL32EntrypointsSources_GL3_2 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/OpenGL/entrypoints/GL3.2/*.cpp")
+    file(GLOB OpenGL32EntrypointsSources_GL3_3 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/OpenGL/entrypoints/GL3.3/*.cpp")
+    file(GLOB OpenGL32EntrypointsSources_GL4_0 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/OpenGL/entrypoints/GL4.0/*.cpp")
+    file(GLOB OpenGL32EntrypointsSources_GL4_1 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/OpenGL/entrypoints/GL4.1/*.cpp")
+    file(GLOB OpenGL32EntrypointsSources_GL4_2 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/OpenGL/entrypoints/GL4.2/*.cpp")
+    file(GLOB OpenGL32EntrypointsSources_GL4_3 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/OpenGL/entrypoints/GL4.3/*.cpp")
+    file(GLOB OpenGL32EntrypointsSources_GL4_4 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/OpenGL/entrypoints/GL4.4/*.cpp")
+    file(GLOB OpenGL32EntrypointsSources_GL4_5 CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/OpenGL/entrypoints/GL4.5/*.cpp")
 
     set(OpenGL32EntrypointsSources
         ${OpenGL32EntrypointsSources_GL1_0}
@@ -214,22 +214,22 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
         ${OpenGL32EntrypointsSources_GL4_4}
         ${OpenGL32EntrypointsSources_GL4_5})
 
-    file(GLOB OpenGL32Includes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/OpenGL/*.h")
-    file(GLOB OpenGL32Sources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/OpenGL/*.cpp")
+    file(GLOB OpenGL32Includes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/OpenGL/*.h")
+    file(GLOB OpenGL32Sources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/OpenGL/*.cpp")
 
-    file(GLOB OpenGL32UtilsIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/OpenGLUtils/*.h")
-    file(GLOB OpenGL32UtilsSources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/OpenGLUtils/*.cpp")
+    file(GLOB OpenGL32UtilsIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Interception/Core/OpenGLUtils/*.h")
+    file(GLOB OpenGL32UtilsSources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Core/OpenGLUtils/*.cpp")
 
     add_library(OpenGLUtils STATIC ${OpenGL32UtilsIncludes}
                                    ${OpenGL32UtilsSources})
 
-    file(GLOB D3D8Includes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/D3D8/*.h"
-                                             "${APIInterceptor_SOURCE_DIR}/include/D3D8/*.inl")
-    file(GLOB D3D8Sources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/D3D8/*.cpp"
-                                             "${APIInterceptor_SOURCE_DIR}/src/D3D8/entrypoints/*.cpp")
+    file(GLOB D3D8Includes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/D3D8/*.h"
+                                             "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/D3D8/*.inl")
+    file(GLOB D3D8Sources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/D3D8/*.cpp"
+                                             "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/D3D8/entrypoints/*.cpp")
 
-    file(GLOB D3D8UtilsIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/D3D8Utils/*.h")
-    file(GLOB D3D8UtilsSources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/D3D8Utils/*.cpp")
+    file(GLOB D3D8UtilsIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Interception/Core/D3D8Utils/*.h")
+    file(GLOB D3D8UtilsSources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Core/D3D8Utils/*.cpp")
 
     add_library(D3D8Utils STATIC ${D3D8Includes}
                                  ${D3D8UtilsIncludes}
@@ -250,19 +250,19 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
     add_dependencies     (OpenGL OpenGLUtils)
     target_link_libraries(OpenGL OpenGLUtils)
 
-    file(GLOB WGLIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/WGL/*.h"
-                                          "${APIInterceptor_SOURCE_DIR}/include/WGL/entrypoints/*.h"
-                                          "${APIInterceptor_SOURCE_DIR}/include/WGL/entrypoints/WGL_ARB_create_context/*.h"
-                                          "${APIInterceptor_SOURCE_DIR}/include/WGL/entrypoints/WGL_ARB_extensions_string/*.h"
-                                          "${APIInterceptor_SOURCE_DIR}/include/WGL/entrypoints/WGL_ARB_framebuffer_sRGB/*.h"
-                                          "${APIInterceptor_SOURCE_DIR}/include/WGL/entrypoints/WGL_EXT_swap_control/*.h"
+    file(GLOB WGLIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/WGL/*.h"
+                                          "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/WGL/entrypoints/*.h"
+                                          "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/WGL/entrypoints/WGL_ARB_create_context/*.h"
+                                          "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/WGL/entrypoints/WGL_ARB_extensions_string/*.h"
+                                          "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/WGL/entrypoints/WGL_ARB_framebuffer_sRGB/*.h"
+                                          "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/WGL/entrypoints/WGL_EXT_swap_control/*.h"
                                           )
-    file(GLOB WGLSources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/WGL/*.cpp"
-                                          "${APIInterceptor_SOURCE_DIR}/src/WGL/entrypoints/*.cpp"
-                                          "${APIInterceptor_SOURCE_DIR}/src/WGL/entrypoints/WGL_ARB_create_context/*.cpp"
-                                          "${APIInterceptor_SOURCE_DIR}/src/WGL/entrypoints/WGL_ARB_extensions_string/*.cpp"
-                                          "${APIInterceptor_SOURCE_DIR}/src/WGL/entrypoints/WGL_ARB_framebuffer_sRGB/*.cpp"
-                                          "${APIInterceptor_SOURCE_DIR}/src/WGL/entrypoints/WGL_EXT_swap_control/*.cpp"
+    file(GLOB WGLSources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/WGL/*.cpp"
+                                          "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/WGL/entrypoints/*.cpp"
+                                          "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/WGL/entrypoints/WGL_ARB_create_context/*.cpp"
+                                          "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/WGL/entrypoints/WGL_ARB_extensions_string/*.cpp"
+                                          "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/WGL/entrypoints/WGL_ARB_framebuffer_sRGB/*.cpp"
+                                          "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/WGL/entrypoints/WGL_EXT_swap_control/*.cpp"
                                           )
 
     add_library(WGL STATIC ${CommonIncludes}

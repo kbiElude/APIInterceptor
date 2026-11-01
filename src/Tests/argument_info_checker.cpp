@@ -3,7 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include <gtest/gtest.h>
-#include "D3D8Utils/argument_info.h"
+#include "Interception/Core/D3D8Utils/argument_info.h"
 #include "argument_info_checker.h"
 
 D3D8::ArgumentInfo Tests::ArgumentInfoChecker::get_argument_info_or_fail(const APIInterceptor::APIFunction& in_function,

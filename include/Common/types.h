@@ -1079,7 +1079,7 @@ namespace APIInterceptor
 
         #define D3D8_METHOD(INTERFACE_TAG, interface_name, METHOD_TAG, method_name, vtable_index, return_type, parameters) \
             APIFUNCTION_D3D8_##INTERFACE_TAG##_##METHOD_TAG,
-        #include "D3D8/d3d8_methods.inl"
+        #include "Interception/Hooks/D3D8/d3d8_methods.inl"
         #undef D3D8_METHOD
 
         APIFUNCTION_D3D8_METHODS_END,

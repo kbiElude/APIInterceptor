@@ -9,7 +9,7 @@
 #define APIDUMPPRINTER_D3D8_DECODER_H
 
 #include "APIDumpLoader/APIDumpLoader.h"
-#include "D3D8/types.h"
+#include "Interception/Hooks/D3D8/types.h"
 #include "types.h"
 #include <map>
 #include <stdio.h>

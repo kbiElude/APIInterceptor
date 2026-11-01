@@ -6,8 +6,8 @@
  */
 #include <gtest/gtest.h>
 #include "Common/callbacks.h"
-#include "OpenGL/string_array_chunk.h"
-#include "OpenGL/string_chunk.h"
+#include "Interception/Hooks/OpenGL/string_array_chunk.h"
+#include "Interception/Hooks/OpenGL/string_chunk.h"
 #include <string.h>
 #include <string>
 #include <vector>

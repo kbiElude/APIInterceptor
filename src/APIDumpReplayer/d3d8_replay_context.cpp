@@ -3,7 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "d3d8_replay_context.h"
-#include "D3D8/types.h"
+#include "Interception/Hooks/D3D8/types.h"
 #include <algorithm>
 
 APIDumpReplayer::D3D8ReplayContext::D3D8ReplayContext(ObjectRemapper* in_remapper_ptr)

@@ -17,16 +17,16 @@ if (APIINTERCEPTOR_BUILD_TESTS)
                                        "${APIInterceptor_SOURCE_DIR}/src/Common/callbacks.cpp"
                                        "${APIInterceptor_SOURCE_DIR}/src/Common/data_chunk_store.cpp"
                                        "${APIInterceptor_SOURCE_DIR}/src/Common/memory_chunk.cpp"
-                                       "${APIInterceptor_SOURCE_DIR}/src/OpenGL/buffer_manager.cpp"
-                                       "${APIInterceptor_SOURCE_DIR}/src/OpenGL/buffer_mapping_manager.cpp"
-                                       "${APIInterceptor_SOURCE_DIR}/src/OpenGL/client_array_manager.cpp"
-                                       "${APIInterceptor_SOURCE_DIR}/src/OpenGL/param_counts.cpp"
-                                       "${APIInterceptor_SOURCE_DIR}/src/OpenGL/pixel_store_manager.cpp"
-                                       "${APIInterceptor_SOURCE_DIR}/src/OpenGL/string_array_chunk.cpp"
-                                       "${APIInterceptor_SOURCE_DIR}/src/OpenGL/string_chunk.cpp"
-                                       "${APIInterceptor_SOURCE_DIR}/src/OpenGL/texture_manager.cpp"
-                                       "${APIInterceptor_SOURCE_DIR}/src/OpenGL/utils.cpp"
-                                       "${APIInterceptor_SOURCE_DIR}/src/WGL/utils.cpp")
+                                       "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/OpenGL/buffer_manager.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/OpenGL/buffer_mapping_manager.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/OpenGL/client_array_manager.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/OpenGL/param_counts.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/OpenGL/pixel_store_manager.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/OpenGL/string_array_chunk.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/OpenGL/string_chunk.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/OpenGL/texture_manager.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/OpenGL/utils.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/WGL/utils.cpp")
 
     target_include_directories(APIInterceptorTests PRIVATE "${APIInterceptor_SOURCE_DIR}/src/APIDumpReplayer")
     target_link_libraries(APIInterceptorTests gtest_main APIDumpLoader APIDumpReplayer D3D8Utils)

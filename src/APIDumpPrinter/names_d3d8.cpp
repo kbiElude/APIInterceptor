@@ -5,7 +5,7 @@
  * Names of D3D8 enums and flags. Tables of values which the D3D8 types do not define use the D3D8 SDK values.
  */
 #include "d3d8_names.h"
-#include "D3D8/types.h"
+#include "Interception/Hooks/D3D8/types.h"
 
 #define D3D8_FLAG_NAME(flag)          {static_cast<uint32_t>(D3D8::flag), #flag}
 #define D3D8_NAMED_VALUE(name, value) {name, value}

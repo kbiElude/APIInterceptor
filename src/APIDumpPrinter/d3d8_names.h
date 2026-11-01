@@ -7,7 +7,7 @@
 #ifndef APIDUMPPRINTER_D3D8_NAMES_H
 #define APIDUMPPRINTER_D3D8_NAMES_H
 
-#include "D3D8/types.h"
+#include "Interception/Hooks/D3D8/types.h"
 #include "types.h"
 
 namespace APIDumpPrinter

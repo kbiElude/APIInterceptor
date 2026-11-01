@@ -5,7 +5,7 @@
  * Checks of the helpers for the WGL entrypoints.
  */
 #include <gtest/gtest.h>
-#include "WGL/utils.h"
+#include "Interception/Hooks/WGL/utils.h"
 
 TEST(WGLUtils, NullAttribListHasNoInts)
 {

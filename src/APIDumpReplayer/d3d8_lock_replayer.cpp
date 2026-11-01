@@ -3,8 +3,8 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "d3d8_lock_replayer.h"
-#include "D3D8/types.h"
-#include "D3D8Utils/surface_layout.h"
+#include "Interception/Hooks/D3D8/types.h"
+#include "Interception/Core/D3D8Utils/surface_layout.h"
 #include <string.h>
 
 const int APIDumpReplayer::D3D8LockReplayer::ARGUMENT_ABSENT = -1;

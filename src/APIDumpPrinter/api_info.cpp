@@ -3,7 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "api_info.h"
-#include "D3D8Utils/methods.h"
+#include "Interception/Core/D3D8Utils/methods.h"
 
 const char* APIDumpPrinter::get_function_name(const APIInterceptor::APIFunction& in_function)
 {

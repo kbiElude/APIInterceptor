@@ -16,6 +16,6 @@
 
 #define AI_APIENTRY KHRONOS_APIENTRY
 
-#include "OpenGL/types_typedefs.h"
+#include "Interception/Hooks/OpenGL/types_typedefs.h"
 
 #endif /* APIDUMPREPLAYER_GL_FUNCTION_TYPES_H */

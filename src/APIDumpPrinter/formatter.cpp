@@ -5,7 +5,7 @@
 #include "formatter.h"
 #include "APIDumpLoader/api_info.h"
 #include "api_info.h"
-#include "OpenGLUtils/utils_enum.h"
+#include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include <assert.h>
 #include <algorithm>
 #include <vector>

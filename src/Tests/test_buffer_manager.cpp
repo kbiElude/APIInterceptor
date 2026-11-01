@@ -5,7 +5,7 @@
  * Checks of the tracking of the buffer bindings and of the sizes of buffers.
  */
 #include <gtest/gtest.h>
-#include "OpenGL/buffer_manager.h"
+#include "Interception/Hooks/OpenGL/buffer_manager.h"
 
 TEST(BufferManager, NothingIsBoundInitially)
 {

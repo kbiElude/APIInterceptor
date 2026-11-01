@@ -2,7 +2,7 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
-#include "D3D8/types.h"
+#include "Interception/Hooks/D3D8/types.h"
 #include "d3d8_swapchain_reader.h"
 #include <string.h>
 

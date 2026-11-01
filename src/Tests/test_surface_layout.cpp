@@ -5,7 +5,7 @@
  * Checks of the layout of the pixels of a surface region in memory.
  */
 #include <gtest/gtest.h>
-#include "D3D8Utils/surface_layout.h"
+#include "Interception/Core/D3D8Utils/surface_layout.h"
 
 TEST(SurfaceLayout, UncompressedRowsAreWidthTimesPixelSize)
 {

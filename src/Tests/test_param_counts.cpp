@@ -5,7 +5,7 @@
  * Checks of the number of values which API calls read through a pointer, when it depends on the parameter name.
  */
 #include <gtest/gtest.h>
-#include "OpenGL/param_counts.h"
+#include "Interception/Hooks/OpenGL/param_counts.h"
 #include "gl/gl.h"
 
 TEST(ParamCounts, CallListsElementsAreSizedByType)

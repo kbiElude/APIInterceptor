@@ -5,7 +5,7 @@
  * Consistency checks of the D3D8 method table.
  */
 #include <gtest/gtest.h>
-#include "D3D8Utils/methods.h"
+#include "Interception/Core/D3D8Utils/methods.h"
 #include <set>
 #include <string>
 
@@ -134,7 +134,7 @@ TEST(D3D8Methods, NamesAreConsistent)
     static const NameCheck name_check_array[] =
     {
         #define D3D8_METHOD(INTERFACE_TAG, interface_name, METHOD_TAG, method_name, vtable_index, return_type, parameters) { #INTERFACE_TAG, #interface_name, #METHOD_TAG, #method_name },
-        #include "D3D8/d3d8_methods.inl"
+        #include "Interception/Hooks/D3D8/d3d8_methods.inl"
         #undef D3D8_METHOD
     };
 

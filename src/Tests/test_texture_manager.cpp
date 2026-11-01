@@ -5,7 +5,7 @@
  * Checks of the tracking of the texture bindings and of the levels of textures.
  */
 #include <gtest/gtest.h>
-#include "OpenGL/texture_manager.h"
+#include "Interception/Hooks/OpenGL/texture_manager.h"
 
 TEST(TextureManager, NothingIsBoundInitially)
 {

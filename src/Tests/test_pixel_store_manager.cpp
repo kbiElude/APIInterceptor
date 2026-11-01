@@ -5,8 +5,8 @@
  * Checks of the sizes of the images which pixel transfers read and write, given the pixel storage modes.
  */
 #include <gtest/gtest.h>
-#include "OpenGL/pixel_store_manager.h"
-#include "OpenGL/types.h"
+#include "Interception/Hooks/OpenGL/pixel_store_manager.h"
+#include "Interception/Hooks/OpenGL/types.h"
 #include "gl/gl.h"
 
 TEST(PixelStoreManager, RowsArePaddedToTheDefaultAlignment)

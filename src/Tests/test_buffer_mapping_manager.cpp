@@ -5,8 +5,8 @@
  * Checks of the tracking of mapped buffers, and of what is handed over to the GPU by unmapping and flushing them.
  */
 #include <gtest/gtest.h>
-#include "OpenGL/buffer_mapping_manager.h"
-#include "OpenGL/types.h"
+#include "Interception/Hooks/OpenGL/buffer_mapping_manager.h"
+#include "Interception/Hooks/OpenGL/types.h"
 
 TEST(BufferMappingManager, UnmappingHandsOverTheWholeMappedRange)
 {

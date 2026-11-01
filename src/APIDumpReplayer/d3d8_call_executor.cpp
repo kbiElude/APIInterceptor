@@ -3,7 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "d3d8_call_executor.h"
-#include "D3D8/types.h"
+#include "Interception/Hooks/D3D8/types.h"
 #include "d3d8_replay_invoker.h"
 #include <string.h>
 
@@ -25,7 +25,7 @@ APIDumpReplayer::D3D8CallExecutor::D3D8CallExecutor(ObjectRemapper* in_remapper_
             \
             m_invoker_map[APIInterceptor::APIFUNCTION_D3D8_##INTERFACE_TAG##_##METHOD_TAG] = {&MethodReplay::invoke, MethodReplay::get_n_arguments()}; \
         }
-    #include "D3D8/d3d8_methods.inl"
+    #include "Interception/Hooks/D3D8/d3d8_methods.inl"
     #undef D3D8_METHOD
 }
 

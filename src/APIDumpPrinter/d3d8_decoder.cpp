@@ -4,8 +4,8 @@
  */
 #include "d3d8_decoder.h"
 #include "d3d8_names.h"
-#include "D3D8Utils/argument_info.h"
-#include "D3D8Utils/methods.h"
+#include "Interception/Core/D3D8Utils/argument_info.h"
+#include "Interception/Core/D3D8Utils/methods.h"
 #include <sstream>
 #include <string.h>
 

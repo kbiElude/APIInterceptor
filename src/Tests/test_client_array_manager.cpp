@@ -5,8 +5,8 @@
  * Checks of the tracking of the vertex arrays which live in the app's memory, and of the snapshots taken of them.
  */
 #include <gtest/gtest.h>
-#include "OpenGL/client_array_manager.h"
-#include "OpenGL/types.h"
+#include "Interception/Hooks/OpenGL/client_array_manager.h"
+#include "Interception/Hooks/OpenGL/types.h"
 #include "gl/gl.h"
 #include <string.h>
 #include <vector>

@@ -5,8 +5,8 @@
  * Checks of the size of the single texel which the clear functions read.
  */
 #include <gtest/gtest.h>
-#include "OpenGL/types.h"
-#include "OpenGL/utils.h"
+#include "Interception/Hooks/OpenGL/types.h"
+#include "Interception/Hooks/OpenGL/utils.h"
 #include "gl/gl.h"
 
 TEST(TexelBytes, ComponentsTimesTypeSize)

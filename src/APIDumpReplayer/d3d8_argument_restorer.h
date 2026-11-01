@@ -11,7 +11,7 @@
 #ifndef APIDUMPREPLAYER_D3D8_ARGUMENT_RESTORER_H
 #define APIDUMPREPLAYER_D3D8_ARGUMENT_RESTORER_H
 
-#include "D3D8Utils/types.h"
+#include "Interception/Core/D3D8Utils/types.h"
 #include "d3d8_replay_context.h"
 #include <string.h>
 #include <string>

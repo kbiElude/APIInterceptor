@@ -5,7 +5,7 @@
  * Checks of the compile-time description of D3D8 method arguments.
  */
 #include <gtest/gtest.h>
-#include "D3D8Utils/argument_info.h"
+#include "Interception/Core/D3D8Utils/argument_info.h"
 #include "argument_info_checker.h"
 #include <string>
 

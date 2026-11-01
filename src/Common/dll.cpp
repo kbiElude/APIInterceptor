@@ -8,12 +8,12 @@
 #include "../deps/Detours/src/detours.h"
 
 #include "common/logger.h"
-#include "D3D8/interceptors.h"
-#include "GDI32/interceptors.h"
-#include "Kernel32/interceptors.h"
-#include "OpenGL/interceptors.h"
-#include "User32/interceptors.h"
-#include "WGL/interceptors.h"
+#include "Interception/Hooks/D3D8/interceptors.h"
+#include "Interception/Hooks/GDI32/interceptors.h"
+#include "Interception/Hooks/Kernel32/interceptors.h"
+#include "Interception/Hooks/OpenGL/interceptors.h"
+#include "Interception/Hooks/User32/interceptors.h"
+#include "Interception/Hooks/WGL/interceptors.h"
 
 const std::vector<APIInterceptor::FunctionInterceptor> g_function_interceptors[] =
 {
