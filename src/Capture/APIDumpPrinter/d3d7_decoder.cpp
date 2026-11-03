@@ -1015,30 +1015,13 @@ const char* Capture::APIDumpPrinter::D3D7Decoder::get_created_object_type_name_p
                                                                                     const Interception::Hooks::D3D7::ArgumentInfo& in_info,
                                                                                     const Capture::APIDumpLoader::Workload&        in_workload)
 {
-    constexpr uint32_t DIRECT_DRAW_CREATE_EX_IID_ARGUMENT = 2;
-    constexpr uint32_t QUERY_INTERFACE_IID_ARGUMENT       = 1;
+    uint32_t    n_iid_argument = 0;
+    const char* result_ptr     = in_info.object_type_name_ptr;
 
-    const Interception::Hooks::D3D7::MethodInfo* method_info_ptr = Interception::Core::D3D7Utils::get_method_info_ptr(in_call.func);
-    uint32_t                                     n_iid_argument  = UINT32_MAX;
-    const char*                                  result_ptr      = in_info.object_type_name_ptr;
-
-    if (in_call.func == APIInterceptor::APIFUNCTION_D3D7_DIRECTDRAWCREATEEX)
+    /* What is asked for decides the type of the object. */
+    if (Interception::Core::D3D7Utils::get_iid_argument_index(in_call.func,
+                                                             &n_iid_argument) )
     {
-        n_iid_argument = DIRECT_DRAW_CREATE_EX_IID_ARGUMENT;
-    }
-    else
-    if (method_info_ptr != nullptr)
-    {
-        if (strcmp(method_info_ptr->method_name_ptr,
-                   "QueryInterface") == 0)
-        {
-            n_iid_argument = QUERY_INTERFACE_IID_ARGUMENT;
-        }
-    }
-
-    if (n_iid_argument != UINT32_MAX)
-    {
-        /* What is asked for decides the type of the object. */
         result_ptr = nullptr;
 
         if (n_iid_argument < in_call.arg_in_vec.size() )
@@ -1050,21 +1033,10 @@ const char* Capture::APIDumpPrinter::D3D7Decoder::get_created_object_type_name_p
                 const auto chunk_ptr = Capture::APIDumpLoader::get_data_chunk_ptr(in_workload,
                                                                                   iid_argument.get_data_chunk_id() );
 
-                if (chunk_ptr != nullptr &&
-                    chunk_ptr->size() == sizeof(GUID) )
+                if (chunk_ptr != nullptr)
                 {
-                    GUID iid;
-
-                    memcpy(&iid,
-                           chunk_ptr->data(),
-                           sizeof(iid) );
-
-                    const Interception::Core::D3D7Utils::KnownGuid* known_guid_ptr = Interception::Core::D3D7Utils::find_known_guid(iid);
-
-                    if (known_guid_ptr != nullptr)
-                    {
-                        result_ptr = Interception::Core::D3D7Utils::get_object_type_name_ptr(known_guid_ptr->object_type);
-                    }
+                    result_ptr = Interception::Core::D3D7Utils::get_object_type_name_ptr_for_iid(chunk_ptr->data(),
+                                                                                                 chunk_ptr->size() );
                 }
             }
         }

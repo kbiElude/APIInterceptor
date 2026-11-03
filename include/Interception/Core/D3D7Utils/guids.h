@@ -8,7 +8,9 @@
 #ifndef D3D7UTILS_GUIDS_H
 #define D3D7UTILS_GUIDS_H
 
+#include "Interception/Core/D3D7Utils/methods.h"
 #include "Interception/Core/D3D7Utils/types.h"
+#include <stddef.h>
 
 namespace Interception
 {
@@ -26,6 +28,18 @@ namespace Interception
 
             /* Returns nullptr if the GUID is not known. */
             const KnownGuid* find_known_guid(const GUID& in_guid);
+
+            /* The calls which are given the IID of the interface they make an object of (QueryInterface, DirectDrawCreateEx): the number of the
+             * argument that holds it. False for the other calls.
+             */
+            bool get_iid_argument_index(const APIInterceptor::APIFunction& in_function,
+                                        uint32_t*                          out_index_ptr);
+
+            /* The name of the type of the object that an IID asks for (see get_object_type_name_ptr); nullptr if the bytes are not a GUID that is
+             * known to make an object.
+             */
+            const char* get_object_type_name_ptr_for_iid(const void*   in_data_ptr,
+                                                         const size_t& in_n_bytes);
         }
     }
 }

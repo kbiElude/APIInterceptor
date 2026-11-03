@@ -46,3 +46,56 @@ const Interception::Core::D3D7Utils::KnownGuid* Interception::Core::D3D7Utils::f
 
     return result_ptr;
 }
+
+bool Interception::Core::D3D7Utils::get_iid_argument_index(const APIInterceptor::APIFunction& in_function,
+                                                           uint32_t*                          out_index_ptr)
+{
+    /* DirectDrawCreateEx has the GUID of the device, the object, and then the IID; QueryInterface has the IID and then the object. */
+    constexpr uint32_t DIRECT_DRAW_CREATE_EX_IID_ARGUMENT = 2;
+    constexpr uint32_t QUERY_INTERFACE_IID_ARGUMENT       = 1;
+
+    const Interception::Hooks::D3D7::MethodInfo* method_info_ptr = get_method_info_ptr(in_function);
+    bool                                         result          = false;
+
+    if (in_function == APIInterceptor::APIFUNCTION_D3D7_DIRECTDRAWCREATEEX)
+    {
+        *out_index_ptr = DIRECT_DRAW_CREATE_EX_IID_ARGUMENT;
+        result         = true;
+    }
+    else
+    if (method_info_ptr != nullptr)
+    {
+        if (strcmp(method_info_ptr->method_name_ptr,
+                   "QueryInterface") == 0)
+        {
+            *out_index_ptr = QUERY_INTERFACE_IID_ARGUMENT;
+            result         = true;
+        }
+    }
+
+    return result;
+}
+
+const char* Interception::Core::D3D7Utils::get_object_type_name_ptr_for_iid(const void*   in_data_ptr,
+                                                                            const size_t& in_n_bytes)
+{
+    const char* result_ptr = nullptr;
+
+    if (in_n_bytes == sizeof(GUID) )
+    {
+        GUID iid;
+
+        memcpy(&iid,
+               in_data_ptr,
+               sizeof(iid) );
+
+        const KnownGuid* known_guid_ptr = find_known_guid(iid);
+
+        if (known_guid_ptr != nullptr)
+        {
+            result_ptr = get_object_type_name_ptr(known_guid_ptr->object_type);
+        }
+    }
+
+    return result_ptr;
+}
