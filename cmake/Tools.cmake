@@ -10,7 +10,7 @@ if (APIINTERCEPTOR_BUILD_TOOLS)
 
     target_link_libraries(APIDumper      InjectionLauncher)
     target_link_libraries(APIDumperDLL   APIInterceptor Zstd)
-    target_link_libraries(APIDumpPrinter APIDumpLoader D3D8Utils OpenGLUtils)
+    target_link_libraries(APIDumpPrinter APIDumpLoader D3D7Utils D3D8Utils OpenGLUtils)
 
     add_dependencies(APIDumper APIDumperDLL)
 

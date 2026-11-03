@@ -39,6 +39,12 @@ Capture::APIDumpLoader::APIGroup Capture::APIDumpLoader::get_api_group(const API
     {
         result = APIGroup::D3D8;
     }
+    else
+    if (in_function >= APIInterceptor::APIFUNCTION_D3D7_FIRST &&
+        in_function <= APIInterceptor::APIFUNCTION_D3D7_LAST)
+    {
+        result = APIGroup::D3D7;
+    }
 
     return result;
 }
@@ -77,6 +83,13 @@ const char* Capture::APIDumpLoader::get_api_group_name(const APIGroup& in_group)
             break;
         }
 
+        case APIGroup::D3D7:
+        {
+            result_ptr = "d3d7";
+
+            break;
+        }
+
         case APIGroup::D3D8:
         {
             result_ptr = "d3d8";
@@ -108,7 +121,8 @@ const std::vector<Capture::APIDumpLoader::APIGroup>& Capture::APIDumpLoader::get
         APIGroup::GL,
         APIGroup::WGL,
         APIGroup::USER32,
-        APIGroup::D3D8
+        APIGroup::D3D8,
+        APIGroup::D3D7
     };
 
     return result_vec;
@@ -119,7 +133,8 @@ bool Capture::APIDumpLoader::is_frame_boundary(const APIInterceptor::APIFunction
     bool result = false;
 
     /* IDirect3DSwapChain8::Present is not a boundary: it presents additional swap chains. */
-    if (in_function == APIInterceptor::APIFUNCTION_GDI32_SWAPBUFFERS             ||
+    if (in_function == APIInterceptor::APIFUNCTION_GDI32_SWAPBUFFERS              ||
+        in_function == APIInterceptor::APIFUNCTION_D3D7_IDIRECTDRAWSURFACE7_FLIP  ||
         in_function == APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_PRESENT)
     {
         result = true;

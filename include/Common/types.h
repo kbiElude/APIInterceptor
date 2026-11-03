@@ -1089,6 +1089,25 @@ namespace APIInterceptor
         APIFUNCTION_D3D8_METHODS_FIRST = APIFUNCTION_D3D8_METHODS_BEGIN + 1,
         APIFUNCTION_D3D8_METHODS_LAST  = APIFUNCTION_D3D8_METHODS_END   - 1,
 
+        /* D3D7 (DirectDraw 7 and Direct3D 7): DirectDrawCreateEx is a flat export; the rest are COM methods generated from
+         * d3d7_methods.inl. Appended after D3D8, so that the IDs of the dumps made before it stay valid.
+         */
+        APIFUNCTION_D3D7_DIRECTDRAWCREATEEX,
+
+        APIFUNCTION_D3D7_METHODS_BEGIN,
+
+        #define D3D7_METHOD(INTERFACE_TAG, interface_name, METHOD_TAG, method_name, vtable_index, return_type, parameters) \
+            APIFUNCTION_D3D7_##INTERFACE_TAG##_##METHOD_TAG,
+        #include "Interception/Hooks/D3D7/d3d7_methods.inl"
+        #undef D3D7_METHOD
+
+        APIFUNCTION_D3D7_METHODS_END,
+
+        APIFUNCTION_D3D7_FIRST         = APIFUNCTION_D3D7_DIRECTDRAWCREATEEX,
+        APIFUNCTION_D3D7_LAST          = APIFUNCTION_D3D7_METHODS_END   - 1,
+        APIFUNCTION_D3D7_METHODS_FIRST = APIFUNCTION_D3D7_METHODS_BEGIN + 1,
+        APIFUNCTION_D3D7_METHODS_LAST  = APIFUNCTION_D3D7_METHODS_END   - 1,
+
         /* Always last */
         APIFUNCTION_COUNT,
         APIFUNCTION_UNKNOWN = APIFUNCTION_COUNT

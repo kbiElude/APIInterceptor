@@ -4,6 +4,7 @@
  */
 #include "api_info.h"
 #include "Common/macros.h"
+#include "Interception/Core/D3D7Utils/methods.h"
 #include "Interception/Core/D3D8Utils/methods.h"
 
 const char* Capture::APIDumpPrinter::get_function_name(const APIInterceptor::APIFunction& in_function)
@@ -12,6 +13,13 @@ const char* Capture::APIDumpPrinter::get_function_name(const APIInterceptor::API
 
     switch (Capture::APIDumpLoader::get_api_group(in_function) )
     {
+        case Capture::APIDumpLoader::APIGroup::D3D7:
+        {
+            result_ptr = Interception::Core::D3D7Utils::get_function_name_ptr(in_function);
+
+            break;
+        }
+
         case Capture::APIDumpLoader::APIGroup::D3D8:
         {
             result_ptr = Interception::Core::D3D8Utils::get_function_name_ptr(in_function);

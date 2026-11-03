@@ -265,7 +265,7 @@ void Capture::APIDumpPrinter::print_usage()
             "  --frame A[-B]       Only print calls from frame A (or frames A..B, inclusive). Frames are counted\n"
             "                      from 0; a frame ends with a swapchain present call. \"A-\" means A..last frame.\n"
             "  --api LIST          Only print calls from the specified comma-separated APIs.\n"
-            "                      Valid values: gdi32, gl, wgl, user32, d3d8. Default: all.\n"
+            "                      Valid values: gdi32, gl, wgl, user32, d3d8, d3d7. Default: all.\n"
             "  --stats             Instead of listing calls, print a call histogram and workload summary.\n"
             "                      Honors --frame and --api.\n"
             "  --dump-chunks DIR   Write each data chunk referenced by the selected calls to DIR\\chunk_NNNNNN.bin.\n"

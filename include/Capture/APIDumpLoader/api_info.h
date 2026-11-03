@@ -22,6 +22,7 @@ namespace Capture
             WGL,
             USER32,
             D3D8,
+            D3D7,
 
             UNKNOWN
         };

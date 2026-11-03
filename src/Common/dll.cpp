@@ -8,6 +8,7 @@
 #include "../deps/Detours/src/detours.h"
 
 #include "common/logger.h"
+#include "Interception/Hooks/D3D7/interceptors.h"
 #include "Interception/Hooks/D3D8/interceptors.h"
 #include "Interception/Hooks/GDI32/interceptors.h"
 #include "Interception/Hooks/Kernel32/interceptors.h"
@@ -86,6 +87,7 @@ INT APIENTRY DllMain(HMODULE in_module_handle,
             handle_attach_detach_event (true); /* in_is_attach_event */
             on_api_interceptor_injected();
 
+            Interception::Hooks::D3D7::on_attach();
             Interception::Hooks::D3D8::on_attach();
             break;
         }
@@ -93,6 +95,7 @@ INT APIENTRY DllMain(HMODULE in_module_handle,
         case DLL_PROCESS_DETACH:
         {
             Interception::Hooks::D3D8::on_detach();
+            Interception::Hooks::D3D7::on_detach();
 
             on_api_interceptor_removed();
 

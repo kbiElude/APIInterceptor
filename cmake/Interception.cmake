@@ -48,6 +48,18 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
     add_library(OpenGLUtils STATIC ${OpenGL32UtilsIncludes}
                                    ${OpenGL32UtilsSources})
 
+    file(GLOB D3D7Includes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/D3D7/*.h"
+                           "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/D3D7/*.inl")
+    file(GLOB D3D7Sources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/D3D7/*.cpp"
+                           "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/D3D7/entrypoints/*.cpp")
+
+    file(GLOB D3D7UtilsIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Interception/Core/D3D7Utils/*.h")
+    file(GLOB D3D7UtilsSources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Core/D3D7Utils/*.cpp")
+
+    add_library(D3D7Utils STATIC ${D3D7Includes}
+                                 ${D3D7UtilsIncludes}
+                                 ${D3D7UtilsSources})
+
     file(GLOB D3D8Includes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/D3D8/*.h"
                            "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/D3D8/*.inl")
     file(GLOB D3D8Sources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/D3D8/*.cpp"
@@ -75,6 +87,12 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
                                       ${D3D8Sources})
     add_dependencies     (D3D8 D3D8Utils HooksCommon Kernel32)
     target_link_libraries(D3D8 D3D8Utils HooksCommon Kernel32)
+
+    add_library          (D3D7 STATIC ${CommonIncludes}
+                                      ${D3D7Includes}
+                                      ${D3D7Sources})
+    add_dependencies     (D3D7 D3D7Utils HooksCommon Kernel32)
+    target_link_libraries(D3D7 D3D7Utils HooksCommon Kernel32)
 
     add_library          (OpenGL STATIC ${CommonIncludes}
                                          ${KhronosIncludes}
@@ -110,6 +128,9 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
 
     target_link_libraries(APIInterceptor Detours)
 
+    add_dependencies     (APIInterceptor D3D7)
+    target_link_libraries(APIInterceptor D3D7)
+
     add_dependencies     (APIInterceptor D3D8)
     target_link_libraries(APIInterceptor D3D8)
 
@@ -128,6 +149,10 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
     add_dependencies     (APIInterceptor WGL)
     target_link_libraries(APIInterceptor WGL ${OPENGL_gl_LIBRARY})
 
+    source_group ("D3D7 include files"       FILES ${D3D7Includes})
+    source_group ("D3D7 source files"        FILES ${D3D7Sources})
+    source_group ("D3D7 Utils include files" FILES ${D3D7UtilsIncludes})
+    source_group ("D3D7 Utils source files"  FILES ${D3D7UtilsSources})
     source_group ("D3D8 include files"       FILES ${D3D8Includes})
     source_group ("D3D8 source files"        FILES ${D3D8Sources})
     source_group ("D3D8 Utils include files" FILES ${D3D8UtilsIncludes})
