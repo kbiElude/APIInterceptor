@@ -5,8 +5,7 @@
 #ifndef D3D8_GLOBALS_H
 #define D3D8_GLOBALS_H
 
-#include "Interception/Hooks/D3D8/types.h"
-#include <mutex>
+#include "Interception/Hooks/Common/export_hook.h"
 
 namespace Interception
 {
@@ -14,12 +13,8 @@ namespace Interception
     {
         namespace D3D8
         {
-            /* Real Direct3DCreate8. Resolved at runtime, as this DLL does not link against d3d8. */
-            extern void* g_cached_direct3d_create8_function_ptr;
-
-            /* g_is_direct3d_create8_hooked is set once Direct3DCreate8 has been hooked. Guarded by g_hook_mutex. */
-            extern std::mutex g_hook_mutex;
-            extern bool       g_is_direct3d_create8_hooked;
+            /* Direct3DCreate8 of d3d8.dll, which this DLL does not link against: found, and hooked, once d3d8.dll is loaded. */
+            extern Interception::Hooks::Common::ExportHook g_direct3d_create8_export_hook;
         }
     }
 }

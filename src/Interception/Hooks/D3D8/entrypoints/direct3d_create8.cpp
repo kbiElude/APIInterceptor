@@ -46,7 +46,7 @@ Interception::Hooks::D3D8::IDirect3D8* __stdcall Interception::Hooks::D3D8::aiDi
 
     if (should_pass_through)
     {
-        result = reinterpret_cast<PFNDIRECT3DCREATE8PROC>(g_cached_direct3d_create8_function_ptr)(in_sdk_version);
+        result = reinterpret_cast<PFNDIRECT3DCREATE8PROC>(g_direct3d_create8_export_hook.get_original_function_ptr() )(in_sdk_version);
     }
 
     /* Hook the methods of IDirect3D8. */

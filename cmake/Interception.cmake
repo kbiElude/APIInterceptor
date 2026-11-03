@@ -64,9 +64,11 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
     file(GLOB HooksCommonIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/Common/*.h")
     file(GLOB HooksCommonSources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/Common/*.cpp")
 
-    add_library(HooksCommon STATIC ${CommonIncludes}
-                                   ${HooksCommonIncludes}
-                                   ${HooksCommonSources})
+    add_library          (HooksCommon STATIC ${CommonIncludes}
+                                             ${HooksCommonIncludes}
+                                             ${HooksCommonSources})
+    add_dependencies     (HooksCommon Detours Kernel32)
+    target_link_libraries(HooksCommon Detours Kernel32)
 
     add_library          (D3D8 STATIC ${CommonIncludes}
                                       ${D3D8Includes}

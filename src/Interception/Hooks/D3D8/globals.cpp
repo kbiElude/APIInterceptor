@@ -2,9 +2,9 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
+#include "Interception/Hooks/D3D8/entrypoints.h"
 #include "Interception/Hooks/D3D8/globals.h"
 
-void* Interception::Hooks::D3D8::g_cached_direct3d_create8_function_ptr = nullptr;
-
-std::mutex Interception::Hooks::D3D8::g_hook_mutex;
-bool       Interception::Hooks::D3D8::g_is_direct3d_create8_hooked = false;
+Interception::Hooks::Common::ExportHook Interception::Hooks::D3D8::g_direct3d_create8_export_hook(L"d3d8.dll",
+                                                                                                  "Direct3DCreate8",
+                                                                                                  reinterpret_cast<void*>(&Interception::Hooks::D3D8::aiDirect3DCreate8) );

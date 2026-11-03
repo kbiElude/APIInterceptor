@@ -33,10 +33,11 @@
 <h3>APIInterceptor (<code>Common</code>)</h3>
 <p><em>Library of objects, compiled into every DLL that hooks.</em> The machinery that does not depend on an API: the registry of callbacks that run before and after each function, the gate that stops the interceptor from seeing its own calls, the store of the data chunks that a call carries, the logger, the failure of unsupported values (<code>AI_FAIL_UNSUPPORTED</code>), and the types of the workload file. Its namespace is <code>APIInterceptor</code>.</p>
 
-<h3>D3D8, OpenGL, WGL, GDI32, User32, Kernel32</h3>
+<h3>D3D8, HooksCommon, OpenGL, WGL, GDI32, User32, Kernel32</h3>
 <p><em>Libraries, one for each set of entry points.</em></p>
 <ul>
-  <li><code>D3D8</code> hooks Direct3D 8 through the tables of methods of its objects. Besides the entry points it has the policy of what is hooked, the construction and modification of typed arguments, and the tracker of locks, so that the data a program writes into a buffer or a surface is known when it is unlocked.</li>
+  <li><code>D3D8</code> hooks Direct3D 8 through the tables of methods of its objects. Besides the entry points it has the policy of what is hooked and the modification of typed arguments. What it shares with the other COM-based APIs is in <code>HooksCommon</code>; it adds its traits to it.</li>
+  <li><code>HooksCommon</code> (<code>Interception/Hooks/Common</code>) is what the hooks of the APIs made of COM objects have in common: the hook of a function exported by a DLL, found once the DLL is loaded; the registry of the patched tables of methods, and the table of hooks that fills them; the hook of one method, which an API tunes with its traits (how its arguments are stored, the extra data and bookkeeping of a method, which call ends a frame); the capture of arguments by category; and the tracker of locks, so that the data a program writes into a buffer or a surface is known when it is unlocked.</li>
   <li><code>OpenGL</code> hooks the functions of each version and extension, a directory for each. It keeps the state that is per context in a registry of contexts.</li>
   <li><code>WGL</code> hooks the creation and the use of OpenGL contexts on Windows.</li>
   <li><code>GDI32</code> hooks the choice of the pixel format and the swap of buffers; <code>User32</code> hooks the creation of windows and device contexts. Together with <code>WGL</code> they are what a workload needs to put the window and the context back at replay. They do not draw.</li>
