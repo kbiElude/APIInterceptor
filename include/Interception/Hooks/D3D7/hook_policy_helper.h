@@ -32,6 +32,11 @@ namespace Interception
                                                                                         const uint32_t&                    in_vertex_format,
                                                                                         const uint32_t&                    in_n_vertices);
 
+                /* Tells if the surface is the primary one, which is what the screen shows (the caps of the surface say so). The blit of a
+                 * frame to it ends the frame.
+                 */
+                static bool is_primary_surface(IDirectDrawSurface7* in_surface_ptr);
+
                 /* Remembers the region of a surface that was locked. */
                 static void on_surface_locked(const void*           in_surface_ptr,
                                               const RECT*           in_rect_ptr,

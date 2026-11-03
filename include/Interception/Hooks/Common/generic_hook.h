@@ -10,7 +10,7 @@
  *   ArgumentCapture<T>      how an argument of type T is stored (create_pre_argument(), create_post_argument())
  *   HookPolicy<function>    the extra arguments and bookkeeping of a method (see HookPolicyBase)
  *   ObjectPatcher<T>        hooks the interface which an argument of type T hands out (patch())
- *   is_frame_boundary(f)    tells if a call of the function ends a frame
+ *   is_frame_boundary(f, a) tells if a call of the function with the arguments ends a frame
  *   repairs_vtables         true if the runtime of the API is known to overwrite the hooks in the vtables it hands out
  */
 #ifndef HOOKS_COMMON_GENERIC_HOOK_H
@@ -118,7 +118,8 @@ ReturnType __stdcall Interception::Hooks::Common::GenericHook<Traits, ReturnType
     /* A callback may have the call not made; the caller of the hook gets a default result then. */
     AI_ASSERT(original_function_ptr != nullptr);
 
-    if (Traits::is_frame_boundary(function) )
+    if (Traits::is_frame_boundary(function,
+                                  in_arguments...) )
     {
         APIInterceptor::g_logger_ptr->on_frame_presented();
     }

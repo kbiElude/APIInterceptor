@@ -362,7 +362,7 @@ int Capture::APIDumpPrinter::run(int   in_argc,
             }
 
             /* A frame boundary is detected regardless of --api, so that frame numbering stays stable. */
-            if (Capture::APIDumpLoader::is_frame_boundary(current_api_call.func) )
+            if (Capture::APIDumpLoader::is_frame_boundary(current_api_call) )
             {
                 n_frame++;
             }

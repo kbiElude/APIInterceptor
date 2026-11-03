@@ -31,6 +31,11 @@ unset(CMAKE_DEBUG_POSTFIX CACHE)
 if (MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
+    # A program may handle a hardware exception (an access violation) which a hooked call raises. The destructors of the hook it unwinds
+    # through must run then (the tracker of the call is told that the call has ended); with the default /EHsc they do not, and the thread
+    # would take every later call for a nested one, and record nothing more.
+    string(REPLACE "/EHsc" "/EHa" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
 endif (MSVC)
 

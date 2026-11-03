@@ -65,6 +65,35 @@ namespace Interception
                                              IUnknown*   in_outer_ptr);
             };
 
+            /* Whether the blit goes to the primary surface (see APIInterceptor::D3D7_BLT_PRESENTS_ARGUMENT). */
+            template<>
+            struct HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIRECTDRAWSURFACE7_BLT> : public HookPolicyBase
+            {
+                static const uint32_t n_extra_arguments = 1; /* is the destination the primary surface */
+
+                static void create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
+                                                   IDirectDrawSurface7*                 in_self,
+                                                   const RECT*                          in_destination_rect_ptr,
+                                                   IDirectDrawSurface7*                 in_source_ptr,
+                                                   const RECT*                          in_source_rect_ptr,
+                                                   DWORD                                in_flags,
+                                                   const DDBLTFX*                       in_effects_ptr);
+            };
+
+            template<>
+            struct HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIRECTDRAWSURFACE7_BLTFAST> : public HookPolicyBase
+            {
+                static const uint32_t n_extra_arguments = 1; /* is the destination the primary surface */
+
+                static void create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
+                                                   IDirectDrawSurface7*                 in_self,
+                                                   DWORD                                in_x,
+                                                   DWORD                                in_y,
+                                                   IDirectDrawSurface7*                 in_source_ptr,
+                                                   const RECT*                          in_source_rect_ptr,
+                                                   DWORD                                in_transfer_flags);
+            };
+
             template<>
             struct HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_CLEAR> : public HookPolicyBase
             {

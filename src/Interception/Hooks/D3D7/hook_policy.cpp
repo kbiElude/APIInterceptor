@@ -27,6 +27,42 @@ void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_DIRE
     }
 }
 
+void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIRECTDRAWSURFACE7_BLT>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
+                                                                                                                            IDirectDrawSurface7*                 in_self,
+                                                                                                                            const RECT*                          in_destination_rect_ptr,
+                                                                                                                            IDirectDrawSurface7*                 in_source_ptr,
+                                                                                                                            const RECT*                          in_source_rect_ptr,
+                                                                                                                            DWORD                                in_flags,
+                                                                                                                            const DDBLTFX*                       in_effects_ptr)
+{
+    (void) in_destination_rect_ptr;
+    (void) in_source_ptr;
+    (void) in_source_rect_ptr;
+    (void) in_flags;
+    (void) in_effects_ptr;
+
+    out_arguments_ptr[0] = Interception::Hooks::Common::ArgumentFactory::create_scalar(HookPolicyHelper::is_primary_surface(in_self) ? 1u
+                                                                                                                                      : 0u);
+}
+
+void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIRECTDRAWSURFACE7_BLTFAST>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
+                                                                                                                                IDirectDrawSurface7*                 in_self,
+                                                                                                                                DWORD                                in_x,
+                                                                                                                                DWORD                                in_y,
+                                                                                                                                IDirectDrawSurface7*                 in_source_ptr,
+                                                                                                                                const RECT*                          in_source_rect_ptr,
+                                                                                                                                DWORD                                in_transfer_flags)
+{
+    (void) in_x;
+    (void) in_y;
+    (void) in_source_ptr;
+    (void) in_source_rect_ptr;
+    (void) in_transfer_flags;
+
+    out_arguments_ptr[0] = Interception::Hooks::Common::ArgumentFactory::create_scalar(HookPolicyHelper::is_primary_surface(in_self) ? 1u
+                                                                                                                                      : 0u);
+}
+
 void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_CLEAR>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
                                                                                                                             IDirect3DDevice7*                    in_self,
                                                                                                                             DWORD                                in_count,

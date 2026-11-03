@@ -3,6 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "Capture/APIDumpLoader/api_info.h"
+#include "Capture/APIDumpLoader/APIDumpLoader.h"
 #include "Common/frame_boundary.h"
 #include "Common/macros.h"
 #include <string.h>
@@ -129,9 +130,11 @@ const std::vector<Capture::APIDumpLoader::APIGroup>& Capture::APIDumpLoader::get
     return result_vec;
 }
 
-bool Capture::APIDumpLoader::is_frame_boundary(const APIInterceptor::APIFunction& in_function)
+bool Capture::APIDumpLoader::is_frame_boundary(const DumpedAPICall& in_call)
 {
-    return APIInterceptor::is_frame_boundary(in_function);
+    return APIInterceptor::is_frame_boundary(in_call.func,
+                                             static_cast<uint32_t>(in_call.arg_in_vec.size() ),
+                                             in_call.arg_in_vec.data() );
 }
 
 bool Capture::APIDumpLoader::parse_api_group_name(const char* in_name_ptr,

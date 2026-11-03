@@ -15,6 +15,8 @@ namespace Capture
 {
     namespace APIDumpLoader
     {
+        struct DumpedAPICall;
+
         enum class APIGroup
         {
             GDI32,
@@ -33,8 +35,8 @@ namespace Capture
         /* Every group but Unknown, in the order of the enum. */
         const std::vector<APIGroup>& get_api_groups();
 
-        /* True for calls which end a frame (a swapchain present). */
-        bool is_frame_boundary(const APIInterceptor::APIFunction& in_function);
+        /* True for calls which end a frame (a present, a flip, a blit to the screen: see Common/frame_boundary.h). */
+        bool is_frame_boundary(const DumpedAPICall& in_call);
 
         bool parse_api_group_name(const char* in_name_ptr,
                                   APIGroup*   out_group_ptr);

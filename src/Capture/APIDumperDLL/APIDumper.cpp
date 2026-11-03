@@ -270,7 +270,9 @@ void APIDumper::on_post_callback(APIInterceptor::APIFunction                in_a
          *
          * TODO: This will break down badly for apps that do NOT use back buffer..
          */
-        if (APIInterceptor::is_frame_boundary(in_api_func) )
+        if (APIInterceptor::is_frame_boundary(in_api_func,
+                                              in_n_arguments_out,
+                                              in_arguments_out_ptr) )
         {
             this_ptr->m_recorded.n_frames_dumped++;
 

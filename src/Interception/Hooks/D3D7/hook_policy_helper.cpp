@@ -118,6 +118,28 @@ APIInterceptor::APIFunctionArgument Interception::Hooks::D3D7::HookPolicyHelper:
                                                                       static_cast<uint32_t>(chunk_u8_vec.size() ));
 }
 
+bool Interception::Hooks::D3D7::HookPolicyHelper::is_primary_surface(IDirectDrawSurface7* in_surface_ptr)
+{
+    constexpr uint32_t CAPS_PRIMARY_SURFACE = 0x00000200;
+
+    DDSCAPS2   caps                  = {};
+    const auto get_caps_func_ptr     = reinterpret_cast<PFN_IDIRECTDRAWSURFACE7_GETCAPS>(
+                                           Interception::Hooks::Common::VTableRegistry::get_ptr()->get_original_function_ptr(in_surface_ptr,
+                                                                                                                             VTABLE_INDEX_IDIRECTDRAWSURFACE7_GETCAPS) );
+    bool       result                = false;
+
+    if (get_caps_func_ptr != nullptr)
+    {
+        if (SUCCEEDED(get_caps_func_ptr(in_surface_ptr,
+                                       &caps) ) )
+        {
+            result = ((caps.dwCaps & CAPS_PRIMARY_SURFACE) != 0);
+        }
+    }
+
+    return result;
+}
+
 void Interception::Hooks::D3D7::HookPolicyHelper::on_surface_locked(const void*           in_surface_ptr,
                                                                     const RECT*           in_rect_ptr,
                                                                     const DDSURFACEDESC2* in_locked_description_ptr,

@@ -31,9 +31,14 @@ namespace Interception
 
                 static constexpr bool repairs_vtables = false;
 
-                static constexpr bool is_frame_boundary(const APIInterceptor::APIFunction& in_function)
+                /* The calls of D3D8 which end a frame do so whatever their arguments. */
+                template<typename... Arguments>
+                static bool is_frame_boundary(const APIInterceptor::APIFunction& in_function,
+                                              const Arguments&...)
                 {
-                    return APIInterceptor::is_frame_boundary(in_function);
+                    return APIInterceptor::is_frame_boundary(in_function,
+                                                             0,
+                                                             nullptr);
                 }
             };
         }

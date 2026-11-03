@@ -311,7 +311,7 @@ void Replay::ReplayEngineDLL::ReplayEngine::play_until_frame_boundary()
             continue;
         }
 
-        const bool is_frame_boundary = Capture::APIDumpLoader::is_frame_boundary(call_ptr->func);
+        const bool is_frame_boundary = Capture::APIDumpLoader::is_frame_boundary(*call_ptr);
 
         if (is_frame_boundary)
         {
