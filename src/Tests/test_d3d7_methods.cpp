@@ -42,11 +42,16 @@ TEST(D3D7Methods, EveryInterfaceHasTheExpectedNumberOfMethods)
 
     static const ExpectedCount expected_count_array[] =
     {
-        { Interception::Hooks::D3D7::Interface::IDIRECT3D7,             8  },
-        { Interception::Hooks::D3D7::Interface::IDIRECT3DDEVICE7,       49 },
-        { Interception::Hooks::D3D7::Interface::IDIRECT3DVERTEXBUFFER7, 9  },
-        { Interception::Hooks::D3D7::Interface::IDIRECTDRAW7,           30 },
-        { Interception::Hooks::D3D7::Interface::IDIRECTDRAWSURFACE7,    49 },
+        { Interception::Hooks::D3D7::Interface::IDIRECT3D7,              8  },
+        { Interception::Hooks::D3D7::Interface::IDIRECT3DDEVICE7,        49 },
+        { Interception::Hooks::D3D7::Interface::IDIRECT3DVERTEXBUFFER7,  9  },
+        { Interception::Hooks::D3D7::Interface::IDIRECTDRAW,             3  }, /* only the methods of IUnknown */
+        { Interception::Hooks::D3D7::Interface::IDIRECTDRAW7,            30 },
+        { Interception::Hooks::D3D7::Interface::IDIRECTDRAWCLIPPER,      9  },
+        { Interception::Hooks::D3D7::Interface::IDIRECTDRAWCOLORCONTROL, 5  },
+        { Interception::Hooks::D3D7::Interface::IDIRECTDRAWGAMMACONTROL, 5  },
+        { Interception::Hooks::D3D7::Interface::IDIRECTDRAWPALETTE,      7  },
+        { Interception::Hooks::D3D7::Interface::IDIRECTDRAWSURFACE7,     49 },
     };
     uint32_t total = 0;
 

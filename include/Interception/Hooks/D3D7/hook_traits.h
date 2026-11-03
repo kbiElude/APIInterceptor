@@ -7,6 +7,7 @@
 #ifndef D3D7_HOOK_TRAITS_H
 #define D3D7_HOOK_TRAITS_H
 
+#include "Common/frame_boundary.h"
 #include "Interception/Hooks/D3D7/argument_capture.h"
 #include "Interception/Hooks/D3D7/hook_policy.h"
 #include "Interception/Hooks/D3D7/object_patcher.h"
@@ -28,12 +29,12 @@ namespace Interception
                 template<typename T>
                 using ObjectPatcher = Interception::Hooks::D3D7::ObjectPatcher<T>;
 
-                /* Flipping the surfaces ends the frame of a program that has the screen to itself. The copy of a frame into a
-                 * window (a Blt to the primary surface) is not recognized yet.
-                 */
+                /* Direct3D 7 puts its own functions back into the slots of its draw calls when the first draw is made. */
+                static constexpr bool repairs_vtables = true;
+
                 static constexpr bool is_frame_boundary(const APIInterceptor::APIFunction& in_function)
                 {
-                    return in_function == APIInterceptor::APIFUNCTION_D3D7_IDIRECTDRAWSURFACE7_FLIP;
+                    return APIInterceptor::is_frame_boundary(in_function);
                 }
             };
         }

@@ -34,14 +34,66 @@ const char* Interception::Core::D3D7Utils::get_function_name_ptr(const APIInterc
     const Interception::Hooks::D3D7::MethodInfo* method_info_ptr = get_method_info_ptr(in_function);
     const char*                                  result_ptr      = nullptr;
 
-    if (in_function == APIInterceptor::APIFUNCTION_D3D7_DIRECTDRAWCREATEEX)
+    switch (in_function)
     {
-        result_ptr = "DirectDrawCreateEx";
-    }
-    else
-    if (method_info_ptr != nullptr)
-    {
-        result_ptr = method_info_ptr->full_name_ptr;
+        case APIInterceptor::APIFUNCTION_D3D7_DIRECTDRAWCREATE:
+        {
+            result_ptr = "DirectDrawCreate";
+
+            break;
+        }
+
+        case APIInterceptor::APIFUNCTION_D3D7_DIRECTDRAWCREATECLIPPER:
+        {
+            result_ptr = "DirectDrawCreateClipper";
+
+            break;
+        }
+
+        case APIInterceptor::APIFUNCTION_D3D7_DIRECTDRAWCREATEEX:
+        {
+            result_ptr = "DirectDrawCreateEx";
+
+            break;
+        }
+
+        case APIInterceptor::APIFUNCTION_D3D7_DIRECTDRAWENUMERATEA:
+        {
+            result_ptr = "DirectDrawEnumerateA";
+
+            break;
+        }
+
+        case APIInterceptor::APIFUNCTION_D3D7_DIRECTDRAWENUMERATEEXA:
+        {
+            result_ptr = "DirectDrawEnumerateExA";
+
+            break;
+        }
+
+        case APIInterceptor::APIFUNCTION_D3D7_DIRECTDRAWENUMERATEEXW:
+        {
+            result_ptr = "DirectDrawEnumerateExW";
+
+            break;
+        }
+
+        case APIInterceptor::APIFUNCTION_D3D7_DIRECTDRAWENUMERATEW:
+        {
+            result_ptr = "DirectDrawEnumerateW";
+
+            break;
+        }
+
+        default:
+        {
+            if (method_info_ptr != nullptr)
+            {
+                result_ptr = method_info_ptr->full_name_ptr;
+            }
+
+            break;
+        }
     }
 
     return result_ptr;

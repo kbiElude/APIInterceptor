@@ -7,6 +7,7 @@
 #ifndef D3D8_HOOK_TRAITS_H
 #define D3D8_HOOK_TRAITS_H
 
+#include "Common/frame_boundary.h"
 #include "Interception/Hooks/D3D8/argument_capture.h"
 #include "Interception/Hooks/D3D8/hook_policy.h"
 #include "Interception/Hooks/D3D8/object_patcher.h"
@@ -28,10 +29,11 @@ namespace Interception
                 template<typename T>
                 using ObjectPatcher = Interception::Hooks::D3D8::ObjectPatcher<T>;
 
-                /* The device's Present call ends the frame. */
+                static constexpr bool repairs_vtables = false;
+
                 static constexpr bool is_frame_boundary(const APIInterceptor::APIFunction& in_function)
                 {
-                    return in_function == APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_PRESENT;
+                    return APIInterceptor::is_frame_boundary(in_function);
                 }
             };
         }

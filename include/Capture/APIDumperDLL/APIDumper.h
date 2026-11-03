@@ -40,8 +40,8 @@ private:
     struct DumpedAPICall
     {
         APIInterceptor::APIFunction         api_func          = APIInterceptor::APIFunction::APIFUNCTION_UNKNOWN;
-        APIInterceptor::APIFunctionArgument arguments_in [14] {};
-        APIInterceptor::APIFunctionArgument arguments_out[14] {};
+        APIInterceptor::APIFunctionArgument arguments_in [APIInterceptor::MAX_N_FUNCTION_ARGUMENTS] {};
+        APIInterceptor::APIFunctionArgument arguments_out[APIInterceptor::MAX_N_FUNCTION_ARGUMENTS] {};
         bool                                is_completed      = false; /* post-callback seen            */
         uint32_t                            n_arguments_in    = 0;
         uint32_t                            n_arguments_out   = 0;

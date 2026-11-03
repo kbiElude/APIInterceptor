@@ -3,6 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "Interception/Hooks/Common/argument_factory.h"
+#include "Interception/Hooks/Common/lock_capture.h"
 #include "Interception/Hooks/Common/lock_tracker.h"
 #include "Interception/Hooks/D3D8/hook_policy_helper.h"
 #include "Interception/Core/D3D8Utils/surface_layout.h"
@@ -11,22 +12,9 @@
 APIInterceptor::APIFunctionArgument Interception::Hooks::D3D8::HookPolicyHelper::create_locked_data_argument(const void*     in_object_ptr,
                                                                                                              const uint32_t& in_level)
 {
-    LockRecord lock_record = {};
-    bool       has_data    = Interception::Hooks::Common::LockTracker::get_ptr()->get_lock(in_object_ptr,
-                                                                                           in_level,
-                                                                                          &lock_record);
-
-    /* Nothing was written to a resource which was locked for reading. */
-    if (has_data                                    &&
-        (lock_record.flags & D3DLOCK_READONLY) != 0)
-    {
-        has_data = false;
-    }
-
-    return Interception::Hooks::Common::ArgumentFactory::create_chunk(has_data ? lock_record.data_ptr
-                                                                               : nullptr,
-                                                                      has_data ? lock_record.n_bytes
-                                                                               : 0);
+    return Interception::Hooks::Common::create_locked_data_argument(in_object_ptr,
+                                                                    in_level,
+                                                                    D3DLOCK_READONLY);
 }
 
 void Interception::Hooks::D3D8::HookPolicyHelper::create_present_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
@@ -137,63 +125,6 @@ uint32_t Interception::Hooks::D3D8::HookPolicyHelper::get_n_vertex_declaration_t
 
     return std::min<uint32_t>(n_tokens,
                               MAX_N_TOKENS);
-}
-
-uint32_t Interception::Hooks::D3D8::HookPolicyHelper::get_n_vertices(const D3DPRIMITIVETYPE& in_primitive_type,
-                                                                     const uint32_t&         in_primitive_count)
-{
-    constexpr uint32_t LINE_N_VERTICES                = 2;
-    constexpr uint32_t LINE_STRIP_N_EXTRA_VERTICES    = 1; /* strips and fans share vertices between primitives */
-    constexpr uint32_t TRIANGLE_N_VERTICES            = 3;
-    constexpr uint32_t TRIANGLE_STRIP_N_EXTRA_VERTICES = 2;
-
-    uint32_t result = 0;
-
-    switch (in_primitive_type)
-    {
-        case D3DPT_POINTLIST:
-        {
-            result = in_primitive_count;
-
-            break;
-        }
-
-        case D3DPT_LINELIST:
-        {
-            result = in_primitive_count * LINE_N_VERTICES;
-
-            break;
-        }
-
-        case D3DPT_LINESTRIP:
-        {
-            result = in_primitive_count + LINE_STRIP_N_EXTRA_VERTICES;
-
-            break;
-        }
-
-        case D3DPT_TRIANGLELIST:
-        {
-            result = in_primitive_count * TRIANGLE_N_VERTICES;
-
-            break;
-        }
-
-        case D3DPT_TRIANGLEFAN:
-        case D3DPT_TRIANGLESTRIP:
-        {
-            result = in_primitive_count + TRIANGLE_STRIP_N_EXTRA_VERTICES;
-
-            break;
-        }
-
-        default:
-        {
-            break;
-        }
-    }
-
-    return result;
 }
 
 uint32_t Interception::Hooks::D3D8::HookPolicyHelper::get_surface_region_n_bytes(const D3DFORMAT& in_format,

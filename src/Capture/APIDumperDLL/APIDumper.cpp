@@ -4,6 +4,8 @@
  */
 #include <Windows.h>
 #include "Common/callbacks.h"
+#include "Common/frame_boundary.h"
+#include "Common/macros.h"
 #include "Common/workload_format.h"
 #include "GL/gl.h"
 #include "Interception/Hooks/Kernel32/callbacks.h"
@@ -246,6 +248,11 @@ void APIDumper::on_post_callback(APIInterceptor::APIFunction                in_a
 
             if (deque_iterator != this_ptr->m_recorded.api_call_deque.rend() )
             {
+                if (in_n_arguments_out > APIInterceptor::MAX_N_FUNCTION_ARGUMENTS)
+                {
+                    AI_FAIL_UNSUPPORTED(in_n_arguments_out);
+                }
+
                 deque_iterator->is_completed   = true;
                 deque_iterator->n_arguments_out     = in_n_arguments_out;
                 deque_iterator->returned_value = *in_returned_value_ptr;
@@ -263,8 +270,7 @@ void APIDumper::on_post_callback(APIInterceptor::APIFunction                in_a
          *
          * TODO: This will break down badly for apps that do NOT use back buffer..
          */
-        if (in_api_func == APIInterceptor::APIFUNCTION_GDI32_SWAPBUFFERS             ||
-            in_api_func == APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_PRESENT)
+        if (APIInterceptor::is_frame_boundary(in_api_func) )
         {
             this_ptr->m_recorded.n_frames_dumped++;
 
@@ -286,7 +292,11 @@ void APIDumper::on_pre_callback(APIInterceptor::APIFunction                in_ap
 {
     APIDumper* this_ptr(reinterpret_cast<APIDumper*>(in_user_arg_ptr) );
 
-    assert(sizeof(DumpedAPICall::arguments_in) / sizeof(DumpedAPICall::arguments_in[0]) >= in_n_arguments_in);
+    /* Not an assert: a call with more arguments than the dump has room for must never be written past the end of its arrays. */
+    if (in_n_arguments_in > APIInterceptor::MAX_N_FUNCTION_ARGUMENTS)
+    {
+        AI_FAIL_UNSUPPORTED(in_n_arguments_in);
+    }
 
     if (in_api_func                          == APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_PRESENT &&
         this_ptr->m_recorded.n_frames_dumped <  this_ptr->m_settings.n_frames_to_dump                     &&

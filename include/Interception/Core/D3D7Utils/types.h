@@ -56,11 +56,16 @@ namespace Interception
                     static const Interception::Hooks::D3D7::Interface interface_value = Interception::Hooks::D3D7::Interface::interface_name; \
                 };
 
-            D3D7_INTERFACE_TRAITS(Interception::Hooks::D3D7::IDirect3D7,             IDIRECT3D7)
-            D3D7_INTERFACE_TRAITS(Interception::Hooks::D3D7::IDirect3DDevice7,       IDIRECT3DDEVICE7)
-            D3D7_INTERFACE_TRAITS(Interception::Hooks::D3D7::IDirect3DVertexBuffer7, IDIRECT3DVERTEXBUFFER7)
-            D3D7_INTERFACE_TRAITS(Interception::Hooks::D3D7::IDirectDraw7,           IDIRECTDRAW7)
-            D3D7_INTERFACE_TRAITS(Interception::Hooks::D3D7::IDirectDrawSurface7,    IDIRECTDRAWSURFACE7)
+            D3D7_INTERFACE_TRAITS(Interception::Hooks::D3D7::IDirect3D7,               IDIRECT3D7)
+            D3D7_INTERFACE_TRAITS(Interception::Hooks::D3D7::IDirect3DDevice7,         IDIRECT3DDEVICE7)
+            D3D7_INTERFACE_TRAITS(Interception::Hooks::D3D7::IDirect3DVertexBuffer7,   IDIRECT3DVERTEXBUFFER7)
+            D3D7_INTERFACE_TRAITS(Interception::Hooks::D3D7::IDirectDraw,              IDIRECTDRAW)
+            D3D7_INTERFACE_TRAITS(Interception::Hooks::D3D7::IDirectDraw7,             IDIRECTDRAW7)
+            D3D7_INTERFACE_TRAITS(Interception::Hooks::D3D7::IDirectDrawClipper,       IDIRECTDRAWCLIPPER)
+            D3D7_INTERFACE_TRAITS(Interception::Hooks::D3D7::IDirectDrawColorControl,  IDIRECTDRAWCOLORCONTROL)
+            D3D7_INTERFACE_TRAITS(Interception::Hooks::D3D7::IDirectDrawGammaControl,  IDIRECTDRAWGAMMACONTROL)
+            D3D7_INTERFACE_TRAITS(Interception::Hooks::D3D7::IDirectDrawPalette,       IDIRECTDRAWPALETTE)
+            D3D7_INTERFACE_TRAITS(Interception::Hooks::D3D7::IDirectDrawSurface7,      IDIRECTDRAWSURFACE7)
             #undef D3D7_INTERFACE_TRAITS
 
             #define D3D7_SCALAR_OUT_TRAITS(type) \
@@ -79,16 +84,28 @@ namespace Interception
                     static const bool is_input_output = is_input_output_value; \
                 };
 
-            D3D7_STRUCT_TRAITS(Interception::Hooks::D3D7::D3DLIGHT7,            false)
-            D3D7_STRUCT_TRAITS(Interception::Hooks::D3D7::D3DMATERIAL7,         false)
-            D3D7_STRUCT_TRAITS(Interception::Hooks::D3D7::D3DMATRIX,            false)
-            D3D7_STRUCT_TRAITS(Interception::Hooks::D3D7::D3DRECT,              false)
-            D3D7_STRUCT_TRAITS(Interception::Hooks::D3D7::D3DVERTEXBUFFERDESC,  true)
-            D3D7_STRUCT_TRAITS(Interception::Hooks::D3D7::D3DVIEWPORT7,         false)
-            D3D7_STRUCT_TRAITS(Interception::Hooks::D3D7::DDCOLORKEY,           false)
-            D3D7_STRUCT_TRAITS(Interception::Hooks::D3D7::DDPIXELFORMAT,        false)
-            D3D7_STRUCT_TRAITS(Interception::Hooks::D3D7::DDSCAPS2,             false)
-            D3D7_STRUCT_TRAITS(Interception::Hooks::D3D7::DDSURFACEDESC2,       true)
+            /* A D3DRECT is not here: the rectangles of a Clear are an array (see HookPolicy). */
+            D3D7_STRUCT_TRAITS(::POINT,                                                      false)
+            D3D7_STRUCT_TRAITS(::RECT,                                                       false)
+            D3D7_STRUCT_TRAITS(Interception::Hooks::D3D7::D3DCLIPPLANE,                      false)
+            D3D7_STRUCT_TRAITS(Interception::Hooks::D3D7::D3DCLIPSTATUS,                     false)
+            D3D7_STRUCT_TRAITS(Interception::Hooks::D3D7::D3DDEVICEDESC7,                    false)
+            D3D7_STRUCT_TRAITS(Interception::Hooks::D3D7::D3DDRAWPRIMITIVESTRIDEDDATA,       false)
+            D3D7_STRUCT_TRAITS(Interception::Hooks::D3D7::D3DLIGHT7,                         false)
+            D3D7_STRUCT_TRAITS(Interception::Hooks::D3D7::D3DMATERIAL7,                      false)
+            D3D7_STRUCT_TRAITS(Interception::Hooks::D3D7::D3DMATRIX,                         false)
+            D3D7_STRUCT_TRAITS(Interception::Hooks::D3D7::D3DVERTEXBUFFERDESC,               true)
+            D3D7_STRUCT_TRAITS(Interception::Hooks::D3D7::D3DVIEWPORT7,                      false)
+            D3D7_STRUCT_TRAITS(Interception::Hooks::D3D7::DDBLTFX,                           false)
+            D3D7_STRUCT_TRAITS(Interception::Hooks::D3D7::DDCAPS,                            false)
+            D3D7_STRUCT_TRAITS(Interception::Hooks::D3D7::DDCOLORCONTROL,                    false)
+            D3D7_STRUCT_TRAITS(Interception::Hooks::D3D7::DDCOLORKEY,                        false)
+            D3D7_STRUCT_TRAITS(Interception::Hooks::D3D7::DDDEVICEIDENTIFIER2,               false)
+            D3D7_STRUCT_TRAITS(Interception::Hooks::D3D7::DDGAMMARAMP,                       false)
+            D3D7_STRUCT_TRAITS(Interception::Hooks::D3D7::DDOVERLAYFX,                       false)
+            D3D7_STRUCT_TRAITS(Interception::Hooks::D3D7::DDPIXELFORMAT,                     false)
+            D3D7_STRUCT_TRAITS(Interception::Hooks::D3D7::DDSCAPS2,                          false)
+            D3D7_STRUCT_TRAITS(Interception::Hooks::D3D7::DDSURFACEDESC2,                    true)
             #undef D3D7_STRUCT_TRAITS
 
             template<typename T>

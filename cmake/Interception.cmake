@@ -50,8 +50,7 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
 
     file(GLOB D3D7Includes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/D3D7/*.h"
                            "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/D3D7/*.inl")
-    file(GLOB D3D7Sources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/D3D7/*.cpp"
-                           "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/D3D7/entrypoints/*.cpp")
+    file(GLOB D3D7Sources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/D3D7/*.cpp")
 
     file(GLOB D3D7UtilsIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Interception/Core/D3D7Utils/*.h")
     file(GLOB D3D7UtilsSources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Core/D3D7Utils/*.cpp")

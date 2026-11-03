@@ -18,7 +18,7 @@ Interception::Hooks::Common::HookTable* Interception::Hooks::D3D8::get_hook_tabl
                 {reinterpret_cast<void*>(&Interception::Hooks::Common::GenericHook<HookTraits, \
                                                                                    PFN_##INTERFACE_TAG##_##METHOD_TAG, \
                                                                                    APIInterceptor::APIFUNCTION_D3D8_##INTERFACE_TAG##_##METHOD_TAG, \
-                                                                                   VTABLE_INDEX_##INTERFACE_TAG##_##METHOD_TAG>::invoke), \
+                                                                                   Interception::Hooks::Common::VTableOriginalFunction<VTABLE_INDEX_##INTERFACE_TAG##_##METHOD_TAG> >::invoke), \
                  VTABLE_INDEX_##INTERFACE_TAG##_##METHOD_TAG} \
             );
         #include "Interception/Hooks/D3D8/d3d8_methods.inl"

@@ -42,10 +42,6 @@ namespace Interception
                 /* Number of tokens of a vertex shader declaration, the end token included. */
                 static uint32_t get_n_vertex_declaration_tokens(const DWORD* in_declaration_ptr);
 
-                /* Number of vertices which a draw call consumes. */
-                static uint32_t get_n_vertices(const D3DPRIMITIVETYPE& in_primitive_type,
-                                               const uint32_t&         in_primitive_count);
-
                 /* Bytes of the pixels in rows of a surface, for a given format. Compressed formats are counted in 4x4 blocks. */
                 static uint32_t get_surface_region_n_bytes(const D3DFORMAT& in_format,
                                                            const uint32_t&  in_width,

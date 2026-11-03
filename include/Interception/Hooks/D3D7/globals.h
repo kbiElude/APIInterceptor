@@ -13,8 +13,16 @@ namespace Interception
     {
         namespace D3D7
         {
-            /* DirectDrawCreateEx of ddraw.dll, which this DLL does not link against: found, and hooked, once ddraw.dll is loaded. */
+            /* The functions which ddraw.dll exports. This DLL does not link against it: they are found, and hooked, once ddraw.dll
+             * is loaded.
+             */
+            extern Interception::Hooks::Common::ExportHook g_direct_draw_create_clipper_export_hook;
+            extern Interception::Hooks::Common::ExportHook g_direct_draw_create_export_hook;
             extern Interception::Hooks::Common::ExportHook g_direct_draw_create_ex_export_hook;
+            extern Interception::Hooks::Common::ExportHook g_direct_draw_enumerate_a_export_hook;
+            extern Interception::Hooks::Common::ExportHook g_direct_draw_enumerate_ex_a_export_hook;
+            extern Interception::Hooks::Common::ExportHook g_direct_draw_enumerate_ex_w_export_hook;
+            extern Interception::Hooks::Common::ExportHook g_direct_draw_enumerate_w_export_hook;
         }
     }
 }

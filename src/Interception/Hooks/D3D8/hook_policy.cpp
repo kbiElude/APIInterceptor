@@ -4,6 +4,7 @@
  */
 #include "Interception/Hooks/Common/argument_factory.h"
 #include "Interception/Hooks/Common/lock_tracker.h"
+#include "Interception/Hooks/Common/primitive_utils.h"
 #include "Interception/Hooks/Common/vtable_registry.h"
 #include "Interception/Hooks/D3D8/hook_policy.h"
 #include "Interception/Hooks/D3D8/hook_policy_helper.h"
@@ -206,8 +207,8 @@ void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIR
     (void) in_self;
 
     out_arguments_ptr[0] = Interception::Hooks::Common::ArgumentFactory::create_chunk(in_index_data_ptr,
-                                                                                      HookPolicyHelper::get_n_vertices(in_primitive_type,
-                                                                                                                       in_primitive_count) * index_stride);
+                                                                                      Interception::Hooks::Common::get_n_vertices(static_cast<Interception::Hooks::Common::PrimitiveType>(in_primitive_type),
+                                                                                                                                  in_primitive_count) * index_stride);
     out_arguments_ptr[1] = Interception::Hooks::Common::ArgumentFactory::create_chunk(in_vertex_data_ptr,
                                                                                       (in_min_vertex_index + in_n_vertex_indices) * in_vertex_stride);
 }
@@ -222,8 +223,8 @@ void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIR
     (void) in_self;
 
     out_arguments_ptr[0] = Interception::Hooks::Common::ArgumentFactory::create_chunk(in_vertex_data_ptr,
-                                                                                      HookPolicyHelper::get_n_vertices(in_primitive_type,
-                                                                                                                       in_primitive_count) * in_vertex_stride);
+                                                                                      Interception::Hooks::Common::get_n_vertices(static_cast<Interception::Hooks::Common::PrimitiveType>(in_primitive_type),
+                                                                                                                                  in_primitive_count) * in_vertex_stride);
 }
 
 void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_DRAWRECTPATCH>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,

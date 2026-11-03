@@ -1089,10 +1089,16 @@ namespace APIInterceptor
         APIFUNCTION_D3D8_METHODS_FIRST = APIFUNCTION_D3D8_METHODS_BEGIN + 1,
         APIFUNCTION_D3D8_METHODS_LAST  = APIFUNCTION_D3D8_METHODS_END   - 1,
 
-        /* D3D7 (DirectDraw 7 and Direct3D 7): DirectDrawCreateEx is a flat export; the rest are COM methods generated from
+        /* D3D7 (DirectDraw 7 and Direct3D 7): the functions DirectDraw exports are flat; the rest are COM methods generated from
          * d3d7_methods.inl. Appended after D3D8, so that the IDs of the dumps made before it stay valid.
          */
+        APIFUNCTION_D3D7_DIRECTDRAWCREATE,
+        APIFUNCTION_D3D7_DIRECTDRAWCREATECLIPPER,
         APIFUNCTION_D3D7_DIRECTDRAWCREATEEX,
+        APIFUNCTION_D3D7_DIRECTDRAWENUMERATEA,
+        APIFUNCTION_D3D7_DIRECTDRAWENUMERATEEXA,
+        APIFUNCTION_D3D7_DIRECTDRAWENUMERATEEXW,
+        APIFUNCTION_D3D7_DIRECTDRAWENUMERATEW,
 
         APIFUNCTION_D3D7_METHODS_BEGIN,
 
@@ -1103,7 +1109,8 @@ namespace APIInterceptor
 
         APIFUNCTION_D3D7_METHODS_END,
 
-        APIFUNCTION_D3D7_FIRST         = APIFUNCTION_D3D7_DIRECTDRAWCREATEEX,
+        APIFUNCTION_D3D7_FIRST         = APIFUNCTION_D3D7_DIRECTDRAWCREATE,
+        APIFUNCTION_D3D7_EXPORTS_LAST  = APIFUNCTION_D3D7_DIRECTDRAWENUMERATEW,
         APIFUNCTION_D3D7_LAST          = APIFUNCTION_D3D7_METHODS_END   - 1,
         APIFUNCTION_D3D7_METHODS_FIRST = APIFUNCTION_D3D7_METHODS_BEGIN + 1,
         APIFUNCTION_D3D7_METHODS_LAST  = APIFUNCTION_D3D7_METHODS_END   - 1,
@@ -1145,6 +1152,9 @@ namespace APIInterceptor
     };
 
     typedef uint32_t DataChunkID;
+
+    /* The most arguments of an API function that a callback is given, the extra ones which a hook adds included. */
+    constexpr uint32_t MAX_N_FUNCTION_ARGUMENTS = 14;
 
     typedef struct APIFunctionArgument
     {

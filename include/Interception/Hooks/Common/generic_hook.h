@@ -2,14 +2,16 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  *
- * Hook of a COM method, generated from the method's function pointer type. It reports the call to the registered
- * callbacks, forwards it to the original method, and hooks the interfaces which the call has handed out.
+ * Hook of a COM method or of a function exported by a DLL, generated from the function pointer type. It reports the call to
+ * the registered callbacks, forwards it to the original function, and hooks the interfaces which the call has handed out.
+ * OriginalFunction tells where the original function is (see Common/original_function_providers.h).
  *
  * What is specific to an API comes from its traits type, which has:
  *   ArgumentCapture<T>      how an argument of type T is stored (create_pre_argument(), create_post_argument())
  *   HookPolicy<function>    the extra arguments and bookkeeping of a method (see HookPolicyBase)
  *   ObjectPatcher<T>        hooks the interface which an argument of type T hands out (patch())
  *   is_frame_boundary(f)    tells if a call of the function ends a frame
+ *   repairs_vtables         true if the runtime of the API is known to overwrite the hooks in the vtables it hands out
  */
 #ifndef HOOKS_COMMON_GENERIC_HOOK_H
 #define HOOKS_COMMON_GENERIC_HOOK_H
@@ -19,7 +21,7 @@
 #include "Common/macros.h"
 #include "Common/tracker.h"
 #include "Interception/Hooks/Common/hook_result.h"
-#include "Interception/Hooks/Common/vtable_registry.h"
+#include "Interception/Hooks/Common/original_function_providers.h"
 #include <algorithm>
 #include <array>
 #include <utility>
@@ -30,13 +32,16 @@ namespace Interception
     {
         namespace Common
         {
-            template<typename Traits, typename FunctionPtr, APIInterceptor::APIFunction function, uint32_t vtable_index>
+            template<typename Traits, typename FunctionPtr, APIInterceptor::APIFunction function, typename OriginalFunction>
             struct GenericHook;
 
-            template<typename Traits, typename ReturnType, typename... Arguments, APIInterceptor::APIFunction function, uint32_t vtable_index>
-            struct GenericHook<Traits, ReturnType (__stdcall*)(Arguments...), function, vtable_index>
+            template<typename Traits, typename ReturnType, typename... Arguments, APIInterceptor::APIFunction function, typename OriginalFunction>
+            struct GenericHook<Traits, ReturnType (__stdcall*)(Arguments...), function, OriginalFunction>
             {
                 typedef typename Traits::template HookPolicy<function> Policy;
+
+                static_assert(sizeof...(Arguments) + Policy::n_extra_arguments <= APIInterceptor::MAX_N_FUNCTION_ARGUMENTS,
+                              "The callbacks are given more arguments than the dumper has room for");
 
                 typedef std::array<APIInterceptor::APIFunctionArgument, sizeof...(Arguments) + Policy::n_extra_arguments> ArgumentArray;
                 typedef std::array<APIInterceptor::APIFunctionArgument, sizeof...(Arguments)>                             HeadArray;
@@ -49,19 +54,15 @@ namespace Interception
                                                        const bool&          in_is_pre_argument_valid,
                                                        std::index_sequence<Indices...>,
                                                        const Arguments&...   in_arguments);
-
-                template<typename Self, typename... Rest>
-                static const void* get_object_ptr(const Self& in_self,
-                                                  const Rest&...);
             };
         }
     }
 }
 
-template<typename Traits, typename ReturnType, typename... Arguments, APIInterceptor::APIFunction function, uint32_t vtable_index>
+template<typename Traits, typename ReturnType, typename... Arguments, APIInterceptor::APIFunction function, typename OriginalFunction>
 template<size_t... Indices>
-typename Interception::Hooks::Common::GenericHook<Traits, ReturnType (__stdcall*)(Arguments...), function, vtable_index>::HeadArray
-Interception::Hooks::Common::GenericHook<Traits, ReturnType (__stdcall*)(Arguments...), function, vtable_index>::create_post_arguments(const ArgumentArray&  in_pre_argument_array,
+typename Interception::Hooks::Common::GenericHook<Traits, ReturnType (__stdcall*)(Arguments...), function, OriginalFunction>::HeadArray
+Interception::Hooks::Common::GenericHook<Traits, ReturnType (__stdcall*)(Arguments...), function, OriginalFunction>::create_post_arguments(const ArgumentArray&  in_pre_argument_array,
                                                                                                                                          const bool&           in_is_pre_argument_valid,
                                                                                                                                          std::index_sequence<Indices...>,
                                                                                                                                          const Arguments&...   in_arguments)
@@ -71,16 +72,8 @@ Interception::Hooks::Common::GenericHook<Traits, ReturnType (__stdcall*)(Argumen
                                                                                in_is_pre_argument_valid)...}};
 }
 
-template<typename Traits, typename ReturnType, typename... Arguments, APIInterceptor::APIFunction function, uint32_t vtable_index>
-template<typename Self, typename... Rest>
-const void* Interception::Hooks::Common::GenericHook<Traits, ReturnType (__stdcall*)(Arguments...), function, vtable_index>::get_object_ptr(const Self& in_self,
-                                                                                                                                            const Rest&...)
-{
-    return in_self;
-}
-
-template<typename Traits, typename ReturnType, typename... Arguments, APIInterceptor::APIFunction function, uint32_t vtable_index>
-ReturnType __stdcall Interception::Hooks::Common::GenericHook<Traits, ReturnType (__stdcall*)(Arguments...), function, vtable_index>::invoke(Arguments... in_arguments)
+template<typename Traits, typename ReturnType, typename... Arguments, APIInterceptor::APIFunction function, typename OriginalFunction>
+ReturnType __stdcall Interception::Hooks::Common::GenericHook<Traits, ReturnType (__stdcall*)(Arguments...), function, OriginalFunction>::invoke(Arguments... in_arguments)
 {
     typedef ReturnType (__stdcall* OriginalFunctionPtr)(Arguments...);
 
@@ -95,9 +88,7 @@ ReturnType __stdcall Interception::Hooks::Common::GenericHook<Traits, ReturnType
     bool                                    is_pre_argument_valid           = false;
     APIInterceptor::Tracker                 tracker;
 
-    OriginalFunctionPtr original_function_ptr = reinterpret_cast<OriginalFunctionPtr>(
-                                                    VTableRegistry::get_ptr()->get_original_function_ptr(get_object_ptr(in_arguments...),
-                                                                                                         vtable_index) );
+    OriginalFunctionPtr original_function_ptr = reinterpret_cast<OriginalFunctionPtr>(OriginalFunction::get_ptr(in_arguments...) );
 
     if (tracker.is_top_level_api_call() )
     {
@@ -143,6 +134,12 @@ ReturnType __stdcall Interception::Hooks::Common::GenericHook<Traits, ReturnType
 
         result.call(original_function_ptr,
                     in_arguments...);
+
+        /* The runtime may have taken the hooks out of the vtable while the call was made; the next call must be seen. */
+        if (Traits::repairs_vtables)
+        {
+            OriginalFunction::repair_after_call(in_arguments...);
+        }
     }
 
     /* Hook the interfaces handed out by the call. */

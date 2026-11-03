@@ -39,7 +39,7 @@ if (APIINTERCEPTOR_BUILD_TESTS)
 
     target_include_directories(APIInterceptorTests PRIVATE "${APIInterceptor_SOURCE_DIR}/src"
                                                            "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL")
-    target_link_libraries(APIInterceptorTests gtest_main APIInterceptorTestSupport APIDumpLoader ReplayEngineDLL D3D7Utils D3D8Utils InjectionLauncher)
+    target_link_libraries(APIInterceptorTests gtest_main APIInterceptorTestSupport APIDumpLoader HooksCommon ReplayEngineDLL D3D7Utils D3D8Utils InjectionLauncher)
 
     enable_testing()
     add_test(NAME APIInterceptorTests COMMAND APIInterceptorTests)

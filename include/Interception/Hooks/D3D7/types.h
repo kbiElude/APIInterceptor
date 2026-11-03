@@ -20,6 +20,23 @@ namespace Interception
     {
         namespace D3D7
         {
+            struct D3DCLIPPLANE
+            {
+                float dvPlaneEquation[4];
+            };
+
+            struct D3DCLIPSTATUS
+            {
+                DWORD dwFlags;
+                DWORD dwStatus;
+                float minx;
+                float maxx;
+                float miny;
+                float maxy;
+                float minz;
+                float maxz;
+            };
+
             struct D3DCOLORVALUE
             {
                 float r;
@@ -59,6 +76,76 @@ namespace Interception
                 float m[4][4];
             };
 
+            struct D3DPRIMCAPS
+            {
+                DWORD dwSize;
+                DWORD dwMiscCaps;
+                DWORD dwRasterCaps;
+                DWORD dwZCmpCaps;
+                DWORD dwSrcBlendCaps;
+                DWORD dwDestBlendCaps;
+                DWORD dwAlphaCmpCaps;
+                DWORD dwShadeCaps;
+                DWORD dwTextureCaps;
+                DWORD dwTextureFilterCaps;
+                DWORD dwTextureBlendCaps;
+                DWORD dwTextureAddressCaps;
+                DWORD dwStippleWidth;
+                DWORD dwStippleHeight;
+            };
+
+            struct D3DDEVICEDESC7
+            {
+                DWORD       dwDevCaps;
+                D3DPRIMCAPS dpcLineCaps;
+                D3DPRIMCAPS dpcTriCaps;
+                DWORD       dwDeviceRenderBitDepth;
+                DWORD       dwDeviceZBufferBitDepth;
+                DWORD       dwMinTextureWidth;
+                DWORD       dwMinTextureHeight;
+                DWORD       dwMaxTextureWidth;
+                DWORD       dwMaxTextureHeight;
+                DWORD       dwMaxTextureRepeat;
+                DWORD       dwMaxTextureAspectRatio;
+                DWORD       dwMaxAnisotropy;
+                float       dvGuardBandLeft;
+                float       dvGuardBandTop;
+                float       dvGuardBandRight;
+                float       dvGuardBandBottom;
+                float       dvExtentsAdjust;
+                DWORD       dwStencilCaps;
+                DWORD       dwFVFCaps;
+                DWORD       dwTextureOpCaps;
+                WORD        wMaxTextureBlendStages;
+                WORD        wMaxSimultaneousTextures;
+                DWORD       dwMaxActiveLights;
+                float       dvMaxVertexW;
+                GUID        deviceGUID;
+                WORD        wMaxUserClipPlanes;
+                WORD        wMaxVertexBlendMatrices;
+                DWORD       dwVertexProcessingCaps;
+                DWORD       dwReserved1;
+                DWORD       dwReserved2;
+                DWORD       dwReserved3;
+                DWORD       dwReserved4;
+            };
+
+            /* A source of the vertices of a strided draw: the first element, and the distance to the next one. */
+            struct D3DDP_PTRSTRIDE
+            {
+                void* lpvData;
+                DWORD dwStride;
+            };
+
+            struct D3DDRAWPRIMITIVESTRIDEDDATA
+            {
+                D3DDP_PTRSTRIDE position;
+                D3DDP_PTRSTRIDE normal;
+                D3DDP_PTRSTRIDE diffuse;
+                D3DDP_PTRSTRIDE specular;
+                D3DDP_PTRSTRIDE textureCoords[8];
+            };
+
             struct D3DRECT
             {
                 LONG x1;
@@ -85,10 +172,157 @@ namespace Interception
                 float dvMaxZ;
             };
 
+            struct DDCOLORCONTROL
+            {
+                DWORD dwSize;
+                DWORD dwFlags;
+                LONG  lBrightness;
+                LONG  lContrast;
+                LONG  lHue;
+                LONG  lSaturation;
+                LONG  lSharpness;
+                LONG  lGamma;
+                LONG  lColorEnable;
+                DWORD dwReserved1;
+            };
+
             struct DDCOLORKEY
             {
                 DWORD dwColorSpaceLowValue;
                 DWORD dwColorSpaceHighValue;
+            };
+
+            /* The unions of the original are flattened to their first member; pointers to surfaces are stored as DWORDs. */
+            struct DDBLTFX
+            {
+                DWORD      dwSize;
+                DWORD      dwDDFX;
+                DWORD      dwROP;
+                DWORD      dwDDROP;
+                DWORD      dwRotationAngle;
+                DWORD      dwZBufferOpCode;
+                DWORD      dwZBufferLow;
+                DWORD      dwZBufferHigh;
+                DWORD      dwZBufferBaseDest;
+                DWORD      dwZDestConstBitDepth;
+                DWORD      dwZDestConst;
+                DWORD      dwZSrcConstBitDepth;
+                DWORD      dwZSrcConst;
+                DWORD      dwAlphaEdgeBlendBitDepth;
+                DWORD      dwAlphaEdgeBlend;
+                DWORD      dwReserved;
+                DWORD      dwAlphaDestConstBitDepth;
+                DWORD      dwAlphaDestConst;
+                DWORD      dwAlphaSrcConstBitDepth;
+                DWORD      dwAlphaSrcConst;
+                DWORD      dwFillColor;
+                DDCOLORKEY ddckDestColorkey;
+                DDCOLORKEY ddckSrcColorkey;
+            };
+
+            struct DDSCAPS2
+            {
+                DWORD dwCaps;
+                DWORD dwCaps2;
+                DWORD dwCaps3;
+                DWORD dwCaps4;
+            };
+
+            struct DDCAPS
+            {
+                DWORD    dwSize;
+                DWORD    dwCaps;
+                DWORD    dwCaps2;
+                DWORD    dwCKeyCaps;
+                DWORD    dwFXCaps;
+                DWORD    dwFXAlphaCaps;
+                DWORD    dwPalCaps;
+                DWORD    dwSVCaps;
+                DWORD    dwAlphaBltConstBitDepths;
+                DWORD    dwAlphaBltPixelBitDepths;
+                DWORD    dwAlphaBltSurfaceBitDepths;
+                DWORD    dwAlphaOverlayConstBitDepths;
+                DWORD    dwAlphaOverlayPixelBitDepths;
+                DWORD    dwAlphaOverlaySurfaceBitDepths;
+                DWORD    dwZBufferBitDepths;
+                DWORD    dwVidMemTotal;
+                DWORD    dwVidMemFree;
+                DWORD    dwMaxVisibleOverlays;
+                DWORD    dwCurrVisibleOverlays;
+                DWORD    dwNumFourCCCodes;
+                DWORD    dwAlignBoundarySrc;
+                DWORD    dwAlignSizeSrc;
+                DWORD    dwAlignBoundaryDest;
+                DWORD    dwAlignSizeDest;
+                DWORD    dwAlignStrideAlign;
+                DWORD    dwRops[8];
+                DWORD    ddsOldCaps;
+                DWORD    dwMinOverlayStretch;
+                DWORD    dwMaxOverlayStretch;
+                DWORD    dwMinLiveVideoStretch;
+                DWORD    dwMaxLiveVideoStretch;
+                DWORD    dwMinHwCodecStretch;
+                DWORD    dwMaxHwCodecStretch;
+                DWORD    dwReserved1;
+                DWORD    dwReserved2;
+                DWORD    dwReserved3;
+                DWORD    dwSVBCaps;
+                DWORD    dwSVBCKeyCaps;
+                DWORD    dwSVBFXCaps;
+                DWORD    dwSVBRops[8];
+                DWORD    dwVSBCaps;
+                DWORD    dwVSBCKeyCaps;
+                DWORD    dwVSBFXCaps;
+                DWORD    dwVSBRops[8];
+                DWORD    dwSSBCaps;
+                DWORD    dwSSBCKeyCaps;
+                DWORD    dwSSBFXCaps;
+                DWORD    dwSSBRops[8];
+                DWORD    dwMaxVideoPorts;
+                DWORD    dwCurrVideoPorts;
+                DWORD    dwSVBCaps2;
+                DWORD    dwNLVBCaps;
+                DWORD    dwNLVBCaps2;
+                DWORD    dwNLVBCKeyCaps;
+                DWORD    dwNLVBFXCaps;
+                DWORD    dwNLVBRops[8];
+                DDSCAPS2 ddsCaps;
+            };
+
+            struct DDDEVICEIDENTIFIER2
+            {
+                char          szDriver[512];
+                char          szDescription[512];
+                LARGE_INTEGER liDriverVersion;
+                DWORD         dwVendorId;
+                DWORD         dwDeviceId;
+                DWORD         dwSubSysId;
+                DWORD         dwRevision;
+                GUID          guidDeviceIdentifier;
+                DWORD         dwWHQLLevel;
+            };
+
+            struct DDGAMMARAMP
+            {
+                WORD red[256];
+                WORD green[256];
+                WORD blue[256];
+            };
+
+            struct DDOVERLAYFX
+            {
+                DWORD      dwSize;
+                DWORD      dwAlphaEdgeBlendBitDepth;
+                DWORD      dwAlphaEdgeBlend;
+                DWORD      dwReserved;
+                DWORD      dwAlphaDestConstBitDepth;
+                DWORD      dwAlphaDestConst;
+                DWORD      dwAlphaSrcConstBitDepth;
+                DWORD      dwAlphaSrcConst;
+                DDCOLORKEY dckDestColorkey;
+                DDCOLORKEY dckSrcColorkey;
+                DWORD      dwDDFX;
+                DWORD      dwFlags;
             };
 
             struct DDPIXELFORMAT
@@ -101,14 +335,6 @@ namespace Interception
                 DWORD dwGBitMask;
                 DWORD dwBBitMask;
                 DWORD dwRGBAlphaBitMask;
-            };
-
-            struct DDSCAPS2
-            {
-                DWORD dwCaps;
-                DWORD dwCaps2;
-                DWORD dwCaps3;
-                DWORD dwCaps4;
             };
 
             /* The unions of the original are flattened to their first member. */
@@ -150,19 +376,34 @@ namespace Interception
             enum D3DTRANSFORMSTATETYPE    : uint32_t { D3DTRANSFORMSTATE_FORCE_DWORD    = 0x7fffffff };
 
             #if !defined(_WIN64)
-                static_assert(sizeof(D3DLIGHT7)       == 104, "D3DLIGHT7 does not have the size of the DirectX 7 one");
-                static_assert(sizeof(D3DMATERIAL7)    == 68,  "D3DMATERIAL7 does not have the size of the DirectX 7 one");
-                static_assert(sizeof(D3DVIEWPORT7)    == 24,  "D3DVIEWPORT7 does not have the size of the DirectX 7 one");
-                static_assert(sizeof(DDPIXELFORMAT)   == 32,  "DDPIXELFORMAT does not have the size of the DirectX 7 one");
-                static_assert(sizeof(DDSCAPS2)        == 16,  "DDSCAPS2 does not have the size of the DirectX 7 one");
-                static_assert(sizeof(DDSURFACEDESC2)  == 124, "DDSURFACEDESC2 does not have the size of the DirectX 7 one");
+                static_assert(sizeof(D3DCLIPSTATUS)               == 32,   "D3DCLIPSTATUS does not have the size of the DirectX 7 one");
+                static_assert(sizeof(D3DDEVICEDESC7)              == 236,  "D3DDEVICEDESC7 does not have the size of the DirectX 7 one");
+                static_assert(sizeof(D3DDRAWPRIMITIVESTRIDEDDATA) == 96,   "D3DDRAWPRIMITIVESTRIDEDDATA does not have the size of the DirectX 7 one");
+                static_assert(sizeof(D3DLIGHT7)                   == 104,  "D3DLIGHT7 does not have the size of the DirectX 7 one");
+                static_assert(sizeof(D3DMATERIAL7)                == 68,   "D3DMATERIAL7 does not have the size of the DirectX 7 one");
+                static_assert(sizeof(D3DPRIMCAPS)                 == 56,   "D3DPRIMCAPS does not have the size of the DirectX 7 one");
+                static_assert(sizeof(D3DVIEWPORT7)                == 24,   "D3DVIEWPORT7 does not have the size of the DirectX 7 one");
+                static_assert(sizeof(DDBLTFX)                     == 100,  "DDBLTFX does not have the size of the DirectX 7 one");
+                static_assert(sizeof(DDCAPS)                      == 380,  "DDCAPS does not have the size of the DirectX 7 one");
+                static_assert(sizeof(DDCOLORCONTROL)              == 40,   "DDCOLORCONTROL does not have the size of the DirectX 7 one");
+                static_assert(sizeof(DDDEVICEIDENTIFIER2)         == 1072, "DDDEVICEIDENTIFIER2 does not have the size of the DirectX 7 one");
+                static_assert(sizeof(DDGAMMARAMP)                 == 1536, "DDGAMMARAMP does not have the size of the DirectX 7 one");
+                static_assert(sizeof(DDOVERLAYFX)                 == 56,   "DDOVERLAYFX does not have the size of the DirectX 7 one");
+                static_assert(sizeof(DDPIXELFORMAT)               == 32,   "DDPIXELFORMAT does not have the size of the DirectX 7 one");
+                static_assert(sizeof(DDSCAPS2)                    == 16,   "DDSCAPS2 does not have the size of the DirectX 7 one");
+                static_assert(sizeof(DDSURFACEDESC2)              == 124,  "DDSURFACEDESC2 does not have the size of the DirectX 7 one");
             #endif
 
-            /* Interfaces (opaque). */
+            /* Interfaces (opaque). IDirectDraw is the first one, of which only the unknown methods are described. */
             struct IDirect3D7;
             struct IDirect3DDevice7;
             struct IDirect3DVertexBuffer7;
+            struct IDirectDraw;
             struct IDirectDraw7;
+            struct IDirectDrawClipper;
+            struct IDirectDrawColorControl;
+            struct IDirectDrawGammaControl;
+            struct IDirectDrawPalette;
             struct IDirectDrawSurface7;
 
             /* Interfaces described by the method table. */
@@ -188,7 +429,12 @@ namespace Interception
                 uint32_t                    vtable_index;
             };
 
-            typedef HRESULT (__stdcall* PFNDIRECTDRAWCREATEEXPROC)(GUID*, void**, const GUID&, IUnknown*);
+            /* The functions exported by ddraw.dll which are hooked. */
+            typedef HRESULT (__stdcall* PFNDIRECTDRAWCREATECLIPPERPROC)(DWORD, IDirectDrawClipper**, IUnknown*);
+            typedef HRESULT (__stdcall* PFNDIRECTDRAWCREATEEXPROC)     (GUID*, void**, const GUID&, IUnknown*);
+            typedef HRESULT (__stdcall* PFNDIRECTDRAWCREATEPROC)       (GUID*, IDirectDraw**, IUnknown*);
+            typedef HRESULT (__stdcall* PFNDIRECTDRAWENUMERATEEXPROC)  (void*, void*, DWORD);
+            typedef HRESULT (__stdcall* PFNDIRECTDRAWENUMERATEPROC)    (void*, void*);
 
             /* Function pointer type of each method, e.g. PFN_IDIRECT3DDEVICE7_BEGINSCENE. */
             #define D3D7_METHOD(INTERFACE_TAG, interface_name, METHOD_TAG, method_name, vtable_index, return_type, parameters) \
