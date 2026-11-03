@@ -2,39 +2,382 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
+#include "Capture/APIDumpLoader/SegmentDecoder.h"
 #include "Capture/APIDumpLoader/WorkloadReader.h"
 #include "Common/workload_format.h"
+#include "zstd_errors.h"
 #include <algorithm>
+#include <condition_variable>
+#include <deque>
+#include <map>
+#include <mutex>
 #include <string.h>
+#include <thread>
 
-/* Shared by several functions. An item bigger than MAX_ITEM_N_BYTES is a sign of corruption. */
-static constexpr size_t   BUFFER_N_BYTES   = 1024 * 1024;
-static constexpr uint32_t MAX_ITEM_N_BYTES = 1u << 30; /* 1 GiB */
-static constexpr size_t   MAX_PEEK_N_BYTES = 64;
+/* Cuts a file into the frames the dumper wrote (one for each segment), without decompressing anything. */
+struct Capture::APIDumpLoader::WorkloadReader::FrameSource
+{
+    /* What the next bytes of the file are. */
+    enum class Result
+    {
+        CUT,     /* the start of a frame whose end the file does not have: all the bytes that are left        */
+        DAMAGED, /* bytes which are not the start of a frame                                                   */
+        END,     /* no bytes are left                                                                          */
+        FRAME
+    };
+
+    explicit FrameSource(FILE* in_file_handle)
+        :buffer_u8_vec(INITIAL_BUFFER_N_BYTES),
+         end         (0),
+         file_handle (in_file_handle),
+         is_at_end   (false),
+         start       (0)
+    {
+        /* Stub */
+    }
+
+    /* The bytes of the next frame, if there is one. */
+    Result read_next(std::vector<uint8_t>* out_frame_byte_vec_ptr)
+    {
+        Result result = Result::END;
+
+        for (;;)
+        {
+            const size_t n_bytes_available = end - start;
+
+            if (n_bytes_available != 0)
+            {
+                const size_t n_frame_bytes = ::ZSTD_findFrameCompressedSize(buffer_u8_vec.data() + start,
+                                                                            n_bytes_available);
+
+                if (::ZSTD_isError(n_frame_bytes) == false)
+                {
+                    out_frame_byte_vec_ptr->assign(buffer_u8_vec.data() + start,
+                                                   buffer_u8_vec.data() + start + n_frame_bytes);
+
+                    start += n_frame_bytes;
+
+                    result = Result::FRAME;
+
+                    break;
+                }
+
+                if (::ZSTD_getErrorCode(n_frame_bytes) != ZSTD_error_srcSize_wrong)
+                {
+                    result = Result::DAMAGED;
+
+                    break;
+                }
+            }
+
+            /* Either nothing is there, or not the whole of the frame. */
+            if (is_at_end)
+            {
+                if (n_bytes_available != 0)
+                {
+                    out_frame_byte_vec_ptr->assign(buffer_u8_vec.data() + start,
+                                                   buffer_u8_vec.data() + end);
+
+                    start  = end;
+                    result = Result::CUT;
+                }
+
+                break;
+            }
+
+            fill_buffer();
+        }
+
+        return result;
+    }
+
+    /* Reads more of the file after the bytes which are held, making room for it. */
+    void fill_buffer()
+    {
+        if (start != 0)
+        {
+            ::memmove(buffer_u8_vec.data(),
+                      buffer_u8_vec.data() + start,
+                      end - start);
+
+            end   -= start;
+            start  = 0;
+        }
+
+        if (end == buffer_u8_vec.size() )
+        {
+            buffer_u8_vec.resize(buffer_u8_vec.size() * 2);
+        }
+
+        const size_t n_bytes_read = ::fread(buffer_u8_vec.data() + end,
+                                            1,
+                                            buffer_u8_vec.size() - end,
+                                            file_handle);
+
+        if (n_bytes_read == 0)
+        {
+            is_at_end = true;
+        }
+
+        end += n_bytes_read;
+    }
+
+
+    static constexpr size_t INITIAL_BUFFER_N_BYTES = 8 * 1024 * 1024; /* a frame is a few MB; a larger one makes the buffer grow */
+
+    std::vector<uint8_t> buffer_u8_vec;
+    size_t               end;
+    FILE*                file_handle;
+    bool                 is_at_end;
+    size_t               start;
+};
+
+/* The threads which read segments ahead of the caller. */
+struct Capture::APIDumpLoader::WorkloadReader::Pipeline
+{
+    /* A frame to be decoded. */
+    struct Job
+    {
+        std::vector<uint8_t> frame_byte_vec;
+        uint64_t             sequence = 0; /* the place of the frame in the file */
+    };
+
+    Pipeline(FrameSource*    in_frame_source_ptr,
+             const uint32_t& in_n_threads,
+             const uint32_t& in_n_segments_in_flight,
+             const uint32_t& in_skip_data_chunks_above_n_bytes)
+        :frame_source_ptr                (in_frame_source_ptr),
+         is_damaged                      (false),
+         is_producer_done                (false),
+         is_stopping                     (false),
+         n_frames_produced               (0),
+         n_in_flight                     (0),
+         n_segments_in_flight            (in_n_segments_in_flight),
+         next_sequence                   (0),
+         skip_data_chunks_above_n_bytes  (in_skip_data_chunks_above_n_bytes)
+    {
+        producer_thread = std::thread(&Pipeline::run_producer,
+                                      this);
+
+        for (uint32_t n_thread = 0;
+                      n_thread < in_n_threads;
+                    ++n_thread)
+        {
+            worker_thread_vec.emplace_back(&Pipeline::run_worker,
+                                           this);
+        }
+    }
+
+    ~Pipeline()
+    {
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+
+            is_stopping = true;
+        }
+
+        job_available_condition.notify_all();
+        result_ready_condition.notify_all();
+        slot_free_condition.notify_all();
+
+        producer_thread.join();
+
+        for (auto& worker_thread : worker_thread_vec)
+        {
+            worker_thread.join();
+        }
+    }
+
+    /* The next segment in the order of the file: waits for it. */
+    Fetch take_next(DecodedSegment* out_segment_ptr)
+    {
+        std::unique_lock<std::mutex> lock(mutex);
+        Fetch                        result = Fetch::CLEAN_END;
+
+        result_ready_condition.wait(lock,
+                                    [&]()
+                                    {
+                                        return (result_map.find(next_sequence) != result_map.end() ||
+                                                is_stopping                                         ||
+                                                (is_producer_done                                   &&
+                                                 next_sequence >= n_frames_produced) );
+                                    });
+
+        const auto result_iterator = result_map.find(next_sequence);
+
+        if (result_iterator != result_map.end() )
+        {
+            *out_segment_ptr = std::move(result_iterator->second);
+
+            result_map.erase(result_iterator);
+
+            next_sequence++;
+            n_in_flight--;
+
+            result = Fetch::SEGMENT;
+
+            slot_free_condition.notify_one();
+        }
+        else
+        if (is_damaged)
+        {
+            result = Fetch::DAMAGED_END;
+        }
+
+        return result;
+    }
+
+    /* Reads the frames from the file, as far as there is room for the segments they will make. */
+    void run_producer()
+    {
+        for (;;)
+        {
+            FrameSource::Result  source_result = FrameSource::Result::END;
+            Job                  job;
+
+            {
+                std::unique_lock<std::mutex> lock(mutex);
+
+                slot_free_condition.wait(lock,
+                                         [&]()
+                                         {
+                                             return (n_in_flight < n_segments_in_flight ||
+                                                     is_stopping);
+                                         });
+
+                if (is_stopping)
+                {
+                    break;
+                }
+            }
+
+            source_result = frame_source_ptr->read_next(&job.frame_byte_vec);
+
+            {
+                std::lock_guard<std::mutex> lock(mutex);
+
+                if (source_result == FrameSource::Result::END     ||
+                    source_result == FrameSource::Result::DAMAGED)
+                {
+                    is_damaged       = (source_result == FrameSource::Result::DAMAGED);
+                    is_producer_done = true;
+                }
+                else
+                {
+                    job.sequence = n_frames_produced++;
+
+                    job_deque.push_back(std::move(job) );
+
+                    n_in_flight++;
+                }
+            }
+
+            /* All of them: when the producer is done, the workers which wait for a job are to see it. */
+            job_available_condition.notify_all();
+            result_ready_condition.notify_all();
+
+            if (source_result == FrameSource::Result::END     ||
+                source_result == FrameSource::Result::DAMAGED)
+            {
+                break;
+            }
+        }
+    }
+
+    /* Decompresses frames and reads the segments out of them. */
+    void run_worker()
+    {
+        ZSTD_DCtx* decompressor_ptr = ::ZSTD_createDCtx();
+
+        for (;;)
+        {
+            Job            job;
+            DecodedSegment decoded_segment;
+
+            {
+                std::unique_lock<std::mutex> lock(mutex);
+
+                job_available_condition.wait(lock,
+                                             [&]()
+                                             {
+                                                 return (job_deque.empty() == false ||
+                                                         is_stopping                ||
+                                                         is_producer_done);
+                                             });
+
+                if (is_stopping                         ||
+                    job_deque.empty() )
+                {
+                    break; /* nothing is left to be done (the producer is done, since the wait is over) */
+                }
+
+                job = std::move(job_deque.front() );
+
+                job_deque.pop_front();
+            }
+
+            if (decompressor_ptr != nullptr)
+            {
+                decode_frame(decompressor_ptr,
+                             job.frame_byte_vec,
+                             skip_data_chunks_above_n_bytes,
+                            &decoded_segment);
+            }
+
+            {
+                std::lock_guard<std::mutex> lock(mutex);
+
+                result_map[job.sequence] = std::move(decoded_segment);
+            }
+
+            result_ready_condition.notify_all();
+        }
+
+        if (decompressor_ptr != nullptr)
+        {
+            ::ZSTD_freeDCtx(decompressor_ptr);
+        }
+    }
+
+
+    std::condition_variable    job_available_condition;
+    FrameSource*               frame_source_ptr;
+    bool                       is_damaged;        /* the producer found bytes which are not a frame        */
+    bool                       is_producer_done;
+    bool                       is_stopping;
+    std::deque<Job>            job_deque;
+    std::mutex                 mutex;             /* guards all of the below, and the flags above          */
+    uint64_t                   n_frames_produced;
+    uint32_t                   n_in_flight;       /* jobs queued, being decoded, or decoded and not taken  */
+    uint32_t                   n_segments_in_flight;
+    uint64_t                   next_sequence;     /* of the segment which the caller is to get next        */
+    std::thread                producer_thread;
+    std::condition_variable    result_ready_condition;
+    std::map<uint64_t, DecodedSegment> result_map;
+    uint32_t                   skip_data_chunks_above_n_bytes;
+    std::condition_variable    slot_free_condition;
+    std::vector<std::thread>   worker_thread_vec;
+};
 
 Capture::APIDumpLoader::WorkloadReader::WorkloadReader()
-    :m_buffer_end         (0),
-     m_buffer_start       (0),
-     m_compressed_end     (0),
-     m_compressed_start   (0),
-     m_decompressor_ptr   (::ZSTD_createDCtx() ),
+    :m_decompressor_ptr   (::ZSTD_createDCtx() ),
      m_file_handle        (nullptr),
-     m_is_damaged         (false),
      m_is_finished        (false),
-     m_is_frame_incomplete(false),
      m_is_truncated       (false),
      m_n_data_chunks_read (0),
      m_pointer_n_bytes    (0),
-     m_qpc_frequency      (0)
+     m_qpc_frequency      (0),
+     m_skip_data_chunks_above_n_bytes(0)
 {
-    m_compressed_u8_vec.resize(::ZSTD_DStreamInSize() );
-
-    /* The padding keeps parsing code from reading outside the buffer when a file ends early. */
-    m_buffer_u8_vec.resize(BUFFER_N_BYTES + MAX_PEEK_N_BYTES);
+    /* Stub */
 }
 
 Capture::APIDumpLoader::WorkloadReader::~WorkloadReader()
 {
+    /* The threads use the file, so they go first. */
+    m_pipeline_ptr.reset();
+    m_frame_source_ptr.reset();
+
     if (m_decompressor_ptr != nullptr)
     {
         ::ZSTD_freeDCtx(m_decompressor_ptr);
@@ -70,6 +413,15 @@ bool Capture::APIDumpLoader::WorkloadReader::contains_api_group(const APIGroup& 
 
 Capture::APIDumpLoader::WorkloadReaderUniquePtr Capture::APIDumpLoader::WorkloadReader::create(const char*  in_filename_ptr,
                                                                                                std::string* out_error_ptr)
+{
+    return create(in_filename_ptr,
+                  Options(),
+                  out_error_ptr);
+}
+
+Capture::APIDumpLoader::WorkloadReaderUniquePtr Capture::APIDumpLoader::WorkloadReader::create(const char*    in_filename_ptr,
+                                                                                               const Options& in_options,
+                                                                                               std::string*   out_error_ptr)
 {
     std::string                                        error;
     APIInterceptor::WorkloadFormat::WorkloadFileHeader header;
@@ -130,8 +482,22 @@ Capture::APIDumpLoader::WorkloadReaderUniquePtr Capture::APIDumpLoader::Workload
         goto fail;
     }
 
-    result_ptr->m_pointer_n_bytes = header.pointer_n_bytes;
-    result_ptr->m_qpc_frequency   = header.qpc_frequency;
+    result_ptr->m_pointer_n_bytes                = header.pointer_n_bytes;
+    result_ptr->m_qpc_frequency                  = header.qpc_frequency;
+    result_ptr->m_skip_data_chunks_above_n_bytes = in_options.skip_data_chunks_above_n_bytes;
+
+    result_ptr->m_frame_source_ptr.reset(new FrameSource(result_ptr->m_file_handle) );
+
+    if (in_options.n_threads != 0)
+    {
+        const uint32_t n_segments_in_flight = (in_options.n_segments_in_flight != 0) ? in_options.n_segments_in_flight
+                                                                                     : in_options.n_threads + 2;
+
+        result_ptr->m_pipeline_ptr.reset(new Pipeline(result_ptr->m_frame_source_ptr.get(),
+                                                      in_options.n_threads,
+                                                      n_segments_in_flight,
+                                                      in_options.skip_data_chunks_above_n_bytes) );
+    }
 
     goto end;
 
@@ -146,6 +512,88 @@ end:
     return result_ptr;
 }
 
+void Capture::APIDumpLoader::WorkloadReader::decode_frame(ZSTD_DCtx*                  in_decompressor_ptr,
+                                                          const std::vector<uint8_t>& in_frame_byte_vec,
+                                                          const uint32_t&             in_skip_data_chunks_above_n_bytes,
+                                                          DecodedSegment*             out_segment_ptr)
+{
+    FrameStream            stream(in_decompressor_ptr,
+                                  in_frame_byte_vec.data(),
+                                  in_frame_byte_vec.size() );
+    bool                   is_short = false;
+    SegmentDecoder::Options options;
+
+    options.skip_data_chunks_above_n_bytes = in_skip_data_chunks_above_n_bytes;
+
+    out_segment_ptr->workload_ptr.reset(new Workload() );
+
+    out_segment_ptr->has_segment = SegmentDecoder::parse_segment(&stream,
+                                                                  options,
+                                                                  out_segment_ptr->workload_ptr.get(),
+                                                                 &is_short);
+
+    out_segment_ptr->is_truncated = is_short;
+
+    /* A segment which was read in full still has the end of its frame to be checked. */
+    if (is_short == false)
+    {
+        out_segment_ptr->is_truncated = (stream.finish() == false);
+    }
+}
+
+Capture::APIDumpLoader::WorkloadReader::Fetch Capture::APIDumpLoader::WorkloadReader::fetch_next_segment(DecodedSegment* out_segment_ptr)
+{
+    std::vector<uint8_t> frame_byte_vec;
+    Fetch                result = Fetch::CLEAN_END;
+
+    if (m_pipeline_ptr != nullptr)
+    {
+        result = m_pipeline_ptr->take_next(out_segment_ptr);
+
+        goto end;
+    }
+
+    switch (m_frame_source_ptr->read_next(&frame_byte_vec) )
+    {
+        case FrameSource::Result::CUT:
+        case FrameSource::Result::FRAME:
+        {
+            decode_frame(m_decompressor_ptr,
+                         frame_byte_vec,
+                         m_skip_data_chunks_above_n_bytes,
+                         out_segment_ptr);
+
+            result = Fetch::SEGMENT;
+
+            break;
+        }
+
+        case FrameSource::Result::DAMAGED:
+        {
+            result = Fetch::DAMAGED_END;
+
+            break;
+        }
+
+        case FrameSource::Result::END:
+        {
+            result = Fetch::CLEAN_END;
+
+            break;
+        }
+
+        default:
+        {
+            result = Fetch::DAMAGED_END;
+
+            break;
+        }
+    }
+
+end:
+    return result;
+}
+
 uint32_t Capture::APIDumpLoader::WorkloadReader::get_pointer_n_bytes() const
 {
     return m_pointer_n_bytes;
@@ -156,388 +604,71 @@ bool Capture::APIDumpLoader::WorkloadReader::is_truncated() const
     return m_is_truncated;
 }
 
-size_t Capture::APIDumpLoader::WorkloadReader::peek(const size_t& in_n_bytes)
-{
-    if (m_buffer_end - m_buffer_start < in_n_bytes)
-    {
-        /* Move what is left to the front, and top the buffer up. */
-        const size_t n_bytes_left = m_buffer_end - m_buffer_start;
-
-        memmove(m_buffer_u8_vec.data(),
-                m_buffer_u8_vec.data() + m_buffer_start,
-                n_bytes_left);
-
-        m_buffer_start = 0;
-        m_buffer_end   = n_bytes_left;
-        m_buffer_end  += read_decompressed(m_buffer_u8_vec.data() + m_buffer_end,
-                                           BUFFER_N_BYTES - m_buffer_end);
-
-        memset(m_buffer_u8_vec.data() + m_buffer_end,
-               0,
-               MAX_PEEK_N_BYTES);
-    }
-
-    return m_buffer_end - m_buffer_start;
-}
-
-bool Capture::APIDumpLoader::WorkloadReader::read_api_call(DumpedAPICall* out_api_call_ptr)
-{
-    constexpr size_t   HEADER_N_BYTES           = APIInterceptor::WorkloadFormat::CALL_HEADER_N_BYTES;
-    constexpr size_t   MAX_ARGUMENT_N_BYTES     = 16;                                                         /* type and the widest payload */
-    constexpr uint32_t MAX_N_ARGUMENTS_PER_CALL = 64;
-
-    const uint8_t*                      header_u8_ptr   = nullptr;
-    uint32_t                            n_in_arguments  = 0;
-    uint32_t                            n_out_arguments = 0;
-    bool                                result          = false;
-    APIInterceptor::APIFunctionArgument returned_value;
-
-    /* Reads one argument. */
-    const auto read_argument_func = [&](APIInterceptor::APIFunctionArgument* out_argument_ptr)
-    {
-        const size_t n_bytes_available = peek(MAX_ARGUMENT_N_BYTES);
-        uint32_t     n_bytes_used      = 0;
-        bool         is_ok             = false;
-
-        if (n_bytes_available != 0)
-        {
-            n_bytes_used = out_argument_ptr->deserialize_from_u8_ptr(m_buffer_u8_vec.data() + m_buffer_start);
-
-            if (n_bytes_used <= n_bytes_available)
-            {
-                m_buffer_start += n_bytes_used;
-                is_ok           = true;
-            }
-        }
-
-        return is_ok;
-    };
-
-    if (peek(HEADER_N_BYTES) < HEADER_N_BYTES)
-    {
-        goto end;
-    }
-
-    header_u8_ptr = m_buffer_u8_vec.data() + m_buffer_start;
-
-    memcpy(&out_api_call_ptr->func,
-           header_u8_ptr,
-           sizeof(APIInterceptor::APIFunction) );
-    memcpy(&n_in_arguments,
-           header_u8_ptr + sizeof(APIInterceptor::APIFunction),
-           sizeof(uint32_t) );
-    memcpy(&n_out_arguments,
-           header_u8_ptr + sizeof(APIInterceptor::APIFunction) + sizeof(uint32_t),
-           sizeof(uint32_t) );
-    memcpy(&out_api_call_ptr->thread_id,
-           header_u8_ptr + sizeof(APIInterceptor::APIFunction) + 2 * sizeof(uint32_t),
-           sizeof(uint32_t) );
-    memcpy(&out_api_call_ptr->timestamp_qpc,
-           header_u8_ptr + sizeof(APIInterceptor::APIFunction) + 3 * sizeof(uint32_t),
-           sizeof(uint64_t) );
-
-    m_buffer_start += HEADER_N_BYTES;
-
-    if (n_in_arguments > MAX_N_ARGUMENTS_PER_CALL)
-    {
-        goto end;
-    }
-
-    if (n_out_arguments > MAX_N_ARGUMENTS_PER_CALL)
-    {
-        goto end;
-    }
-
-    out_api_call_ptr->arg_in_vec.resize (n_in_arguments);
-    out_api_call_ptr->arg_out_vec.resize(n_out_arguments);
-
-    for (auto& current_argument : out_api_call_ptr->arg_in_vec)
-    {
-        if (read_argument_func(&current_argument) == false)
-        {
-            goto end;
-        }
-    }
-
-    for (auto& current_argument : out_api_call_ptr->arg_out_vec)
-    {
-        if (read_argument_func(&current_argument) == false)
-        {
-            goto end;
-        }
-    }
-
-    if (read_argument_func(&returned_value) == false)
-    {
-        goto end;
-    }
-
-    if (returned_value.type != APIInterceptor::APIFunctionArgumentType::UNKNOWN)
-    {
-        out_api_call_ptr->returned_value_ptr.reset(
-            new APIInterceptor::APIFunctionArgument(returned_value)
-        );
-    }
-
-    result = true;
-end:
-    return result;
-}
-
-bool Capture::APIDumpLoader::WorkloadReader::read_bytes(void*         out_data_ptr,
-                                                        const size_t& in_n_bytes)
-{
-    const size_t n_bytes_buffered = std::min<size_t>(in_n_bytes,
-                                                     m_buffer_end - m_buffer_start);
-    size_t       n_bytes_read     = n_bytes_buffered;
-
-    if (n_bytes_buffered != 0)
-    {
-        memcpy(out_data_ptr,
-               m_buffer_u8_vec.data() + m_buffer_start,
-               n_bytes_buffered);
-
-        m_buffer_start += n_bytes_buffered;
-    }
-
-    /* The rest does not go through the buffer. */
-    if (n_bytes_read < in_n_bytes)
-    {
-        n_bytes_read += read_decompressed(static_cast<uint8_t*>(out_data_ptr) + n_bytes_read,
-                                          in_n_bytes - n_bytes_read);
-    }
-
-    return (n_bytes_read == in_n_bytes);
-}
-
-bool Capture::APIDumpLoader::WorkloadReader::read_data_chunk(DataChunk* out_data_chunk_ptr)
-{
-    uint32_t n_bytes = 0;
-    bool     result  = false;
-
-    if (peek(sizeof(uint32_t) ) < sizeof(uint32_t) )
-    {
-        goto end;
-    }
-
-    memcpy(&n_bytes,
-           m_buffer_u8_vec.data() + m_buffer_start,
-           sizeof(uint32_t) );
-
-    m_buffer_start += sizeof(uint32_t);
-
-    if (n_bytes > MAX_ITEM_N_BYTES)
-    {
-        goto end;
-    }
-
-    out_data_chunk_ptr->resize(n_bytes);
-
-    result = read_bytes(out_data_chunk_ptr->data(),
-                        n_bytes);
-end:
-    return result;
-}
-
-size_t Capture::APIDumpLoader::WorkloadReader::read_decompressed(void*         out_data_ptr,
-                                                                 const size_t& in_n_bytes)
-{
-    ZSTD_outBuffer output = {out_data_ptr, in_n_bytes, 0};
-
-    while (output.pos < output.size &&
-           m_is_damaged == false)
-    {
-        ZSTD_inBuffer input;
-        size_t        n_bytes_expected = 0;
-        size_t        n_bytes_before   = 0;
-
-        if (m_compressed_start == m_compressed_end)
-        {
-            m_compressed_start = 0;
-            m_compressed_end   = ::fread(m_compressed_u8_vec.data(),
-                                         1,
-                                         m_compressed_u8_vec.size(),
-                                         m_file_handle);
-        }
-
-        /* At the end of the file, there may still be decompressed data waiting to be handed out. */
-        input          = {m_compressed_u8_vec.data(), m_compressed_end, m_compressed_start};
-        n_bytes_before  = output.pos + input.pos;
-
-        n_bytes_expected = ::ZSTD_decompressStream(m_decompressor_ptr,
-                                                  &output,
-                                                  &input);
-
-        m_compressed_start = input.pos;
-
-        if (::ZSTD_isError(n_bytes_expected) )
-        {
-            m_is_damaged          = true;
-            m_is_frame_incomplete = true;
-        }
-        else
-        if (output.pos + input.pos == n_bytes_before)
-        {
-            /* Nothing more to be had from the file. A call which got nowhere tells nothing about the frame. */
-            break;
-        }
-        else
-        {
-            /* Zero means that a frame has just ended. */
-            m_is_frame_incomplete = (n_bytes_expected != 0);
-        }
-    }
-
-    return output.pos;
-}
-
 bool Capture::APIDumpLoader::WorkloadReader::read_next_segment(Workload* out_workload_ptr)
 {
-    constexpr size_t N_COUNTS = 3; /* API calls, data chunks, surfaces */
-
-    uint32_t     counts_u32vec3[N_COUNTS] = {};
-    size_t       n_bytes_available        = 0;
-    bool         result                   = false;
-    const size_t segment_header_n_bytes   = sizeof(uint32_t) * N_COUNTS;
-
-    /* A segment which ends abruptly is still returned, as far as it goes. */
-    const auto mark_truncated_func = [&]()
-    {
-        m_is_truncated = true;
-        m_is_finished  = true;
-    };
+    DecodedSegment segment;
+    bool           result = false;
 
     if (m_is_finished)
     {
         goto end;
     }
 
-    n_bytes_available = peek(segment_header_n_bytes);
-
-    if (n_bytes_available == 0)
+    switch (fetch_next_segment(&segment) )
     {
-        /* A frame which is not complete is a segment which was not written to the end. */
-        if (m_is_frame_incomplete)
+        case Fetch::CLEAN_END:
         {
-            mark_truncated_func();
-        }
-        else
-        {
-            /* Clean end of file. */
             m_is_finished = true;
+
+            break;
         }
 
-        goto end;
-    }
-
-    if (n_bytes_available < segment_header_n_bytes)
-    {
-        mark_truncated_func();
-
-        goto end;
-    }
-
-    memcpy(counts_u32vec3,
-           m_buffer_u8_vec.data() + m_buffer_start,
-           segment_header_n_bytes);
-
-    m_buffer_start += segment_header_n_bytes;
-
-    out_workload_ptr->data_chunk_ptr_vec.clear     ();
-    out_workload_ptr->dumped_api_call_vec_ptr.reset(new DumpedAPICallVector() );
-    out_workload_ptr->dumped_surface_vec_ptr.reset (new DumpedSurfaceVector() );
-
-    out_workload_ptr->first_data_chunk_id = m_n_data_chunks_read;
-    out_workload_ptr->pointer_n_bytes     = m_pointer_n_bytes;
-    out_workload_ptr->qpc_frequency       = m_qpc_frequency;
-
-    result = true;
-
-    for (uint32_t n_api_call = 0;
-                  n_api_call < counts_u32vec3[0];
-                ++n_api_call)
-    {
-        DumpedAPICall new_api_call;
-
-        if (read_api_call(&new_api_call) == false)
+        case Fetch::DAMAGED_END:
         {
-            mark_truncated_func();
+            m_is_finished  = true;
+            m_is_truncated = true;
 
-            goto end;
+            break;
         }
 
-        out_workload_ptr->dumped_api_call_vec_ptr->emplace_back(std::move(new_api_call) );
-    }
-
-    for (uint32_t n_data_chunk = 0;
-                  n_data_chunk < counts_u32vec3[1];
-                ++n_data_chunk)
-    {
-        DataChunkUniquePtr new_data_chunk_ptr(new DataChunk() );
-
-        if (read_data_chunk(new_data_chunk_ptr.get() ) == false)
+        case Fetch::SEGMENT:
         {
-            mark_truncated_func();
+            if (segment.has_segment == false)
+            {
+                /* So little is left of the frame that not even the counts of the segment are. */
+                m_is_finished  = true;
+                m_is_truncated = true;
 
-            goto end;
+                break;
+            }
+
+            *out_workload_ptr = std::move(*segment.workload_ptr);
+
+            out_workload_ptr->first_data_chunk_id = m_n_data_chunks_read;
+            out_workload_ptr->pointer_n_bytes     = m_pointer_n_bytes;
+            out_workload_ptr->qpc_frequency       = m_qpc_frequency;
+
+            m_n_data_chunks_read += static_cast<uint32_t>(out_workload_ptr->data_chunk_ptr_vec.size() );
+
+            if (segment.is_truncated)
+            {
+                m_is_finished  = true;
+                m_is_truncated = true;
+            }
+
+            result = true;
+
+            break;
         }
 
-        out_workload_ptr->data_chunk_ptr_vec.emplace_back(std::move(new_data_chunk_ptr) );
-
-        m_n_data_chunks_read++;
-    }
-
-    for (uint32_t n_surface = 0;
-                  n_surface < counts_u32vec3[2];
-                ++n_surface)
-    {
-        DumpedSurface new_surface;
-
-        if (read_surface(&new_surface) == false)
+        default:
         {
-            mark_truncated_func();
+            m_is_finished = true;
 
-            goto end;
+            break;
         }
-
-        out_workload_ptr->dumped_surface_vec_ptr->emplace_back(std::move(new_surface) );
     }
 
-end:
-    return result;
-}
-
-bool Capture::APIDumpLoader::WorkloadReader::read_surface(DumpedSurface* out_surface_ptr)
-{
-    constexpr size_t N_HEADER_FIELDS = 3; /* width, height, n bytes */
-
-    uint32_t     header_u32vec3[N_HEADER_FIELDS] = {};
-    const size_t header_n_bytes                  = sizeof(uint32_t) * N_HEADER_FIELDS;
-    bool         result                          = false;
-
-    if (peek(header_n_bytes) < header_n_bytes)
-    {
-        goto end;
-    }
-
-    memcpy(header_u32vec3,
-           m_buffer_u8_vec.data() + m_buffer_start,
-           header_n_bytes);
-
-    m_buffer_start += header_n_bytes;
-
-    if (header_u32vec3[2] > MAX_ITEM_N_BYTES)
-    {
-        goto end;
-    }
-
-    out_surface_ptr->extents_u32vec2[0] = header_u32vec3[0];
-    out_surface_ptr->extents_u32vec2[1] = header_u32vec3[1];
-
-    out_surface_ptr->data_u8_vec.resize(header_u32vec3[2]);
-
-    result = read_bytes(out_surface_ptr->data_u8_vec.data(),
-                        header_u32vec3[2]);
 end:
     return result;
 }

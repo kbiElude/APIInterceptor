@@ -2,8 +2,12 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  *
- * Reads a workload file one segment at a time (see APIDumpLoader.cpp for the file layout), so that a dump needs not fit
+ * Reads a workload file one segment at a time (see Common/workload_format.h for the file layout), so that a dump needs not fit
  * in memory. A file which is still being written, or which ends abruptly, can be read as far as it goes.
+ *
+ * Each segment is a Zstandard frame of its own, so the segments can be decompressed and read at the same time: with threads (see Options),
+ * the reader works on the next segments while the caller works on the one it has, and hands them out in the order of the file all the same.
+ * What a caller sees is the same with and without them.
  */
 #if !defined(APIDUMPLOADER_WORKLOAD_READER_H)
 #define APIDUMPLOADER_WORKLOAD_READER_H
@@ -28,6 +32,23 @@ namespace Capture
         class WorkloadReader
         {
         public:
+            /* How a reader goes about it. */
+            struct Options
+            {
+                /* The segments which are being read or are waiting for the caller, at most; each is held in memory in full (a segment is as
+                 * large as the dumper's memory was when it spilled). 0 is n_threads + 2.
+                 */
+                uint32_t n_segments_in_flight = 0;
+
+                /* The threads which read segments ahead of the caller. 0: the caller reads a segment itself when it asks for it. */
+                uint32_t n_threads = 0;
+
+                /* A data chunk of more bytes than this comes as an empty one (the chunks after it keep their numbers), and is not copied
+                 * anywhere: for tools which look at the calls and not at the vertices and pixels, which are most of a workload. 0: none is left out.
+                 */
+                uint32_t skip_data_chunks_above_n_bytes = 0;
+            };
+
             ~WorkloadReader();
 
             /* Returns nullptr if the file cannot be opened, or is not a workload this version can read. In that case,
@@ -35,6 +56,9 @@ namespace Capture
              */
             static WorkloadReaderUniquePtr create(const char*  in_filename_ptr,
                                                   std::string* out_error_ptr = nullptr);
+            static WorkloadReaderUniquePtr create(const char*    in_filename_ptr,
+                                                  const Options& in_options,
+                                                  std::string*   out_error_ptr = nullptr);
 
 
             /* Reads on until it meets a call of the group. The segments which were read are gone, so this is for a reader
@@ -55,40 +79,46 @@ namespace Capture
             bool read_next_segment(Workload* out_workload_ptr);
 
         private:
+            struct FrameSource;
+            struct Pipeline;
+
+            /* A segment, as a frame of the file made it. */
+            struct DecodedSegment
+            {
+                bool                      has_segment  = false; /* the frame held at least the counts of a segment */
+                bool                      is_truncated = false; /* the frame was cut or damaged, or the segment is short of what its counts say */
+                std::unique_ptr<Workload> workload_ptr;
+            };
+
+            /* What the next frame of the file came to. */
+            enum class Fetch
+            {
+                CLEAN_END,
+                DAMAGED_END, /* a frame which cannot be told to be one: nothing more can be read */
+                SEGMENT
+            };
+
             WorkloadReader();
 
-            /* Makes n bytes available at the front of the buffer, unless the file ends first. Returns the number of bytes
-             * available, which may be smaller than asked.
-             */
-            size_t peek(const size_t& in_n_bytes);
+            /* Makes a segment of the bytes of a frame. A frame which is cut is decompressed as far as it goes. */
+            static void decode_frame(ZSTD_DCtx*                  in_decompressor_ptr,
+                                     const std::vector<uint8_t>& in_frame_byte_vec,
+                                     const uint32_t&             in_skip_data_chunks_above_n_bytes,
+                                     DecodedSegment*             out_segment_ptr);
 
-            /* The read_* functions return false if the file ends before the item is complete, bar read_decompressed which
-             * is the source of them all: it decompresses the next bytes of the file, and returns how many it got.
-             */
-            bool   read_api_call    (DumpedAPICall* out_api_call_ptr);
-            bool   read_bytes       (void*          out_data_ptr,
-                                     const size_t&  in_n_bytes);
-            bool   read_data_chunk  (DataChunk*     out_data_chunk_ptr);
-            size_t read_decompressed(void*          out_data_ptr,
-                                     const size_t&  in_n_bytes);
-            bool   read_surface     (DumpedSurface* out_surface_ptr);
+            /* The next segment of the file, in order. */
+            Fetch fetch_next_segment(DecodedSegment* out_segment_ptr);
 
-
-            std::vector<uint8_t> m_buffer_u8_vec;
-            size_t               m_buffer_end;
-            size_t               m_buffer_start;
-            std::vector<uint8_t> m_compressed_u8_vec;       /* what was read from the file, and not decompressed yet */
-            size_t               m_compressed_end;
-            size_t               m_compressed_start;
-            ZSTD_DCtx*           m_decompressor_ptr;
-            FILE*                m_file_handle;
-            bool                 m_is_damaged;              /* the decompressor has rejected the data              */
-            bool                 m_is_finished;
-            bool                 m_is_frame_incomplete;     /* the frame which was being decompressed is not done  */
-            bool                 m_is_truncated;
-            uint32_t             m_n_data_chunks_read;
-            uint32_t             m_pointer_n_bytes;
-            uint64_t             m_qpc_frequency;
+            ZSTD_DCtx*                     m_decompressor_ptr;    /* for the caller's own reading, without threads */
+            FILE*                          m_file_handle;
+            std::unique_ptr<FrameSource>   m_frame_source_ptr;
+            bool                           m_is_finished;
+            bool                           m_is_truncated;
+            uint32_t                       m_n_data_chunks_read;
+            std::unique_ptr<Pipeline>      m_pipeline_ptr;        /* the threads, if there are any */
+            uint32_t                       m_pointer_n_bytes;
+            uint64_t                       m_qpc_frequency;
+            uint32_t                       m_skip_data_chunks_above_n_bytes;
         };
     }
 }

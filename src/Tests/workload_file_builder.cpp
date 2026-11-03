@@ -134,6 +134,46 @@ void Tests::WorkloadFileBuilder::append_header(std::vector<uint8_t>* inout_u8_ve
                  sizeof(uint32_t) );
 }
 
+/* As the dumper writes a segment: the compressor is not told how large it is, so the frame does not say. */
+void Tests::WorkloadFileBuilder::append_streamed_segment(std::vector<uint8_t>*       inout_u8_vec_ptr,
+                                                         const std::vector<uint8_t>& in_segment_u8_vec)
+{
+    constexpr int COMPRESSION_LEVEL = 1;
+
+    const size_t     file_n_bytes = inout_u8_vec_ptr->size();
+    const size_t     max_n_bytes  = ::ZSTD_compressBound(in_segment_u8_vec.size() );
+    ZSTD_CCtx* const compressor   = ::ZSTD_createCCtx();
+    ZSTD_inBuffer    input        = {in_segment_u8_vec.data(), in_segment_u8_vec.size(), 0};
+    size_t           n_remaining  = 0;
+
+    ASSERT_NE(compressor,
+              nullptr);
+
+    inout_u8_vec_ptr->resize(file_n_bytes + max_n_bytes);
+
+    ::ZSTD_CCtx_setParameter(compressor,
+                             ZSTD_c_checksumFlag,
+                             1);
+    ::ZSTD_CCtx_setParameter(compressor,
+                             ZSTD_c_compressionLevel,
+                             COMPRESSION_LEVEL);
+
+    ZSTD_outBuffer output = {inout_u8_vec_ptr->data() + file_n_bytes, max_n_bytes, 0};
+
+    n_remaining = ::ZSTD_compressStream2(compressor,
+                                        &output,
+                                        &input,
+                                         ZSTD_e_end);
+
+    ASSERT_FALSE(::ZSTD_isError(n_remaining) );
+    ASSERT_EQ   (n_remaining,
+                 0u);
+
+    inout_u8_vec_ptr->resize(file_n_bytes + output.pos);
+
+    ::ZSTD_freeCCtx(compressor);
+}
+
 void Tests::WorkloadFileBuilder::append_surface(std::vector<uint8_t>*       inout_u8_vec_ptr,
                                                 const std::vector<uint8_t>& in_data_u8_vec)
 {
@@ -225,6 +265,58 @@ void Tests::WorkloadFileBuilder::build_large_chunk(std::vector<uint8_t>* out_u8_
                               segment_u8_vec);
 }
 
+void Tests::WorkloadFileBuilder::build_many_segments(std::vector<uint8_t>* out_u8_vec_ptr,
+                                                     const uint32_t&       in_n_segments,
+                                                     const uint32_t&       in_n_calls_per_segment,
+                                                     const size_t&         in_n_bytes_per_chunk)
+{
+    constexpr uint32_t N_CALL_ARGUMENTS_PER_SEGMENT = 1000; /* the argument of a call is S * this + N */
+
+    append_file_header(out_u8_vec_ptr);
+
+    for (uint32_t n_segment = 0;
+                  n_segment < in_n_segments;
+                ++n_segment)
+    {
+        std::vector<uint8_t> segment_u8_vec;
+
+        append_header(&segment_u8_vec,
+                      in_n_calls_per_segment,
+                      N_CHUNKS_PER_SEGMENT,
+                      0); /* in_n_surfaces */
+
+        for (uint32_t n_call = 0;
+                      n_call < in_n_calls_per_segment;
+                    ++n_call)
+        {
+            append_call(&segment_u8_vec,
+                        n_segment * N_CALL_ARGUMENTS_PER_SEGMENT + n_call);
+        }
+
+        for (uint32_t n_chunk = 0;
+                      n_chunk < N_CHUNKS_PER_SEGMENT;
+                    ++n_chunk)
+        {
+            std::vector<uint8_t> chunk_u8_vec(in_n_bytes_per_chunk);
+
+            for (size_t n_byte = 0;
+                        n_byte < in_n_bytes_per_chunk;
+                      ++n_byte)
+            {
+                chunk_u8_vec.at(n_byte) = get_segment_chunk_byte(n_segment,
+                                                                 n_chunk,
+                                                                 n_byte);
+            }
+
+            append_chunk(&segment_u8_vec,
+                         chunk_u8_vec);
+        }
+
+        append_streamed_segment(out_u8_vec_ptr,
+                                segment_u8_vec);
+    }
+}
+
 void Tests::WorkloadFileBuilder::build_two_segments(std::vector<uint8_t>* out_u8_vec_ptr,
                                                     const size_t&         in_n_bytes_to_drop_from_second_segment)
 {
@@ -279,6 +371,16 @@ uint8_t Tests::WorkloadFileBuilder::get_large_chunk_byte(const size_t& in_n_byte
     constexpr uint32_t SHIFT      = 24;
 
     return static_cast<uint8_t>((in_n_byte * MULTIPLIER) >> SHIFT);
+}
+
+/* Runs of one value, so that the chunks compress far better than anything the reader would guess. */
+uint8_t Tests::WorkloadFileBuilder::get_segment_chunk_byte(const uint32_t& in_n_segment,
+                                                           const uint32_t& in_n_chunk,
+                                                           const size_t&   in_n_byte)
+{
+    constexpr size_t RUN_N_BYTES = 64 * 1024;
+
+    return static_cast<uint8_t>(in_n_segment * 7 + in_n_chunk * 3 + in_n_byte / RUN_N_BYTES);
 }
 
 void Tests::WorkloadFileBuilder::write_file(const std::vector<uint8_t>& in_u8_vec)
