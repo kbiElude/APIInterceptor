@@ -2,20 +2,20 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  *
- * Value returned by a hooked method.
+ * Value returned by a hooked method. How the value is stored as an argument is up to the API (see create_argument()).
  */
-#ifndef D3D8_HOOK_RESULT_H
-#define D3D8_HOOK_RESULT_H
+#ifndef HOOKS_COMMON_HOOK_RESULT_H
+#define HOOKS_COMMON_HOOK_RESULT_H
 
-#include "Interception/Hooks/D3D8/argument_capture.h"
-#include "Interception/Hooks/D3D8/success_traits.h"
+#include "Interception/Hooks/Common/argument_factory.h"
+#include "Interception/Hooks/Common/success_traits.h"
 #include <utility>
 
 namespace Interception
 {
     namespace Hooks
     {
-        namespace D3D8
+        namespace Common
         {
             template<typename ReturnType>
             struct HookResult
@@ -28,6 +28,8 @@ namespace Interception
                 void call(Function in_function,
                           Arguments&&... in_arguments);
 
+                /* Capture is the API's ArgumentCapture<ReturnType>. */
+                template<typename Capture>
                 APIInterceptor::APIFunctionArgument create_argument() const;
                 ReturnType                          get            () const;
                 bool                                is_success     () const;
@@ -40,6 +42,7 @@ namespace Interception
                 void call(Function in_function,
                           Arguments&&... in_arguments);
 
+                template<typename Capture>
                 APIInterceptor::APIFunctionArgument create_argument() const;
                 void                                get            () const;
                 bool                                is_success     () const;
@@ -49,7 +52,7 @@ namespace Interception
 }
 
 template<typename ReturnType>
-Interception::Hooks::D3D8::HookResult<ReturnType>::HookResult()
+Interception::Hooks::Common::HookResult<ReturnType>::HookResult()
     :value()
 {
     /* Stub */
@@ -57,35 +60,42 @@ Interception::Hooks::D3D8::HookResult<ReturnType>::HookResult()
 
 template<typename ReturnType>
 template<typename Function, typename... Arguments>
-void Interception::Hooks::D3D8::HookResult<ReturnType>::call(Function in_function, Arguments&&... in_arguments)
+void Interception::Hooks::Common::HookResult<ReturnType>::call(Function in_function, Arguments&&... in_arguments)
 {
     value = in_function(std::forward<Arguments>(in_arguments)...);
 }
 
 template<typename ReturnType>
-APIInterceptor::APIFunctionArgument Interception::Hooks::D3D8::HookResult<ReturnType>::create_argument() const
+template<typename Capture>
+APIInterceptor::APIFunctionArgument Interception::Hooks::Common::HookResult<ReturnType>::create_argument() const
 {
-    return ArgumentCapture<ReturnType>::create_post_argument(value,
-                                                             APIInterceptor::APIFunctionArgument(),
-                                                             false); /* in_is_pre_argument_valid */
+    return Capture::create_post_argument(value,
+                                         APIInterceptor::APIFunctionArgument(),
+                                         false); /* in_is_pre_argument_valid */
 }
 
 template<typename ReturnType>
-ReturnType Interception::Hooks::D3D8::HookResult<ReturnType>::get() const
+ReturnType Interception::Hooks::Common::HookResult<ReturnType>::get() const
 {
     return value;
 }
 
 template<typename ReturnType>
-bool Interception::Hooks::D3D8::HookResult<ReturnType>::is_success() const
+bool Interception::Hooks::Common::HookResult<ReturnType>::is_success() const
 {
     return SuccessTraits<ReturnType>::is_success(value);
 }
 
 template<typename Function, typename... Arguments>
-void Interception::Hooks::D3D8::HookResult<void>::call(Function in_function, Arguments&&... in_arguments)
+void Interception::Hooks::Common::HookResult<void>::call(Function in_function, Arguments&&... in_arguments)
 {
     in_function(std::forward<Arguments>(in_arguments)...);
 }
 
-#endif /* D3D8_HOOK_RESULT_H */
+template<typename Capture>
+APIInterceptor::APIFunctionArgument Interception::Hooks::Common::HookResult<void>::create_argument() const
+{
+    return ArgumentFactory::create_unknown();
+}
+
+#endif /* HOOKS_COMMON_HOOK_RESULT_H */

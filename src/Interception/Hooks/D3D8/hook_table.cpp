@@ -2,66 +2,30 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
-#include "Interception/Hooks/D3D8/generic_hook.h"
+#include "Interception/Hooks/Common/generic_hook.h"
 #include "Interception/Hooks/D3D8/hook_table.h"
-#include "Interception/Hooks/D3D8/vtable_registry.h"
+#include "Interception/Hooks/D3D8/hook_traits.h"
 
-Interception::Hooks::D3D8::HookTable::HookTable()
+Interception::Hooks::Common::HookTable* Interception::Hooks::D3D8::get_hook_table_ptr()
 {
-    m_hook_entry_vec_vec.resize(static_cast<uint32_t>(Interface::COUNT) );
-
-    #define D3D8_METHOD(INTERFACE_TAG, interface_name, METHOD_TAG, method_name, vtable_index, return_type, parameters) \
-        m_hook_entry_vec_vec.at(static_cast<uint32_t>(Interface::INTERFACE_TAG) ).push_back( \
-            {reinterpret_cast<void*>(&GenericHook<PFN_##INTERFACE_TAG##_##METHOD_TAG, \
-                                                  APIInterceptor::APIFUNCTION_D3D8_##INTERFACE_TAG##_##METHOD_TAG, \
-                                                  VTABLE_INDEX_##INTERFACE_TAG##_##METHOD_TAG>::invoke), \
-             VTABLE_INDEX_##INTERFACE_TAG##_##METHOD_TAG} \
-        );
-    #include "Interception/Hooks/D3D8/d3d8_methods.inl"
-    #undef D3D8_METHOD
-}
-
-void Interception::Hooks::D3D8::HookTable::get_hook_entries(const Interface&  in_interface,
-                                                            const HookEntry** out_hook_entry_array_ptr_ptr,
-                                                            uint32_t*         out_n_hook_entries_ptr) const
-{
-    const auto n_interface = static_cast<uint32_t>(in_interface);
-
-    *out_hook_entry_array_ptr_ptr = nullptr;
-    *out_n_hook_entries_ptr       = 0;
-
-    if (n_interface < m_hook_entry_vec_vec.size() )
+    /* Thread-safe initialization: the table is not changed afterwards. */
+    static Interception::Hooks::Common::HookTable* result_ptr = []()
     {
-        const auto& hook_entry_vec = m_hook_entry_vec_vec.at(n_interface);
+        auto hook_table_ptr = new Interception::Hooks::Common::HookTable();
 
-        *out_hook_entry_array_ptr_ptr = hook_entry_vec.data();
-        *out_n_hook_entries_ptr       = static_cast<uint32_t>(hook_entry_vec.size() );
-    }
-}
+        #define D3D8_METHOD(INTERFACE_TAG, interface_name, METHOD_TAG, method_name, vtable_index, return_type, parameters) \
+            hook_table_ptr->add_hook_entry(static_cast<uint32_t>(Interface::INTERFACE_TAG), \
+                {reinterpret_cast<void*>(&Interception::Hooks::Common::GenericHook<HookTraits, \
+                                                                                   PFN_##INTERFACE_TAG##_##METHOD_TAG, \
+                                                                                   APIInterceptor::APIFUNCTION_D3D8_##INTERFACE_TAG##_##METHOD_TAG, \
+                                                                                   VTABLE_INDEX_##INTERFACE_TAG##_##METHOD_TAG>::invoke), \
+                 VTABLE_INDEX_##INTERFACE_TAG##_##METHOD_TAG} \
+            );
+        #include "Interception/Hooks/D3D8/d3d8_methods.inl"
+        #undef D3D8_METHOD
 
-Interception::Hooks::D3D8::HookTable* Interception::Hooks::D3D8::HookTable::get_ptr()
-{
-    static HookTable instance;
+        return hook_table_ptr;
+    }();
 
-    return &instance;
-}
-
-void Interception::Hooks::D3D8::HookTable::patch_object(const Interface& in_interface,
-                                                        const void*      in_object_ptr)
-{
-    const HookEntry* hook_entry_array_ptr = nullptr;
-    uint32_t         n_hook_entries       = 0;
-
-    get_hook_entries(in_interface,
-                    &hook_entry_array_ptr,
-                    &n_hook_entries);
-
-    if (in_object_ptr        != nullptr &&
-        hook_entry_array_ptr != nullptr)
-    {
-        VTableRegistry::get_ptr()->patch_vtable(in_interface,
-                                                in_object_ptr,
-                                                hook_entry_array_ptr,
-                                                n_hook_entries);
-    }
+    return result_ptr;
 }

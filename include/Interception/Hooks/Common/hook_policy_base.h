@@ -4,16 +4,16 @@
  *
  * What a method gets from HookPolicy when it has no specialization: nothing.
  */
-#ifndef D3D8_HOOK_POLICY_BASE_H
-#define D3D8_HOOK_POLICY_BASE_H
+#ifndef HOOKS_COMMON_HOOK_POLICY_BASE_H
+#define HOOKS_COMMON_HOOK_POLICY_BASE_H
 
-#include "Interception/Hooks/D3D8/types.h"
+#include "Interception/Hooks/Common/types.h"
 
 namespace Interception
 {
     namespace Hooks
     {
-        namespace D3D8
+        namespace Common
         {
             struct HookPolicyBase
             {
@@ -36,23 +36,23 @@ namespace Interception
 }
 
 template<typename... Arguments>
-void Interception::Hooks::D3D8::HookPolicyBase::create_extra_arguments(APIInterceptor::APIFunctionArgument*,
-                                                                       const Arguments&...)
+void Interception::Hooks::Common::HookPolicyBase::create_extra_arguments(APIInterceptor::APIFunctionArgument*,
+                                                                         const Arguments&...)
 {
     /* Stub */
 }
 
 template<typename... Arguments>
-void Interception::Hooks::D3D8::HookPolicyBase::on_call_finished(const bool&,
-                                                                 const Arguments&...)
+void Interception::Hooks::Common::HookPolicyBase::on_call_finished(const bool&,
+                                                                   const Arguments&...)
 {
     /* Stub */
 }
 
 template<typename... Arguments>
-void Interception::Hooks::D3D8::HookPolicyBase::on_call_starting(const Arguments&...)
+void Interception::Hooks::Common::HookPolicyBase::on_call_starting(const Arguments&...)
 {
     /* Stub */
 }
 
-#endif /* D3D8_HOOK_POLICY_BASE_H */
+#endif /* HOOKS_COMMON_HOOK_POLICY_BASE_H */

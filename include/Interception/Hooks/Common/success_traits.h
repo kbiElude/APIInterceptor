@@ -4,16 +4,16 @@
  *
  * Tells if a returned value reports success. Only HRESULTs do.
  */
-#ifndef D3D8_SUCCESS_TRAITS_H
-#define D3D8_SUCCESS_TRAITS_H
+#ifndef HOOKS_COMMON_SUCCESS_TRAITS_H
+#define HOOKS_COMMON_SUCCESS_TRAITS_H
 
-#include "Interception/Hooks/D3D8/types.h"
+#include "Interception/Hooks/Common/types.h"
 
 namespace Interception
 {
     namespace Hooks
     {
-        namespace D3D8
+        namespace Common
         {
             template<typename T>
             struct SuccessTraits
@@ -31,11 +31,11 @@ namespace Interception
 }
 
 template<typename T>
-bool Interception::Hooks::D3D8::SuccessTraits<T>::is_success(const T& in_value)
+bool Interception::Hooks::Common::SuccessTraits<T>::is_success(const T& in_value)
 {
     (void) in_value;
 
     return false;
 }
 
-#endif /* D3D8_SUCCESS_TRAITS_H */
+#endif /* HOOKS_COMMON_SUCCESS_TRAITS_H */

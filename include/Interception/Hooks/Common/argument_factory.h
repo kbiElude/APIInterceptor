@@ -2,18 +2,18 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  *
- * Creates API call arguments out of values of D3D8 argument types.
+ * Creates API call arguments out of values.
  */
-#ifndef D3D8_ARGUMENT_FACTORY_H
-#define D3D8_ARGUMENT_FACTORY_H
+#ifndef HOOKS_COMMON_ARGUMENT_FACTORY_H
+#define HOOKS_COMMON_ARGUMENT_FACTORY_H
 
-#include "Interception/Hooks/D3D8/types.h"
+#include "Interception/Hooks/Common/types.h"
 
 namespace Interception
 {
     namespace Hooks
     {
-        namespace D3D8
+        namespace Common
         {
             class ArgumentFactory
             {
@@ -42,4 +42,4 @@ namespace Interception
     }
 }
 
-#endif /* D3D8_ARGUMENT_FACTORY_H */
+#endif /* HOOKS_COMMON_ARGUMENT_FACTORY_H */

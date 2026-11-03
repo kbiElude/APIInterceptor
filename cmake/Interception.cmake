@@ -60,11 +60,19 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
                                  ${D3D8UtilsIncludes}
                                  ${D3D8UtilsSources})
 
+    # What the hooks of the COM-based APIs (D3D8...) have in common.
+    file(GLOB HooksCommonIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Interception/Hooks/Common/*.h")
+    file(GLOB HooksCommonSources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Interception/Hooks/Common/*.cpp")
+
+    add_library(HooksCommon STATIC ${CommonIncludes}
+                                   ${HooksCommonIncludes}
+                                   ${HooksCommonSources})
+
     add_library          (D3D8 STATIC ${CommonIncludes}
                                       ${D3D8Includes}
                                       ${D3D8Sources})
-    add_dependencies     (D3D8 D3D8Utils Kernel32)
-    target_link_libraries(D3D8 D3D8Utils Kernel32)
+    add_dependencies     (D3D8 D3D8Utils HooksCommon Kernel32)
+    target_link_libraries(D3D8 D3D8Utils HooksCommon Kernel32)
 
     add_library          (OpenGL STATIC ${CommonIncludes}
                                          ${KhronosIncludes}
@@ -123,6 +131,8 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
     source_group ("D3D8 Utils include files" FILES ${D3D8UtilsIncludes})
     source_group ("D3D8 Utils source files"  FILES ${D3D8UtilsSources})
     source_group ("GDI32 include files"      FILES ${GDI32Includes})
+    source_group ("Hooks Common include files" FILES ${HooksCommonIncludes})
+    source_group ("Hooks Common source files"  FILES ${HooksCommonSources})
     source_group ("GDI32 source files"       FILES ${GDI32Sources})
     source_group ("Kernel32 include files"   FILES ${Kernel32Includes})
     source_group ("Kernel32 source files"    FILES ${Kernel32Sources})

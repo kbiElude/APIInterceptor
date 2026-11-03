@@ -6,7 +6,6 @@
 #include "Interception/Hooks/D3D8/entrypoints.h"
 #include "Interception/Hooks/D3D8/globals.h"
 #include "Interception/Hooks/D3D8/interceptors.h"
-#include "Interception/Hooks/D3D8/vtable_registry.h"
 #include "Detours/src/detours.h"
 #include "Interception/Hooks/Kernel32/callbacks.h"
 

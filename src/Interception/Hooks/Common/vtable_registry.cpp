@@ -3,12 +3,11 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "Common/macros.h"
-#include "Interception/Hooks/D3D8/vtable_registry.h"
-#include "Interception/Core/D3D8Utils/methods.h"
+#include "Interception/Hooks/Common/vtable_registry.h"
 #include <Windows.h>
 
-void* Interception::Hooks::D3D8::VTableRegistry::get_original_function_ptr(const void*     in_object_ptr,
-                                                                           const uint32_t& in_vtable_index)
+void* Interception::Hooks::Common::VTableRegistry::get_original_function_ptr(const void*     in_object_ptr,
+                                                                             const uint32_t& in_vtable_index)
 {
     constexpr size_t N_CACHE_ENTRIES = 64; /* a power of two */
 
@@ -53,7 +52,7 @@ void* Interception::Hooks::D3D8::VTableRegistry::get_original_function_ptr(const
     return result_ptr;
 }
 
-Interception::Hooks::D3D8::VTableRegistry* Interception::Hooks::D3D8::VTableRegistry::get_ptr()
+Interception::Hooks::Common::VTableRegistry* Interception::Hooks::Common::VTableRegistry::get_ptr()
 {
     /* Never destroyed: hooks can still run during shutdown. */
     static VTableRegistry* instance_ptr = new VTableRegistry();
@@ -61,10 +60,11 @@ Interception::Hooks::D3D8::VTableRegistry* Interception::Hooks::D3D8::VTableRegi
     return instance_ptr;
 }
 
-bool Interception::Hooks::D3D8::VTableRegistry::patch_vtable(const Interface& in_interface,
-                                                             const void*      in_object_ptr,
-                                                             const HookEntry* in_hook_entry_array_ptr,
-                                                             uint32_t         in_n_hook_entries)
+bool Interception::Hooks::Common::VTableRegistry::patch_vtable(const uint32_t&  in_interface_id,
+                                                               const uint32_t&  in_n_methods,
+                                                               const void*      in_object_ptr,
+                                                               const HookEntry* in_hook_entry_array_ptr,
+                                                               uint32_t         in_n_hook_entries)
 {
     bool result = false;
 
@@ -80,14 +80,14 @@ bool Interception::Hooks::D3D8::VTableRegistry::patch_vtable(const Interface& in
             {
                 PatchedVtable new_vtable;
 
-                new_vtable.interface_type = in_interface;
+                new_vtable.interface_id = in_interface_id;
 
-                new_vtable.original_function_ptr_vec.resize(Interception::Core::D3D8Utils::get_n_methods(in_interface) );
+                new_vtable.original_function_ptr_vec.resize(in_n_methods);
                 iterator = m_patched_vtable_map.emplace(vtable_ptr,
                                                         std::move(new_vtable) ).first;
             }
 
-            AI_ASSERT(iterator->second.interface_type == in_interface);
+            AI_ASSERT(iterator->second.interface_id == in_interface_id);
 
             for (uint32_t n_hook_entry = 0;
                           n_hook_entry < in_n_hook_entries;

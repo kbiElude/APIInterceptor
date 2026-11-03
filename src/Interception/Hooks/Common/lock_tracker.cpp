@@ -2,11 +2,11 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
-#include "Interception/Hooks/D3D8/lock_tracker.h"
+#include "Interception/Hooks/Common/lock_tracker.h"
 
-bool Interception::Hooks::D3D8::LockTracker::get_lock(const void*     in_object_ptr,
-                                                      const uint32_t& in_level,
-                                                      LockRecord*     out_lock_record_ptr)
+bool Interception::Hooks::Common::LockTracker::get_lock(const void*     in_object_ptr,
+                                                        const uint32_t& in_level,
+                                                        LockRecord*     out_lock_record_ptr)
 {
     bool result = false;
 
@@ -26,16 +26,16 @@ bool Interception::Hooks::D3D8::LockTracker::get_lock(const void*     in_object_
     return result;
 }
 
-Interception::Hooks::D3D8::LockTracker* Interception::Hooks::D3D8::LockTracker::get_ptr()
+Interception::Hooks::Common::LockTracker* Interception::Hooks::Common::LockTracker::get_ptr()
 {
     static LockTracker instance;
 
     return &instance;
 }
 
-void Interception::Hooks::D3D8::LockTracker::on_locked(const void*       in_object_ptr,
-                                                       const uint32_t&   in_level,
-                                                       const LockRecord& in_lock_record)
+void Interception::Hooks::Common::LockTracker::on_locked(const void*       in_object_ptr,
+                                                         const uint32_t&   in_level,
+                                                         const LockRecord& in_lock_record)
 {
     {
         std::lock_guard<std::mutex> lock(m_mutex);
@@ -45,8 +45,8 @@ void Interception::Hooks::D3D8::LockTracker::on_locked(const void*       in_obje
     }
 }
 
-void Interception::Hooks::D3D8::LockTracker::on_unlocked(const void*     in_object_ptr,
-                                                         const uint32_t& in_level)
+void Interception::Hooks::Common::LockTracker::on_unlocked(const void*     in_object_ptr,
+                                                           const uint32_t& in_level)
 {
     {
         std::lock_guard<std::mutex> lock(m_mutex);

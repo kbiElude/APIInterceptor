@@ -49,8 +49,8 @@ void Interception::Hooks::D3D8::ObjectPatcher<T, true>::patch(const T& in_value)
     {
         const Interface interface_value = Interception::Core::D3D8Utils::InterfaceTraits<InterfaceType>::interface_value;
 
-        HookTable::get_ptr()->patch_object(interface_value,
-                                          *in_value);
+        get_hook_table_ptr()->patch_object(static_cast<uint32_t>(interface_value),
+                                           *in_value);
     }
 }
 

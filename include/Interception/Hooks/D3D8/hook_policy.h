@@ -9,7 +9,7 @@
 #ifndef D3D8_HOOK_POLICY_H
 #define D3D8_HOOK_POLICY_H
 
-#include "Interception/Hooks/D3D8/hook_policy_base.h"
+#include "Interception/Hooks/Common/hook_policy_base.h"
 #include "Interception/Hooks/D3D8/hook_policy_helper.h"
 
 namespace Interception
@@ -18,6 +18,8 @@ namespace Interception
     {
         namespace D3D8
         {
+            typedef Interception::Hooks::Common::HookPolicyBase HookPolicyBase;
+
             template<APIInterceptor::APIFunction function>
             struct HookPolicy : public HookPolicyBase
             {

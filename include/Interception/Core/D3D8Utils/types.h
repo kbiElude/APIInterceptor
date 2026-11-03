@@ -17,18 +17,8 @@ namespace Interception
     {
         namespace D3D8Utils
         {
-            /* How an argument is captured. */
-            enum class ArgumentCategory
-            {
-                CONST_STRUCT,   /* const S*: input structure, captured before the call                       */
-                GUID,           /* const GUID&                                                               */
-                MUTABLE_STRUCT, /* S*: output structure, captured after the call (input/output: before, too) */
-                OBJECT,         /* Pointer to a D3D8 interface                                               */
-                OBJECT_OUT,     /* Pointer to a pointer to a D3D8 interface, written by the call             */
-                POINTER_OUT,    /* void**: pointer written by the call, e.g. by QueryInterface               */
-                SCALAR,         /* Integers, floats, enums and any other pointers                            */
-                SCALAR_OUT      /* Pointer to an integer, written by the call                                */
-            };
+            /* How an argument is captured (see Hooks/Common/types.h). */
+            typedef Interception::Hooks::Common::ArgumentCategory ArgumentCategory;
 
             enum class ObjectType
             {
@@ -74,10 +64,7 @@ namespace Interception
 
             /* The pointed-to type of a pointer argument, without cv-qualifiers. */
             template<typename T>
-            struct PointeeOf
-            {
-                typedef typename std::remove_cv<typename std::remove_pointer<T>::type>::type type;
-            };
+            using PointeeOf = Interception::Hooks::Common::PointeeOf<T>;
 
             /* Integers which can be written through a pointer. */
             template<typename T>

@@ -5,10 +5,10 @@
  * Remembers the regions of resources which the application has locked, until it unlocks them. The contents are
  * captured at unlock time, when the application is done writing.
  */
-#ifndef D3D8_LOCK_TRACKER_H
-#define D3D8_LOCK_TRACKER_H
+#ifndef HOOKS_COMMON_LOCK_TRACKER_H
+#define HOOKS_COMMON_LOCK_TRACKER_H
 
-#include "Interception/Hooks/D3D8/types.h"
+#include "Interception/Hooks/Common/types.h"
 #include <map>
 #include <mutex>
 #include <utility>
@@ -17,7 +17,7 @@ namespace Interception
 {
     namespace Hooks
     {
-        namespace D3D8
+        namespace Common
         {
             class LockTracker
             {
@@ -43,4 +43,4 @@ namespace Interception
     }
 }
 
-#endif /* D3D8_LOCK_TRACKER_H */
+#endif /* HOOKS_COMMON_LOCK_TRACKER_H */

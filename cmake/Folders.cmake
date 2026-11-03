@@ -1,7 +1,7 @@
 # The projects of the solution in folders, by what they are for.
 include(${APIInterceptor_SOURCE_DIR}/cmake/FolderHelpers.cmake)
 
-assign_folder("Interception/Hooks"     D3D8 GDI32 Kernel32 OpenGL User32 WGL)
+assign_folder("Interception/Hooks"     D3D8 GDI32 HooksCommon Kernel32 OpenGL User32 WGL)
 assign_folder("Interception/Core"      APIInterceptor D3D8Utils OpenGLUtils)
 assign_folder("Capture"                APIDumper APIDumperDLL APIDumpLoader APIDumpPrinter InjectionLauncher)
 assign_folder("Replay"                 ReplayEngineDLL ReplayPlayer)

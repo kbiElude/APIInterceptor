@@ -2,9 +2,9 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
-#include "Interception/Hooks/D3D8/argument_factory.h"
+#include "Interception/Hooks/Common/argument_factory.h"
+#include "Interception/Hooks/Common/lock_tracker.h"
 #include "Interception/Hooks/D3D8/hook_policy_helper.h"
-#include "Interception/Hooks/D3D8/lock_tracker.h"
 #include "Interception/Core/D3D8Utils/surface_layout.h"
 #include <algorithm>
 
@@ -12,9 +12,9 @@ APIInterceptor::APIFunctionArgument Interception::Hooks::D3D8::HookPolicyHelper:
                                                                                                              const uint32_t& in_level)
 {
     LockRecord lock_record = {};
-    bool       has_data    = LockTracker::get_ptr()->get_lock(in_object_ptr,
-                                                              in_level,
-                                                             &lock_record);
+    bool       has_data    = Interception::Hooks::Common::LockTracker::get_ptr()->get_lock(in_object_ptr,
+                                                                                           in_level,
+                                                                                          &lock_record);
 
     /* Nothing was written to a resource which was locked for reading. */
     if (has_data                                    &&
@@ -23,10 +23,10 @@ APIInterceptor::APIFunctionArgument Interception::Hooks::D3D8::HookPolicyHelper:
         has_data = false;
     }
 
-    return ArgumentFactory::create_chunk(has_data ? lock_record.data_ptr
-                                                  : nullptr,
-                                         has_data ? lock_record.n_bytes
-                                                  : 0);
+    return Interception::Hooks::Common::ArgumentFactory::create_chunk(has_data ? lock_record.data_ptr
+                                                                               : nullptr,
+                                                                      has_data ? lock_record.n_bytes
+                                                                               : 0);
 }
 
 void Interception::Hooks::D3D8::HookPolicyHelper::create_present_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
@@ -46,12 +46,12 @@ void Interception::Hooks::D3D8::HookPolicyHelper::create_present_arguments(APIIn
                                              MAX_N_RECTS);
     }
 
-    out_arguments_ptr[0] = ArgumentFactory::create_chunk(in_source_rect_ptr,
-                                                         static_cast<uint32_t>(sizeof(RECT) ));
-    out_arguments_ptr[1] = ArgumentFactory::create_chunk(in_dest_rect_ptr,
-                                                         static_cast<uint32_t>(sizeof(RECT) ));
-    out_arguments_ptr[2] = ArgumentFactory::create_chunk(dirty_rects_ptr,
-                                                         n_dirty_rects * static_cast<uint32_t>(sizeof(RECT) ));
+    out_arguments_ptr[0] = Interception::Hooks::Common::ArgumentFactory::create_chunk(in_source_rect_ptr,
+                                                                                      static_cast<uint32_t>(sizeof(RECT) ));
+    out_arguments_ptr[1] = Interception::Hooks::Common::ArgumentFactory::create_chunk(in_dest_rect_ptr,
+                                                                                      static_cast<uint32_t>(sizeof(RECT) ));
+    out_arguments_ptr[2] = Interception::Hooks::Common::ArgumentFactory::create_chunk(dirty_rects_ptr,
+                                                                                      n_dirty_rects * static_cast<uint32_t>(sizeof(RECT) ));
 }
 
 uint32_t Interception::Hooks::D3D8::HookPolicyHelper::get_cube_face_level_key(const D3DCUBEMAP_FACES& in_face,
@@ -247,9 +247,9 @@ void Interception::Hooks::D3D8::HookPolicyHelper::on_box_locked(const void*     
                                                                      static_cast<uint32_t>(in_locked_box_ptr->RowPitch) )
                                         : 0;
 
-    LockTracker::get_ptr()->on_locked(in_object_ptr,
-                                      in_level,
-                                      lock_record);
+    Interception::Hooks::Common::LockTracker::get_ptr()->on_locked(in_object_ptr,
+                                                                   in_level,
+                                                                   lock_record);
 }
 
 void Interception::Hooks::D3D8::HookPolicyHelper::on_buffer_locked(const void*     in_object_ptr,
@@ -268,9 +268,9 @@ void Interception::Hooks::D3D8::HookPolicyHelper::on_buffer_locked(const void*  
     lock_record.n_bytes  = (in_size_to_lock != 0) ? in_size_to_lock
                                                   : n_bytes_to_end;
 
-    LockTracker::get_ptr()->on_locked(in_object_ptr,
-                                      0, /* in_level */
-                                      lock_record);
+    Interception::Hooks::Common::LockTracker::get_ptr()->on_locked(in_object_ptr,
+                                                                   0, /* in_level */
+                                                                   lock_record);
 }
 
 void Interception::Hooks::D3D8::HookPolicyHelper::on_rect_locked(const void*            in_object_ptr,
@@ -295,7 +295,7 @@ void Interception::Hooks::D3D8::HookPolicyHelper::on_rect_locked(const void*    
                                                       height,
                                                       static_cast<uint32_t>(in_locked_rect_ptr->Pitch) );
 
-    LockTracker::get_ptr()->on_locked(in_object_ptr,
-                                      in_level,
-                                      lock_record);
+    Interception::Hooks::Common::LockTracker::get_ptr()->on_locked(in_object_ptr,
+                                                                   in_level,
+                                                                   lock_record);
 }

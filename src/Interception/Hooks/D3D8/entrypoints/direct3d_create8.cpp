@@ -50,7 +50,7 @@ Interception::Hooks::D3D8::IDirect3D8* __stdcall Interception::Hooks::D3D8::aiDi
     }
 
     /* Hook the methods of IDirect3D8. */
-    HookTable::get_ptr()->patch_object(Interface::IDIRECT3D8,
+    get_hook_table_ptr()->patch_object(static_cast<uint32_t>(Interface::IDIRECT3D8),
                                        result);
 
     if (tracker.is_top_level_api_call() )

@@ -9,6 +9,7 @@
 #define D3D8_TYPES_H
 
 #include "Common/types.h"
+#include "Interception/Hooks/Common/types.h"
 #include <Windows.h>
 #include <cstdint>
 #include <type_traits>
@@ -597,13 +598,6 @@ namespace Interception
                 UINT            Depth;
             };
 
-            /* A vtable slot to hook. */
-            struct HookEntry
-            {
-                void*    hook_function_ptr;
-                uint32_t vtable_index;
-            };
-
             /* Interfaces (opaque). */
             struct IDirect3D8;
             struct IDirect3DBaseTexture8;
@@ -631,12 +625,7 @@ namespace Interception
             };
 
             /* A locked region of a resource, as handed out to the application. */
-            struct LockRecord
-            {
-                const uint8_t* data_ptr;
-                uint32_t       flags;
-                uint32_t       n_bytes;
-            };
+            typedef Interception::Hooks::Common::LockRecord LockRecord;
 
             struct MethodInfo
             {
@@ -732,17 +721,8 @@ namespace Interception
             };
 
             /* Enums are 32-bit in D3D8. */
-            template<typename T, bool is_enum = std::is_enum<T>::value>
-            struct ScalarConversion
-            {
-                typedef T type;
-            };
-
             template<typename T>
-            struct ScalarConversion<T, true>
-            {
-                typedef uint32_t type;
-            };
+            using ScalarConversion = Interception::Hooks::Common::ScalarConversion<T>;
 
             /* Accessors of the description of a method's signature. */
             struct SignatureEntry
