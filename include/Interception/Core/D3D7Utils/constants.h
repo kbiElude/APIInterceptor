@@ -104,6 +104,14 @@ namespace Interception
             enum TransformState : uint32_t
             {
                 D3DTRANSFORMSTATE_PROJECTION = 3,
+                D3DTRANSFORMSTATE_TEXTURE0   = 16,
+                D3DTRANSFORMSTATE_TEXTURE1   = 17,
+                D3DTRANSFORMSTATE_TEXTURE2   = 18,
+                D3DTRANSFORMSTATE_TEXTURE3   = 19,
+                D3DTRANSFORMSTATE_TEXTURE4   = 20,
+                D3DTRANSFORMSTATE_TEXTURE5   = 21,
+                D3DTRANSFORMSTATE_TEXTURE6   = 22,
+                D3DTRANSFORMSTATE_TEXTURE7   = 23,
                 D3DTRANSFORMSTATE_VIEW       = 2,
                 D3DTRANSFORMSTATE_WORLD      = 1,
                 D3DTRANSFORMSTATE_WORLD1     = 4,
