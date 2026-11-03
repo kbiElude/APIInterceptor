@@ -9,6 +9,7 @@
 #define D3D8_TYPES_H
 
 #include "Common/types.h"
+#include "Interception/Core/Common/signature_info.h"
 #include "Interception/Hooks/Common/types.h"
 #include <Windows.h>
 #include <cstdint>
@@ -725,11 +726,7 @@ namespace Interception
             using ScalarConversion = Interception::Hooks::Common::ScalarConversion<T>;
 
             /* Accessors of the description of a method's signature. */
-            struct SignatureEntry
-            {
-                const std::vector<ArgumentInfo>& (*get_argument_info_vec_func_ptr)();
-                ArgumentInfo                     (*get_return_info_func_ptr)();
-            };
+            typedef Interception::Core::Common::SignatureEntry<ArgumentInfo> SignatureEntry;
 
             /* Vtable slot of each method, e.g. VTABLE_INDEX_IDIRECT3DDEVICE8_PRESENT. */
             enum VtableIndex : uint32_t

@@ -33,9 +33,10 @@
 <h3>APIInterceptor (<code>Common</code>)</h3>
 <p><em>Library of objects, compiled into every DLL that hooks.</em> The machinery that does not depend on an API: the registry of callbacks that run before and after each function, the gate that stops the interceptor from seeing its own calls, the store of the data chunks that a call carries, the logger, the failure of unsupported values (<code>AI_FAIL_UNSUPPORTED</code>), and the types of the workload file. Its namespace is <code>APIInterceptor</code>.</p>
 
-<h3>D3D8, HooksCommon, OpenGL, WGL, GDI32, User32, Kernel32</h3>
+<h3>D3D7, D3D8, HooksCommon, OpenGL, WGL, GDI32, User32, Kernel32</h3>
 <p><em>Libraries, one for each set of entry points.</em></p>
 <ul>
+  <li><code>D3D7</code> hooks DirectDraw 7 and Direct3D 7 the same way: the objects it hooks are the DirectDraw, its surfaces, palettes and clippers, and the Direct3D, its device and its vertex buffers, found through <code>DirectDrawCreateEx</code> and <code>QueryInterface</code>. The runtime of Direct3D 7 rewrites the slots of the draw calls of a device after the first call, so the hooks put theirs back after each call they see. A frame ends with a flip, or with a blit to the primary surface.</li>
   <li><code>D3D8</code> hooks Direct3D 8 through the tables of methods of its objects. Besides the entry points it has the policy of what is hooked and the modification of typed arguments. What it shares with the other COM-based APIs is in <code>HooksCommon</code>; it adds its traits to it.</li>
   <li><code>HooksCommon</code> (<code>Interception/Hooks/Common</code>) is what the hooks of the APIs made of COM objects have in common: the hook of a function exported by a DLL, found once the DLL is loaded; the registry of the patched tables of methods, and the table of hooks that fills them; the hook of one method, which an API tunes with its traits (how its arguments are stored, the extra data and bookkeeping of a method, which call ends a frame); the capture of arguments by category; and the tracker of locks, so that the data a program writes into a buffer or a surface is known when it is unlocked.</li>
   <li><code>OpenGL</code> hooks the functions of each version and extension, a directory for each. It keeps the state that is per context in a registry of contexts.</li>
@@ -44,8 +45,8 @@
   <li><code>Kernel32</code> hooks <code>LoadLibrary</code> and <code>ExitProcess</code>: the first to notice an API that is loaded after the program starts, the second to know when the process ends.</li>
 </ul>
 
-<h3>D3D8Utils and OpenGLUtils</h3>
-<p><em>Libraries, in <code>Interception/Core</code>.</em> The knowledge of an API that is not a hook. <code>D3D8Utils</code> describes the Direct3D 8 interfaces and methods (the table of methods, the traits and kinds of arguments, readers of values, the layout of the pixels of a surface). The hooks, the printer and any project that reads a workload all read it, so that none of them keeps its own list. <code>OpenGLUtils</code> is the corresponding, smaller helper for the enums of OpenGL.</p>
+<h3>D3D7Utils, D3D8Utils and OpenGLUtils</h3>
+<p><em>Libraries, in <code>Interception/Core</code>.</em> The knowledge of an API that is not a hook. <code>D3D8Utils</code> describes the Direct3D 8 interfaces and methods (the table of methods, the traits and kinds of arguments, readers of values, the layout of the pixels of a surface); <code>D3D7Utils</code> does the same for DirectDraw 7 and Direct3D 7, and adds the formats of vertices, the layouts of the palettes and the known GUIDs. What the two share (how a signature is turned into the description of its arguments) is in <code>Core/Common</code>. The hooks, the printer and any project that reads a workload all read it, so that none of them keeps its own list. <code>OpenGLUtils</code> is the corresponding, smaller helper for the enums of OpenGL.</p>
 
 <h2 id="capture">Capture</h2>
 <p>Recording what a program does into a workload file. See <a href="capture.html">Capture</a>.</p>
@@ -60,7 +61,7 @@
 <p><em>Library.</em> Reads a workload. <code>WorkloadReader</code> takes it segment by segment, so that a workload larger than memory can be read; <code>api_info</code> says which API group a call belongs to and which calls end a frame. The replay engine and the printer read workloads through it.</p>
 
 <h3>APIDumpPrinter</h3>
-<p><em>Program.</em> Prints a workload as text, every call with every argument. It has the names of the calls and enums of each API, and a decoder of the arguments. It is for reading what a program did, and nothing else.</p>
+<p><em>Program.</em> Prints a workload as text, every call with every argument. It has the names of the calls and enums of each API, and a decoder of the arguments for Direct3D 7 and 8: enums and flags by name, structures field by field, and objects by the order they were created in (<code>Surface#3</code>). The decoders share the naming of the objects and the formatting of the values that the two APIs have in common. It is for reading what a program did, and nothing else.</p>
 
 <h3>InjectionLauncher</h3>
 <p><em>Library.</em> Starting an application with a DLL in it, used by the dumper, and by any project that has to start a program with a DLL in it. It reads the executable to know its architecture, injects with Detours while the application is suspended.</p>

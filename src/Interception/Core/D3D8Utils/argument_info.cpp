@@ -49,46 +49,12 @@ bool Interception::Core::D3D8Utils::get_argument_info(const APIInterceptor::APIF
         {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DVOLUMETEXTURE8_LOCKBOX,       Interception::Hooks::D3D8::ValueKind::LOCK_FLAGS,                4},
     };
 
-    const Interception::Hooks::D3D8::ArgumentOverride* override_ptr    = nullptr;
-    bool                    result          = false;
-    const Interception::Hooks::D3D8::SignatureEntry*   signature_entry = get_signature_entry_ptr(in_function);
-
-    for (const auto& current_override : argument_override_array)
-    {
-        if (current_override.function   == in_function &&
-            current_override.n_argument == in_n_argument)
-        {
-            override_ptr = &current_override;
-
-            break;
-        }
-    }
-
-    if (signature_entry != nullptr)
-    {
-        const auto& argument_info_vec = signature_entry->get_argument_info_vec_func_ptr();
-
-        if (in_n_argument < argument_info_vec.size() )
-        {
-            *out_argument_info_ptr = argument_info_vec.at(in_n_argument);
-
-            if (override_ptr != nullptr)
-            {
-                out_argument_info_ptr->kind = override_ptr->kind;
-            }
-
-            result = true;
-        }
-        else
-        if (override_ptr != nullptr)
-        {
-            /* An argument which follows the ones of the method. Only overrides describe those. */
-            out_argument_info_ptr->kind                 = override_ptr->kind;
-            out_argument_info_ptr->object_type_name_ptr = nullptr;
-
-            result = true;
-        }
-    }
+    const bool result = Interception::Core::Common::find_argument_info(get_signature_entry_ptr(in_function),
+                                                                       argument_override_array,
+                                                                       sizeof(argument_override_array) / sizeof(argument_override_array[0]),
+                                                                       in_function,
+                                                                       in_n_argument,
+                                                                       out_argument_info_ptr);
 
     return result;
 }

@@ -45,6 +45,7 @@
 <p>Direct3D 8 is the first API with a deep set of hooks, and the demos are what drove the work, but the code is arranged for more. What depends on an API is the set of its hooks, its names for the printer, and what its structures are called in a dump; everything else (the callbacks, the data chunks, the workload file) is the same for each.</p>
 <table>
 <tr><th>API</th><th>Hooks and dump</th><th>Printer</th></tr>
+<tr><td>DirectDraw 7 and Direct3D 7</td><td>yes</td><td>yes</td></tr>
 <tr><td>Direct3D 8</td><td>yes</td><td>yes</td></tr>
 <tr><td>OpenGL</td><td>yes</td><td>yes</td></tr>
 <tr><td>Win32 windows (GDI32, User32, WGL)</td><td>yes</td><td>yes</td></tr>
@@ -57,8 +58,8 @@
 <p>Each project is described in <a href="components.html">Components</a>.</p>
 <table>
 <tr><th>Group</th><th>Projects</th><th>What they do</th></tr>
-<tr><td>Interception hooks</td><td><code>D3D8</code>, <code>GDI32</code>, <code>HooksCommon</code>, <code>Kernel32</code>, <code>OpenGL</code>, <code>User32</code>, <code>WGL</code></td><td>The hooked entry points of each API, named <code>ai&lt;ApiName&gt;</code>.</td></tr>
-<tr><td>Interception core</td><td><code>APIInterceptor</code> (in <code>Common</code>), <code>D3D8Utils</code>, <code>OpenGLUtils</code></td><td>Hooking, callbacks, data chunks, argument types.</td></tr>
+<tr><td>Interception hooks</td><td><code>D3D7</code>, <code>D3D8</code>, <code>GDI32</code>, <code>HooksCommon</code>, <code>Kernel32</code>, <code>OpenGL</code>, <code>User32</code>, <code>WGL</code></td><td>The hooked entry points of each API, named <code>ai&lt;ApiName&gt;</code>.</td></tr>
+<tr><td>Interception core</td><td><code>APIInterceptor</code> (in <code>Common</code>), <code>D3D7Utils</code>, <code>D3D8Utils</code>, <code>OpenGLUtils</code></td><td>Hooking, callbacks, data chunks, argument types.</td></tr>
 <tr><td>Capture</td><td><code>APIDumper</code>, <code>APIDumperDLL</code>, <code>APIDumpLoader</code>, <code>APIDumpPrinter</code>, <code>InjectionLauncher</code></td><td>Launch a program with the dumper injected; read, write and print workloads; start any program with a DLL in it.</td></tr>
 <tr><td>Replay</td><td><code>ReplayEngineDLL</code>, <code>ReplayPlayer</code></td><td>Execute the calls of a workload again, in a window.</td></tr>
 </table>

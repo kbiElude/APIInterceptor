@@ -32,6 +32,9 @@ namespace Interception
             const Interception::Hooks::D3D7::MethodInfo* get_method_info_array_ptr(uint32_t* out_n_methods_ptr);
 
             uint32_t get_n_methods(const Interception::Hooks::D3D7::Interface& in_interface);
+
+            /* Returns nullptr for ObjectType::NONE. */
+            const char* get_object_type_name_ptr(const ObjectType& in_object_type);
         }
     }
 }

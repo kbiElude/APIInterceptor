@@ -15,6 +15,8 @@
 #include "Capture/APIDumpLoader/WorkloadReader.h"
 #include "Capture/APIDumpLoader/api_info.h"
 #include "api_info.h"
+#include "d3d7_decoder.h"
+#include "d3d8_decoder.h"
 #include "formatter.h"
 #include "printer.h"
 
@@ -277,8 +279,13 @@ void Capture::APIDumpPrinter::print_usage()
 int Capture::APIDumpPrinter::run(int   in_argc,
                                   char* in_argv[])
 {
+    typedef std::map<Capture::APIDumpLoader::APIGroup, IAPIDecoder*> DecoderPtrMap;
+
     std::map<APIInterceptor::APIFunction, uint32_t>      call_count_map;
+    D3D7Decoder                                          d3d7_decoder;
     D3D8Decoder                                          d3d8_decoder;
+    DecoderPtrMap                                        decoder_ptr_map   = {{Capture::APIDumpLoader::APIGroup::D3D7, &d3d7_decoder},
+                                                                              {Capture::APIDumpLoader::APIGroup::D3D8, &d3d8_decoder}};
     std::map<Capture::APIDumpLoader::APIGroup, uint32_t> group_count_map;
     uint32_t                                             last_header_frame = UINT32_MAX;
     uint32_t                                             n_calls_selected  = 0;
@@ -326,9 +333,14 @@ int Capture::APIDumpPrinter::run(int   in_argc,
                                            options.allowed_api_group_set.find(api_group) != options.allowed_api_group_set.end();
 
             /* Objects are named in the order they are created, whether or not their creation is printed. */
-            if (api_group == Capture::APIDumpLoader::APIGroup::D3D8)
+            const auto   decoder_iterator = decoder_ptr_map.find(api_group);
+            IAPIDecoder* decoder_ptr      = (decoder_iterator != decoder_ptr_map.end() ) ? decoder_iterator->second
+                                                                                         : nullptr;
+
+            if (decoder_ptr != nullptr)
             {
-                d3d8_decoder.register_created_objects(current_api_call);
+                decoder_ptr->register_created_objects(current_api_call,
+                                                      segment);
             }
 
             if (is_in_frame_range &&
@@ -357,7 +369,7 @@ int Capture::APIDumpPrinter::run(int   in_argc,
                                segment,
                                options.n_hexdump_bytes,
                               &referenced_chunk_set,
-                              &d3d8_decoder);
+                               decoder_ptr);
                 }
             }
 

@@ -6,7 +6,7 @@
 #define APIDUMPPRINTER_FORMATTER_H
 
 #include "Capture/APIDumpLoader/APIDumpLoader.h"
-#include "d3d8_decoder.h"
+#include "i_api_decoder.h"
 #include <stdio.h>
 #include <set>
 #include <vector>
@@ -34,7 +34,7 @@ namespace Capture
                         const Capture::APIDumpLoader::Workload&      in_workload,
                         uint32_t                                     in_n_hexdump_bytes,
                         std::set<APIInterceptor::DataChunkID>*       inout_referenced_chunk_set_ptr,
-                        D3D8Decoder*                                 inout_d3d8_decoder_ptr);
+                        const IAPIDecoder*                           in_decoder_ptr);
 
         /* Helper: hex-dumps up to in_n_bytes_max bytes of a data chunk. */
         void print_hexdump(FILE*                       in_file_handle,

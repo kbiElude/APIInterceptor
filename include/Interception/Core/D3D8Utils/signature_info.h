@@ -1,15 +1,13 @@
 /* API Interceptor (c) 2025 Dominik Witczak
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
- *
- * Describes the arguments and the returned value of a D3D8 method, given its function pointer type.
  */
 #ifndef D3D8UTILS_SIGNATURE_INFO_H
 #define D3D8UTILS_SIGNATURE_INFO_H
 
+#include "Interception/Core/Common/signature_info.h"
 #include "Interception/Core/D3D8Utils/argument_traits.h"
 #include "Interception/Core/D3D8Utils/methods.h"
-#include <vector>
 
 namespace Interception
 {
@@ -17,36 +15,23 @@ namespace Interception
     {
         namespace D3D8Utils
         {
-            template<typename FunctionPtr>
-            struct SignatureInfo;
-
-            template<typename ReturnType, typename... Arguments>
-            struct SignatureInfo<ReturnType (__stdcall*)(Arguments...)>
+            /* What the description of a signature needs to know of D3D8 (see Common/signature_info.h). */
+            struct SignatureTraits
             {
-                static const std::vector<Interception::Hooks::D3D8::ArgumentInfo>& get_argument_info_vec();
-                static Interception::Hooks::D3D8::ArgumentInfo                     get_return_info      ();
+                typedef Interception::Hooks::D3D8::ArgumentInfo ArgumentInfo;
+
+                template<typename T> using ArgumentTraits = D3D8Utils::ArgumentTraits<T>;
+
+                static const char* get_object_type_name_ptr(const ObjectType& in_object_type)
+                {
+                    return D3D8Utils::get_object_type_name_ptr(in_object_type);
+                }
             };
+
+            template<typename FunctionPtr>
+            using SignatureInfo = Interception::Core::Common::SignatureInfo<SignatureTraits, FunctionPtr>;
         }
     }
-}
-
-template<typename ReturnType, typename... Arguments>
-const std::vector<Interception::Hooks::D3D8::ArgumentInfo>& Interception::Core::D3D8Utils::SignatureInfo<ReturnType (__stdcall*)(Arguments...)>::get_argument_info_vec()
-{
-    static const std::vector<Interception::Hooks::D3D8::ArgumentInfo> result_vec =
-    {
-        {ArgumentTraits<Arguments>::kind,
-         get_object_type_name_ptr(static_cast<ObjectType>(ArgumentTraits<Arguments>::object_type) )}...
-    };
-
-    return result_vec;
-}
-
-template<typename ReturnType, typename... Arguments>
-Interception::Hooks::D3D8::ArgumentInfo Interception::Core::D3D8Utils::SignatureInfo<ReturnType (__stdcall*)(Arguments...)>::get_return_info()
-{
-    return {ArgumentTraits<ReturnType>::kind,
-            get_object_type_name_ptr(static_cast<ObjectType>(ArgumentTraits<ReturnType>::object_type) )};
 }
 
 #endif /* D3D8UTILS_SIGNATURE_INFO_H */

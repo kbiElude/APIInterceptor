@@ -8,6 +8,7 @@
 #include "Interception/Hooks/Common/vtable_registry.h"
 #include "Interception/Hooks/D3D7/hook_policy_helper.h"
 #include "Interception/Hooks/D3D7/hook_table.h"
+#include "Interception/Core/D3D7Utils/guids.h"
 #include "Interception/Core/D3D7Utils/surface_layout.h"
 #include "Interception/Core/D3D7Utils/vertex_format.h"
 #include <vector>
@@ -198,38 +199,13 @@ void Interception::Hooks::D3D7::HookPolicyHelper::on_vertex_buffer_locked(IDirec
 void Interception::Hooks::D3D7::HookPolicyHelper::patch_object_for_iid(const GUID& in_iid,
                                                                        void*       in_object_ptr)
 {
-    struct InterfaceOfIID
-    {
-        GUID      iid;
-        Interface interface_type;
-    };
+    const auto* known_guid_ptr = Interception::Core::D3D7Utils::find_known_guid(in_iid);
 
-    static const InterfaceOfIID interface_of_iid_array[] =
+    if (in_object_ptr   != nullptr &&
+        known_guid_ptr  != nullptr &&
+        known_guid_ptr->interface_type != Interface::UNKNOWN)
     {
-        {{0x6c14db80, 0xa733, 0x11ce, {0xa5, 0x21, 0x00, 0x20, 0xaf, 0x0b, 0xe5, 0x60} }, Interface::IDIRECTDRAW},
-        {{0x6c14db84, 0xa733, 0x11ce, {0xa5, 0x21, 0x00, 0x20, 0xaf, 0x0b, 0xe5, 0x60} }, Interface::IDIRECTDRAWPALETTE},
-        {{0x6c14db85, 0xa733, 0x11ce, {0xa5, 0x21, 0x00, 0x20, 0xaf, 0x0b, 0xe5, 0x60} }, Interface::IDIRECTDRAWCLIPPER},
-        {{0x15e65ec0, 0x3b9c, 0x11d2, {0xb9, 0x2f, 0x00, 0x60, 0x97, 0x97, 0xea, 0x5b} }, Interface::IDIRECTDRAW7},
-        {{0x06675a80, 0x3b9b, 0x11d2, {0xb9, 0x2f, 0x00, 0x60, 0x97, 0x97, 0xea, 0x5b} }, Interface::IDIRECTDRAWSURFACE7},
-        {{0x4b9f0ee0, 0x0d7e, 0x11d0, {0x9b, 0x06, 0x00, 0xa0, 0xc9, 0x03, 0xa3, 0xb8} }, Interface::IDIRECTDRAWCOLORCONTROL},
-        {{0x69c11c3e, 0xb46b, 0x11d1, {0xad, 0x7a, 0x00, 0xc0, 0x4f, 0xc2, 0x9b, 0x4e} }, Interface::IDIRECTDRAWGAMMACONTROL},
-        {{0xf5049e77, 0x4861, 0x11d2, {0xa4, 0x07, 0x00, 0xa0, 0xc9, 0x06, 0x29, 0xa8} }, Interface::IDIRECT3D7},
-        {{0xf5049e79, 0x4861, 0x11d2, {0xa4, 0x07, 0x00, 0xa0, 0xc9, 0x06, 0x29, 0xa8} }, Interface::IDIRECT3DDEVICE7},
-        {{0xf5049e7d, 0x4861, 0x11d2, {0xa4, 0x07, 0x00, 0xa0, 0xc9, 0x06, 0x29, 0xa8} }, Interface::IDIRECT3DVERTEXBUFFER7}
-    };
-
-    if (in_object_ptr != nullptr)
-    {
-        for (const auto& interface_of_iid : interface_of_iid_array)
-        {
-            if (::IsEqualGUID(in_iid,
-                              interface_of_iid.iid) )
-            {
-                get_hook_table_ptr()->patch_object(static_cast<uint32_t>(interface_of_iid.interface_type),
-                                                   in_object_ptr);
-
-                break;
-            }
-        }
+        get_hook_table_ptr()->patch_object(static_cast<uint32_t>(known_guid_ptr->interface_type),
+                                           in_object_ptr);
     }
 }

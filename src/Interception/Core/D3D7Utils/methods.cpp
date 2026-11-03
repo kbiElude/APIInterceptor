@@ -196,3 +196,40 @@ uint32_t Interception::Core::D3D7Utils::get_n_methods(const Interception::Hooks:
 
     return result;
 }
+
+const char* Interception::Core::D3D7Utils::get_object_type_name_ptr(const ObjectType& in_object_type)
+{
+    struct ObjectTypeName
+    {
+        ObjectType  object_type;
+        const char* name_ptr;
+    };
+
+    static const ObjectTypeName object_type_name_array[] =
+    {
+        {ObjectType::CLIPPER,       "Clipper"},
+        {ObjectType::COLOR_CONTROL, "ColorControl"},
+        {ObjectType::DEVICE,        "Device"},
+        {ObjectType::DIRECT3D7,     "Direct3D7"},
+        {ObjectType::DIRECT_DRAW,   "DirectDraw"},
+        {ObjectType::DIRECT_DRAW7,  "DirectDraw7"},
+        {ObjectType::GAMMA_CONTROL, "GammaControl"},
+        {ObjectType::PALETTE,       "Palette"},
+        {ObjectType::SURFACE,       "Surface"},
+        {ObjectType::VERTEX_BUFFER, "VertexBuffer"}
+    };
+
+    const char* result_ptr = nullptr;
+
+    for (const auto& object_type_name : object_type_name_array)
+    {
+        if (object_type_name.object_type == in_object_type)
+        {
+            result_ptr = object_type_name.name_ptr;
+
+            break;
+        }
+    }
+
+    return result_ptr;
+}

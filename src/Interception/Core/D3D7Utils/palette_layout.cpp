@@ -6,7 +6,7 @@
 
 const uint32_t Interception::Core::D3D7Utils::PaletteLayout::FLAG_1_BIT       = 0x00000100; /* DDPCAPS_1BIT */
 const uint32_t Interception::Core::D3D7Utils::PaletteLayout::FLAG_2_BIT       = 0x00000200; /* DDPCAPS_2BIT */
-const uint32_t Interception::Core::D3D7Utils::PaletteLayout::FLAG_4_BIT       = 0x00000008; /* DDPCAPS_4BIT */
+const uint32_t Interception::Core::D3D7Utils::PaletteLayout::FLAG_4_BIT       = 0x00000001; /* DDPCAPS_4BIT */
 const uint32_t Interception::Core::D3D7Utils::PaletteLayout::FLAG_8_BIT       = 0x00000004; /* DDPCAPS_8BIT */
 const uint32_t Interception::Core::D3D7Utils::PaletteLayout::N_ENTRIES_1_BIT  = 2;
 const uint32_t Interception::Core::D3D7Utils::PaletteLayout::N_ENTRIES_2_BIT  = 4;

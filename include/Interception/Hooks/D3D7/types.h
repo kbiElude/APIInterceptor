@@ -10,6 +10,7 @@
 #define D3D7_TYPES_H
 
 #include "Common/types.h"
+#include "Interception/Core/Common/signature_info.h"
 #include "Interception/Hooks/Common/types.h"
 #include <Windows.h>
 #include <cstdint>
@@ -428,6 +429,85 @@ namespace Interception
                 const char*                 method_name_ptr;    /* e.g. BeginScene                   */
                 uint32_t                    vtable_index;
             };
+
+            /* Meaning of an API call argument; tells the printer how to decode it. */
+            enum class ValueKind : uint32_t
+            {
+                BLT_FAST_FLAGS,
+                BLT_FLAGS,
+                BLT_FX,
+                BOOLEAN,
+                CAPS,
+                CLEAR_FLAGS,
+                CLIP_PLANE,
+                CLIP_STATUS,
+                COLOR,
+                COLOR_CONTROL,
+                COLOR_KEY,
+                COLOR_KEY_FLAGS,
+                COOPERATIVE_LEVEL_FLAGS,
+                DEVICE_DESC,
+                DEVICE_IDENTIFIER,
+                DRAW_FLAGS,
+                ENUM_DISPLAY_MODES_FLAGS,
+                ENUM_SURFACES_FLAGS,
+                FLIP_FLAGS,
+                FVF_FLAGS,
+                GAMMA_RAMP,
+                GUID,
+                HRESULT,
+                LIGHT,
+                LOCK_FLAGS,
+                MATERIAL,
+                MATRIX,
+                OBJECT,
+                OBJECT_OUT,
+                OVERLAY_FLAGS,
+                OVERLAY_FX,
+                PALETTE_ENTRIES,
+                PALETTE_FLAGS,
+                PIXEL_FORMAT,
+                PLAIN,
+                POINT,
+                PRIMITIVE_TYPE,
+                RECT,
+                RECT_ARRAY,
+                RENDER_STATE_TYPE,
+                RENDER_STATE_VALUE,
+                SET_DISPLAY_MODE_FLAGS,
+                STATE_BLOCK_TYPE,
+                STRIDED_DATA,
+                STRIDED_VERTEX_ARRAYS,
+                SURFACE_CAPS,
+                SURFACE_DESC,
+                TEXTURE_STAGE_STATE_TYPE,
+                TEXTURE_STAGE_STATE_VALUE,
+                TRANSFORM_STATE_TYPE,
+                VERTEX_BUFFER_DESC,
+                VERTEX_OPERATION_FLAGS,
+                VIEWPORT,
+                WAIT_FOR_VERTICAL_BLANK_FLAGS
+            };
+
+            /* Describes an argument or a returned value of a D3D7 method. Follows ValueKind, which it depends on. */
+            struct ArgumentInfo
+            {
+                ValueKind   kind;
+                const char* object_type_name_ptr; /* e.g. "Surface"; set for ValueKind::OBJECT and ::OBJECT_OUT only */
+            };
+
+            /* DWORD argument which holds flags or a color, or whose meaning depends on another argument; or an extra argument which a
+             * hook adds.
+             */
+            struct ArgumentOverride
+            {
+                APIInterceptor::APIFunction function;
+                ValueKind                   kind;
+                uint32_t                    n_argument;
+            };
+
+            /* Accessors of the description of a method's signature. */
+            typedef Interception::Core::Common::SignatureEntry<ArgumentInfo> SignatureEntry;
 
             /* The functions exported by ddraw.dll which are hooked. */
             typedef HRESULT (__stdcall* PFNDIRECTDRAWCREATECLIPPERPROC)(DWORD, IDirectDrawClipper**, IUnknown*);

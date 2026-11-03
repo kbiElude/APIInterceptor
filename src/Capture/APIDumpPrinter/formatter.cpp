@@ -280,27 +280,26 @@ void Capture::APIDumpPrinter::print_call(FILE*                                  
                                           const Capture::APIDumpLoader::Workload&      in_workload,
                                           uint32_t                                     in_n_hexdump_bytes,
                                           std::set<APIInterceptor::DataChunkID>*       inout_referenced_chunk_set_ptr,
-                                          D3D8Decoder*                                 inout_d3d8_decoder_ptr)
+                                          const IAPIDecoder*                           in_decoder_ptr)
 {
     std::vector<APIInterceptor::DataChunkID> call_chunk_id_vec;
-    const bool                               is_d3d8_call = (inout_d3d8_decoder_ptr != nullptr                   &&
-                                                             Capture::APIDumpLoader::get_api_group(in_call.func) == Capture::APIDumpLoader::APIGroup::D3D8);
+    const bool                               is_decoded_call = (in_decoder_ptr != nullptr);
 
-    /* D3D8 arguments are decoded by the decoder, if it knows them. */
+    /* The arguments are decoded by the decoder of the API of the call, if it knows them. */
     const auto print_call_argument_func = [&](const uint32_t&                            in_n_argument,
                                               const bool&                                in_is_out,
                                               const APIInterceptor::APIFunctionArgument& in_argument)
     {
         bool is_printed = false;
 
-        if (is_d3d8_call)
+        if (is_decoded_call)
         {
-            is_printed = inout_d3d8_decoder_ptr->print_argument(in_file_handle,
-                                                                in_call,
-                                                                in_n_argument,
-                                                                in_is_out,
-                                                                in_argument,
-                                                                in_workload);
+            is_printed = in_decoder_ptr->print_argument(in_file_handle,
+                                                        in_call,
+                                                        in_n_argument,
+                                                        in_is_out,
+                                                        in_argument,
+                                                        in_workload);
         }
 
         if (is_printed == false)
@@ -401,11 +400,11 @@ void Capture::APIDumpPrinter::print_call(FILE*                                  
         fprintf(in_file_handle,
                 " returned ");
 
-        if (is_d3d8_call)
+        if (is_decoded_call)
         {
-            is_printed = inout_d3d8_decoder_ptr->print_returned_value(in_file_handle,
-                                                                      in_call,
-                                                                     *in_call.returned_value_ptr);
+            is_printed = in_decoder_ptr->print_returned_value(in_file_handle,
+                                                              in_call,
+                                                             *in_call.returned_value_ptr);
         }
 
         if (is_printed == false)

@@ -5,6 +5,7 @@
 #ifndef D3D8UTILS_ARGUMENT_TRAITS_H
 #define D3D8UTILS_ARGUMENT_TRAITS_H
 
+#include "Interception/Core/Common/argument_traits.h"
 #include "Interception/Core/D3D8Utils/types.h"
 
 namespace Interception
@@ -13,29 +14,21 @@ namespace Interception
     {
         namespace D3D8Utils
         {
+            /* How the types of D3D8 are read (see Common/argument_traits.h). */
+            struct ApiTraits
+            {
+                typedef Interception::Hooks::D3D8::ValueKind ValueKind;
+                typedef D3D8Utils::ObjectType                ObjectType;
+
+                template<typename T> using ArgumentCategoryOf = D3D8Utils::ArgumentCategoryOf<T>;
+                template<typename T> using InterfaceTraits    = D3D8Utils::InterfaceTraits<T>;
+                template<typename T> using StructTraits       = D3D8Utils::StructTraits<T>;
+                template<typename T> using ValueKindOf        = D3D8Utils::ValueKindOf<T>;
+            };
+
             /* Meaning of an argument or of a returned value (void is allowed), and the interface it refers to. */
             template<typename T>
-            struct ArgumentTraits
-            {
-                typedef typename PointeeOf<T>::type                    PointeeType;
-                typedef typename PointeeOf<PointeeType>::type          PointeePointeeType;
-
-                static const ArgumentCategory category = ArgumentCategoryOf<T>::value;
-
-                static const Interception::Hooks::D3D8::ValueKind kind =
-                    (category == ArgumentCategory::CONST_STRUCT)   ? StructTraits<PointeeType>::kind
-                  : (category == ArgumentCategory::GUID)          ? Interception::Hooks::D3D8::ValueKind::GUID
-                  : (category == ArgumentCategory::MUTABLE_STRUCT) ? StructTraits<PointeeType>::kind
-                  : (category == ArgumentCategory::OBJECT)        ? Interception::Hooks::D3D8::ValueKind::OBJECT
-                  : (category == ArgumentCategory::OBJECT_OUT)     ? Interception::Hooks::D3D8::ValueKind::OBJECT_OUT
-                  : (category == ArgumentCategory::SCALAR_OUT)     ? ValueKindOf<PointeeType>::kind
-                                                                  : ValueKindOf<T>::kind;
-
-                static const ObjectType object_type =
-                    (category == ArgumentCategory::OBJECT)    ? InterfaceTraits<PointeeType>::object_type
-                  : (category == ArgumentCategory::OBJECT_OUT) ? InterfaceTraits<PointeePointeeType>::object_type
-                                                              : ObjectType::NONE;
-            };
+            using ArgumentTraits = Interception::Core::Common::ArgumentTraits<ApiTraits, T>;
         }
     }
 }

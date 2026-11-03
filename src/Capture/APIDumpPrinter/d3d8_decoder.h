@@ -9,7 +9,9 @@
 #define APIDUMPPRINTER_D3D8_DECODER_H
 
 #include "Capture/APIDumpLoader/APIDumpLoader.h"
+#include "i_api_decoder.h"
 #include "Interception/Hooks/D3D8/types.h"
+#include "object_namer.h"
 #include "types.h"
 #include <map>
 #include <stdio.h>
@@ -20,7 +22,7 @@ namespace Capture
 {
     namespace APIDumpPrinter
     {
-        class D3D8Decoder
+        class D3D8Decoder : public IAPIDecoder
         {
         public:
             /* Prints an argument of a D3D8 call. Returns false if the argument is not decoded; the caller then prints it
@@ -31,45 +33,40 @@ namespace Capture
                                 const uint32_t&                              in_n_argument,
                                 const bool&                                  in_is_out,
                                 const APIInterceptor::APIFunctionArgument&   in_argument,
-                                const Capture::APIDumpLoader::Workload&      in_workload) const;
+                                const Capture::APIDumpLoader::Workload&      in_workload) const override;
 
             /* As above, for the returned value. */
             bool print_returned_value(FILE*                                        in_file_handle,
                                       const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                      const APIInterceptor::APIFunctionArgument&   in_returned_value) const;
+                                      const APIInterceptor::APIFunctionArgument&   in_returned_value) const override;
 
             /* Names the objects created by the call. To be called before the call is printed. */
-            void register_created_objects(const Capture::APIDumpLoader::DumpedAPICall& in_call);
+            void register_created_objects(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                          const Capture::APIDumpLoader::Workload&      in_workload) override;
 
         private:
             /* Returns "<type>#<n>" if the object has been seen being created, "<type>@0x<address>" otherwise. */
             std::string get_object_name(const void* in_object_ptr,
                                         const char* in_type_name_ptr) const;
 
-            static std::string format_boolean            (const int32_t&                                  in_value);
-            static std::string format_color              (const uint32_t&                                 in_value);
             static std::string format_color_value        (const Interception::Hooks::D3D8::D3DCOLORVALUE& in_value);
             static std::string format_enum               (const Interception::Hooks::D3D8::ValueKind&     in_kind,
                                                           const uint32_t&                                 in_value);
             static std::string format_flags              (const Interception::Hooks::D3D8::ValueKind&     in_kind,
                                                           const uint32_t&                                 in_value);
             static std::string format_fvf                (const uint32_t&                                 in_value);
-            static std::string format_hex                (const uint32_t&                                 in_value);
             static std::string format_hresult            (const int32_t&                                  in_value);
             static std::string format_resource_properties(const uint32_t&                                 in_format,
                                                           const uint32_t&                                 in_type,
                                                           const uint32_t&                                 in_usage,
                                                           const uint32_t&                                 in_pool);
-            static std::string format_state_value        (const StateValueInfo&                           in_info,
-                                                          const uint32_t&                                 in_value);
 
             /* Returns false if the structure is not decoded (e.g. the chunk has an unexpected size). */
             static bool format_struct(const Interception::Hooks::D3D8::ValueKind& in_kind,
                                       const std::vector<uint8_t>&                 in_chunk_u8_vec,
                                       std::string*                                out_text_ptr);
 
-            std::map<const void*, std::string> m_object_name_map;
-            std::map<std::string, uint32_t>    m_n_created_objects_map; /* by type name */
+            ObjectNamer m_object_namer;
         };
     }
 }

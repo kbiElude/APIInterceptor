@@ -107,7 +107,7 @@ TEST(D3D7PaletteLayout, EntriesFollowTheFlags)
 
     EXPECT_EQ(PaletteLayout::get_n_entries(0x100), 2u);   /* DDPCAPS_1BIT */
     EXPECT_EQ(PaletteLayout::get_n_entries(0x200), 4u);   /* DDPCAPS_2BIT */
-    EXPECT_EQ(PaletteLayout::get_n_entries(0x008), 16u);  /* DDPCAPS_4BIT */
+    EXPECT_EQ(PaletteLayout::get_n_entries(0x001), 16u);  /* DDPCAPS_4BIT */
     EXPECT_EQ(PaletteLayout::get_n_entries(0x004 | 0x040 /* DDPCAPS_ALLOW256 */), 256u);
     EXPECT_EQ(PaletteLayout::get_n_entries(0),     0u);
 }
