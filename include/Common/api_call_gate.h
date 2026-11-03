@@ -37,6 +37,10 @@ namespace APIInterceptor
 
         void resume();
 
+        /* The nesting of intercepted calls on the thread is forgotten, and later put back (see TopLevelScope). */
+        void     resume_nesting (const uint32_t& in_depth);
+        uint32_t suspend_nesting();
+
         /* Closes the gate and waits for the threads which are inside intercepted calls to leave (the caller, if it is inside one, does
          * not count). Returns false, and leaves the gate open, if that does not happen within the timeout, or if the gate is closed.
          */

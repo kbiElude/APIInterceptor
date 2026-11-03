@@ -54,6 +54,16 @@ bool APIInterceptor::on_api_call_interception_started()
     return ApiCallGate::get_ptr()->on_api_call_interception_started();
 }
 
+uint32_t APIInterceptor::suspend_api_call_nesting()
+{
+    return ApiCallGate::get_ptr()->suspend_nesting();
+}
+
+void APIInterceptor::resume_api_call_nesting(const uint32_t& in_depth)
+{
+    ApiCallGate::get_ptr()->resume_nesting(in_depth);
+}
+
 void APIInterceptor::on_gate_scope_entered()
 {
     ApiCallGate::get_ptr()->on_scope_entered();

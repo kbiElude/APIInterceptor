@@ -70,6 +70,12 @@ namespace APIInterceptor
     void on_api_call_interception_finished();
     bool on_api_call_interception_started ();
 
+    /* Used by TopLevelScope: the calls made by the application from a callback of an intercepted call count as top-level ones, as the
+     * calls it makes outside. Suspending returns the depth the thread was at, which resuming puts back.
+     */
+    uint32_t suspend_api_call_nesting();
+    void     resume_api_call_nesting (const uint32_t& in_depth);
+
     /* Used by Tracker and GateScope: the thread counts as being inside an intercepted API call from the first scope it
      * enters to the last one it leaves.
      */

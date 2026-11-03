@@ -301,4 +301,7 @@ void Interception::Hooks::D3D7::QueryInterfaceHookPolicy<ObjectType>::on_call_fi
     }
 }
 
+/* The policies of the functions that take callbacks. */
+#include "Interception/Hooks/D3D7/enum_callback_policy.h"
+
 #endif /* D3D7_HOOK_POLICY_H */
