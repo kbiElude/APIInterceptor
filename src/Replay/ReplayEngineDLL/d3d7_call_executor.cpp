@@ -7,6 +7,7 @@
 #include "Interception/Core/D3D7Utils/argument_info.h"
 #include "Interception/Core/D3D7Utils/constants.h"
 #include "Interception/Core/D3D7Utils/methods.h"
+#include "Interception/Core/D3D7Utils/strided_layout.h"
 #include "Interception/Core/D3D7Utils/value_readers.h"
 #include "pixel_converter.h"
 #include <algorithm>
@@ -669,8 +670,6 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_indexed_primitive_strided(s
 
     if (get_strided_data(STRIDED_ARGUMENT,
                          STRIDED_DATA_ARGUMENT,
-                         n_vertices,
-                         fvf,
                         &strided) == false)
     {
         *out_error_ptr = "The vertices of a strided draw are not in the dump.";
@@ -827,8 +826,6 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_primitive_strided(std::stri
 
     if (get_strided_data(STRIDED_ARGUMENT,
                          STRIDED_DATA_ARGUMENT,
-                         n_vertices,
-                         fvf,
                         &strided) == false)
     {
         *out_error_ptr = "The vertices of a strided draw are not in the dump.";
@@ -1223,103 +1220,23 @@ const std::map<uint32_t, void*>& Replay::ReplayEngineDLL::D3D7CallExecutor::get_
 }
 
 bool Replay::ReplayEngineDLL::D3D7CallExecutor::get_strided_data(const size_t&                                           in_n_strided_argument,
-                                                                 const size_t&                                           in_n_data_argument,
-                                                                 const uint32_t&                                         in_n_vertices,
-                                                                 const uint32_t&                                         in_vertex_format,
-                                                                 Interception::Hooks::D3D7::D3DDRAWPRIMITIVESTRIDEDDATA* out_strided_ptr) const
+                                                                  const size_t&                                           in_n_data_argument,
+                                                                  Interception::Hooks::D3D7::D3DDRAWPRIMITIVESTRIDEDDATA* out_strided_ptr) const
 {
-    constexpr size_t   N_ARRAYS = 12; /* the position, the normal, the two colors and the 8 texture coordinates */
-
-    size_t                         n_data_bytes    = 0;
-    const uint8_t*                 data_ptr        = get_chunk_ptr(in_n_data_argument,
-                                                                  &n_data_bytes);
-    size_t                         n_strided_bytes = 0;
-    const uint8_t*                 strided_ptr     = get_chunk_ptr(in_n_strided_argument,
-                                                                  &n_strided_bytes);
-    bool                           result          = false;
-    Interception::Hooks::D3D7::D3DDP_PTRSTRIDE* array_ptr_array[N_ARRAYS] = {};
-    Interception::Hooks::D3D7::D3DDRAWPRIMITIVESTRIDEDDATA dumped          = {};
-
-    (void) in_vertex_format;
-    (void) in_n_vertices;
+    size_t         n_data_bytes    = 0;
+    const uint8_t* data_ptr        = get_chunk_ptr(in_n_data_argument,
+                                                   &n_data_bytes);
+    size_t         n_strided_bytes = 0;
+    const uint8_t* strided_ptr     = get_chunk_ptr(in_n_strided_argument,
+                                                   &n_strided_bytes);
 
     *out_strided_ptr = {};
 
-    /* The chunk is the number of the arrays, the size of each, and the arrays; the structure of the dump tells the distance between the vertices of each. */
-    if (data_ptr        == nullptr                                                                               ||
-        strided_ptr     == nullptr                                                                               ||
-        n_strided_bytes != sizeof(dumped)                                                                        ||
-        n_data_bytes    <  sizeof(uint32_t) * (1 + N_ARRAYS) )
-    {
-        goto end;
-    }
-
-    ::memcpy(&dumped,
-             strided_ptr,
-             sizeof(dumped) );
-
-    array_ptr_array[0]  = &out_strided_ptr->position;
-    array_ptr_array[1]  = &out_strided_ptr->normal;
-    array_ptr_array[2]  = &out_strided_ptr->diffuse;
-    array_ptr_array[3]  = &out_strided_ptr->specular;
-
-    for (size_t n_stage = 0;
-                n_stage < 8;
-              ++n_stage)
-    {
-        array_ptr_array[4 + n_stage] = &out_strided_ptr->textureCoords[n_stage];
-    }
-
-    {
-        const Interception::Hooks::D3D7::D3DDP_PTRSTRIDE* dumped_array_ptr_array[N_ARRAYS] = {&dumped.position, &dumped.normal, &dumped.diffuse, &dumped.specular};
-        uint32_t                                          n_arrays                          = 0;
-        size_t                                            offset                            = sizeof(uint32_t) * (1 + N_ARRAYS);
-
-        ::memcpy(&n_arrays,
-                 data_ptr,
-                 sizeof(n_arrays) );
-
-        if (n_arrays != N_ARRAYS)
-        {
-            goto end;
-        }
-
-        for (size_t n_stage = 0;
-                    n_stage < 8;
-                  ++n_stage)
-        {
-            dumped_array_ptr_array[4 + n_stage] = &dumped.textureCoords[n_stage];
-        }
-
-        for (size_t n_array = 0;
-                    n_array < N_ARRAYS;
-                  ++n_array)
-        {
-            uint32_t n_array_bytes = 0;
-
-            ::memcpy(&n_array_bytes,
-                     data_ptr + sizeof(uint32_t) * (1 + n_array),
-                     sizeof(n_array_bytes) );
-
-            if (n_array_bytes != 0)
-            {
-                if (offset + n_array_bytes > n_data_bytes)
-                {
-                    goto end;
-                }
-
-                array_ptr_array[n_array]->lpvData  = const_cast<uint8_t*>(data_ptr + offset);
-                array_ptr_array[n_array]->dwStride = dumped_array_ptr_array[n_array]->dwStride;
-
-                offset += n_array_bytes;
-            }
-        }
-    }
-
-    result = true;
-
-end:
-    return result;
+    return Interception::Core::D3D7Utils::StridedLayout::rebuild(strided_ptr,
+                                                                 n_strided_bytes,
+                                                                 data_ptr,
+                                                                 n_data_bytes,
+                                                                 out_strided_ptr);
 }
 
 bool Replay::ReplayEngineDLL::D3D7CallExecutor::get_u32(const size_t& in_n_argument,

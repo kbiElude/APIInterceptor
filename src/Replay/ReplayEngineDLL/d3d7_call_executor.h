@@ -186,8 +186,6 @@ namespace Replay
              */
             bool get_strided_data(const size_t&                                           in_n_strided_argument,
                                   const size_t&                                           in_n_data_argument,
-                                  const uint32_t&                                         in_n_vertices,
-                                  const uint32_t&                                         in_vertex_format,
                                   Interception::Hooks::D3D7::D3DDRAWPRIMITIVESTRIDEDDATA* out_strided_ptr) const;
 
             bool get_u32(const size_t& in_n_argument,

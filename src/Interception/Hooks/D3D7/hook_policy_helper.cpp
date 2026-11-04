@@ -9,6 +9,7 @@
 #include "Interception/Hooks/D3D7/hook_policy_helper.h"
 #include "Interception/Hooks/D3D7/hook_table.h"
 #include "Interception/Core/D3D7Utils/guids.h"
+#include "Interception/Core/D3D7Utils/strided_layout.h"
 #include "Interception/Core/D3D7Utils/surface_layout.h"
 #include "Interception/Core/D3D7Utils/vertex_format.h"
 #include <vector>
@@ -28,13 +29,14 @@ APIInterceptor::APIFunctionArgument Interception::Hooks::D3D7::HookPolicyHelper:
                                                                                                               const uint32_t&                    in_n_vertices)
 {
     constexpr uint32_t DIFFUSE_ARRAY  = 2;
-    constexpr uint32_t N_ARRAYS       = 12;
     constexpr uint32_t N_BYTES_COLOR  = sizeof(uint32_t);
     constexpr uint32_t N_BYTES_NORMAL = 3 * sizeof(float);
     constexpr uint32_t NORMAL_ARRAY   = 1;
     constexpr uint32_t POSITION_ARRAY = 0;
     constexpr uint32_t SPECULAR_ARRAY = 3;
     constexpr uint32_t TEXTURE_ARRAY  = 4;
+
+    constexpr uint32_t N_ARRAYS = Interception::Core::D3D7Utils::StridedLayout::N_ARRAYS;
 
     const uint8_t* array_ptr_ptr_vec[N_ARRAYS] = {};
     uint32_t       array_n_bytes_vec [N_ARRAYS] = {};
