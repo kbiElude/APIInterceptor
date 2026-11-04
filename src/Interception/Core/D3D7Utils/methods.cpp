@@ -3,30 +3,42 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "Common/macros.h"
+#include "Interception/Core/Common/method_table.h"
 #include "Interception/Core/D3D7Utils/methods.h"
 #include <assert.h>
+
+namespace
+{
+    /* What the lookups of the table are made with (see MethodTable). */
+    struct MethodTableTraits
+    {
+        typedef Interception::Hooks::D3D7::Interface  Interface;
+        typedef Interception::Hooks::D3D7::MethodInfo MethodInfo;
+
+        static const MethodInfo* get_method_info_array_ptr(uint32_t* out_n_methods_ptr)
+        {
+            return Interception::Core::D3D7Utils::get_method_info_array_ptr(out_n_methods_ptr);
+        }
+
+        static APIInterceptor::APIFunction get_first_function()
+        {
+            return APIInterceptor::APIFUNCTION_D3D7_METHODS_FIRST;
+        }
+
+        static APIInterceptor::APIFunction get_last_function()
+        {
+            return APIInterceptor::APIFUNCTION_D3D7_METHODS_LAST;
+        }
+    };
+
+    typedef Interception::Core::Common::MethodTable<MethodTableTraits> Table;
+}
 
 APIInterceptor::APIFunction Interception::Core::D3D7Utils::get_api_function(const Interception::Hooks::D3D7::Interface& in_interface,
                                                                             const uint32_t&                             in_vtable_index)
 {
-    uint32_t                                     n_methods   = 0;
-    const Interception::Hooks::D3D7::MethodInfo* methods_ptr = get_method_info_array_ptr(&n_methods);
-    APIInterceptor::APIFunction                  result      = APIInterceptor::APIFUNCTION_UNKNOWN;
-
-    for (uint32_t n_method = 0;
-                  n_method < n_methods;
-                ++n_method)
-    {
-        if (methods_ptr[n_method].interface_type == in_interface &&
-            methods_ptr[n_method].vtable_index   == in_vtable_index)
-        {
-            result = methods_ptr[n_method].function;
-
-            break;
-        }
-    }
-
-    return result;
+    return Table::get_api_function(in_interface,
+                                   in_vtable_index);
 }
 
 const char* Interception::Core::D3D7Utils::get_function_name_ptr(const APIInterceptor::APIFunction& in_function)
@@ -138,19 +150,7 @@ const char* Interception::Core::D3D7Utils::get_interface_name_ptr(const Intercep
 
 const Interception::Hooks::D3D7::MethodInfo* Interception::Core::D3D7Utils::get_method_info_ptr(const APIInterceptor::APIFunction& in_function)
 {
-    uint32_t                                     n_methods   = 0;
-    const Interception::Hooks::D3D7::MethodInfo* methods_ptr = get_method_info_array_ptr(&n_methods);
-    const Interception::Hooks::D3D7::MethodInfo* result_ptr  = nullptr;
-
-    if (in_function >= APIInterceptor::APIFUNCTION_D3D7_METHODS_FIRST &&
-        in_function <= APIInterceptor::APIFUNCTION_D3D7_METHODS_LAST)
-    {
-        result_ptr = methods_ptr + (in_function - APIInterceptor::APIFUNCTION_D3D7_METHODS_FIRST);
-
-        assert(result_ptr->function == in_function);
-    }
-
-    return result_ptr;
+    return Table::get_method_info_ptr(in_function);
 }
 
 const Interception::Hooks::D3D7::MethodInfo* Interception::Core::D3D7Utils::get_method_info_array_ptr(uint32_t* out_n_methods_ptr)
@@ -180,21 +180,7 @@ const Interception::Hooks::D3D7::MethodInfo* Interception::Core::D3D7Utils::get_
 
 uint32_t Interception::Core::D3D7Utils::get_n_methods(const Interception::Hooks::D3D7::Interface& in_interface)
 {
-    uint32_t                                     n_methods   = 0;
-    const Interception::Hooks::D3D7::MethodInfo* methods_ptr = get_method_info_array_ptr(&n_methods);
-    uint32_t                                     result      = 0;
-
-    for (uint32_t n_method = 0;
-                  n_method < n_methods;
-                ++n_method)
-    {
-        if (methods_ptr[n_method].interface_type == in_interface)
-        {
-            result++;
-        }
-    }
-
-    return result;
+    return Table::get_n_methods(in_interface);
 }
 
 const char* Interception::Core::D3D7Utils::get_object_type_name_ptr(const ObjectType& in_object_type)
