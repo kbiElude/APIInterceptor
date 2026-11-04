@@ -12,7 +12,7 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR AND APIINTERCEPTOR_BUILD_LIBS)
     add_library(ReplayEngineCore STATIC ${ReplayEngineDLLIncludes} ${ReplayEngineCoreSources})
 
     target_include_directories(ReplayEngineCore PUBLIC "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL")
-    target_link_libraries     (ReplayEngineCore PUBLIC APIDumpLoader D3D8Utils gdi32 opengl32 user32 winmm)
+    target_link_libraries     (ReplayEngineCore PUBLIC APIDumpLoader D3D7Utils D3D8Utils gdi32 opengl32 user32 winmm)
 
     add_library(ReplayEngineDLL SHARED ${ReplayEngineDLLIncludes} "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL/entrypoints.cpp")
 

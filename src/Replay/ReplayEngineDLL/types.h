@@ -8,7 +8,16 @@
 namespace Replay
 {
     namespace ReplayEngineDLL
-    {        /* What a handle or an ID of the dumped process stands for. An object is told apart by the kind and the value it had
+    {
+        /* When the calls of a frame that is executed more than once are executed. */
+        enum class ExecutionClass
+        {
+            AFTER_ALL,      /* once, after the last execution: what destroys objects, and the present */
+            EVERY_TIME,     /* in every execution: state, draws, uploads                              */
+            FIRST_TIME_ONLY /* once, in the first execution: what creates objects                     */
+        };
+
+        /* What a handle or an ID of the dumped process stands for. An object is told apart by the kind and the value it had
          * in the dump (see ObjectRemapper). NONE stands for a value which is not one of those.
          */
         enum class ObjectKind

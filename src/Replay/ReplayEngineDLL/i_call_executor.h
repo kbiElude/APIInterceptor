@@ -26,6 +26,14 @@ namespace Replay
                                  const IChunkSource&                          in_chunk_source,
                                  std::string*                                 out_error_ptr) = 0;
 
+            /* When the call is executed, if its frame is executed more than once. */
+            virtual ExecutionClass get_execution_class(const Capture::APIDumpLoader::DumpedAPICall& in_call) const
+            {
+                (void) in_call;
+
+                return ExecutionClass::FIRST_TIME_ONLY;
+            }
+
             /* A frame of the workload has been replayed. */
             virtual void on_frame_presented() = 0;
 
@@ -54,6 +62,18 @@ namespace Replay
              * viewer sees may stay, to be used again.
              */
             virtual void reset() = 0;
+
+            /* Puts the state of the device back as save_state() found it. */
+            virtual void restore_state()
+            {
+                /* Stub */
+            }
+
+            /* Remembers the state of the device, at the start of a frame that is executed more than once. */
+            virtual void save_state()
+            {
+                /* Stub */
+            }
 
             /* Whether the windows of the replayed application are shown. They are, unless this says otherwise (before the replay is
              * played). The application still renders to them.

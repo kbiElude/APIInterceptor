@@ -31,21 +31,17 @@ namespace Replay
             D3D8CallExecutor(ObjectRemapper* in_remapper_ptr);
             ~D3D8CallExecutor();
 
-            bool execute           (const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                    const IChunkSource&                          in_chunk_source,
-                                    std::string*                                 out_error_ptr) override;
-            void on_frame_presented()                                                             override;
-            bool read_back_buffer  (std::vector<uint8_t>*                        out_pixel_u8_vec_ptr,
-                                    FrameImage*                                  out_image_ptr) override;
-            void reset             ()                                                             override;
-            bool write_back_buffer (const std::vector<uint8_t>&                  in_pixel_u8_vec) override;
-
-        protected:
-            /* The device the replay created, or nullptr (before it, and after reset). */
-            void* get_device_ptr() const;
-
-            /* True for a call of the Release method of any of the interfaces. */
-            bool is_release_call(const Capture::APIDumpLoader::DumpedAPICall& in_call) const;
+            bool           execute            (const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                               const IChunkSource&                          in_chunk_source,
+                                               std::string*                                 out_error_ptr) override;
+            ExecutionClass get_execution_class(const Capture::APIDumpLoader::DumpedAPICall& in_call)         const override;
+            void           on_frame_presented ()                                                             override;
+            bool           read_back_buffer   (std::vector<uint8_t>*                        out_pixel_u8_vec_ptr,
+                                               FrameImage*                                  out_image_ptr) override;
+            void           reset              ()                                                             override;
+            void           restore_state      ()                                                             override;
+            void           save_state         ()                                                             override;
+            bool           write_back_buffer  (const std::vector<uint8_t>&                  in_pixel_u8_vec) override;
 
         private:
             typedef bool (*InvokeFuncPtr)(D3D8ReplayContext* in_context_ptr,
@@ -93,6 +89,7 @@ namespace Replay
             Interception::Hooks::D3D8::D3DSURFACE_DESC                      m_scratch_description; /* of the back buffer which the scratch surface is for */
             void*                                                           m_scratch_device_ptr;
             void*                                                           m_scratch_surface_ptr; /* an image surface the size of the back buffer, kept for the next read */
+            DWORD                                                           m_state_block_token;
         };
     }
 }

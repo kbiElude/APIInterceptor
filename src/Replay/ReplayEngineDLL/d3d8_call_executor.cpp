@@ -14,7 +14,8 @@ Replay::ReplayEngineDLL::D3D8CallExecutor::D3D8CallExecutor(ObjectRemapper* in_r
      m_d3d8_module        (nullptr),
      m_lock_replayer      (&m_context),
      m_scratch_device_ptr (nullptr),
-     m_scratch_surface_ptr(nullptr)
+     m_scratch_surface_ptr(nullptr),
+     m_state_block_token  (0)
 {
     /* Every method of the method table. */
     #define D3D8_METHOD(INTERFACE_TAG, interface_name, METHOD_TAG, method_name, vtable_index, return_type, parameters) \
@@ -175,9 +176,86 @@ end:
     return result;
 }
 
-void* Replay::ReplayEngineDLL::D3D8CallExecutor::get_device_ptr() const
+Replay::ReplayEngineDLL::ExecutionClass Replay::ReplayEngineDLL::D3D8CallExecutor::get_execution_class(const Capture::APIDumpLoader::DumpedAPICall& in_call) const
 {
-    return m_context.get_device_ptr();
+    ExecutionClass result = ExecutionClass::FIRST_TIME_ONLY;
+
+    if (D3D8LockReplayer::is_lock_function(in_call.func) )
+    {
+        result = ExecutionClass::EVERY_TIME;
+
+        goto end;
+    }
+
+    if (m_release_function_set.find(in_call.func) != m_release_function_set.end() )
+    {
+        result = ExecutionClass::AFTER_ALL;
+
+        goto end;
+    }
+
+    switch (in_call.func)
+    {
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_BEGINSCENE:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_CAPTURESTATEBLOCK:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_CLEAR:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_COPYRECTS:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_APPLYSTATEBLOCK:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_DRAWINDEXEDPRIMITIVE:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_DRAWINDEXEDPRIMITIVEUP:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_DRAWPRIMITIVE:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_DRAWPRIMITIVEUP:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_DRAWRECTPATCH:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_DRAWTRIPATCH:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_ENDSCENE:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_LIGHTENABLE:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_MULTIPLYTRANSFORM:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_PROCESSVERTICES:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETCLIPPLANE:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETCLIPSTATUS:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETCURRENTTEXTUREPALETTE:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETINDICES:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETLIGHT:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETMATERIAL:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETPALETTEENTRIES:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETPIXELSHADER:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETPIXELSHADERCONSTANT:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETRENDERSTATE:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETRENDERTARGET:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETSTREAMSOURCE:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETTEXTURE:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETTEXTURESTAGESTATE:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETTRANSFORM:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETVERTEXSHADER:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETVERTEXSHADERCONSTANT:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_SETVIEWPORT:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_UPDATETEXTURE:
+        {
+            result = ExecutionClass::EVERY_TIME;
+
+            break;
+        }
+
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_DELETEPATCH:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_DELETEPIXELSHADER:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_DELETESTATEBLOCK:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_DELETEVERTEXSHADER:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_PRESENT:
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DSWAPCHAIN8_PRESENT:
+        {
+            result = ExecutionClass::AFTER_ALL;
+
+            break;
+        }
+
+        default:
+        {
+            break;
+        }
+    }
+
+end:
+    return result;
 }
 
 bool Replay::ReplayEngineDLL::D3D8CallExecutor::is_ignored_method(const char* in_method_name_ptr)
@@ -211,11 +289,6 @@ bool Replay::ReplayEngineDLL::D3D8CallExecutor::is_ignored_method(const char* in
     }
 
     return result;
-}
-
-bool Replay::ReplayEngineDLL::D3D8CallExecutor::is_release_call(const Capture::APIDumpLoader::DumpedAPICall& in_call) const
-{
-    return (m_release_function_set.find(in_call.func) != m_release_function_set.end() );
 }
 
 void Replay::ReplayEngineDLL::D3D8CallExecutor::on_frame_presented()
@@ -430,9 +503,48 @@ void Replay::ReplayEngineDLL::D3D8CallExecutor::release_scratch_surface()
 
 void Replay::ReplayEngineDLL::D3D8CallExecutor::reset()
 {
+    m_state_block_token = 0;
+
     release_scratch_surface      ();
     m_lock_replayer.reset        ();
     m_context.release_all_objects();
+}
+
+void Replay::ReplayEngineDLL::D3D8CallExecutor::restore_state()
+{
+    void* const device_ptr = m_context.get_device_ptr();
+
+    if (device_ptr != nullptr &&
+        m_state_block_token != 0)
+    {
+        void** const vtable_ptr = APIInterceptor::get_vtable_ptr(device_ptr);
+
+        APIInterceptor::get_method_ptr<Interception::Hooks::D3D8::PFN_IDIRECT3DDEVICE8_APPLYSTATEBLOCK>(vtable_ptr, Interception::Hooks::D3D8::VTABLE_INDEX_IDIRECT3DDEVICE8_APPLYSTATEBLOCK)(static_cast<Interception::Hooks::D3D8::IDirect3DDevice8*>(device_ptr),
+                                                                                                                                                                                m_state_block_token);
+    }
+}
+
+void Replay::ReplayEngineDLL::D3D8CallExecutor::save_state()
+{
+    void* const device_ptr = m_context.get_device_ptr();
+
+    if (device_ptr != nullptr)
+    {
+        void** const vtable_ptr = APIInterceptor::get_vtable_ptr(device_ptr);
+
+        if (m_state_block_token == 0)
+        {
+            /* Creating a state block captures the state. */
+            APIInterceptor::get_method_ptr<Interception::Hooks::D3D8::PFN_IDIRECT3DDEVICE8_CREATESTATEBLOCK>(vtable_ptr, Interception::Hooks::D3D8::VTABLE_INDEX_IDIRECT3DDEVICE8_CREATESTATEBLOCK)(static_cast<Interception::Hooks::D3D8::IDirect3DDevice8*>(device_ptr),
+                                                                                                                                                                                      Interception::Hooks::D3D8::D3DSBT_ALL,
+                                                                                                                                                                                      &m_state_block_token);
+        }
+        else
+        {
+            APIInterceptor::get_method_ptr<Interception::Hooks::D3D8::PFN_IDIRECT3DDEVICE8_CAPTURESTATEBLOCK>(vtable_ptr, Interception::Hooks::D3D8::VTABLE_INDEX_IDIRECT3DDEVICE8_CAPTURESTATEBLOCK)(static_cast<Interception::Hooks::D3D8::IDirect3DDevice8*>(device_ptr),
+                                                                                                                                                                                        m_state_block_token);
+        }
+    }
 }
 
 void Replay::ReplayEngineDLL::D3D8CallExecutor::unlock_back_buffer_image(BackBufferImage* inout_image_ptr)

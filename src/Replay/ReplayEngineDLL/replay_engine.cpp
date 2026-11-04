@@ -2,6 +2,7 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
+#include "d3d7_call_executor.h"
 #include "d3d8_call_executor.h"
 #include "gl_call_executor.h"
 #include "null_call_executor.h"
@@ -41,6 +42,8 @@ Replay::ReplayEngineDLL::ReplayEngine::ReplayEngine()
                         win32_executor_ptr);
     }
 
+    m_executors.add(Capture::APIDumpLoader::APIGroup::D3D7,
+                    std::make_shared<D3D7CallExecutor>(&m_remapper) );
     m_executors.add(Capture::APIDumpLoader::APIGroup::D3D8,
                     std::make_shared<D3D8CallExecutor>(&m_remapper) );
     m_executors.add(Capture::APIDumpLoader::APIGroup::GL,
