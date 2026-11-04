@@ -98,6 +98,8 @@ void Replay::ReplayEngineDLL::ReplayEngine::complete_frame(bool* out_is_done_ptr
         executor_ptr->on_frame_presented();
     }
 
+    m_frame_executor_ptr->on_frame_presented();
+
     {
         std::lock_guard<std::mutex> lock(m_control.mutex);
 
@@ -198,6 +200,11 @@ void Replay::ReplayEngineDLL::ReplayEngine::fail(const std::string& in_message)
 
     set_state   (PlaybackState::FAILED);
     notify_error(in_message);
+}
+
+Replay::ReplayEngineDLL::ICallExecutor* Replay::ReplayEngineDLL::ReplayEngine::get_call_executor_ptr(const Capture::APIDumpLoader::APIGroup& in_group) const
+{
+    return m_executors.get_executor_ptr(in_group);
 }
 
 const std::vector<Replay::ReplayEngineDLL::ICallExecutor*>& Replay::ReplayEngineDLL::ReplayEngine::get_call_executor_ptr_vec() const

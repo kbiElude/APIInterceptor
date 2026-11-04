@@ -42,6 +42,7 @@ namespace Replay
             bool                                    execute_call               (const Capture::APIDumpLoader::DumpedAPICall&  in_call,
                                                                                 const IChunkSource&                           in_chunk_source) override;
             void                                    fail                       (const std::string&                            in_message)         override;
+            ICallExecutor*                          get_call_executor_ptr      (const Capture::APIDumpLoader::APIGroup& in_group)           const override;
             const std::vector<ICallExecutor*>&      get_call_executor_ptr_vec  ()                                                                 const override;
             const IChunkSource&                     get_chunk_source           ()                                                                 const override;
             uint32_t                                get_n_frames_presented     ()                                                                 const override;

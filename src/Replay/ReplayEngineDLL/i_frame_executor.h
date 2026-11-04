@@ -28,6 +28,9 @@ namespace Replay
             /* Stops the replay with the error. */
             virtual void fail(const std::string& in_message) = 0;
 
+            /* The executor of the API, or one which does nothing, if the API has none. */
+            virtual ICallExecutor* get_call_executor_ptr(const Capture::APIDumpLoader::APIGroup& in_group) const = 0;
+
             /* Every executor once. */
             virtual const std::vector<ICallExecutor*>& get_call_executor_ptr_vec() const = 0;
 
@@ -58,8 +61,8 @@ namespace Replay
             virtual bool execute_frame(IFrameHost* in_host_ptr,
                                        bool*       out_has_workload_ended_ptr) = 0;
 
-            /* The replay goes back to the start of the workload. */
-            virtual void on_rewind()
+            /* The frame has been presented: the executors of the calls know it already. */
+            virtual void on_frame_presented()
             {
                 /* Stub */
             }
@@ -69,6 +72,13 @@ namespace Replay
             {
                 /* Stub */
             }
+
+            /* The replay goes back to the start of the workload. */
+            virtual void on_rewind()
+            {
+                /* Stub */
+            }
+
         };
     }
 }

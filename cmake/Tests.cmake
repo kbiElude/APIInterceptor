@@ -4,22 +4,21 @@ if (APIINTERCEPTOR_BUILD_TESTS)
 
     file(GLOB APIInterceptorTestsSources CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/src/Tests/*.cpp")
 
-    list(FILTER APIInterceptorTestsSources EXCLUDE REGEX ".*/fixtures\.cpp$")
+    list(FILTER APIInterceptorTestsSources EXCLUDE REGEX ".*/(fixtures|replay_test_doubles).cpp$")
 
     # Where the data files of the tests are, and the names the tests use: shared with a project which builds on this one.
     add_library(APIInterceptorTestSupport STATIC "${APIInterceptor_SOURCE_DIR}/src/Tests/fixtures.cpp"
-                                                 "${APIInterceptor_SOURCE_DIR}/src/Tests/fixtures.h")
+                                                 "${APIInterceptor_SOURCE_DIR}/src/Tests/fixtures.h"
+                                                 "${APIInterceptor_SOURCE_DIR}/src/Tests/replay_test_doubles.cpp"
+                                                 "${APIInterceptor_SOURCE_DIR}/src/Tests/replay_test_doubles.h")
+
+    target_link_libraries(APIInterceptorTestSupport PUBLIC ReplayEngineCore)
 
     target_compile_definitions(APIInterceptorTestSupport PUBLIC APIINTERCEPTOR_TESTS_DATA_DIR="${APIInterceptor_SOURCE_DIR}/src/Tests/data")
     target_include_directories(APIInterceptorTestSupport PUBLIC "${APIInterceptor_SOURCE_DIR}/src/Tests")
 
     # Sources under test which are not part of a library.
     add_executable(APIInterceptorTests ${APIInterceptorTestsSources}
-                                       "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL/call_context.cpp"
-                                       "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL/call_walker.cpp"
-                                       "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL/gl_index_replayer.cpp"
-                                       "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL/gl_replay_context.cpp"
-                                       "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL/object_remapper.cpp"
                                        "${APIInterceptor_SOURCE_DIR}/src/Common/api_call_gate.cpp"
                                        "${APIInterceptor_SOURCE_DIR}/src/Common/callback_registry.cpp"
                                        "${APIInterceptor_SOURCE_DIR}/src/Common/callbacks.cpp"
@@ -38,7 +37,7 @@ if (APIINTERCEPTOR_BUILD_TESTS)
 
     target_include_directories(APIInterceptorTests PRIVATE "${APIInterceptor_SOURCE_DIR}/src"
                                                            "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL")
-    target_link_libraries(APIInterceptorTests gtest_main APIInterceptorTestSupport APIDumpLoader HooksCommon ReplayEngineDLL D3D7Utils D3D8Utils InjectionLauncher)
+    target_link_libraries(APIInterceptorTests gtest_main APIInterceptorTestSupport APIDumpLoader HooksCommon ReplayEngineCore ReplayEngineDLL D3D7Utils D3D8Utils InjectionLauncher)
 
     enable_testing()
     add_test(NAME APIInterceptorTests COMMAND APIInterceptorTests)
