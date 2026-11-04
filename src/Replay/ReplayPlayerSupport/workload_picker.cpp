@@ -7,7 +7,7 @@
 #include <Windows.h>
 #include <commdlg.h>
 
-bool Replay::ReplayPlayer::WorkloadPicker::pick(std::string* out_path_ptr)
+bool Replay::ReplayPlayerSupport::WorkloadPicker::pick(std::string* out_path_ptr)
 {
     /* Pairs of a description and a pattern, each ending with a 0; the list ends with one more. */
     static const wchar_t FILTER_ARRAY[] = L"Workload files (*.workload)\0*.workload\0All files (*.*)\0*.*\0";

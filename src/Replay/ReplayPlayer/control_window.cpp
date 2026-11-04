@@ -272,7 +272,7 @@ void Replay::ReplayPlayer::ControlWindow::draw_controls()
                  ImGuiWindowFlags_NoTitleBar);
 
     ImGui::Text("State: %s",
-                StateNames::get_state_name_ptr(status.state) );
+                Replay::ReplayPlayerSupport::StateNames::get_state_name_ptr(status.state) );
 
     extend_func();
 

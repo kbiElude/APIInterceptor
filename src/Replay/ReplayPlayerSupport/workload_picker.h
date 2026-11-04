@@ -2,14 +2,14 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
-#ifndef REPLAYPLAYER_WORKLOAD_PICKER_H
-#define REPLAYPLAYER_WORKLOAD_PICKER_H
+#ifndef REPLAYPLAYERSUPPORT_WORKLOAD_PICKER_H
+#define REPLAYPLAYERSUPPORT_WORKLOAD_PICKER_H
 
 #include <string>
 
 namespace Replay
 {
-    namespace ReplayPlayer
+    namespace ReplayPlayerSupport
     {
         /* Lets the user choose the workload to replay, if the command line did not say which. */
         class WorkloadPicker
@@ -21,4 +21,4 @@ namespace Replay
     }
 }
 
-#endif /* REPLAYPLAYER_WORKLOAD_PICKER_H */
+#endif /* REPLAYPLAYERSUPPORT_WORKLOAD_PICKER_H */

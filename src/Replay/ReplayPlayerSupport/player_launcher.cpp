@@ -8,14 +8,15 @@
 #include <vector>
 #include <Windows.h>
 
-std::wstring Replay::ReplayPlayer::PlayerLauncher::get_wide_string(const std::string& in_text)
+std::wstring Replay::ReplayPlayerSupport::PlayerLauncher::get_wide_string(const std::string& in_text)
 {
-    const int    n_characters = ::MultiByteToWideChar(CP_ACP,
-                                                      0, /* flags */
-                                                      in_text.c_str(),
-                                                      static_cast<int>(in_text.size() ),
-                                                      nullptr,
-                                                      0);
+    const int n_characters = ::MultiByteToWideChar(CP_ACP,
+                                                   0, /* flags */
+                                                   in_text.c_str(),
+                                                   static_cast<int>(in_text.size() ),
+                                                   nullptr,
+                                                   0);
+
     std::wstring result(static_cast<size_t>(n_characters),
                         L'\0');
 
@@ -23,22 +24,22 @@ std::wstring Replay::ReplayPlayer::PlayerLauncher::get_wide_string(const std::st
     {
         ::MultiByteToWideChar(CP_ACP,
                               0, /* flags */
-                              in_text.c_str(),
+                              in_text.c_str   (),
                               static_cast<int>(in_text.size() ),
-                              &result.front(),
+                              &result.front   (),
                               n_characters);
     }
 
     return result;
 }
 
-bool Replay::ReplayPlayer::PlayerLauncher::is_handover_needed(const char* in_workload_path_ptr)
+bool Replay::ReplayPlayerSupport::PlayerLauncher::is_handover_needed(const char* in_workload_path_ptr)
 {
     constexpr uint32_t N_BYTES_PER_POINTER_X86 = 4;
 
+    /* Only a 64-bit player hands over, and only a dump with 32-bit pointers can hold D3D7 or D3D8. */
     bool result = false;
 
-    /* Only a 32-bit process has D3D8, so a dump of any other kind need not be searched. */
     if (sizeof(void*) != N_BYTES_PER_POINTER_X86)
     {
         const auto reader_ptr = Capture::APIDumpLoader::WorkloadReader::create(in_workload_path_ptr);
@@ -47,7 +48,11 @@ bool Replay::ReplayPlayer::PlayerLauncher::is_handover_needed(const char* in_wor
         {
             if (reader_ptr->get_pointer_n_bytes() == N_BYTES_PER_POINTER_X86)
             {
-                result = reader_ptr->contains_api_group(Capture::APIDumpLoader::APIGroup::D3D8);
+                const bool has_d3d7 = reader_ptr->contains_api_group(Capture::APIDumpLoader::APIGroup::D3D7);
+                const bool has_d3d8 = reader_ptr->contains_api_group(Capture::APIDumpLoader::APIGroup::D3D8);
+
+                result = (has_d3d7 ||
+                          has_d3d8);
             }
         }
     }
@@ -55,22 +60,21 @@ bool Replay::ReplayPlayer::PlayerLauncher::is_handover_needed(const char* in_wor
     return result;
 }
 
-bool Replay::ReplayPlayer::PlayerLauncher::run_x86_player(const std::string& in_workload_path,
-                                                          const bool&        in_is_console,
-                                                          int*               out_exit_code_ptr,
-                                                          std::string*       out_error_ptr)
+bool Replay::ReplayPlayerSupport::PlayerLauncher::run_x86_player(const std::string&              in_x86_player_file_name,
+                                                                 const std::vector<std::string>& in_argument_vec,
+                                                                 int*                            out_exit_code_ptr,
+                                                                 std::string*                    out_error_ptr)
 {
-    constexpr const wchar_t* X86_PLAYER_FILE_NAME = L"ReplayPlayer_x86.exe";
-
     std::wstring                         command_line;
     DWORD                                exit_code           = EXIT_FAILURE;
     HANDLE                               job_handle          = nullptr;
     JOBOBJECT_EXTENDED_LIMIT_INFORMATION job_limits          = {};
-    std::vector<wchar_t>                 module_path_vec(MAX_PATH);
     PROCESS_INFORMATION                  process_information = {};
     bool                                 result              = false;
     STARTUPINFOW                         startup_information = {};
     std::wstring                         x86_player_path;
+
+    std::vector<wchar_t> module_path_vec(MAX_PATH);
 
     startup_information.cb = sizeof(startup_information);
 
@@ -84,13 +88,13 @@ bool Replay::ReplayPlayer::PlayerLauncher::run_x86_player(const std::string& in_
     }
 
     /* The 32-bit player is in the folder of this one. */
-    x86_player_path = module_path_vec.data();
+    x86_player_path = module_path_vec.data  ();
     x86_player_path = x86_player_path.substr(0,
-                                             x86_player_path.find_last_of(L'\\') + 1) + X86_PLAYER_FILE_NAME;
+                                             x86_player_path.find_last_of(L'\\') + 1) + get_wide_string(in_x86_player_file_name);
 
     if (::GetFileAttributesW(x86_player_path.c_str() ) == INVALID_FILE_ATTRIBUTES)
     {
-        *out_error_ptr = "This workload holds D3D8 calls, which only the 32-bit player can replay, but ReplayPlayer_x86.exe is not next to this player.";
+        *out_error_ptr = "This workload holds Direct3D 7 or 8 calls, which only the 32-bit player can replay, but " + in_x86_player_file_name + " is not next to this player.";
 
         goto end;
     }
@@ -108,11 +112,19 @@ bool Replay::ReplayPlayer::PlayerLauncher::run_x86_player(const std::string& in_
                                   sizeof(job_limits) );
     }
 
-    command_line = L"\"" + x86_player_path + L"\" " + ((in_is_console) ? L"--console "
-                                                                         : L"") + L"\"" + get_wide_string(in_workload_path) + L"\"";
+    command_line = L"\""           +
+                   x86_player_path +
+                   L"\"";
+
+    for (const auto& argument : in_argument_vec)
+    {
+        command_line += L" \""                    +
+                        get_wide_string(argument) +
+                        L"\"";
+    }
 
     if (::CreateProcessW(x86_player_path.c_str(),
-                         &command_line.front(),
+                         &command_line.front  (),
                          nullptr, /* process attributes */
                          nullptr, /* thread attributes  */
                          TRUE,    /* inherit handles    */
@@ -133,11 +145,11 @@ bool Replay::ReplayPlayer::PlayerLauncher::run_x86_player(const std::string& in_
                                    process_information.hProcess);
     }
 
-    ::ResumeThread(process_information.hThread);
+    ::ResumeThread       (process_information.hThread);
     ::WaitForSingleObject(process_information.hProcess,
                           INFINITE);
-    ::GetExitCodeProcess(process_information.hProcess,
-                        &exit_code);
+    ::GetExitCodeProcess (process_information.hProcess,
+                         &exit_code);
 
     *out_exit_code_ptr = static_cast<int>(exit_code);
     result             = true;

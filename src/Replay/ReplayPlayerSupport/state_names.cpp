@@ -3,8 +3,9 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "state_names.h"
+#include "Common/macros.h"
 
-const char* Replay::ReplayPlayer::StateNames::get_state_name_ptr(const Replay::ReplayEngineDLL::PlaybackState& in_state)
+const char* Replay::ReplayPlayerSupport::StateNames::get_state_name_ptr(const Replay::ReplayEngineDLL::PlaybackState& in_state)
 {
     const char* result_ptr = "unknown";
 
@@ -47,6 +48,8 @@ const char* Replay::ReplayPlayer::StateNames::get_state_name_ptr(const Replay::R
 
         default:
         {
+            AI_FAIL_UNSUPPORTED(in_state);
+
             break;
         }
     }

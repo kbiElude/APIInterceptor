@@ -92,7 +92,7 @@ void Replay::ReplayPlayer::ConsoleObserver::on_state_changed(const Replay::Repla
 
     fprintf(stdout,
             "[*] %s\n",
-            StateNames::get_state_name_ptr(in_new_state) );
+            Replay::ReplayPlayerSupport::StateNames::get_state_name_ptr(in_new_state) );
 
     /* A pause, or the end, closes a stretch of frames; the time to the next one does not count. */
     if (in_new_state != Replay::ReplayEngineDLL::PlaybackState::PLAYING)
@@ -179,7 +179,7 @@ int Replay::ReplayPlayer::run(int   in_argc,
     }
 
     if (workload_path.empty() &&
-        WorkloadPicker::pick(&workload_path) == false)
+        Replay::ReplayPlayerSupport::WorkloadPicker::pick(&workload_path) == false)
     {
         fprintf(stdout,
                 "[*] No workload has been selected.\n");
@@ -189,13 +189,22 @@ int Replay::ReplayPlayer::run(int   in_argc,
         goto end;
     }
 
-    /* D3D8 can only be replayed by the 32-bit player. */
-    if (PlayerLauncher::is_handover_needed(workload_path.c_str() ) )
+    /* Direct3D 7 and 8 can only be replayed by the 32-bit player. */
+    if (Replay::ReplayPlayerSupport::PlayerLauncher::is_handover_needed(workload_path.c_str() ) )
     {
-        if (PlayerLauncher::run_x86_player(workload_path,
-                                           is_console,
-                                          &exit_code,
-                                          &error) )
+        std::vector<std::string> argument_vec;
+
+        if (is_console)
+        {
+            argument_vec.push_back("--console");
+        }
+
+        argument_vec.push_back(workload_path);
+
+        if (Replay::ReplayPlayerSupport::PlayerLauncher::run_x86_player("ReplayPlayer_x86.exe",
+                                                                        argument_vec,
+                                                                       &exit_code,
+                                                                       &error) )
         {
             result = exit_code;
         }
@@ -305,7 +314,7 @@ void Replay::ReplayPlayer::run_console(Replay::ReplayEngineDLL::IPlaybackControl
 
             fprintf(stdout,
                     "[*] %s: %llu calls, %u frames\n",
-                    StateNames::get_state_name_ptr(status.state),
+                    Replay::ReplayPlayerSupport::StateNames::get_state_name_ptr(status.state),
                     static_cast<unsigned long long>(status.n_calls_executed),
                     status.n_frames_presented);
         }

@@ -31,12 +31,22 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR AND APIINTERCEPTOR_BUILD_LIBS)
                                             "${APIInterceptor_SOURCE_DIR}/deps/imgui/backends")
     target_link_libraries     (ImGui d3d11 d3dcompiler dxgi dwmapi)
 
+    # What the programs which play a workload have in common: the names of the states, the dialog which picks the file and the handover
+    # of a workload with 32-bit only APIs from the 64-bit player to the 32-bit one.
+    file(GLOB ReplayPlayerSupportSources CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayPlayerSupport/*.cpp"
+                                                           "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayPlayerSupport/*.h")
+
+    add_library(ReplayPlayerSupport STATIC ${ReplayPlayerSupportSources})
+
+    target_include_directories(ReplayPlayerSupport PUBLIC "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayPlayerSupport")
+    target_link_libraries     (ReplayPlayerSupport PUBLIC APIDumpLoader comdlg32)
+
     file(GLOB ReplayPlayerSources CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayPlayer/*.cpp"
                                                      "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayPlayer/*.h")
 
     add_executable(ReplayPlayer ${ReplayPlayerSources})
 
-    target_link_libraries(ReplayPlayer APIDumpLoader ReplayEngineDLL ImGui comdlg32)
+    target_link_libraries(ReplayPlayer APIDumpLoader ReplayEngineDLL ReplayPlayerSupport ImGui)
 
     # The 32-bit pair has its own names, so that the 64-bit player can find it next to itself (see PlayerLauncher).
     if (CMAKE_SIZEOF_VOID_P EQUAL 4)
@@ -46,4 +56,5 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR AND APIINTERCEPTOR_BUILD_LIBS)
 
     source_group ("Replay Engine include files" FILES ${ReplayEngineDLLIncludes})
     source_group ("Replay Engine source files"  FILES ${ReplayEngineCoreSources})
+    source_group ("Replay Player Support source files" FILES ${ReplayPlayerSupportSources})
 endif()

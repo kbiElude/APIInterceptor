@@ -2,14 +2,14 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
-#ifndef REPLAYPLAYER_STATE_NAMES_H
-#define REPLAYPLAYER_STATE_NAMES_H
+#ifndef REPLAYPLAYERSUPPORT_STATE_NAMES_H
+#define REPLAYPLAYERSUPPORT_STATE_NAMES_H
 
 #include "Replay/ReplayEngineDLL/types.h"
 
 namespace Replay
 {
-    namespace ReplayPlayer
+    namespace ReplayPlayerSupport
     {
         /* How the front-ends of the player call the states of the playback. */
         class StateNames
@@ -20,4 +20,4 @@ namespace Replay
     }
 }
 
-#endif /* REPLAYPLAYER_STATE_NAMES_H */
+#endif /* REPLAYPLAYERSUPPORT_STATE_NAMES_H */
