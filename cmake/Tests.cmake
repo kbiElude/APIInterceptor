@@ -39,6 +39,14 @@ if (APIINTERCEPTOR_BUILD_TESTS)
                                                            "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL")
     target_link_libraries(APIInterceptorTests gtest_main APIInterceptorTestSupport APIDumpLoader HooksCommon ReplayEngineCore ReplayEngineDLL D3D7Utils D3D8Utils InjectionLauncher)
 
+    # Direct3D 7 is 32-bit: the program which makes every kind of draw is for the captures of it.
+    if (CMAKE_SIZEOF_VOID_P EQUAL 4)
+        add_executable(D3D7DrawKinds "${APIInterceptor_SOURCE_DIR}/src/Tests/programs/d3d7_draw_kinds.cpp")
+
+        target_include_directories(D3D7DrawKinds PRIVATE "${APIInterceptor_SOURCE_DIR}/include")
+        target_link_libraries     (D3D7DrawKinds user32)
+    endif()
+
     enable_testing()
     add_test(NAME APIInterceptorTests COMMAND APIInterceptorTests)
 endif()

@@ -108,6 +108,13 @@ namespace Replay
                 std::vector<uint8_t>                             viewport_u8_vec;
             };
 
+            /* A vertex buffer that is locked: the memory that the replay was given, and how much of it there is. */
+            struct LockedVertexBuffer
+            {
+                void* data_ptr = nullptr;
+                DWORD n_bytes  = 0;
+            };
+
             /* A surface that is locked: where the pixels are, and how the dump had them laid out. */
             struct LockedSurface
             {
@@ -117,36 +124,43 @@ namespace Replay
                 RECT                                      rect         = {};
             };
 
-            bool add_ref                (std::string* out_error_ptr);
-            bool begin_scene            (std::string* out_error_ptr);
-            bool blt                    (std::string* out_error_ptr);
-            bool blt_fast               (std::string* out_error_ptr);
-            bool clear                  (std::string* out_error_ptr);
-            bool create_device          (std::string* out_error_ptr);
-            bool create_direct_draw     (std::string* out_error_ptr);
-            bool create_surface         (std::string* out_error_ptr);
-            bool draw_indexed_primitive (std::string* out_error_ptr);
-            bool draw_primitive         (std::string* out_error_ptr);
-            bool end_scene              (std::string* out_error_ptr);
-            bool flip                   (std::string* out_error_ptr);
-            bool get_attached_surface   (std::string* out_error_ptr);
-            bool add_attached_surface   (std::string* out_error_ptr);
-            bool light_enable           (std::string* out_error_ptr);
-            bool load                   (std::string* out_error_ptr);
-            bool lock                   (std::string* out_error_ptr);
-            bool query_interface        (std::string* out_error_ptr);
-            bool release                (std::string* out_error_ptr);
-            bool set_cooperative_level  (std::string* out_error_ptr);
-            bool set_display_mode       (std::string* out_error_ptr);
-            bool set_light              (std::string* out_error_ptr);
-            bool set_material           (std::string* out_error_ptr);
-            bool set_render_state       (std::string* out_error_ptr);
-            bool set_render_target      (std::string* out_error_ptr);
-            bool set_texture            (std::string* out_error_ptr);
-            bool set_texture_stage_state(std::string* out_error_ptr);
-            bool set_transform          (std::string* out_error_ptr);
-            bool set_viewport           (std::string* out_error_ptr);
-            bool unlock                 (std::string* out_error_ptr);
+            bool add_ref                       (std::string* out_error_ptr);
+            bool begin_scene                   (std::string* out_error_ptr);
+            bool blt                           (std::string* out_error_ptr);
+            bool blt_fast                      (std::string* out_error_ptr);
+            bool clear                         (std::string* out_error_ptr);
+            bool create_device                 (std::string* out_error_ptr);
+            bool create_direct_draw            (std::string* out_error_ptr);
+            bool create_surface                (std::string* out_error_ptr);
+            bool create_vertex_buffer          (std::string* out_error_ptr);
+            bool draw_indexed_primitive        (std::string* out_error_ptr);
+            bool draw_indexed_primitive_strided(std::string* out_error_ptr);
+            bool draw_indexed_primitive_vb     (std::string* out_error_ptr);
+            bool draw_primitive                (std::string* out_error_ptr);
+            bool draw_primitive_strided        (std::string* out_error_ptr);
+            bool draw_primitive_vb             (std::string* out_error_ptr);
+            bool end_scene                     (std::string* out_error_ptr);
+            bool flip                          (std::string* out_error_ptr);
+            bool get_attached_surface          (std::string* out_error_ptr);
+            bool add_attached_surface          (std::string* out_error_ptr);
+            bool light_enable                  (std::string* out_error_ptr);
+            bool load                          (std::string* out_error_ptr);
+            bool lock                          (std::string* out_error_ptr);
+            bool query_interface               (std::string* out_error_ptr);
+            bool release                       (std::string* out_error_ptr);
+            bool set_cooperative_level         (std::string* out_error_ptr);
+            bool set_display_mode              (std::string* out_error_ptr);
+            bool set_light                     (std::string* out_error_ptr);
+            bool set_material                  (std::string* out_error_ptr);
+            bool set_render_state              (std::string* out_error_ptr);
+            bool set_render_target             (std::string* out_error_ptr);
+            bool set_texture                   (std::string* out_error_ptr);
+            bool set_texture_stage_state       (std::string* out_error_ptr);
+            bool set_transform                 (std::string* out_error_ptr);
+            bool set_viewport                  (std::string* out_error_ptr);
+            bool unlock                        (std::string* out_error_ptr);
+            bool vertex_buffer_lock            (std::string* out_error_ptr);
+            bool vertex_buffer_unlock          (std::string* out_error_ptr);
 
             /* Makes the primary surface show the window: the back buffer is blitted to it. */
             void present_to_window();
@@ -167,6 +181,15 @@ namespace Replay
                                  void**        out_object_ptr,
                                  std::string*  out_error_ptr) const;
 
+            /* The arrays of a strided draw, as the dump has them: the structure that says the distance between the vertices of each, and the chunk
+             * that holds the arrays (see HookPolicyHelper::create_strided_data_argument). Pointers into the chunk.
+             */
+            bool get_strided_data(const size_t&                                           in_n_strided_argument,
+                                  const size_t&                                           in_n_data_argument,
+                                  const uint32_t&                                         in_n_vertices,
+                                  const uint32_t&                                         in_vertex_format,
+                                  Interception::Hooks::D3D7::D3DDRAWPRIMITIVESTRIDEDDATA* out_strided_ptr) const;
+
             bool get_u32(const size_t& in_n_argument,
                          uint32_t*     out_value_ptr) const;
 
@@ -179,8 +202,8 @@ namespace Replay
             void register_object(const size_t& in_n_argument,
                                  void*         in_live_object_ptr);
 
-            /* True for the methods which only ask the API about itself, whose results the replay does not need. */
-            static bool is_query_method(const char* in_method_name_ptr);
+            /* True for the methods which only ask the API about itself, whose results the replay does not need, and for what the replay does for itself (the clipper that shows its window). */
+            static bool is_ignored_method(const char* in_method_name_ptr);
 
             template<typename ReturnType, typename... Arguments>
             static ReturnType call_method(void*           in_object_ptr,
@@ -200,6 +223,7 @@ namespace Replay
             std::unordered_map<APIInterceptor::APIFunction, HandlerFuncPtr> m_handler_map;
             LiveObjectList                                                 m_live_objects;
             std::map<void*, LockedSurface>                                 m_locked_surface_map;
+            std::map<void*, LockedVertexBuffer>                            m_locked_vertex_buffer_map;
             std::map<void*, std::vector<uint64_t> >                        m_dumped_value_map;    /* the pointers of the dump that stand for each object */
             std::map<void*, uint32_t>                                      m_reference_count_map; /* the references the replay holds to each object */
             void*                                                          m_primary_ptr;

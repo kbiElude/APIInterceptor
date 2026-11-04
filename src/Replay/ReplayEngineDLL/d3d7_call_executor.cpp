@@ -9,6 +9,7 @@
 #include "Interception/Core/D3D7Utils/methods.h"
 #include "Interception/Core/D3D7Utils/value_readers.h"
 #include "pixel_converter.h"
+#include <algorithm>
 #include <string.h>
 
 /* The values of the headers of DirectX 7 which only the replay needs. */
@@ -75,10 +76,15 @@ Replay::ReplayEngineDLL::D3D7CallExecutor::D3D7CallExecutor(ObjectRemapper* in_r
 
     m_handler_map[APIInterceptor::APIFUNCTION_D3D7_DIRECTDRAWCREATEEX]                          = &D3D7CallExecutor::create_direct_draw;
     m_handler_map[APIInterceptor::APIFUNCTION_D3D7_IDIRECT3D7_CREATEDEVICE]                     = &D3D7CallExecutor::create_device;
+    m_handler_map[APIInterceptor::APIFUNCTION_D3D7_IDIRECT3D7_CREATEVERTEXBUFFER]                = &D3D7CallExecutor::create_vertex_buffer;
     m_handler_map[APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_BEGINSCENE]                 = &D3D7CallExecutor::begin_scene;
     m_handler_map[APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_CLEAR]                      = &D3D7CallExecutor::clear;
     m_handler_map[APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_DRAWINDEXEDPRIMITIVE]       = &D3D7CallExecutor::draw_indexed_primitive;
+    m_handler_map[APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_DRAWINDEXEDPRIMITIVESTRIDED] = &D3D7CallExecutor::draw_indexed_primitive_strided;
+    m_handler_map[APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_DRAWINDEXEDPRIMITIVEVB]      = &D3D7CallExecutor::draw_indexed_primitive_vb;
     m_handler_map[APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_DRAWPRIMITIVE]              = &D3D7CallExecutor::draw_primitive;
+    m_handler_map[APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_DRAWPRIMITIVESTRIDED]        = &D3D7CallExecutor::draw_primitive_strided;
+    m_handler_map[APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_DRAWPRIMITIVEVB]             = &D3D7CallExecutor::draw_primitive_vb;
     m_handler_map[APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_ENDSCENE]                   = &D3D7CallExecutor::end_scene;
     m_handler_map[APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_LIGHTENABLE]                = &D3D7CallExecutor::light_enable;
     m_handler_map[APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_LOAD]                       = &D3D7CallExecutor::load;
@@ -100,6 +106,8 @@ Replay::ReplayEngineDLL::D3D7CallExecutor::D3D7CallExecutor(ObjectRemapper* in_r
     m_handler_map[APIInterceptor::APIFUNCTION_D3D7_IDIRECTDRAWSURFACE7_GETATTACHEDSURFACE]      = &D3D7CallExecutor::get_attached_surface;
     m_handler_map[APIInterceptor::APIFUNCTION_D3D7_IDIRECTDRAWSURFACE7_LOCK]                    = &D3D7CallExecutor::lock;
     m_handler_map[APIInterceptor::APIFUNCTION_D3D7_IDIRECTDRAWSURFACE7_UNLOCK]                  = &D3D7CallExecutor::unlock;
+    m_handler_map[APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DVERTEXBUFFER7_LOCK]                  = &D3D7CallExecutor::vertex_buffer_lock;
+    m_handler_map[APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DVERTEXBUFFER7_UNLOCK]                = &D3D7CallExecutor::vertex_buffer_unlock;
 }
 
 Replay::ReplayEngineDLL::D3D7CallExecutor::~D3D7CallExecutor()
@@ -515,6 +523,62 @@ end:
     return result;
 }
 
+bool Replay::ReplayEngineDLL::D3D7CallExecutor::create_vertex_buffer(std::string* out_error_ptr)
+{
+    constexpr size_t DESCRIPTION_ARGUMENT   = 1;
+    constexpr size_t FLAGS_ARGUMENT         = 3;
+    constexpr size_t VERTEX_BUFFER_ARGUMENT = 2;
+
+    void*                                          direct3d_ptr        = nullptr;
+    Interception::Hooks::D3D7::D3DVERTEXBUFFERDESC description         = {};
+    uint32_t                                       flags               = 0;
+    size_t                                         n_description_bytes = 0;
+    const uint8_t*                                 description_ptr     = get_chunk_ptr(DESCRIPTION_ARGUMENT,
+                                                                                       &n_description_bytes);
+    bool                                           result              = false;
+    void*                                          vertex_buffer_ptr   = nullptr;
+
+    if (get_live_object(0,
+                       &direct3d_ptr,
+                        out_error_ptr) == false ||
+        get_u32(FLAGS_ARGUMENT,
+               &flags)                 == false)
+    {
+        goto end;
+    }
+
+    if (description_ptr     == nullptr ||
+        n_description_bytes != sizeof(description) )
+    {
+        *out_error_ptr = "CreateVertexBuffer has no description in the dump.";
+
+        goto end;
+    }
+
+    ::memcpy(&description,
+             description_ptr,
+             sizeof(description) );
+
+    if (call_method<HRESULT>(direct3d_ptr,
+                             Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3D7_CREATEVERTEXBUFFER,
+                            &description,
+                            &vertex_buffer_ptr,
+                             static_cast<DWORD>(flags) ) < 0)
+    {
+        *out_error_ptr = "CreateVertexBuffer failed in the replay.";
+
+        goto end;
+    }
+
+    register_object(VERTEX_BUFFER_ARGUMENT,
+                    vertex_buffer_ptr);
+
+    result = true;
+
+end:
+    return result;
+}
+
 bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_indexed_primitive(std::string* out_error_ptr)
 {
     constexpr size_t FLAGS_ARGUMENT      = 7;
@@ -566,6 +630,125 @@ end:
     return result;
 }
 
+bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_indexed_primitive_strided(std::string* out_error_ptr)
+{
+    constexpr size_t FLAGS_ARGUMENT        = 7;
+    constexpr size_t FVF_ARGUMENT          = 2;
+    constexpr size_t INDICES_ARGUMENT      = 8; /* follow the arguments of the method, in data chunks */
+    constexpr size_t N_INDICES_ARGUMENT    = 6;
+    constexpr size_t N_VERTICES_ARGUMENT   = 4;
+    constexpr size_t STRIDED_DATA_ARGUMENT = 9;
+    constexpr size_t STRIDED_ARGUMENT      = 3;
+    constexpr size_t TYPE_ARGUMENT         = 1;
+
+    void*                                                   device_ptr = nullptr;
+    uint32_t                                                flags      = 0;
+    uint32_t                                                fvf        = 0;
+    uint32_t                                                n_indices  = 0;
+    uint32_t                                                n_vertices = 0;
+    bool                                                    result     = false;
+    Interception::Hooks::D3D7::D3DDRAWPRIMITIVESTRIDEDDATA  strided    = {};
+    uint32_t                                                type       = 0;
+
+    if (get_live_object(0,
+                       &device_ptr,
+                        out_error_ptr) == false ||
+        get_u32(FLAGS_ARGUMENT,
+               &flags)                 == false ||
+        get_u32(FVF_ARGUMENT,
+               &fvf)                   == false ||
+        get_u32(N_INDICES_ARGUMENT,
+               &n_indices)             == false ||
+        get_u32(N_VERTICES_ARGUMENT,
+               &n_vertices)            == false ||
+        get_u32(TYPE_ARGUMENT,
+               &type)                  == false)
+    {
+        goto end;
+    }
+
+    if (get_strided_data(STRIDED_ARGUMENT,
+                         STRIDED_DATA_ARGUMENT,
+                         n_vertices,
+                         fvf,
+                        &strided) == false)
+    {
+        *out_error_ptr = "The vertices of a strided draw are not in the dump.";
+
+        goto end;
+    }
+
+    result = true;
+
+    call_method<HRESULT>(device_ptr,
+                         Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_DRAWINDEXEDPRIMITIVESTRIDED,
+                         static_cast<Interception::Hooks::D3D7::D3DPRIMITIVETYPE>(type),
+                         static_cast<DWORD>(fvf),
+                        &strided,
+                         static_cast<DWORD>(n_vertices),
+                         reinterpret_cast<WORD*>(const_cast<uint8_t*>(get_chunk_ptr(INDICES_ARGUMENT) )),
+                         static_cast<DWORD>(n_indices),
+                         static_cast<DWORD>(flags) );
+
+end:
+    return result;
+}
+
+bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_indexed_primitive_vb(std::string* out_error_ptr)
+{
+    constexpr size_t FLAGS_ARGUMENT        = 7;
+    constexpr size_t INDICES_ARGUMENT      = 8; /* follows the arguments of the method, in a data chunk */
+    constexpr size_t N_INDICES_ARGUMENT    = 6;
+    constexpr size_t N_VERTICES_ARGUMENT   = 4;
+    constexpr size_t START_VERTEX_ARGUMENT = 3;
+    constexpr size_t TYPE_ARGUMENT         = 1;
+    constexpr size_t VERTEX_BUFFER_ARGUMENT = 2;
+
+    void*    device_ptr        = nullptr;
+    uint32_t flags             = 0;
+    uint32_t n_indices         = 0;
+    uint32_t n_vertices        = 0;
+    bool     result            = false;
+    uint32_t start_vertex      = 0;
+    uint32_t type              = 0;
+    void*    vertex_buffer_ptr = nullptr;
+
+    if (get_live_object(0,
+                       &device_ptr,
+                        out_error_ptr) == false ||
+        get_live_object(VERTEX_BUFFER_ARGUMENT,
+                       &vertex_buffer_ptr,
+                        out_error_ptr) == false ||
+        get_u32(FLAGS_ARGUMENT,
+               &flags)                 == false ||
+        get_u32(N_INDICES_ARGUMENT,
+               &n_indices)             == false ||
+        get_u32(N_VERTICES_ARGUMENT,
+               &n_vertices)            == false ||
+        get_u32(START_VERTEX_ARGUMENT,
+               &start_vertex)          == false ||
+        get_u32(TYPE_ARGUMENT,
+               &type)                  == false)
+    {
+        goto end;
+    }
+
+    result = true;
+
+    call_method<HRESULT>(device_ptr,
+                         Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_DRAWINDEXEDPRIMITIVEVB,
+                         static_cast<Interception::Hooks::D3D7::D3DPRIMITIVETYPE>(type),
+                         vertex_buffer_ptr,
+                         static_cast<DWORD>(start_vertex),
+                         static_cast<DWORD>(n_vertices),
+                         reinterpret_cast<WORD*>(const_cast<uint8_t*>(get_chunk_ptr(INDICES_ARGUMENT) )),
+                         static_cast<DWORD>(n_indices),
+                         static_cast<DWORD>(flags) );
+
+end:
+    return result;
+}
+
 bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_primitive(std::string* out_error_ptr)
 {
     constexpr size_t FLAGS_ARGUMENT      = 5;
@@ -603,6 +786,111 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_primitive(std::string* out_
                          static_cast<Interception::Hooks::D3D7::D3DPRIMITIVETYPE>(type),
                          static_cast<DWORD>(fvf),
                          const_cast<uint8_t*>(get_chunk_ptr(VERTICES_ARGUMENT) ),
+                         static_cast<DWORD>(n_vertices),
+                         static_cast<DWORD>(flags) );
+
+end:
+    return result;
+}
+
+bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_primitive_strided(std::string* out_error_ptr)
+{
+    constexpr size_t FLAGS_ARGUMENT        = 5;
+    constexpr size_t FVF_ARGUMENT          = 2;
+    constexpr size_t N_VERTICES_ARGUMENT   = 4;
+    constexpr size_t STRIDED_DATA_ARGUMENT = 6; /* follows the arguments of the method, in a data chunk */
+    constexpr size_t STRIDED_ARGUMENT      = 3;
+    constexpr size_t TYPE_ARGUMENT         = 1;
+
+    void*                                                   device_ptr = nullptr;
+    uint32_t                                                flags      = 0;
+    uint32_t                                                fvf        = 0;
+    uint32_t                                                n_vertices = 0;
+    bool                                                    result     = false;
+    Interception::Hooks::D3D7::D3DDRAWPRIMITIVESTRIDEDDATA  strided    = {};
+    uint32_t                                                type       = 0;
+
+    if (get_live_object(0,
+                       &device_ptr,
+                        out_error_ptr) == false ||
+        get_u32(FLAGS_ARGUMENT,
+               &flags)                 == false ||
+        get_u32(FVF_ARGUMENT,
+               &fvf)                   == false ||
+        get_u32(N_VERTICES_ARGUMENT,
+               &n_vertices)            == false ||
+        get_u32(TYPE_ARGUMENT,
+               &type)                  == false)
+    {
+        goto end;
+    }
+
+    if (get_strided_data(STRIDED_ARGUMENT,
+                         STRIDED_DATA_ARGUMENT,
+                         n_vertices,
+                         fvf,
+                        &strided) == false)
+    {
+        *out_error_ptr = "The vertices of a strided draw are not in the dump.";
+
+        goto end;
+    }
+
+    result = true;
+
+    call_method<HRESULT>(device_ptr,
+                         Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_DRAWPRIMITIVESTRIDED,
+                         static_cast<Interception::Hooks::D3D7::D3DPRIMITIVETYPE>(type),
+                         static_cast<DWORD>(fvf),
+                        &strided,
+                         static_cast<DWORD>(n_vertices),
+                         static_cast<DWORD>(flags) );
+
+end:
+    return result;
+}
+
+bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_primitive_vb(std::string* out_error_ptr)
+{
+    constexpr size_t FLAGS_ARGUMENT         = 5;
+    constexpr size_t N_VERTICES_ARGUMENT    = 4;
+    constexpr size_t START_VERTEX_ARGUMENT  = 3;
+    constexpr size_t TYPE_ARGUMENT          = 1;
+    constexpr size_t VERTEX_BUFFER_ARGUMENT = 2;
+
+    void*    device_ptr        = nullptr;
+    uint32_t flags             = 0;
+    uint32_t n_vertices        = 0;
+    bool     result            = false;
+    uint32_t start_vertex      = 0;
+    uint32_t type              = 0;
+    void*    vertex_buffer_ptr = nullptr;
+
+    if (get_live_object(0,
+                       &device_ptr,
+                        out_error_ptr) == false ||
+        get_live_object(VERTEX_BUFFER_ARGUMENT,
+                       &vertex_buffer_ptr,
+                        out_error_ptr) == false ||
+        get_u32(FLAGS_ARGUMENT,
+               &flags)                 == false ||
+        get_u32(N_VERTICES_ARGUMENT,
+               &n_vertices)            == false ||
+        get_u32(START_VERTEX_ARGUMENT,
+               &start_vertex)          == false ||
+        get_u32(TYPE_ARGUMENT,
+               &type)                  == false)
+    {
+        goto end;
+    }
+
+    result = true;
+
+    call_method<HRESULT>(device_ptr,
+                         Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_DRAWPRIMITIVEVB,
+                         static_cast<Interception::Hooks::D3D7::D3DPRIMITIVETYPE>(type),
+                         vertex_buffer_ptr,
+                         static_cast<DWORD>(start_vertex),
                          static_cast<DWORD>(n_vertices),
                          static_cast<DWORD>(flags) );
 
@@ -673,7 +961,7 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::execute(const Capture::APIDumpLo
          * is not replayed. Any other call is something the replay has no code for.
          */
         if (method_info_ptr == nullptr ||
-            is_query_method(method_info_ptr->method_name_ptr) )
+            is_ignored_method(method_info_ptr->method_name_ptr) )
         {
             result = true;
         }
@@ -827,7 +1115,11 @@ Replay::ReplayEngineDLL::ExecutionClass Replay::ReplayEngineDLL::D3D7CallExecuto
         case APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_BEGINSCENE:
         case APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_CLEAR:
         case APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_DRAWINDEXEDPRIMITIVE:
+        case APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_DRAWINDEXEDPRIMITIVESTRIDED:
+        case APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_DRAWINDEXEDPRIMITIVEVB:
         case APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_DRAWPRIMITIVE:
+        case APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_DRAWPRIMITIVESTRIDED:
+        case APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_DRAWPRIMITIVEVB:
         case APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_ENDSCENE:
         case APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_LIGHTENABLE:
         case APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_LOAD:
@@ -843,6 +1135,8 @@ Replay::ReplayEngineDLL::ExecutionClass Replay::ReplayEngineDLL::D3D7CallExecuto
         case APIInterceptor::APIFUNCTION_D3D7_IDIRECTDRAWSURFACE7_BLTFAST:
         case APIInterceptor::APIFUNCTION_D3D7_IDIRECTDRAWSURFACE7_LOCK:
         case APIInterceptor::APIFUNCTION_D3D7_IDIRECTDRAWSURFACE7_UNLOCK:
+        case APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DVERTEXBUFFER7_LOCK:
+        case APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DVERTEXBUFFER7_UNLOCK:
         {
             result = ExecutionClass::EVERY_TIME;
 
@@ -928,6 +1222,106 @@ const std::map<uint32_t, void*>& Replay::ReplayEngineDLL::D3D7CallExecutor::get_
     return m_stage_texture_map;
 }
 
+bool Replay::ReplayEngineDLL::D3D7CallExecutor::get_strided_data(const size_t&                                           in_n_strided_argument,
+                                                                 const size_t&                                           in_n_data_argument,
+                                                                 const uint32_t&                                         in_n_vertices,
+                                                                 const uint32_t&                                         in_vertex_format,
+                                                                 Interception::Hooks::D3D7::D3DDRAWPRIMITIVESTRIDEDDATA* out_strided_ptr) const
+{
+    constexpr size_t   N_ARRAYS = 12; /* the position, the normal, the two colors and the 8 texture coordinates */
+
+    size_t                         n_data_bytes    = 0;
+    const uint8_t*                 data_ptr        = get_chunk_ptr(in_n_data_argument,
+                                                                  &n_data_bytes);
+    size_t                         n_strided_bytes = 0;
+    const uint8_t*                 strided_ptr     = get_chunk_ptr(in_n_strided_argument,
+                                                                  &n_strided_bytes);
+    bool                           result          = false;
+    Interception::Hooks::D3D7::D3DDP_PTRSTRIDE* array_ptr_array[N_ARRAYS] = {};
+    Interception::Hooks::D3D7::D3DDRAWPRIMITIVESTRIDEDDATA dumped          = {};
+
+    (void) in_vertex_format;
+    (void) in_n_vertices;
+
+    *out_strided_ptr = {};
+
+    /* The chunk is the number of the arrays, the size of each, and the arrays; the structure of the dump tells the distance between the vertices of each. */
+    if (data_ptr        == nullptr                                                                               ||
+        strided_ptr     == nullptr                                                                               ||
+        n_strided_bytes != sizeof(dumped)                                                                        ||
+        n_data_bytes    <  sizeof(uint32_t) * (1 + N_ARRAYS) )
+    {
+        goto end;
+    }
+
+    ::memcpy(&dumped,
+             strided_ptr,
+             sizeof(dumped) );
+
+    array_ptr_array[0]  = &out_strided_ptr->position;
+    array_ptr_array[1]  = &out_strided_ptr->normal;
+    array_ptr_array[2]  = &out_strided_ptr->diffuse;
+    array_ptr_array[3]  = &out_strided_ptr->specular;
+
+    for (size_t n_stage = 0;
+                n_stage < 8;
+              ++n_stage)
+    {
+        array_ptr_array[4 + n_stage] = &out_strided_ptr->textureCoords[n_stage];
+    }
+
+    {
+        const Interception::Hooks::D3D7::D3DDP_PTRSTRIDE* dumped_array_ptr_array[N_ARRAYS] = {&dumped.position, &dumped.normal, &dumped.diffuse, &dumped.specular};
+        uint32_t                                          n_arrays                          = 0;
+        size_t                                            offset                            = sizeof(uint32_t) * (1 + N_ARRAYS);
+
+        ::memcpy(&n_arrays,
+                 data_ptr,
+                 sizeof(n_arrays) );
+
+        if (n_arrays != N_ARRAYS)
+        {
+            goto end;
+        }
+
+        for (size_t n_stage = 0;
+                    n_stage < 8;
+                  ++n_stage)
+        {
+            dumped_array_ptr_array[4 + n_stage] = &dumped.textureCoords[n_stage];
+        }
+
+        for (size_t n_array = 0;
+                    n_array < N_ARRAYS;
+                  ++n_array)
+        {
+            uint32_t n_array_bytes = 0;
+
+            ::memcpy(&n_array_bytes,
+                     data_ptr + sizeof(uint32_t) * (1 + n_array),
+                     sizeof(n_array_bytes) );
+
+            if (n_array_bytes != 0)
+            {
+                if (offset + n_array_bytes > n_data_bytes)
+                {
+                    goto end;
+                }
+
+                array_ptr_array[n_array]->lpvData  = const_cast<uint8_t*>(data_ptr + offset);
+                array_ptr_array[n_array]->dwStride = dumped_array_ptr_array[n_array]->dwStride;
+
+                offset += n_array_bytes;
+            }
+        }
+    }
+
+    result = true;
+
+end:
+    return result;
+}
+
 bool Replay::ReplayEngineDLL::D3D7CallExecutor::get_u32(const size_t& in_n_argument,
                                                         uint32_t*     out_value_ptr) const
 {
@@ -938,8 +1332,17 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::get_u32(const size_t& in_n_argum
                          out_value_ptr) );
 }
 
-bool Replay::ReplayEngineDLL::D3D7CallExecutor::is_query_method(const char* in_method_name_ptr)
+bool Replay::ReplayEngineDLL::D3D7CallExecutor::is_ignored_method(const char* in_method_name_ptr)
 {
+    /* What the replay has done for itself: it shows its window through a clipper of its own, whatever the application did. */
+    static const char* const name_ptr_array[] =
+    {
+        "CreateClipper",
+        "SetClipList",
+        "SetClipper",
+        "SetHWnd"
+    };
+
     static const char* const prefix_ptr_array[] =
     {
         "Enum",
@@ -956,6 +1359,17 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::is_query_method(const char* in_m
         if (::strncmp(in_method_name_ptr,
                       prefix_ptr,
                       ::strlen(prefix_ptr) ) == 0)
+        {
+            result = true;
+
+            break;
+        }
+    }
+
+    for (const char* name_ptr : name_ptr_array)
+    {
+        if (::strcmp(in_method_name_ptr,
+                     name_ptr) == 0)
         {
             result = true;
 
@@ -1419,6 +1833,7 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::release(std::string* out_error_p
             m_dumped_value_map.erase(object_ptr);
             m_live_objects.remove(object_ptr);
             m_locked_surface_map.erase(object_ptr);
+            m_locked_vertex_buffer_map.erase(object_ptr);
             m_reference_count_map.erase(object_ptr);
 
             on_object_gone(object_ptr);
@@ -1499,6 +1914,7 @@ void Replay::ReplayEngineDLL::D3D7CallExecutor::reset()
     m_dumped_value_map.clear();
     m_live_objects.clear();
     m_locked_surface_map.clear();
+    m_locked_vertex_buffer_map.clear();
     m_reference_count_map.clear();
 
     m_back_buffer_ptr   = nullptr;
@@ -1606,10 +2022,16 @@ void Replay::ReplayEngineDLL::D3D7CallExecutor::restore_state()
         }
     }
 
-    m_device_state                  = m_saved_device_state;
-    m_render_target_ptr             = m_saved_device_state.render_target_ptr;
-    m_stage_texture_map             = m_saved_device_state.stage_texture_map;
+    m_device_state                   = m_saved_device_state;
+    m_stage_texture_map              = m_saved_device_state.stage_texture_map;
     m_device_state.render_target_ptr = nullptr;
+
+    /* A state saved before the device was made has no target: what the device renders to now stays. */
+    if (m_saved_device_state.render_target_ptr != nullptr)
+    {
+        m_render_target_ptr = m_saved_device_state.render_target_ptr;
+    }
+
     m_device_state.stage_texture_map.clear();
 
 end:
@@ -2077,6 +2499,85 @@ void Replay::ReplayEngineDLL::D3D7CallExecutor::unlock_frame_image()
 
         m_locked_image_ptr = nullptr;
     }
+}
+
+bool Replay::ReplayEngineDLL::D3D7CallExecutor::vertex_buffer_lock(std::string* out_error_ptr)
+{
+    constexpr size_t FLAGS_ARGUMENT = 1;
+
+    uint32_t           flags             = 0;
+    LockedVertexBuffer locked;
+    bool               result            = false;
+    void*              vertex_buffer_ptr = nullptr;
+
+    if (get_live_object(0,
+                       &vertex_buffer_ptr,
+                        out_error_ptr) == false ||
+        get_u32(FLAGS_ARGUMENT,
+               &flags)                 == false)
+    {
+        goto end;
+    }
+
+    if (call_method<HRESULT>(vertex_buffer_ptr,
+                             Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DVERTEXBUFFER7_LOCK,
+                             static_cast<DWORD>(flags),
+                            &locked.data_ptr,
+                            &locked.n_bytes) < 0)
+    {
+        *out_error_ptr = "Lock of a vertex buffer failed in the replay.";
+
+        goto end;
+    }
+
+    m_locked_vertex_buffer_map[vertex_buffer_ptr] = locked;
+
+    result = true;
+
+end:
+    return result;
+}
+
+bool Replay::ReplayEngineDLL::D3D7CallExecutor::vertex_buffer_unlock(std::string* out_error_ptr)
+{
+    size_t         n_data_bytes      = 0;
+    const uint8_t* data_ptr          = get_chunk_ptr(m_context.get_n_head_arguments(),
+                                                     &n_data_bytes);
+    bool           result            = false;
+    void*          vertex_buffer_ptr = nullptr;
+
+    if (get_live_object(0,
+                       &vertex_buffer_ptr,
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    {
+        const auto locked_iterator = m_locked_vertex_buffer_map.find(vertex_buffer_ptr);
+
+        /* What the application wrote goes into the memory that the replay was given: the vertices of the dump are as they were in a buffer of that size. */
+        if (locked_iterator != m_locked_vertex_buffer_map.end() )
+        {
+            if (data_ptr != nullptr)
+            {
+                ::memcpy(locked_iterator->second.data_ptr,
+                         data_ptr,
+                         std::min<size_t>(n_data_bytes,
+                                          locked_iterator->second.n_bytes) );
+            }
+
+            m_locked_vertex_buffer_map.erase(locked_iterator);
+        }
+    }
+
+    result = true;
+
+    call_method<HRESULT>(vertex_buffer_ptr,
+                         Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DVERTEXBUFFER7_UNLOCK);
+
+end:
+    return result;
 }
 
 bool Replay::ReplayEngineDLL::D3D7CallExecutor::write_back_buffer(const std::vector<uint8_t>& in_pixel_u8_vec)
