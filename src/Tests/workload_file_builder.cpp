@@ -317,6 +317,54 @@ void Tests::WorkloadFileBuilder::build_many_segments(std::vector<uint8_t>* out_u
     }
 }
 
+void Tests::WorkloadFileBuilder::build_segments(std::vector<uint8_t>* out_u8_vec_ptr,
+                                                const uint32_t&       in_n_segments,
+                                                const uint32_t&       in_n_calls_per_segment,
+                                                const uint32_t&       in_n_calls_per_frame)
+{
+    uint64_t n_call_in_file = 0;
+
+    append_file_header(out_u8_vec_ptr);
+
+    for (uint32_t n_segment = 0;
+                  n_segment < in_n_segments;
+                ++n_segment)
+    {
+        std::vector<uint8_t> segment_u8_vec;
+
+        append_header(&segment_u8_vec,
+                      in_n_calls_per_segment,
+                      1,  /* in_n_data_chunks */
+                      0); /* in_n_surfaces    */
+
+        for (uint32_t n_call = 0;
+                      n_call < in_n_calls_per_segment;
+                    ++n_call, ++n_call_in_file)
+        {
+            if ( (n_call_in_file + 1) % (in_n_calls_per_frame + 1) == 0)
+            {
+                append_call_with_argument(&segment_u8_vec,
+                                          APIInterceptor::APIFUNCTION_GDI32_SWAPBUFFERS,
+                                          APIInterceptor::APIFunctionArgument::create_void_ptr(nullptr),
+                                          static_cast<uint32_t>(n_call_in_file) );
+            }
+            else
+            {
+                append_call(&segment_u8_vec,
+                            static_cast<uint32_t>(n_call_in_file),
+                            APIInterceptor::APIFUNCTION_GDI32_GETPIXELFORMAT);
+            }
+        }
+
+        append_chunk(&segment_u8_vec,
+                     std::vector<uint8_t>(4,
+                                          static_cast<uint8_t>(n_segment) ) );
+
+        append_compressed_segment(out_u8_vec_ptr,
+                                  segment_u8_vec);
+    }
+}
+
 void Tests::WorkloadFileBuilder::build_two_segments(std::vector<uint8_t>* out_u8_vec_ptr,
                                                     const size_t&         in_n_bytes_to_drop_from_second_segment)
 {

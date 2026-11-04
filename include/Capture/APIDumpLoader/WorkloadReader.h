@@ -40,6 +40,11 @@ namespace Capture
                  */
                 uint32_t n_segments_in_flight = 0;
 
+                /* The number of data chunks in the segments before the one that the reader starts at (see start_offset_n_bytes): the chunks of the segments it
+                 * reads are numbered as they are in the dump. The index of a workload has it (see WorkloadIndex).
+                 */
+                uint32_t n_data_chunks_before = 0;
+
                 /* The threads which read segments ahead of the caller. 0: the caller reads a segment itself when it asks for it. */
                 uint32_t n_threads = 0;
 
@@ -47,6 +52,12 @@ namespace Capture
                  * anywhere: for tools which look at the calls and not at the vertices and pixels, which are most of a workload. 0: none is left out.
                  */
                 uint32_t skip_data_chunks_above_n_bytes = 0;
+
+                /* Where in the file the reader starts: at the start of a segment (a frame of the file, see Workload::file_offset_n_bytes). 0: after the header,
+                 * which is the start of the file. The calls of the segments before it are not read, so what a tool follows from call to call is not
+                 * what it would be if it read them (the names of objects, for one).
+                 */
+                uint64_t start_offset_n_bytes = 0;
             };
 
             ~WorkloadReader();
@@ -85,8 +96,10 @@ namespace Capture
             /* A segment, as a frame of the file made it. */
             struct DecodedSegment
             {
+                uint64_t                  file_offset_n_bytes = 0; /* of the frame, in the file                                        */
                 bool                      has_segment  = false; /* the frame held at least the counts of a segment */
                 bool                      is_truncated = false; /* the frame was cut or damaged, or the segment is short of what its counts say */
+                uint64_t                  n_compressed_bytes  = 0; /* of the frame                                                      */
                 std::unique_ptr<Workload> workload_ptr;
             };
 

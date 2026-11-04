@@ -46,6 +46,14 @@ namespace Tests
                                         const uint32_t&       in_n_calls_per_segment,
                                         const size_t&         in_n_bytes_per_chunk);
 
+        /* n_segments segments of n_calls_per_segment calls each, one data chunk of a few bytes in each. Every (n_calls_per_frame + 1)th call of the
+         * file is a SwapBuffers call, which ends a frame, wherever that is in a segment (the frames need not fit in them).
+         */
+        static void build_segments(std::vector<uint8_t>* out_u8_vec_ptr,
+                                   const uint32_t&       in_n_segments,
+                                   const uint32_t&       in_n_calls_per_segment,
+                                   const uint32_t&       in_n_calls_per_frame);
+
         /* Two segments: [2 calls, 2 chunks, 1 surface] and [1 call, 1 chunk]. The last bytes of the second segment can
          * be left out, which ends it in the middle of the chunk (the segment is compressed as it is, so the frame is
          * complete).

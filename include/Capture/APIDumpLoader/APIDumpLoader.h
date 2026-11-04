@@ -44,6 +44,8 @@ namespace Capture
             DumpedAPICallVectorUniquePtr    dumped_api_call_vec_ptr;
             DumpedSurfaceVectorUniquePtr    dumped_surface_vec_ptr;
             uint32_t                        first_data_chunk_id = 0; /* data_chunk_ptr_vec[0] has this ID in the dump */
+            uint64_t                        file_offset_n_bytes = 0; /* of the frame of the file which holds the segment, if it was read from a file (see WorkloadReader) */
+            uint64_t                        n_compressed_bytes  = 0; /* of that frame                                                                                    */
             uint32_t                        pointer_n_bytes     = 0; /* of the process which was dumped              */
             uint64_t                        qpc_frequency       = 0; /* ticks per second                             */
 

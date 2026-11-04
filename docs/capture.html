@@ -50,7 +50,7 @@
 <table>
 <tr><th>Tool</th><th>Use</th></tr>
 <tr><td><code>APIDumper</code></td><td>Starts a program with <code>APIDumperDLL</code> injected; the DLL writes the workload.</td></tr>
-<tr><td><code>APIDumpPrinter</code></td><td>Prints a workload as text, verbosely: every input and result; <code>[out:]</code> marks an argument the call changed by reference.</td></tr>
+<tr><td><code>APIDumpPrinter</code></td><td>Prints a workload as text, verbosely: every input and result; <code>[out:]</code> marks an argument the call changed by reference. <code>--frame</code> reads the file from the segment of the first frame, with the data chunks of the segments before it left out (the names of the objects are given by the order of their creation, so those calls are still read), by the index that <code>--index</code> makes: on a capture of 30,000 frames and 42 million calls the index is made in 7 seconds and is 8 KB, and printing frames near the end takes 12 seconds instead of 30.</td></tr>
 <tr><td><code>ReplayPlayer</code></td><td>Plays a workload again in a window, with the replay engine, without the program.</td></tr>
 </table>
 

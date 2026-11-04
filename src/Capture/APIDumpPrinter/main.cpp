@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 #include "Capture/APIDumpLoader/APIDumpLoader.h"
+#include "Capture/APIDumpLoader/WorkloadIndex.h"
 #include "Capture/APIDumpLoader/WorkloadReader.h"
 #include "Capture/APIDumpLoader/api_info.h"
 #include "api_info.h"
@@ -72,6 +73,11 @@ bool Capture::APIDumpPrinter::parse_arguments(int      in_argc,
         const std::string argument(in_argv[n_argument]);
         const bool        has_value = (n_argument + 1 < in_argc);
 
+        if (argument == "--index")
+        {
+            out_options_ptr->makes_index_only = true;
+        }
+        else
         if (argument == "--stats")
         {
             out_options_ptr->show_statistics = true;
@@ -270,6 +276,9 @@ void Capture::APIDumpPrinter::print_usage()
             "                      Valid values: gdi32, gl, wgl, user32, d3d8, d3d7. Default: all.\n"
             "  --stats             Instead of listing calls, print a call histogram and workload summary.\n"
             "                      Honors --frame and --api.\n"
+            "  --index             Make the index of the workload (it is kept in a file next to it, and says where its frames are),\n"
+            "                      and say what it holds. --frame uses it to read the file from the segment of the first frame, without\n"
+            "                      the data chunks of the segments before it: it is made the first time that it is needed.\n"
             "  --dump-chunks DIR   Write each data chunk referenced by the selected calls to DIR\\chunk_NNNNNN.bin.\n"
             "  --hexdump N         Under each call, hex-dump the first N bytes of every data chunk it references.\n"
             "\n"
@@ -281,6 +290,10 @@ int Capture::APIDumpPrinter::run(int   in_argc,
 {
     typedef std::map<Capture::APIDumpLoader::APIGroup, IAPIDecoder*> DecoderPtrMap;
 
+    /* The threads that read segments ahead of the printer when the index is used (a 32-bit process holds the segments in its 4 GB). */
+    const uint32_t N_READER_THREADS                  = (sizeof(void*) == sizeof(uint64_t) ) ? 6 : 3;
+    constexpr uint32_t PREFIX_SKIP_CHUNKS_ABOVE_N_BYTES = 256; /* the names of objects need the chunks that name their types, which are small */
+
     std::map<APIInterceptor::APIFunction, uint32_t>      call_count_map;
     D3D7Decoder                                          d3d7_decoder;
     D3D8Decoder                                          d3d8_decoder;
@@ -291,7 +304,11 @@ int Capture::APIDumpPrinter::run(int   in_argc,
     uint32_t                                             n_calls_selected  = 0;
     uint32_t                                             n_chunks_written  = 0;
     uint32_t                                             n_frame           = 0;
+    size_t                                               n_prefix_segments = 0;
+    size_t                                               n_segments_read   = 0;
     Options                                              options;
+    Capture::APIDumpLoader::WorkloadReader::Options      prefix_options;
+    Capture::APIDumpLoader::WorkloadReader::Options      range_options;
     std::string                                          reader_error;
     Capture::APIDumpLoader::WorkloadReaderUniquePtr      reader_ptr;
     std::set<APIInterceptor::DataChunkID>                referenced_chunk_set;
@@ -308,7 +325,88 @@ int Capture::APIDumpPrinter::run(int   in_argc,
         goto end;
     }
 
+    /* What is before the first frame is only to be read for the names of the objects, which are given by the order of their creation: with the index, the
+     * segments before the one that has the first frame are read without their big data chunks, and from there on the file is read in full.
+     */
+    if (options.first_frame != 0 &&
+        options.show_statistics == false)
+    {
+        Capture::APIDumpLoader::WorkloadIndex index;
+        bool                                  was_built = false;
+        size_t                                n_segment = 0;
+        std::string                           index_error;
+
+        if (Capture::APIDumpLoader::WorkloadIndex::load_or_build(options.workload_filename_ptr,
+                                                                 N_READER_THREADS,
+                                                                &index,
+                                                                &was_built,
+                                                                &index_error) )
+        {
+            if (was_built)
+            {
+                fprintf(stderr,
+                        "[*] The index of the workload has been made, and is kept in %s.\n",
+                        Capture::APIDumpLoader::WorkloadIndex::get_default_filename(options.workload_filename_ptr).c_str() );
+            }
+
+            if (index.find_segment_of_frame(options.first_frame,
+                                           &n_segment) &&
+                n_segment != 0)
+            {
+                n_prefix_segments           = n_segment;
+                prefix_options.n_threads                      = N_READER_THREADS;
+                prefix_options.skip_data_chunks_above_n_bytes = PREFIX_SKIP_CHUNKS_ABOVE_N_BYTES;
+                range_options.n_threads                       = N_READER_THREADS;
+                range_options                                 = index.make_reader_options(n_segment,
+                                                                                          range_options);
+            }
+        }
+        else
+        {
+            fprintf(stderr,
+                    "[!] The index of the workload cannot be made (%s): the file is read from its start.\n",
+                    index_error.c_str() );
+        }
+    }
+
+    if (options.makes_index_only)
+    {
+        Capture::APIDumpLoader::WorkloadIndex index;
+        bool                                  was_built = false;
+        std::string                           index_error;
+
+        if (Capture::APIDumpLoader::WorkloadIndex::load_or_build(options.workload_filename_ptr,
+                                                                 N_READER_THREADS,
+                                                                &index,
+                                                                &was_built,
+                                                                &index_error) == false)
+        {
+            fprintf(stderr,
+                    "[!] The index of the workload cannot be made: %s\n",
+                    index_error.c_str() );
+
+            goto end;
+        }
+
+        fprintf(stdout,
+                "%s the index %s\n"
+                "  Segments: %zu\n"
+                "  Calls:    %llu\n"
+                "  Frames:   %llu%s\n",
+                (was_built) ? "Made" : "Read",
+                Capture::APIDumpLoader::WorkloadIndex::get_default_filename(options.workload_filename_ptr).c_str(),
+                index.get_segment_vec().size(),
+                static_cast<unsigned long long>(index.get_n_calls() ),
+                static_cast<unsigned long long>(index.get_n_frames() ),
+                (index.is_truncated() ) ? " (the file ends in the middle of a segment)" : "");
+
+        result = EXIT_SUCCESS;
+
+        goto end;
+    }
+
     reader_ptr = Capture::APIDumpLoader::WorkloadReader::create(options.workload_filename_ptr,
+                                                                prefix_options,
                                                                &reader_error);
 
     if (reader_ptr == nullptr)
@@ -321,8 +419,35 @@ int Capture::APIDumpPrinter::run(int   in_argc,
     }
 
     /* The workload is read, and printed, one segment at a time. */
-    while (reader_ptr->read_next_segment(&segment) )
+    for (;;)
     {
+        /* The last of the segments that are only for the names: the rest is read from the one which has the first frame. */
+        if (n_prefix_segments != 0 &&
+            n_segments_read   == n_prefix_segments)
+        {
+            reader_ptr = Capture::APIDumpLoader::WorkloadReader::create(options.workload_filename_ptr,
+                                                                        range_options,
+                                                                       &reader_error);
+
+            n_prefix_segments = 0;
+
+            if (reader_ptr == nullptr)
+            {
+                fprintf(stderr,
+                        "[!] Could not open the specified workload: %s\n",
+                        reader_error.c_str() );
+
+                goto end;
+            }
+        }
+
+        if (reader_ptr->read_next_segment(&segment) == false)
+        {
+            break;
+        }
+
+        n_segments_read++;
+
         /* Walk through the calls, tracking frames. */
         for (const auto& current_api_call : *segment.dumped_api_call_vec_ptr)
         {

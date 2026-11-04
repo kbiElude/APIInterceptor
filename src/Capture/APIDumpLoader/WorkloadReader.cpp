@@ -26,12 +26,15 @@ struct Capture::APIDumpLoader::WorkloadReader::FrameSource
         FRAME
     };
 
-    explicit FrameSource(FILE* in_file_handle)
-        :buffer_u8_vec(INITIAL_BUFFER_N_BYTES),
-         end         (0),
-         file_handle (in_file_handle),
-         is_at_end   (false),
-         start       (0)
+    FrameSource(FILE*          in_file_handle,
+                const uint64_t& in_first_frame_offset)
+        :buffer_u8_vec    (INITIAL_BUFFER_N_BYTES),
+         end              (0),
+         file_handle      (in_file_handle),
+         is_at_end        (false),
+         last_frame_offset(0),
+         next_frame_offset(in_first_frame_offset),
+         start            (0)
     {
         /* Stub */
     }
@@ -55,7 +58,9 @@ struct Capture::APIDumpLoader::WorkloadReader::FrameSource
                     out_frame_byte_vec_ptr->assign(buffer_u8_vec.data() + start,
                                                    buffer_u8_vec.data() + start + n_frame_bytes);
 
-                    start += n_frame_bytes;
+                    last_frame_offset  = next_frame_offset;
+                    next_frame_offset += n_frame_bytes;
+                    start             += n_frame_bytes;
 
                     result = Result::FRAME;
 
@@ -78,7 +83,9 @@ struct Capture::APIDumpLoader::WorkloadReader::FrameSource
                     out_frame_byte_vec_ptr->assign(buffer_u8_vec.data() + start,
                                                    buffer_u8_vec.data() + end);
 
-                    start  = end;
+                    last_frame_offset  = next_frame_offset;
+                    next_frame_offset += end - start;
+                    start              = end;
                     result = Result::CUT;
                 }
 
@@ -129,6 +136,8 @@ struct Capture::APIDumpLoader::WorkloadReader::FrameSource
     size_t               end;
     FILE*                file_handle;
     bool                 is_at_end;
+    uint64_t             last_frame_offset; /* of the frame that read_next() last gave                              */
+    uint64_t             next_frame_offset; /* of the one it will give                                              */
     size_t               start;
 };
 
@@ -138,8 +147,9 @@ struct Capture::APIDumpLoader::WorkloadReader::Pipeline
     /* A frame to be decoded. */
     struct Job
     {
+        uint64_t             file_offset = 0; /* of the frame, in the file        */
         std::vector<uint8_t> frame_byte_vec;
-        uint64_t             sequence = 0; /* the place of the frame in the file */
+        uint64_t             sequence    = 0; /* the place of the frame in the file */
     };
 
     Pipeline(FrameSource*    in_frame_source_ptr,
@@ -251,7 +261,8 @@ struct Capture::APIDumpLoader::WorkloadReader::Pipeline
                 }
             }
 
-            source_result = frame_source_ptr->read_next(&job.frame_byte_vec);
+            source_result   = frame_source_ptr->read_next(&job.frame_byte_vec);
+            job.file_offset = frame_source_ptr->last_frame_offset;
 
             {
                 std::lock_guard<std::mutex> lock(mutex);
@@ -323,6 +334,9 @@ struct Capture::APIDumpLoader::WorkloadReader::Pipeline
                              skip_data_chunks_above_n_bytes,
                             &decoded_segment);
             }
+
+            decoded_segment.file_offset_n_bytes = job.file_offset;
+            decoded_segment.n_compressed_bytes  = job.frame_byte_vec.size();
 
             {
                 std::lock_guard<std::mutex> lock(mutex);
@@ -486,7 +500,25 @@ Capture::APIDumpLoader::WorkloadReaderUniquePtr Capture::APIDumpLoader::Workload
     result_ptr->m_qpc_frequency                  = header.qpc_frequency;
     result_ptr->m_skip_data_chunks_above_n_bytes = in_options.skip_data_chunks_above_n_bytes;
 
-    result_ptr->m_frame_source_ptr.reset(new FrameSource(result_ptr->m_file_handle) );
+    /* The frames follow the header; a reader that is to start later is given where. */
+    result_ptr->m_n_data_chunks_read = in_options.n_data_chunks_before;
+
+    if (in_options.start_offset_n_bytes != 0)
+    {
+        if (in_options.start_offset_n_bytes < sizeof(header) ||
+            ::_fseeki64(result_ptr->m_file_handle,
+                        static_cast<__int64>(in_options.start_offset_n_bytes),
+                        SEEK_SET) != 0)
+        {
+            error = "The file cannot be read from the place that was asked for.";
+
+            goto fail;
+        }
+    }
+
+    result_ptr->m_frame_source_ptr.reset(new FrameSource(result_ptr->m_file_handle,
+                                                         (in_options.start_offset_n_bytes != 0) ? in_options.start_offset_n_bytes
+                                                                                                : sizeof(header) ) );
 
     if (in_options.n_threads != 0)
     {
@@ -562,6 +594,9 @@ Capture::APIDumpLoader::WorkloadReader::Fetch Capture::APIDumpLoader::WorkloadRe
                          frame_byte_vec,
                          m_skip_data_chunks_above_n_bytes,
                          out_segment_ptr);
+
+            out_segment_ptr->file_offset_n_bytes = m_frame_source_ptr->last_frame_offset;
+            out_segment_ptr->n_compressed_bytes  = frame_byte_vec.size();
 
             result = Fetch::SEGMENT;
 
@@ -644,7 +679,9 @@ bool Capture::APIDumpLoader::WorkloadReader::read_next_segment(Workload* out_wor
 
             *out_workload_ptr = std::move(*segment.workload_ptr);
 
+            out_workload_ptr->file_offset_n_bytes = segment.file_offset_n_bytes;
             out_workload_ptr->first_data_chunk_id = m_n_data_chunks_read;
+            out_workload_ptr->n_compressed_bytes  = segment.n_compressed_bytes;
             out_workload_ptr->pointer_n_bytes     = m_pointer_n_bytes;
             out_workload_ptr->qpc_frequency       = m_qpc_frequency;
 

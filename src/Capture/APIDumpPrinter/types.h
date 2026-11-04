@@ -33,6 +33,7 @@ namespace Capture
             uint32_t                                   first_frame           = 0;
             uint32_t                                   last_frame            = UINT32_MAX;
             uint32_t                                   n_hexdump_bytes       = 0;
+            bool                                       makes_index_only      = false;
             bool                                       show_statistics       = false;
             const char*                                workload_filename_ptr = nullptr;
         };
