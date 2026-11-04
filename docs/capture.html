@@ -55,8 +55,18 @@
 </table>
 
 <h2>The replay engine</h2>
-<p><code>ReplayEngineDLL</code> reads calls from a workload (in segments if it is large; see <code>WorkloadReader</code>) and executes each through an <code>ICallExecutor</code>. Observers (<code>IReplayObserver</code>) hear about frames and calls, and the pacing of the frames is one.</p>
-<div class="note">Each API has an executor of its own, registered by its API group: today Direct3D 8, OpenGL and the Win32 windowing calls (GDI32, User32, WGL), and another API is added with its own. There is no translation of one API to another.</div>
+<p><code>ReplayEngineCore</code> (a static library; <code>ReplayEngineDLL</code> is a thin shell around it) reads calls from a workload (in segments if it is large; see <code>WorkloadReader</code>) and executes each through an <code>ICallExecutor</code>, one after the other. Observers (<code>IReplayObserver</code>) hear about frames, errors and windows. It does not pace the frames: it is there to show that a capture holds what a program needs, not to show it at the speed of the program.</p>
+<div class="note">Each API has an executor of its own, registered by its API group: today Direct3D 7 and 8, OpenGL and the Win32 windowing calls (GDI32, User32, WGL), and another API is added with its own. There is no translation of one API to another. The Direct3D 7 executor replays a program in a window, whatever it did: the primary surface shows the window, the back buffer of a flipping chain is a surface of the replay, and a flip is a blit of it to the window. A call the executor has no code for fails the replay, rather than draw something wrong.</div>
+
+<h3>Playing more than the plain sequence</h3>
+<p>A program that needs more (a frame played twice, the frames at the pace of the dumped process) links <code>ReplayEngineCore</code> and plugs into it, without the engine knowing what it is for:</p>
+<table>
+<tr><th>Interface</th><th>Use</th></tr>
+<tr><td><code>IFrameExecutor</code></td><td>Plays the calls of one frame. It reads them from the <code>IFrameHost</code> (the engine), may keep them, and executes them through the host, in any order and any number of times. The engine presents the frame and pauses between two frames. <code>SequentialFrameExecutor</code> is the default: each call is executed as it is read. An executor can wrap another (it is given a host that waits when the call which ends a frame is read, for instance).</td></tr>
+<tr><td><code>ICallExecutor</code></td><td>Replays the calls of an API. <code>ReplayEngine::add_call_executor</code> replaces the one of an API. It can read and write the back buffer, save and put back the state of the device, and tell when a call is executed if its frame is played again (<code>get_execution_class</code>).</td></tr>
+<tr><td>Hooks of <code>D3D7CallExecutor</code></td><td>A class that derives from it can make an object twice, or use another object than the one the replay made: <code>after_call</code>, <code>take_object</code>, <code>resolve_object</code>, <code>on_object_registered</code>, <code>on_object_released</code>, <code>on_object_gone</code> and <code>on_reset</code>, with <code>run_handler</code> and <code>release_object_reference</code> to work with.</td></tr>
+<tr><td><code>ICallInterceptor</code></td><td>Sees every call before and after it is replayed, and may skip it.</td></tr>
+</table>
 </main>
 </body>
 </html>

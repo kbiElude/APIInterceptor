@@ -69,11 +69,17 @@
 <h2 id="replay">Replay</h2>
 <p>Executing the calls of a workload again, without the program: to check that a capture is complete, and as a test of the captures that the dumper makes.</p>
 
+<h3>ReplayEngineCore</h3>
+<p><em>Static library.</em> The replay engine. It walks the calls of a workload and hands each to the executor of its API (Direct3D 7 and 8, OpenGL, Win32 windows, or one that does nothing), found in a registry. It remaps the objects of the dump onto the live ones, restores the arguments a call needs, replays locks and client arrays, and lets a frame executor decide how the calls of a frame are read and executed. The executors are the parts that depend on an API. A project that builds on this one links it and plugs in its own frame executor and executors (see <a href="capture.html#replay">the replay engine</a>).</p>
+
 <h3>ReplayEngineDLL</h3>
-<p><em>DLL, built for 32 and 64 bits.</em> The replay engine. It walks the calls of a workload and hands each to the executor of its API (Direct3D 8, OpenGL, Win32 windows, or one that does nothing). It remaps the objects of the dump onto the live ones, restores the arguments a call needs, replays locks and client arrays, and paces the frames. The executors are the parts that depend on an API.</p>
+<p><em>DLL, built for 32 and 64 bits.</em> The replay engine as the player uses it: a thin shell around <code>ReplayEngineCore</code> with the entry points to create and destroy an engine.</p>
+
+<h3>ReplayPlayerSupport</h3>
+<p><em>Static library.</em> What the programs that play a workload have in common: the names of the states, the dialog that picks the file, and the handover of a workload with Direct3D 7 or 8 calls from the 64-bit player to the 32-bit one.</p>
 
 <h3>ReplayPlayer</h3>
-<p><em>Program.</em> A control window (Dear ImGui) around the replay engine: choose a workload, play and pause. A 64-bit player starts the 32-bit one for a 32-bit workload.</p>
+<p><em>Program.</em> A control window (Dear ImGui) around the replay engine: choose a workload, play and pause. A 64-bit player starts the 32-bit one for a 32-bit workload (Direct3D 7 and 8 are 32-bit only).
 
 <h2 id="support">Tests and third-party code</h2>
 
