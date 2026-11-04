@@ -22,6 +22,7 @@
 #include "Common/tracker.h"
 #include "Interception/Hooks/Common/hook_result.h"
 #include "Interception/Hooks/Common/original_function_providers.h"
+#include "Interception/Hooks/Common/types.h"
 #include <algorithm>
 #include <array>
 #include <utility>
@@ -34,6 +35,10 @@ namespace Interception
         {
             template<typename Traits, typename FunctionPtr, APIInterceptor::APIFunction function, typename OriginalFunction>
             struct GenericHook;
+
+            /* The entry of a hook table for a method that is found by its place in the vtable of its interface. */
+            template<typename Traits, typename FunctionPtr, APIInterceptor::APIFunction function, uint32_t vtable_index>
+            HookEntry make_vtable_hook_entry();
 
             template<typename Traits, typename ReturnType, typename... Arguments, APIInterceptor::APIFunction function, typename OriginalFunction>
             struct GenericHook<Traits, ReturnType (__stdcall*)(Arguments...), function, OriginalFunction>
@@ -180,6 +185,13 @@ ReturnType __stdcall Interception::Hooks::Common::GenericHook<Traits, ReturnType
     }
 
     return result.get();
+}
+
+template<typename Traits, typename FunctionPtr, APIInterceptor::APIFunction function, uint32_t vtable_index>
+Interception::Hooks::Common::HookEntry Interception::Hooks::Common::make_vtable_hook_entry()
+{
+    return {reinterpret_cast<void*>(&GenericHook<Traits, FunctionPtr, function, VTableOriginalFunction<vtable_index> >::invoke),
+            vtable_index};
 }
 
 #endif /* HOOKS_COMMON_GENERIC_HOOK_H */

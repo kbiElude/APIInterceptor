@@ -15,12 +15,10 @@ Interception::Hooks::Common::HookTable* Interception::Hooks::D3D8::get_hook_tabl
 
         #define D3D8_METHOD(INTERFACE_TAG, interface_name, METHOD_TAG, method_name, vtable_index, return_type, parameters) \
             hook_table_ptr->add_hook_entry(static_cast<uint32_t>(Interface::INTERFACE_TAG), \
-                {reinterpret_cast<void*>(&Interception::Hooks::Common::GenericHook<HookTraits, \
-                                                                                   PFN_##INTERFACE_TAG##_##METHOD_TAG, \
-                                                                                   APIInterceptor::APIFUNCTION_D3D8_##INTERFACE_TAG##_##METHOD_TAG, \
-                                                                                   Interception::Hooks::Common::VTableOriginalFunction<VTABLE_INDEX_##INTERFACE_TAG##_##METHOD_TAG> >::invoke), \
-                 VTABLE_INDEX_##INTERFACE_TAG##_##METHOD_TAG} \
-            );
+                                           Interception::Hooks::Common::make_vtable_hook_entry<HookTraits, \
+                                                                                               PFN_##INTERFACE_TAG##_##METHOD_TAG, \
+                                                                                               APIInterceptor::APIFUNCTION_D3D8_##INTERFACE_TAG##_##METHOD_TAG, \
+                                                                                               VTABLE_INDEX_##INTERFACE_TAG##_##METHOD_TAG>() );
         #include "Interception/Hooks/D3D8/d3d8_methods.inl"
         #undef D3D8_METHOD
 
