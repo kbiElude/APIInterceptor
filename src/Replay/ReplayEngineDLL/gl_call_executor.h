@@ -29,11 +29,12 @@ namespace Replay
              GlCallExecutor(ObjectRemapper* in_remapper_ptr);
             ~GlCallExecutor();
 
-            bool execute           (const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                    const IChunkSource&                          in_chunk_source,
-                                    std::string*                                 out_error_ptr) override;
-            void on_frame_presented() override;
-            void reset             () override;
+            bool        execute           (const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                           const IChunkSource&                          in_chunk_source,
+                                           std::string*                                 out_error_ptr) override;
+            CallSupport get_call_support  (const APIInterceptor::APIFunction& in_function) const override;
+            void        on_frame_presented() override;
+            void        reset             () override;
 
         private:
             typedef bool (*InvokeFuncPtr)(GlReplayContext* in_context_ptr,

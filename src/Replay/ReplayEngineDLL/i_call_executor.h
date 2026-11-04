@@ -26,6 +26,16 @@ namespace Replay
                                  const IChunkSource&                          in_chunk_source,
                                  std::string*                                 out_error_ptr) = 0;
 
+            /* What replaying a call of the function comes to: it is made, the replay does without it, or the replay fails on it. It depends on the
+             * function alone, and is what execute() does, so that a workload can be checked for what the replay cannot do without replaying it.
+             */
+            virtual CallSupport get_call_support(const APIInterceptor::APIFunction& in_function) const
+            {
+                (void) in_function;
+
+                return CallSupport::REPLAYED;
+            }
+
             /* When the call is executed, if its frame is executed more than once. */
             virtual ExecutionClass get_execution_class(const Capture::APIDumpLoader::DumpedAPICall& in_call) const
             {

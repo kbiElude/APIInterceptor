@@ -20,6 +20,13 @@ bool Replay::ReplayEngineDLL::NullCallExecutor::execute(const Capture::APIDumpLo
     return true;
 }
 
+Replay::ReplayEngineDLL::CallSupport Replay::ReplayEngineDLL::NullCallExecutor::get_call_support(const APIInterceptor::APIFunction& in_function) const
+{
+    (void) in_function;
+
+    return CallSupport::SKIPPED;
+}
+
 void Replay::ReplayEngineDLL::NullCallExecutor::on_frame_presented()
 {
     /* Stub */

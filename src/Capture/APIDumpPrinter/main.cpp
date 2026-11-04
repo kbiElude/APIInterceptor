@@ -83,6 +83,16 @@ bool Capture::APIDumpPrinter::parse_arguments(int      in_argc,
             out_options_ptr->show_statistics = true;
         }
         else
+        if (argument == "--unreplayed-functions")
+        {
+            out_options_ptr->lists_unreplayed_functions = true;
+        }
+        else
+        if (argument == "--verify")
+        {
+            out_options_ptr->verifies_replay = true;
+        }
+        else
         if (argument == "--frame"       ||
             argument == "--api"         ||
             argument == "--dump-chunks" ||
@@ -156,7 +166,8 @@ bool Capture::APIDumpPrinter::parse_arguments(int      in_argc,
         }
     }
 
-    result = (out_options_ptr->workload_filename_ptr != nullptr);
+    result = (out_options_ptr->workload_filename_ptr != nullptr ||
+              out_options_ptr->lists_unreplayed_functions);
 end:
     return result;
 }
@@ -276,6 +287,9 @@ void Capture::APIDumpPrinter::print_usage()
             "                      Valid values: gdi32, gl, wgl, user32, d3d8, d3d7. Default: all.\n"
             "  --stats             Instead of listing calls, print a call histogram and workload summary.\n"
             "                      Honors --frame and --api.\n"
+            "  --verify            Instead of listing calls: read the workload and say what a replay of it would fail on, without replaying it (calls\n"
+            "                      of functions the replay has no code for, and data chunks that are not in the file). Exits with 1 if it would fail.\n"
+            "  --unreplayed-functions  Needs no workload: list the functions that are recorded and cannot be replayed.\n"
             "  --index             Make the index of the workload (it is kept in a file next to it, and says where its frames are),\n"
             "                      and say what it holds. --frame uses it to read the file from the segment of the first frame, without\n"
             "                      the data chunks of the segments before it: it is made the first time that it is needed.\n"
@@ -321,6 +335,20 @@ int Capture::APIDumpPrinter::run(int   in_argc,
                        &options) == false)
     {
         print_usage();
+
+        goto end;
+    }
+
+    if (options.lists_unreplayed_functions)
+    {
+        result = list_unreplayed_functions();
+
+        goto end;
+    }
+
+    if (options.verifies_replay)
+    {
+        result = verify_replay(options);
 
         goto end;
     }

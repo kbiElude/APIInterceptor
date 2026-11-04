@@ -9,6 +9,14 @@ namespace Replay
 {
     namespace ReplayEngineDLL
     {
+        /* What replaying a call of an API function comes to. */
+        enum class CallSupport
+        {
+            REPLAYED,   /* the call is made again                                                                              */
+            SKIPPED,    /* the replay does without it: it only asks about the API, or the executor leaves it out               */
+            UNSUPPORTED /* the replay has no code for it, and fails on it                                                      */
+        };
+
         /* When the calls of a frame that is executed more than once are executed. */
         enum class ExecutionClass
         {

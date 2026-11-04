@@ -237,7 +237,7 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::execute(const Capture::APIDumpL
     const auto handler_iterator = m_handler_func_ptr_map.find(in_call.func);
     bool       result           = false;
 
-    if (handler_iterator == m_handler_func_ptr_map.end() )
+    if (get_call_support(in_call.func) == CallSupport::UNSUPPORTED)
     {
         *out_error_ptr = "The Win32 executor does not know the function.";
 
@@ -250,6 +250,12 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::execute(const Capture::APIDumpL
 
 end:
     return result;
+}
+
+Replay::ReplayEngineDLL::CallSupport Replay::ReplayEngineDLL::Win32CallExecutor::get_call_support(const APIInterceptor::APIFunction& in_function) const
+{
+    return (m_handler_func_ptr_map.find(in_function) != m_handler_func_ptr_map.end() ) ? CallSupport::REPLAYED
+                                                                                      : CallSupport::UNSUPPORTED;
 }
 
 bool Replay::ReplayEngineDLL::Win32CallExecutor::get_live_handle(const ObjectKind&                          in_kind,

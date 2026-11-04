@@ -17,6 +17,9 @@ namespace Capture
 {
     namespace APIDumpPrinter
     {
+        /* Prints the functions which the dumper records and the replay has no code for. EXIT_SUCCESS if there are none. */
+        int list_unreplayed_functions();
+
         bool parse_api_list   (const char*                                                 in_argument_ptr,
                                Options*                                                    inout_options_ptr);
         bool parse_arguments  (int                                                         in_argc,
@@ -34,6 +37,9 @@ namespace Capture
         /* Entry point of the tool (called by the global main). */
         int run(int   in_argc,
                 char* in_argv[]);
+
+        /* Reads the workload and says what the replay would fail on, without replaying it. EXIT_SUCCESS if nothing. */
+        int verify_replay(const Options& in_options);
 
         uint32_t write_chunks  (const std::string&                           in_directory,
                                 const Capture::APIDumpLoader::Workload&      in_workload,

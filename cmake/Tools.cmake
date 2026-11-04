@@ -10,7 +10,8 @@ if (APIINTERCEPTOR_BUILD_TOOLS)
 
     target_link_libraries(APIDumper      InjectionLauncher)
     target_link_libraries(APIDumperDLL   APIInterceptor Zstd)
-    target_link_libraries(APIDumpPrinter APIDumpLoader D3D7Utils D3D8Utils OpenGLUtils)
+    # --verify asks the executors of the replay what they can replay.
+    target_link_libraries(APIDumpPrinter APIDumpLoader D3D7Utils D3D8Utils OpenGLUtils ReplayEngineCore)
 
     add_dependencies(APIDumper APIDumperDLL)
 

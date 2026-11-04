@@ -213,7 +213,7 @@ bool Replay::ReplayEngineDLL::GlCallExecutor::execute(const Capture::APIDumpLoad
     void*      proc_ptr       = nullptr;
     bool       result         = false;
 
-    if (entry_iterator == m_entry_map.end() )
+    if (get_call_support(in_call.func) == CallSupport::UNSUPPORTED)
     {
         *out_error_ptr = "The GL executor does not know the function.";
 
@@ -287,6 +287,12 @@ bool Replay::ReplayEngineDLL::GlCallExecutor::execute(const Capture::APIDumpLoad
 
 end:
     return result;
+}
+
+Replay::ReplayEngineDLL::CallSupport Replay::ReplayEngineDLL::GlCallExecutor::get_call_support(const APIInterceptor::APIFunction& in_function) const
+{
+    return (m_entry_map.find(in_function) != m_entry_map.end() ) ? CallSupport::REPLAYED
+                                                                 : CallSupport::UNSUPPORTED;
 }
 
 void* Replay::ReplayEngineDLL::GlCallExecutor::get_proc_ptr(const char* in_name_ptr)

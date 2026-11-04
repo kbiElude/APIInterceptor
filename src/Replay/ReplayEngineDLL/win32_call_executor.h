@@ -37,14 +37,15 @@ namespace Replay
                               const WindowPlacedFunc& in_window_placed_func);
             ~Win32CallExecutor();
 
-            bool execute            (const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                     const IChunkSource&                          in_chunk_source,
-                                     std::string*                                 out_error_ptr) override;
-            void on_frame_presented ()                                                            override;
-            void on_idle            ()                                                            override;
-            void reset              ()                                                            override;
-            void set_windows_visible(const bool&                                  in_are_visible) override;
-            void shutdown           ()                                                            override;
+            bool        execute            (const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                            const IChunkSource&                          in_chunk_source,
+                                            std::string*                                 out_error_ptr) override;
+            CallSupport get_call_support (const APIInterceptor::APIFunction&                   in_function) const override;
+            void        on_frame_presented ()                                                            override;
+            void        on_idle            ()                                                            override;
+            void        reset              ()                                                            override;
+            void        set_windows_visible(const bool&                                  in_are_visible) override;
+            void        shutdown           ()                                                            override;
 
         private:
             /* What makes a window of the app the one to use again after a reset. */

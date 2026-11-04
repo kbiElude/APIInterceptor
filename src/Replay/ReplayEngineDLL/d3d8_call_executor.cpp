@@ -156,7 +156,7 @@ bool Replay::ReplayEngineDLL::D3D8CallExecutor::execute(const Capture::APIDumpLo
     }
 
     /* A method the replay does not do. */
-    if (invoker_iterator == m_invoker_map.end() )
+    if (get_call_support(in_call.func) == CallSupport::SKIPPED)
     {
         result = true;
 
@@ -170,6 +170,40 @@ bool Replay::ReplayEngineDLL::D3D8CallExecutor::execute(const Capture::APIDumpLo
         in_call.func == APIInterceptor::APIFUNCTION_D3D8_IDIRECT3D8_CREATEDEVICE)
     {
         m_context.set_device_from_argument(CREATE_DEVICE_ARGUMENT);
+    }
+
+end:
+    return result;
+}
+
+Replay::ReplayEngineDLL::CallSupport Replay::ReplayEngineDLL::D3D8CallExecutor::get_call_support(const APIInterceptor::APIFunction& in_function) const
+{
+    CallSupport result = CallSupport::SKIPPED; /* a method of the API which the replay does not do */
+
+    if (in_function == APIInterceptor::APIFUNCTION_D3D8_DIRECT3DCREATE8)
+    {
+        result = CallSupport::REPLAYED;
+
+        goto end;
+    }
+
+    if (m_release_function_set.find(in_function) != m_release_function_set.end() )
+    {
+        result = CallSupport::REPLAYED;
+
+        goto end;
+    }
+
+    if (D3D8LockReplayer::is_lock_function(in_function) )
+    {
+        result = CallSupport::REPLAYED;
+
+        goto end;
+    }
+
+    if (m_invoker_map.find(in_function) != m_invoker_map.end() )
+    {
+        result = CallSupport::REPLAYED;
     }
 
 end:

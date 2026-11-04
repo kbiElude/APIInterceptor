@@ -951,21 +951,13 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::execute(const Capture::APIDumpLo
         }
     }
     else
+    if (get_call_support(in_call.func) == CallSupport::SKIPPED)
     {
-        const auto* method_info_ptr = Interception::Core::D3D7Utils::get_method_info_ptr(in_call.func);
-
-        /* What asks the API about itself, and what the dump holds of the enumerations (the calls the application made in them are there too),
-         * is not replayed. Any other call is something the replay has no code for.
-         */
-        if (method_info_ptr == nullptr ||
-            is_ignored_method(method_info_ptr->method_name_ptr) )
-        {
-            result = true;
-        }
-        else
-        {
-            *out_error_ptr = std::string(method_info_ptr->full_name_ptr) + " is not replayed yet.";
-        }
+        result = true;
+    }
+    else
+    {
+        *out_error_ptr = std::string(Interception::Core::D3D7Utils::get_method_info_ptr(in_call.func)->full_name_ptr) + " is not replayed yet.";
     }
 
 end:
@@ -1073,6 +1065,36 @@ end:
 const Replay::ReplayEngineDLL::CallContext& Replay::ReplayEngineDLL::D3D7CallExecutor::get_call_context() const
 {
     return m_context;
+}
+
+Replay::ReplayEngineDLL::CallSupport Replay::ReplayEngineDLL::D3D7CallExecutor::get_call_support(const APIInterceptor::APIFunction& in_function) const
+{
+    CallSupport result = CallSupport::REPLAYED;
+
+    if (m_handler_map.find(in_function) != m_handler_map.end() )
+    {
+        goto end;
+    }
+
+    /* What asks the API about itself, and what the dump holds of the enumerations (the calls the application made in them are there too), is not
+     * replayed. Any other call is something the replay has no code for.
+     */
+    {
+        const auto* method_info_ptr = Interception::Core::D3D7Utils::get_method_info_ptr(in_function);
+
+        if (method_info_ptr == nullptr ||
+            is_ignored_method(method_info_ptr->method_name_ptr) )
+        {
+            result = CallSupport::SKIPPED;
+        }
+        else
+        {
+            result = CallSupport::UNSUPPORTED;
+        }
+    }
+
+end:
+    return result;
 }
 
 const uint8_t* Replay::ReplayEngineDLL::D3D7CallExecutor::get_chunk_ptr(const size_t& in_n_argument,

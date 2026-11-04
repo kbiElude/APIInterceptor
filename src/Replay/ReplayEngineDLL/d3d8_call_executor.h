@@ -34,6 +34,7 @@ namespace Replay
             bool           execute            (const Capture::APIDumpLoader::DumpedAPICall& in_call,
                                                const IChunkSource&                          in_chunk_source,
                                                std::string*                                 out_error_ptr) override;
+            CallSupport    get_call_support   (const APIInterceptor::APIFunction&           in_function)     const override;
             ExecutionClass get_execution_class(const Capture::APIDumpLoader::DumpedAPICall& in_call)         const override;
             void           on_frame_presented ()                                                             override;
             bool           read_back_buffer   (std::vector<uint8_t>*                        out_pixel_u8_vec_ptr,
