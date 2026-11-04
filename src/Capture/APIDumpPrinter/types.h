@@ -20,12 +20,6 @@ namespace Capture
             const char* name_ptr;
         };
 
-        struct FunctionNameEntry
-        {
-            APIInterceptor::APIFunction function;
-            const char*                 name_ptr;
-        };
-
         struct Options
         {
             std::set<Capture::APIDumpLoader::APIGroup> allowed_api_group_set;          /* empty = all */

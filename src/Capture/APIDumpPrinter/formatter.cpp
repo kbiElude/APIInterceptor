@@ -4,7 +4,7 @@
  */
 #include "formatter.h"
 #include "Capture/APIDumpLoader/api_info.h"
-#include "api_info.h"
+#include "Capture/APIDumpNames/function_names.h"
 #include "Common/macros.h"
 #include "Interception/Core/OpenGLUtils/utils_enum.h"
 #include <algorithm>
@@ -331,7 +331,7 @@ void Capture::APIDumpPrinter::print_call(FILE*                                  
 
     fprintf(in_file_handle,
             "%s(",
-            get_function_name(in_call.func) );
+            Capture::APIDumpNames::get_function_name(in_call.func) );
 
     for (size_t n_argument = 0; n_argument < in_call.arg_in_vec.size(); ++n_argument)
     {

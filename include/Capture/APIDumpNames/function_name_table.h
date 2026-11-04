@@ -2,16 +2,22 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
-#ifndef APIDUMPPRINTER_FUNCTION_NAME_TABLE_H
-#define APIDUMPPRINTER_FUNCTION_NAME_TABLE_H
+#ifndef APIDUMPNAMES_FUNCTION_NAME_TABLE_H
+#define APIDUMPNAMES_FUNCTION_NAME_TABLE_H
 
-#include "types.h"
+#include "Common/types.h"
 #include <unordered_map>
 
 namespace Capture
 {
-    namespace APIDumpPrinter
+    namespace APIDumpNames
     {
+        struct FunctionNameEntry
+        {
+            APIInterceptor::APIFunction function;
+            const char*                 name_ptr;
+        };
+
         /* Maps API functions to their names. Built once from a FunctionNameEntry array. */
         class FunctionNameTable
         {
@@ -28,4 +34,4 @@ namespace Capture
     }
 }
 
-#endif /* APIDUMPPRINTER_FUNCTION_NAME_TABLE_H */
+#endif /* APIDUMPNAMES_FUNCTION_NAME_TABLE_H */

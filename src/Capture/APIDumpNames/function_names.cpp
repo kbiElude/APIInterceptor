@@ -2,12 +2,14 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
-#include "api_info.h"
+#include "Capture/APIDumpLoader/api_info.h"
+#include "Capture/APIDumpNames/function_names.h"
 #include "Common/macros.h"
+#include "function_names_by_group.h"
 #include "Interception/Core/D3D7Utils/methods.h"
 #include "Interception/Core/D3D8Utils/methods.h"
 
-const char* Capture::APIDumpPrinter::get_function_name(const APIInterceptor::APIFunction& in_function)
+const char* Capture::APIDumpNames::get_function_name(const APIInterceptor::APIFunction& in_function)
 {
     const char* result_ptr = nullptr;
 

@@ -24,6 +24,20 @@ if (APIINTERCEPTOR_BUILD_LIBS)
 
     target_link_libraries(APIDumpLoader PUBLIC Zstd)
 
+    # The names of the API functions, which the tools that say what a call is use: the Direct3D ones are in the descriptions of the interceptor.
+    if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
+        file(GLOB APIDumpNamesIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Capture/APIDumpNames/*.h")
+        file(GLOB APIDumpNamesSources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Capture/APIDumpNames/*.cpp"
+                                                         "${APIInterceptor_SOURCE_DIR}/src/Capture/APIDumpNames/*.h")
+
+        add_library(APIDumpNames STATIC ${APIDumpNamesIncludes} ${APIDumpNamesSources})
+
+        target_link_libraries(APIDumpNames PUBLIC APIDumpLoader D3D7Utils D3D8Utils)
+
+        source_group ("APIDumpNames include files" FILES ${APIDumpNamesIncludes})
+        source_group ("APIDumpNames source files"  FILES ${APIDumpNamesSources})
+    endif()
+
     # The launcher needs Detours, which the interceptor builds.
     if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
         file(GLOB InjectionLauncherIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Capture/InjectionLauncher/*.h")

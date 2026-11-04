@@ -2,9 +2,9 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
-#include "function_name_table.h"
+#include "Capture/APIDumpNames/function_name_table.h"
 
-Capture::APIDumpPrinter::FunctionNameTable::FunctionNameTable(const FunctionNameEntry* in_entry_array_ptr,
+Capture::APIDumpNames::FunctionNameTable::FunctionNameTable(const FunctionNameEntry* in_entry_array_ptr,
                                                                size_t                   in_n_entries)
 {
     for (size_t n_entry = 0;
@@ -15,7 +15,7 @@ Capture::APIDumpPrinter::FunctionNameTable::FunctionNameTable(const FunctionName
     }
 }
 
-const char* Capture::APIDumpPrinter::FunctionNameTable::get_name(const APIInterceptor::APIFunction& in_function) const
+const char* Capture::APIDumpNames::FunctionNameTable::get_name(const APIInterceptor::APIFunction& in_function) const
 {
     const auto  iterator   = m_name_map.find(static_cast<uint32_t>(in_function) );
     const char* result_ptr = nullptr;

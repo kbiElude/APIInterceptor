@@ -15,7 +15,7 @@
 #include "Capture/APIDumpLoader/WorkloadIndex.h"
 #include "Capture/APIDumpLoader/WorkloadReader.h"
 #include "Capture/APIDumpLoader/api_info.h"
-#include "api_info.h"
+#include "Capture/APIDumpNames/function_names.h"
 #include "d3d7_decoder.h"
 #include "d3d8_decoder.h"
 #include "formatter.h"
@@ -226,7 +226,7 @@ void Capture::APIDumpPrinter::print_statistics(const std::map<APIInterceptor::AP
                  const std::pair<uint32_t, APIInterceptor::APIFunction>& in_item_b)
               {
                   return (in_item_a.first != in_item_b.first) ? (in_item_a.first > in_item_b.first)
-                                                              : (std::string(get_function_name(in_item_a.second)) < std::string(get_function_name(in_item_b.second)));
+                                                              : (std::string(Capture::APIDumpNames::get_function_name(in_item_a.second)) < std::string(Capture::APIDumpNames::get_function_name(in_item_b.second)));
               });
 
     fprintf(stdout,
@@ -265,7 +265,7 @@ void Capture::APIDumpPrinter::print_statistics(const std::map<APIInterceptor::AP
         fprintf(stdout,
                 "  %8u  %s\n",
                 item.first,
-                get_function_name(item.second) );
+                Capture::APIDumpNames::get_function_name(item.second) );
     }
 }
 

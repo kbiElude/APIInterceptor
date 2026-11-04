@@ -60,6 +60,9 @@
 <h3>APIDumpLoader</h3>
 <p><em>Library.</em> Reads a workload. <code>WorkloadReader</code> takes it segment by segment, so that a workload larger than memory can be read; <code>api_info</code> says which API group a call belongs to and which calls end a frame. <code>WorkloadIndex</code> says where the segments and the frames of a workload are in its file (it is made by reading the workload once, with the data chunks left out, and is kept in a file next to it that knows the workload it is of), so that a tool that looks at a few frames can start its reader at a segment (<code>WorkloadReader::Options::start_offset_n_bytes</code>). The replay engine and the printer read workloads through it.</p>
 
+<h3>APIDumpNames</h3>
+<p><em>Library.</em> The names of the API functions (<code>get_function_name</code>): the Direct3D ones come from the descriptions of the interceptor, the OpenGL and Windows ones from tables of its own. The printer says what a call is with them, and so does any tool that reports on calls (the replay profile of the consistency checker, for one).</p>
+
 <h3>APIDumpPrinter</h3>
 <p><em>Program.</em> Prints a workload as text, every call with every argument. It has the names of the calls and enums of each API, and a decoder of the arguments for Direct3D 7 and 8: enums and flags by name, structures field by field, and objects by the order they were created in (<code>Surface#3</code>). The decoders share the naming of the objects and the formatting of the values that the two APIs have in common. It is for reading what a program did, and nothing else.</p>
 

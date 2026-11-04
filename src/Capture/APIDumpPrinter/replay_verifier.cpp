@@ -7,7 +7,7 @@
  */
 #include "Capture/APIDumpLoader/WorkloadReader.h"
 #include "Capture/APIDumpLoader/api_info.h"
-#include "api_info.h"
+#include "Capture/APIDumpNames/function_names.h"
 #include "printer.h"
 #include "replay_coverage.h"
 #include "replay_engine.h"
@@ -40,7 +40,7 @@ namespace
 
             fprintf(stdout,
                     "    %-48s %10llu calls, the first is call %llu in frame %llu\n",
-                    Capture::APIDumpPrinter::get_function_name(entry.function),
+                    Capture::APIDumpNames::get_function_name(entry.function),
                     static_cast<unsigned long long>(entry.n_calls),
                     static_cast<unsigned long long>(entry.first_call_index),
                     static_cast<unsigned long long>(entry.first_frame_index) );
@@ -79,7 +79,7 @@ int Capture::APIDumpPrinter::list_unreplayed_functions()
             fprintf(stdout,
                     "  [%s] %s\n",
                     Capture::APIDumpLoader::get_api_group_name(group),
-                    get_function_name(function) );
+                    Capture::APIDumpNames::get_function_name(function) );
         }
     }
 
@@ -165,7 +165,7 @@ int Capture::APIDumpPrinter::verify_replay(const Options& in_options)
                 "  %llu references to data chunks which are not in the workload; the first is in call %llu (%s) in frame %llu.\n",
                 static_cast<unsigned long long>(report.n_missing_chunk_references),
                 static_cast<unsigned long long>(report.first_missing_chunk_call_index),
-                get_function_name(report.first_missing_chunk_function),
+                Capture::APIDumpNames::get_function_name(report.first_missing_chunk_function),
                 static_cast<unsigned long long>(report.first_missing_chunk_frame_index) );
     }
 

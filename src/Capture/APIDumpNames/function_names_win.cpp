@@ -2,10 +2,10 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
-#include "api_info.h"
-#include "function_name_table.h"
+#include "Capture/APIDumpNames/function_name_table.h"
+#include "function_names_by_group.h"
 
-const char* Capture::APIDumpPrinter::get_win_function_name(const APIInterceptor::APIFunction& in_function)
+const char* Capture::APIDumpNames::get_win_function_name(const APIInterceptor::APIFunction& in_function)
 {
     static const FunctionNameEntry name_entry_array[] =
     {
