@@ -48,11 +48,25 @@ bool Replay::ReplayPlayerSupport::PlayerLauncher::is_handover_needed(const char*
         {
             if (reader_ptr->get_pointer_n_bytes() == N_BYTES_PER_POINTER_X86)
             {
-                const bool has_d3d7 = reader_ptr->contains_api_group(Capture::APIDumpLoader::APIGroup::D3D7);
-                const bool has_d3d8 = reader_ptr->contains_api_group(Capture::APIDumpLoader::APIGroup::D3D8);
+                Capture::APIDumpLoader::Workload workload;
 
-                result = (has_d3d7 ||
-                          has_d3d8);
+                /* One pass for both APIs: a reader only goes forward, so what the first look has read is gone for the second. */
+                while (result == false                                &&
+                       reader_ptr->read_next_segment(&workload) )
+                {
+                    for (const auto& call : *workload.dumped_api_call_vec_ptr)
+                    {
+                        const auto group = Capture::APIDumpLoader::get_api_group(call.func);
+
+                        if (group == Capture::APIDumpLoader::APIGroup::D3D7 ||
+                            group == Capture::APIDumpLoader::APIGroup::D3D8)
+                        {
+                            result = true;
+
+                            break;
+                        }
+                    }
+                }
             }
         }
     }
