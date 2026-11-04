@@ -3,6 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "d3d7_decoder.h"
+#include "argument_formatter.h"
 #include "Common/macros.h"
 #include "Interception/Core/D3D7Utils/argument_info.h"
 #include "Interception/Core/D3D7Utils/guids.h"
@@ -1068,18 +1069,8 @@ bool Capture::APIDumpPrinter::D3D7Decoder::print_argument(FILE*                 
     {
         case Interception::Hooks::D3D7::ValueKind::BOOLEAN:
         {
-            /* The flags which the hooks add are unsigned. */
-            if (in_argument.type == APIInterceptor::ARGTYPE_I32)
-            {
-                text   = ValueFormatter::format_boolean(in_argument.get_i32() );
-                result = true;
-            }
-            else
-            if (in_argument.type == APIInterceptor::ARGTYPE_U32)
-            {
-                text   = ValueFormatter::format_boolean(static_cast<int32_t>(in_argument.get_u32() ));
-                result = true;
-            }
+            result = ArgumentFormatter::format_boolean(in_argument,
+                                                      &text);
 
             break;
         }
@@ -1090,14 +1081,13 @@ bool Capture::APIDumpPrinter::D3D7Decoder::print_argument(FILE*                 
         case Interception::Hooks::D3D7::ValueKind::TEXTURE_STAGE_STATE_TYPE:
         case Interception::Hooks::D3D7::ValueKind::TRANSFORM_STATE_TYPE:
         {
-            if (in_argument.type != APIInterceptor::ARGTYPE_U32)
-            {
-                goto end;
-            }
-
-            text   = format_enum(info.kind,
-                                 in_argument.get_u32() );
-            result = true;
+            result = ArgumentFormatter::format_u32(in_argument,
+                                                   [&info](const uint32_t& in_value)
+                                                   {
+                                                       return format_enum(info.kind,
+                                                                          in_value);
+                                                   },
+                                                  &text);
 
             break;
         }
@@ -1118,89 +1108,69 @@ bool Capture::APIDumpPrinter::D3D7Decoder::print_argument(FILE*                 
         case Interception::Hooks::D3D7::ValueKind::VERTEX_OPERATION_FLAGS:
         case Interception::Hooks::D3D7::ValueKind::WAIT_FOR_VERTICAL_BLANK_FLAGS:
         {
-            if (in_argument.type != APIInterceptor::ARGTYPE_U32)
-            {
-                goto end;
-            }
-
-            text   = format_flags(info.kind,
-                                  in_argument.get_u32() );
-            result = true;
+            result = ArgumentFormatter::format_u32(in_argument,
+                                                   [&info](const uint32_t& in_value)
+                                                   {
+                                                       return format_flags(info.kind,
+                                                                           in_value);
+                                                   },
+                                                  &text);
 
             break;
         }
 
         case Interception::Hooks::D3D7::ValueKind::COLOR:
         {
-            if (in_argument.type != APIInterceptor::ARGTYPE_U32)
-            {
-                goto end;
-            }
-
-            text   = ValueFormatter::format_color(in_argument.get_u32() );
-            result = true;
+            result = ArgumentFormatter::format_u32(in_argument,
+                                                   &ValueFormatter::format_color,
+                                                  &text);
 
             break;
         }
 
         case Interception::Hooks::D3D7::ValueKind::FVF_FLAGS:
         {
-            if (in_argument.type != APIInterceptor::ARGTYPE_U32)
-            {
-                goto end;
-            }
-
-            text   = format_fvf(in_argument.get_u32() );
-            result = true;
+            result = ArgumentFormatter::format_u32(in_argument,
+                                                   &format_fvf,
+                                                  &text);
 
             break;
         }
 
         case Interception::Hooks::D3D7::ValueKind::HRESULT:
         {
-            if (in_argument.type != APIInterceptor::ARGTYPE_I32)
-            {
-                goto end;
-            }
-
-            text   = format_hresult(in_argument.get_i32() );
-            result = true;
+            result = ArgumentFormatter::format_i32(in_argument,
+                                                   &format_hresult,
+                                                  &text);
 
             break;
         }
 
         case Interception::Hooks::D3D7::ValueKind::OBJECT:
         {
-            if (in_argument.type != APIInterceptor::ARGTYPE_VOID_PTR)
-            {
-                goto end;
-            }
-
-            text   = m_object_namer.get_name(in_argument.get_ptr(),
-                                             info.object_type_name_ptr);
-            result = true;
+            result = ArgumentFormatter::format_pointer(in_argument,
+                                                       [this, &info](const void* in_pointer)
+                                                       {
+                                                           return m_object_namer.get_name(in_pointer,
+                                                                                          info.object_type_name_ptr);
+                                                       },
+                                                      &text);
 
             break;
         }
 
         case Interception::Hooks::D3D7::ValueKind::OBJECT_OUT:
         {
-            if (in_argument.type != APIInterceptor::ARGTYPE_VOID_PTR)
-            {
-                goto end;
-            }
-
-            /* Before the call, the argument is the address of the returned pointer. */
-            if (in_is_out == false)
-            {
-                goto end;
-            }
-
-            text   = m_object_namer.get_name(in_argument.get_ptr(),
-                                             get_created_object_type_name_ptr(in_call,
-                                                                              info,
-                                                                              in_workload) );
-            result = true;
+            result = ArgumentFormatter::format_pointer_out(in_argument,
+                                                           in_is_out,
+                                                           [this, &in_call, &in_workload, &info](const void* in_pointer)
+                                                           {
+                                                               return m_object_namer.get_name(in_pointer,
+                                                                                              get_created_object_type_name_ptr(in_call,
+                                                                                                                               info,
+                                                                                                                               in_workload) );
+                                                           },
+                                                          &text);
 
             break;
         }
@@ -1208,34 +1178,29 @@ bool Capture::APIDumpPrinter::D3D7Decoder::print_argument(FILE*                 
         case Interception::Hooks::D3D7::ValueKind::RENDER_STATE_VALUE:
         case Interception::Hooks::D3D7::ValueKind::TEXTURE_STAGE_STATE_VALUE:
         {
-            if (in_argument.type != APIInterceptor::ARGTYPE_U32)
-            {
-                goto end;
-            }
+            result = ArgumentFormatter::format_u32_after_state(in_call,
+                                                               in_n_argument,
+                                                               in_argument,
+                                                               [this, &info](const uint32_t& in_state,
+                                                                             const uint32_t& in_value)
+                                                               {
+                                                                   StateValueInfo value_info = {};
 
-            if (in_n_argument == 0)
-            {
-                goto end;
-            }
+                                                                   if (info.kind == Interception::Hooks::D3D7::ValueKind::RENDER_STATE_VALUE)
+                                                                   {
+                                                                       D3D7Names::get_render_state_value_info(in_state,
+                                                                                                         &value_info);
+                                                                   }
+                                                                   else
+                                                                   {
+                                                                       D3D7Names::get_texture_stage_state_value_info(in_state,
+                                                                                                                &value_info);
+                                                                   }
 
-            /* The state is the argument before the value. */
-            StateValueInfo value_info = {};
-            const uint32_t state      = in_call.arg_in_vec.at(in_n_argument - 1).get_u32();
-
-            if (info.kind == Interception::Hooks::D3D7::ValueKind::RENDER_STATE_VALUE)
-            {
-                D3D7Names::get_render_state_value_info(state,
-                                                      &value_info);
-            }
-            else
-            {
-                D3D7Names::get_texture_stage_state_value_info(state,
-                                                             &value_info);
-            }
-
-            text   = ValueFormatter::format_state_value(value_info,
-                                                        in_argument.get_u32() );
-            result = true;
+                                                                   return ValueFormatter::format_state_value(value_info,
+                                                                                                             in_value);
+                                                               },
+                                                              &text);
 
             break;
         }
@@ -1248,30 +1213,16 @@ bool Capture::APIDumpPrinter::D3D7Decoder::print_argument(FILE*                 
         default:
         {
             /* Structures and GUIDs, stored as data chunks. */
-            if (in_argument.type != APIInterceptor::ARGTYPE_DATA_CHUNK_ID)
-            {
-                goto end;
-            }
-
-            const auto chunk_ptr = Capture::APIDumpLoader::get_data_chunk_ptr(in_workload,
-                                                                              in_argument.get_data_chunk_id() );
-
-            if (chunk_ptr == nullptr)
-            {
-                goto end;
-            }
-
-            if (chunk_ptr->empty() )
-            {
-                text   = "NULL";
-                result = true;
-            }
-            else
-            {
-                result = format_struct(info.kind,
-                                       *chunk_ptr,
-                                      &text);
-            }
+            result = ArgumentFormatter::format_chunk(in_workload,
+                                                     in_argument,
+                                                     [&info](const Capture::APIDumpLoader::DataChunk& in_chunk,
+                                                             std::string*                             out_text_ptr)
+                                                     {
+                                                         return format_struct(info.kind,
+                                                                              in_chunk,
+                                                                              out_text_ptr);
+                                                     },
+                                                    &text);
 
             break;
         }
