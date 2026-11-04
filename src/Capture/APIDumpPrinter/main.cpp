@@ -95,6 +95,7 @@ bool Capture::APIDumpPrinter::parse_arguments(int      in_argc,
         else
         if (argument == "--frame"       ||
             argument == "--api"         ||
+            argument == "--compare"     ||
             argument == "--dump-chunks" ||
             argument == "--hexdump")
         {
@@ -133,6 +134,11 @@ bool Capture::APIDumpPrinter::parse_arguments(int      in_argc,
             if (argument == "--dump-chunks")
             {
                 out_options_ptr->chunk_dump_directory = value_ptr;
+            }
+            else
+            if (argument == "--compare")
+            {
+                out_options_ptr->compare_filename_ptr = value_ptr;
             }
             else
             if (argument == "--hexdump")
@@ -287,6 +293,9 @@ void Capture::APIDumpPrinter::print_usage()
             "                      Valid values: gdi32, gl, wgl, user32, d3d8, d3d7. Default: all.\n"
             "  --stats             Instead of listing calls, print a call histogram and workload summary.\n"
             "                      Honors --frame and --api.\n"
+            "  --compare FILE      Instead of listing calls: read the workload and FILE and say what they have in common (calls, frames, data, and the functions called a\n"
+            "                      different number of times) and where their calls first differ, by function (the arguments have addresses and times in them). Exits with\n"
+            "                      1 if they differ.\n"
             "  --verify            Instead of listing calls: read the workload and say what a replay of it would fail on, without replaying it (calls\n"
             "                      of functions the replay has no code for, and data chunks that are not in the file). Exits with 1 if it would fail.\n"
             "  --unreplayed-functions  Needs no workload: list the functions that are recorded and cannot be replayed.\n"
@@ -335,6 +344,13 @@ int Capture::APIDumpPrinter::run(int   in_argc,
                        &options) == false)
     {
         print_usage();
+
+        goto end;
+    }
+
+    if (options.compare_filename_ptr != nullptr)
+    {
+        result = compare_workloads(options);
 
         goto end;
     }

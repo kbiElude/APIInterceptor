@@ -24,6 +24,7 @@ namespace Capture
         {
             std::set<Capture::APIDumpLoader::APIGroup> allowed_api_group_set;          /* empty = all */
             std::string                                chunk_dump_directory;
+            const char*                                compare_filename_ptr       = nullptr;
             uint32_t                                   first_frame                = 0;
             uint32_t                                   last_frame                 = UINT32_MAX;
             bool                                       lists_unreplayed_functions = false;

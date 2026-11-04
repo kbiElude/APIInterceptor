@@ -17,6 +17,11 @@ namespace Capture
 {
     namespace APIDumpPrinter
     {
+        /* Reads the workload and the one that --compare names, and says what they have in common and where their calls first differ. EXIT_SUCCESS if the
+         * calls are the same functions in the same order.
+         */
+        int compare_workloads(const Options& in_options);
+
         /* Prints the functions which the dumper records and the replay has no code for. EXIT_SUCCESS if there are none. */
         int list_unreplayed_functions();
 
