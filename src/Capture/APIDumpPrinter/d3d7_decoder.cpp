@@ -23,7 +23,7 @@ std::string Capture::APIDumpPrinter::D3D7Decoder::format_color_value(const Inter
 }
 
 std::string Capture::APIDumpPrinter::D3D7Decoder::format_enum(const Interception::Hooks::D3D7::ValueKind& in_kind,
-                                                               const uint32_t&                             in_value)
+                                                              const uint32_t&                             in_value)
 {
     const ValueNameEntry* table_ptr = nullptr;
     uint32_t              n_entries = 0;
@@ -38,7 +38,7 @@ std::string Capture::APIDumpPrinter::D3D7Decoder::format_enum(const Interception
 }
 
 std::string Capture::APIDumpPrinter::D3D7Decoder::format_flag_table(const D3D7FlagTable& in_table,
-                                                                     const uint32_t&      in_value)
+                                                                    const uint32_t&      in_value)
 {
     const FlagNameEntry* table_ptr = nullptr;
     uint32_t             n_entries = 0;
@@ -53,7 +53,7 @@ std::string Capture::APIDumpPrinter::D3D7Decoder::format_flag_table(const D3D7Fl
 }
 
 std::string Capture::APIDumpPrinter::D3D7Decoder::format_flags(const Interception::Hooks::D3D7::ValueKind& in_kind,
-                                                                const uint32_t&                             in_value)
+                                                               const uint32_t&                             in_value)
 {
     struct FlagKind
     {
@@ -215,8 +215,8 @@ std::string Capture::APIDumpPrinter::D3D7Decoder::format_pixel_format(const Inte
 }
 
 bool Capture::APIDumpPrinter::D3D7Decoder::format_struct(const Interception::Hooks::D3D7::ValueKind& in_kind,
-                                                          const std::vector<uint8_t>&                 in_chunk_u8_vec,
-                                                          std::string*                                out_text_ptr)
+                                                         const std::vector<uint8_t>&                 in_chunk_u8_vec,
+                                                         std::string*                                out_text_ptr)
 {
     /* The dumped process is a 32-bit one: DirectDraw 7 has no 64-bit version. */
     constexpr size_t   MAX_N_DISPLAYED_ITEMS      = 8;  /* of a printed array */
@@ -1013,8 +1013,8 @@ std::string Capture::APIDumpPrinter::D3D7Decoder::format_surface_caps(const Inte
 }
 
 const char* Capture::APIDumpPrinter::D3D7Decoder::get_created_object_type_name_ptr(const Capture::APIDumpLoader::DumpedAPICall&   in_call,
-                                                                                    const Interception::Hooks::D3D7::ArgumentInfo& in_info,
-                                                                                    const Capture::APIDumpLoader::Workload&        in_workload)
+                                                                                   const Interception::Hooks::D3D7::ArgumentInfo& in_info,
+                                                                                   const Capture::APIDumpLoader::Workload&        in_workload)
 {
     uint32_t    n_iid_argument = 0;
     const char* result_ptr     = in_info.object_type_name_ptr;
@@ -1048,11 +1048,11 @@ const char* Capture::APIDumpPrinter::D3D7Decoder::get_created_object_type_name_p
 }
 
 bool Capture::APIDumpPrinter::D3D7Decoder::print_argument(FILE*                                        in_file_handle,
-                                                           const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                           const uint32_t&                              in_n_argument,
-                                                           const bool&                                  in_is_out,
-                                                           const APIInterceptor::APIFunctionArgument&   in_argument,
-                                                           const Capture::APIDumpLoader::Workload&      in_workload) const
+                                                          const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                          const uint32_t&                              in_n_argument,
+                                                          const bool&                                  in_is_out,
+                                                          const APIInterceptor::APIFunctionArgument&   in_argument,
+                                                          const Capture::APIDumpLoader::Workload&      in_workload) const
 {
     Interception::Hooks::D3D7::ArgumentInfo info   = {};
     bool                                    result = false;
@@ -1151,7 +1151,7 @@ bool Capture::APIDumpPrinter::D3D7Decoder::print_argument(FILE*                 
             result = ArgumentFormatter::format_pointer(in_argument,
                                                        [this, &info](const void* in_pointer)
                                                        {
-                                                           return m_object_namer.get_name(in_pointer,
+                                                           return m_object_namer.get_name(reinterpret_cast<uint64_t>(in_pointer),
                                                                                           info.object_type_name_ptr);
                                                        },
                                                       &text);
@@ -1165,7 +1165,7 @@ bool Capture::APIDumpPrinter::D3D7Decoder::print_argument(FILE*                 
                                                            in_is_out,
                                                            [this, &in_call, &in_workload, &info](const void* in_pointer)
                                                            {
-                                                               return m_object_namer.get_name(in_pointer,
+                                                               return m_object_namer.get_name(reinterpret_cast<uint64_t>(in_pointer),
                                                                                               get_created_object_type_name_ptr(in_call,
                                                                                                                                info,
                                                                                                                                in_workload) );
@@ -1242,8 +1242,8 @@ end:
 }
 
 bool Capture::APIDumpPrinter::D3D7Decoder::print_returned_value(FILE*                                        in_file_handle,
-                                                                 const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                                 const APIInterceptor::APIFunctionArgument&   in_returned_value) const
+                                                                const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                                const APIInterceptor::APIFunctionArgument&   in_returned_value) const
 {
     Interception::Hooks::D3D7::ArgumentInfo info   = {};
     bool                                    result = false;
@@ -1282,8 +1282,20 @@ end:
     return result;
 }
 
+void Capture::APIDumpPrinter::D3D7Decoder::forget_released_objects(const Capture::APIDumpLoader::DumpedAPICall& in_call)
+{
+    const Interception::Hooks::D3D7::MethodInfo* method_info_ptr = Interception::Core::D3D7Utils::get_method_info_ptr(in_call.func);
+
+    if (method_info_ptr != nullptr &&
+        ::strcmp(method_info_ptr->method_name_ptr,
+                 "Release") == 0)
+    {
+        m_object_namer.forget_after_release(in_call);
+    }
+}
+
 void Capture::APIDumpPrinter::D3D7Decoder::register_created_objects(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                                     const Capture::APIDumpLoader::Workload&      in_workload)
+                                                                    const Capture::APIDumpLoader::Workload&      in_workload)
 {
     const Interception::Hooks::D3D7::MethodInfo* method_info_ptr = Interception::Core::D3D7Utils::get_method_info_ptr(in_call.func);
 
@@ -1319,7 +1331,7 @@ void Capture::APIDumpPrinter::D3D7Decoder::register_created_objects(const Captur
             if (info.kind                               == Interception::Hooks::D3D7::ValueKind::OBJECT_OUT &&
                 in_call.arg_out_vec.at(n_argument).type == APIInterceptor::ARGTYPE_VOID_PTR)
             {
-                m_object_namer.register_object(in_call.arg_out_vec.at(n_argument).get_ptr(),
+                m_object_namer.register_object(in_call.arg_out_vec.at(n_argument).get_ptr_as_u64(),
                                                get_created_object_type_name_ptr(in_call,
                                                                                 info,
                                                                                 in_workload),

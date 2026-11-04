@@ -34,6 +34,11 @@ namespace Capture
                                               const Capture::APIDumpLoader::DumpedAPICall& in_call,
                                               const APIInterceptor::APIFunctionArgument&   in_returned_value) const = 0;
 
+            /* Forgets the names of the objects that the call released for the last time, so that the address may name another object. To be
+             * called after the call is printed.
+             */
+            virtual void forget_released_objects(const Capture::APIDumpLoader::DumpedAPICall& in_call) = 0;
+
             /* Names the objects created by the call. To be called before the call is printed. */
             virtual void register_created_objects(const Capture::APIDumpLoader::DumpedAPICall& in_call,
                                                   const Capture::APIDumpLoader::Workload&      in_workload) = 0;

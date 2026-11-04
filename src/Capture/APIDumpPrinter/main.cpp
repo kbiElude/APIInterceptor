@@ -373,6 +373,12 @@ int Capture::APIDumpPrinter::run(int   in_argc,
                 }
             }
 
+            /* An object which is released for the last time has no name any more: the address may be given to another one. */
+            if (decoder_ptr != nullptr)
+            {
+                decoder_ptr->forget_released_objects(current_api_call);
+            }
+
             /* A frame boundary is detected regardless of --api, so that frame numbering stays stable. */
             if (Capture::APIDumpLoader::is_frame_boundary(current_api_call) )
             {

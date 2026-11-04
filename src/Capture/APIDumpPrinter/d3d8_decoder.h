@@ -9,9 +9,9 @@
 #define APIDUMPPRINTER_D3D8_DECODER_H
 
 #include "Capture/APIDumpLoader/APIDumpLoader.h"
+#include "Capture/APIDumpLoader/object_namer.h"
 #include "i_api_decoder.h"
 #include "Interception/Hooks/D3D8/types.h"
-#include "object_namer.h"
 #include "types.h"
 #include <map>
 #include <stdio.h>
@@ -41,6 +41,7 @@ namespace Capture
                                       const APIInterceptor::APIFunctionArgument&   in_returned_value) const override;
 
             /* Names the objects created by the call. To be called before the call is printed. */
+            void forget_released_objects (const Capture::APIDumpLoader::DumpedAPICall& in_call) override;
             void register_created_objects(const Capture::APIDumpLoader::DumpedAPICall& in_call,
                                           const Capture::APIDumpLoader::Workload&      in_workload) override;
 
@@ -66,7 +67,7 @@ namespace Capture
                                       const std::vector<uint8_t>&                 in_chunk_u8_vec,
                                       std::string*                                out_text_ptr);
 
-            ObjectNamer m_object_namer;
+            Capture::APIDumpLoader::ObjectNamer m_object_namer;
         };
     }
 }

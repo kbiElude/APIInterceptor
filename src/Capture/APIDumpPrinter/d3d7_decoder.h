@@ -9,10 +9,10 @@
 #define APIDUMPPRINTER_D3D7_DECODER_H
 
 #include "Capture/APIDumpLoader/APIDumpLoader.h"
+#include "Capture/APIDumpLoader/object_namer.h"
 #include "d3d7_names.h"
 #include "i_api_decoder.h"
 #include "Interception/Hooks/D3D7/types.h"
-#include "object_namer.h"
 #include "types.h"
 #include <stdio.h>
 #include <string>
@@ -36,23 +36,24 @@ namespace Capture
                                       const Capture::APIDumpLoader::DumpedAPICall& in_call,
                                       const APIInterceptor::APIFunctionArgument&   in_returned_value) const override;
 
+            void forget_released_objects (const Capture::APIDumpLoader::DumpedAPICall& in_call) override;
             void register_created_objects(const Capture::APIDumpLoader::DumpedAPICall& in_call,
                                           const Capture::APIDumpLoader::Workload&      in_workload) override;
 
         private:
-            static std::string format_color_value(const Interception::Hooks::D3D7::D3DCOLORVALUE& in_value);
-            static std::string format_enum       (const Interception::Hooks::D3D7::ValueKind&     in_kind,
-                                                  const uint32_t&                                 in_value);
-            static std::string format_flag_table (const D3D7FlagTable&                            in_table,
-                                                  const uint32_t&                                 in_value);
-            static std::string format_flags      (const Interception::Hooks::D3D7::ValueKind&     in_kind,
-                                                  const uint32_t&                                 in_value);
-            static std::string format_four_cc    (const uint32_t&                                 in_value);
-            static std::string format_fvf        (const uint32_t&                                 in_value);
-            static std::string format_guid       (const GUID&                                     in_value);
-            static std::string format_hresult    (const int32_t&                                  in_value);
+            static std::string format_color_value (const Interception::Hooks::D3D7::D3DCOLORVALUE& in_value);
+            static std::string format_enum        (const Interception::Hooks::D3D7::ValueKind&     in_kind,
+                                                   const uint32_t&                                 in_value);
+            static std::string format_flag_table  (const D3D7FlagTable&                            in_table,
+                                                   const uint32_t&                                 in_value);
+            static std::string format_flags       (const Interception::Hooks::D3D7::ValueKind&     in_kind,
+                                                   const uint32_t&                                 in_value);
+            static std::string format_four_cc     (const uint32_t&                                 in_value);
+            static std::string format_fvf         (const uint32_t&                                 in_value);
+            static std::string format_guid        (const GUID&                                     in_value);
+            static std::string format_hresult     (const int32_t&                                  in_value);
             static std::string format_pixel_format(const Interception::Hooks::D3D7::DDPIXELFORMAT& in_value);
-            static std::string format_surface_caps(const Interception::Hooks::D3D7::DDSCAPS2&     in_value);
+            static std::string format_surface_caps(const Interception::Hooks::D3D7::DDSCAPS2&      in_value);
 
             /* Returns false if the structure is not decoded (e.g. the chunk has an unexpected size). */
             static bool format_struct(const Interception::Hooks::D3D7::ValueKind& in_kind,
@@ -62,11 +63,11 @@ namespace Capture
             /* Returns the name of the type of the object which a call makes. It is the type of the interface that the call is asked for
              * if the call is QueryInterface or DirectDrawCreateEx, whose argument tells it. Returns nullptr if it is not known.
              */
-            static const char* get_created_object_type_name_ptr(const Capture::APIDumpLoader::DumpedAPICall&      in_call,
-                                                                const Interception::Hooks::D3D7::ArgumentInfo&    in_info,
-                                                                const Capture::APIDumpLoader::Workload&           in_workload);
+            static const char* get_created_object_type_name_ptr(const Capture::APIDumpLoader::DumpedAPICall&   in_call,
+                                                                const Interception::Hooks::D3D7::ArgumentInfo& in_info,
+                                                                const Capture::APIDumpLoader::Workload&        in_workload);
 
-            ObjectNamer m_object_namer;
+            Capture::APIDumpLoader::ObjectNamer m_object_namer;
         };
     }
 }
