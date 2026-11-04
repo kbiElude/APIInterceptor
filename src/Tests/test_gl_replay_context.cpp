@@ -4,6 +4,7 @@
  *
  * Checks of the mapping of the names and locations of GL objects from the dump to the replay.
  */
+#include "call_walker.h"
 #include <gtest/gtest.h>
 #include "gl_replay_context.h"
 

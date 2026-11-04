@@ -5,10 +5,11 @@
 #include "gl_client_array_replayer.h"
 #include <string.h>
 #include <Windows.h>
+#include "Common/macros.h"
 #include "Khronos/GL/glcorearb.h"
 
 Replay::ReplayEngineDLL::GlClientArrayReplayer::GlClientArrayReplayer(GlReplayContext* in_context_ptr,
-                                                                      ResolveFunc      in_resolve_func)
+                                                                        ResolveFunc      in_resolve_func)
     :m_context_ptr (in_context_ptr),
      m_resolve_func(in_resolve_func)
 {
@@ -16,7 +17,7 @@ Replay::ReplayEngineDLL::GlClientArrayReplayer::GlClientArrayReplayer(GlReplayCo
 }
 
 bool Replay::ReplayEngineDLL::GlClientArrayReplayer::apply(const uint8_t* in_snapshot_ptr,
-                                                           const size_t&  in_n_bytes)
+                                                             const size_t&  in_n_bytes)
 {
     /* Compatibility-profile token which the core headers do not have. */
     constexpr GLenum COMPAT_GL_CLIENT_ACTIVE_TEXTURE = 0x84E1;
@@ -25,18 +26,18 @@ bool Replay::ReplayEngineDLL::GlClientArrayReplayer::apply(const uint8_t* in_sna
     typedef void (APIENTRY* PFNCLIENTACTIVETEXTUREPROC)(GLenum);
     typedef void (APIENTRY* PFNGETINTEGERVPROC)        (GLenum, GLint*);
 
-    const auto bind_buffer_func_ptr   = reinterpret_cast<PFNBINDBUFFERPROC>(m_resolve_func("glBindBuffer") );
+    const auto bind_buffer_func_ptr   = reinterpret_cast<PFNBINDBUFFERPROC>         (m_resolve_func("glBindBuffer") );
     const auto client_active_func_ptr = reinterpret_cast<PFNCLIENTACTIVETEXTUREPROC>(m_resolve_func("glClientActiveTexture") );
-    const auto get_integer_func_ptr   = reinterpret_cast<PFNGETINTEGERVPROC>(m_resolve_func("glGetIntegerv") );
+    const auto get_integer_func_ptr   = reinterpret_cast<PFNGETINTEGERVPROC>        (m_resolve_func("glGetIntegerv") );
     uint32_t   n_arrays               = 0;
     size_t     offset                 = sizeof(n_arrays);
     bool       result                 = false;
     GLint      saved_array_buffer     = 0;
     GLint      saved_client_active    = GL_TEXTURE0;
 
-    if (in_snapshot_ptr      == nullptr ||
-        bind_buffer_func_ptr == nullptr ||
-        get_integer_func_ptr == nullptr ||
+    if (in_snapshot_ptr      == nullptr          ||
+        bind_buffer_func_ptr == nullptr          ||
+        get_integer_func_ptr == nullptr          ||
         in_n_bytes           <  sizeof(n_arrays) )
     {
         goto end;
@@ -97,7 +98,7 @@ end:
 }
 
 void Replay::ReplayEngineDLL::GlClientArrayReplayer::apply_array(const SnapshotArray& in_array,
-                                                                 const uint8_t*       in_data_ptr)
+                                                                   const uint8_t*       in_data_ptr)
 {
     /* ClientArrayKind (see OpenGL/types_enums.h). */
     enum class ArrayKind : uint32_t
@@ -114,7 +115,7 @@ void Replay::ReplayEngineDLL::GlClientArrayReplayer::apply_array(const SnapshotA
     };
 
     /* The data starts at the first element which was copied, so the pointer is the one of the (missing) element 0. */
-    const uintptr_t base    = reinterpret_cast<uintptr_t>(in_data_ptr) - static_cast<uintptr_t>(in_array.first_element) * get_element_stride(in_array);
+    const uintptr_t base    = reinterpret_cast<uintptr_t>  (in_data_ptr) - static_cast<uintptr_t>(in_array.first_element) * get_element_stride(in_array);
     const void*     pointer = reinterpret_cast<const void*>(base);
 
     switch (static_cast<ArrayKind>(in_array.kind) )
@@ -199,6 +200,8 @@ void Replay::ReplayEngineDLL::GlClientArrayReplayer::apply_array(const SnapshotA
 
         default:
         {
+            AI_FAIL_UNSUPPORTED(in_array.kind);
+
             break;
         }
     }
@@ -208,7 +211,7 @@ uint32_t Replay::ReplayEngineDLL::GlClientArrayReplayer::get_element_stride(cons
 {
     uint32_t result = in_array.stride;
 
-    if (result == 0 &&
+    if (result              == 0 &&
         in_array.n_elements != 0)
     {
         result = in_array.n_bytes / in_array.n_elements;
@@ -218,7 +221,7 @@ uint32_t Replay::ReplayEngineDLL::GlClientArrayReplayer::get_element_stride(cons
 }
 
 void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_edge_flag(const SnapshotArray& in_array,
-                                                                     const void*          in_pointer)
+                                                                       const void*          in_pointer)
 {
     typedef void (APIENTRY* PFNEDGEFLAGPOINTERPROC)(GLsizei, const void*);
 
@@ -232,7 +235,7 @@ void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_edge_flag(const Snaps
 }
 
 void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_generic(const SnapshotArray& in_array,
-                                                                   const void*          in_pointer)
+                                                                     const void*          in_pointer)
 {
     /* ClientArrayManager::SNAPSHOT_FLAG_*. */
     constexpr uint32_t FLAG_IS_INTEGER    = 1 << 0;
@@ -275,7 +278,7 @@ void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_generic(const Snapsho
     else
     {
         const GLboolean normalized       = ((in_array.flags & FLAG_IS_NORMALIZED) != 0) ? GL_TRUE
-                                                                                         : GL_FALSE;
+                                                                                        : GL_FALSE;
         const auto      pointer_func_ptr = reinterpret_cast<PFNVERTEXATTRIBPOINTERPROC>(m_resolve_func("glVertexAttribPointer") );
 
         if (pointer_func_ptr != nullptr)
@@ -302,7 +305,7 @@ void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_generic(const Snapsho
 }
 
 void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_tex_coord(const SnapshotArray& in_array,
-                                                                     const void*          in_pointer)
+                                                                       const void*          in_pointer)
 {
     typedef void (APIENTRY* PFNCLIENTACTIVETEXTUREPROC)(GLenum);
     typedef void (APIENTRY* PFNPOINTERWITHSIZEPROC)    (GLint, GLenum, GLsizei, const void*);
@@ -324,8 +327,8 @@ void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_tex_coord(const Snaps
 }
 
 void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_with_size(const char*          in_function_name_ptr,
-                                                                     const SnapshotArray& in_array,
-                                                                     const void*          in_pointer)
+                                                                       const SnapshotArray& in_array,
+                                                                       const void*          in_pointer)
 {
     typedef void (APIENTRY* PFNPOINTERWITHSIZEPROC)(GLint, GLenum, GLsizei, const void*);
 
@@ -341,8 +344,8 @@ void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_with_size(const char*
 }
 
 void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_without_size(const char*          in_function_name_ptr,
-                                                                        const SnapshotArray& in_array,
-                                                                        const void*          in_pointer)
+                                                                          const SnapshotArray& in_array,
+                                                                          const void*          in_pointer)
 {
     typedef void (APIENTRY* PFNPOINTERWITHOUTSIZEPROC)(GLenum, GLsizei, const void*);
 

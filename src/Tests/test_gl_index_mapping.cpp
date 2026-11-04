@@ -4,6 +4,7 @@
  *
  * Checks of the mapping of the indices that a GL program hands out (uniform blocks, subroutines, fragment outputs).
  */
+#include "call_walker.h"
 #include <gtest/gtest.h>
 #include "gl_index_replayer.h"
 

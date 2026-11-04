@@ -29,6 +29,14 @@ namespace Replay
             PlaybackState state              = PlaybackState::IDLE;
         };
 
+        /* The back buffer of the device, as B, G, R and A (always 255) of 8 bits for each pixel, rows one after the other. */
+        struct FrameImage
+        {
+            uint32_t       height    = 0;
+            const uint8_t* pixel_ptr = nullptr; /* valid only while the sink is called */
+            uint32_t       width     = 0;
+        };
+
         /* Where the replay put one of its windows: the outer rectangle, in screen coordinates. */
         struct WindowPlacement
         {

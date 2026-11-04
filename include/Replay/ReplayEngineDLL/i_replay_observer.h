@@ -23,6 +23,7 @@ namespace Replay
             virtual void on_frame_presented(const uint32_t&        in_n_frame)   = 0;
             virtual void on_state_changed  (const PlaybackState&   in_old_state,
                                             const PlaybackState&   in_new_state) = 0;
+            virtual void on_window_closed  ()                                    = 0;
             virtual void on_window_placed  (const WindowPlacement& in_placement) = 0;
         };
     }

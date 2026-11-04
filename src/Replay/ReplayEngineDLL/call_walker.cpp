@@ -3,6 +3,8 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "call_walker.h"
+#include <algorithm>
+#include <thread>
 
 Replay::ReplayEngineDLL::CallWalker::CallWalker()
     :m_n_next_call(0)
@@ -21,18 +23,42 @@ const Capture::APIDumpLoader::DataChunk* Replay::ReplayEngineDLL::CallWalker::ge
                                                       in_data_chunk_id);
 }
 
+uint32_t Replay::ReplayEngineDLL::CallWalker::get_pointer_n_bytes() const
+{
+    return m_segment.pointer_n_bytes;
+}
+
 const Capture::APIDumpLoader::Workload& Replay::ReplayEngineDLL::CallWalker::get_segment() const
 {
     return m_segment;
 }
 
 bool Replay::ReplayEngineDLL::CallWalker::open(const char*  in_filename_ptr,
-                                               std::string* out_error_ptr)
+                                                 std::string* out_error_ptr)
 {
-    std::string                            error;
+    /* Segments are decompressed and read by threads of the loader, which a replay needs: playing the first frames of a long workload means
+     * reading all the segments before them. A segment held is some 100 to 200 MB, and the replay of a 32-bit application is a 32-bit process
+     * with two gigabytes to put them in (the segments being read, this walker's own two, and the one that is being freed), so it has a few. What
+     * more threads would do (the work is of the memory) is not worth the risk of running out.
+     */
+    constexpr uint32_t N_READER_THREADS_32_BIT = 3;
+    constexpr uint32_t N_READER_THREADS_64_BIT = 6;
+
+    const uint32_t                                  n_threads_wanted = (sizeof(void*) == sizeof(uint32_t) ) ? N_READER_THREADS_32_BIT
+                                                                                                           : N_READER_THREADS_64_BIT;
+    const uint32_t                                  n_cores          = std::max<uint32_t>(2,
+                                                                                          std::thread::hardware_concurrency() );
+    std::string                                     error;
+    Capture::APIDumpLoader::WorkloadReader::Options reader_options;
+    bool                                            result           = false;
+
+    reader_options.n_threads             = std::min<uint32_t>(n_threads_wanted,
+                                                              n_cores - 1);
+    reader_options.n_segments_in_flight  = reader_options.n_threads + 1;
+
     Capture::APIDumpLoader::WorkloadReaderUniquePtr reader_ptr = Capture::APIDumpLoader::WorkloadReader::create(in_filename_ptr,
-                                                                                                       &error);
-    bool                                   result     = false;
+                                                                                                                reader_options,
+                                                                                                                &error);
 
     if (reader_ptr == nullptr)
     {
@@ -76,7 +102,7 @@ void Replay::ReplayEngineDLL::CallWalker::prefetch_main()
     {
         Capture::APIDumpLoader::Workload next_segment;
         Capture::APIDumpLoader::Workload old_segment;
-        bool                    is_read = false;
+        bool                             is_read = false;
 
         {
             std::unique_lock<std::mutex> lock(m_prefetch.mutex);
@@ -99,7 +125,7 @@ void Replay::ReplayEngineDLL::CallWalker::prefetch_main()
 
         /* Free the memory of the old segment (it takes a while), then read the next one. */
         old_segment = Capture::APIDumpLoader::Workload();
-        is_read     = m_reader_ptr->read_next_segment(&next_segment);
+        is_read     = m_reader_ptr->read_next_segment (&next_segment);
 
         {
             std::lock_guard<std::mutex> lock(m_prefetch.mutex);
@@ -136,7 +162,7 @@ bool Replay::ReplayEngineDLL::CallWalker::read_next_call(const Capture::APIDumpL
     }
 
     /* A segment may hold no calls; skip those. */
-    while (m_segment.dumped_api_call_vec_ptr == nullptr ||
+    while (m_segment.dumped_api_call_vec_ptr == nullptr                                   ||
            m_n_next_call                     >= m_segment.dumped_api_call_vec_ptr->size() )
     {
         if (read_next_segment() == false)
@@ -147,7 +173,8 @@ bool Replay::ReplayEngineDLL::CallWalker::read_next_call(const Capture::APIDumpL
 
     *out_call_ptr_ptr = &m_segment.dumped_api_call_vec_ptr->at(m_n_next_call);
     m_n_next_call++;
-    result            = true;
+
+    result = true;
 
 end:
     return result;

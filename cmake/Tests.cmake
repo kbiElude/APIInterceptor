@@ -17,7 +17,6 @@ if (APIINTERCEPTOR_BUILD_TESTS)
     add_executable(APIInterceptorTests ${APIInterceptorTestsSources}
                                        "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL/call_context.cpp"
                                        "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL/call_walker.cpp"
-                                       "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL/frame_pacer.cpp"
                                        "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL/gl_index_replayer.cpp"
                                        "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL/gl_replay_context.cpp"
                                        "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL/object_remapper.cpp"

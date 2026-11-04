@@ -2,6 +2,7 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
+#include "Common/vtable.h"
 #include "d3d8_lock_replayer.h"
 #include "Interception/Hooks/D3D8/types.h"
 #include "Interception/Core/D3D8Utils/surface_layout.h"
@@ -16,15 +17,15 @@ Replay::ReplayEngineDLL::D3D8LockReplayer::D3D8LockReplayer(D3D8ReplayContext* i
 }
 
 int32_t Replay::ReplayEngineDLL::D3D8LockReplayer::get_dumped_int32(const D3D8ReplayContext& in_context,
-                                                                    const size_t&            in_n_argument,
-                                                                    const size_t&            in_index)
+                                                                      const size_t&            in_n_argument,
+                                                                      const size_t&            in_index)
 {
     size_t         n_bytes  = 0;
     const uint8_t* data_ptr = in_context.get_chunk_data_ptr(in_context.get_out_argument_ptr(in_n_argument),
                                                             &n_bytes);
     int32_t        result   = 0;
 
-    if (data_ptr != nullptr &&
+    if (data_ptr != nullptr                          &&
         n_bytes  >= (in_index + 1) * sizeof(int32_t) )
     {
         ::memcpy(&result,
@@ -72,10 +73,10 @@ const Replay::ReplayEngineDLL::D3D8LockReplayer::LockSpec* Replay::ReplayEngineD
 }
 
 uint32_t Replay::ReplayEngineDLL::D3D8LockReplayer::get_u32_argument(const D3D8ReplayContext& in_context,
-                                                                     const int&               in_n_argument)
+                                                                       const int&               in_n_argument)
 {
     const auto argument_ptr = (in_n_argument != ARGUMENT_ABSENT) ? in_context.get_in_argument_ptr(static_cast<size_t>(in_n_argument) )
-                                                          : nullptr;
+                                                                 : nullptr;
 
     return (argument_ptr != nullptr) ? argument_ptr->get_u32()
                                      : 0;
@@ -90,12 +91,12 @@ bool Replay::ReplayEngineDLL::D3D8LockReplayer::is_unlock_function(const APIInte
 {
     const auto spec_ptr = get_lock_spec_ptr(in_function);
 
-    return (spec_ptr != nullptr &&
+    return (spec_ptr             != nullptr &&
             spec_ptr->is_unlock);
 }
 
 bool Replay::ReplayEngineDLL::D3D8LockReplayer::lock(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                              std::string*                        out_error_ptr)
+                                                       std::string*                                 out_error_ptr)
 {
     void*      object_ptr = nullptr;
     bool       result     = false;
@@ -117,8 +118,10 @@ bool Replay::ReplayEngineDLL::D3D8LockReplayer::lock(const Capture::APIDumpLoade
 
     {
         const LockKey key(object_ptr,
-                          get_u32_argument(*m_context_ptr, spec_ptr->n_face_argument), get_u32_argument(*m_context_ptr,
-                          spec_ptr->n_level_argument));
+                          get_u32_argument(*m_context_ptr,
+                                           spec_ptr->n_face_argument),
+                          get_u32_argument(*m_context_ptr,
+                                           spec_ptr->n_level_argument) );
 
         switch (spec_ptr->kind)
         {
@@ -166,9 +169,9 @@ end:
 }
 
 bool Replay::ReplayEngineDLL::D3D8LockReplayer::lock_box(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                                  void*                               in_object_ptr,
-                                                                  const LockKey&                      in_key,
-                                                                  std::string*                        out_error_ptr)
+                                                           void*                                        in_object_ptr,
+                                                           const LockKey&                               in_key,
+                                                           std::string*                                 out_error_ptr)
 {
     typedef HRESULT (__stdcall* PFNLEVELBOXPROC)    (void*, UINT, Interception::Hooks::D3D8::D3DVOLUME_DESC*);
     typedef HRESULT (__stdcall* PFNLEVELBOXLOCKPROC)(void*, UINT, Interception::Hooks::D3D8::D3DLOCKED_BOX*, const Interception::Hooks::D3D8::D3DBOX*, DWORD);
@@ -178,15 +181,15 @@ bool Replay::ReplayEngineDLL::D3D8LockReplayer::lock_box(const Capture::APIDumpL
     Interception::Hooks::D3D8::D3DBOX         box        = {};
     const Interception::Hooks::D3D8::D3DBOX*  box_ptr    = nullptr;
     Interception::Hooks::D3D8::D3DVOLUME_DESC desc       = {};
-    HRESULT              hresult    = E_FAIL;
-    const uint32_t       level      = std::get<2>(in_key);
+    HRESULT                                   hresult    = E_FAIL;
+    const uint32_t                            level      = std::get<2>(in_key);
     Interception::Hooks::D3D8::D3DLOCKED_BOX  locked     = {};
-    LockRecord           record     = {};
-    bool                 result     = false;
-    const auto           spec_ptr   = get_lock_spec_ptr(in_call.func);
-    void** const         vtable_ptr = *reinterpret_cast<void***>(in_object_ptr);
-    const DWORD          flags      = get_u32_argument(*m_context_ptr,
-                                                       spec_ptr->n_flags_argument);
+    LockRecord                                record     = {};
+    bool                                      result     = false;
+    const auto                                spec_ptr   = get_lock_spec_ptr         (in_call.func);
+    void** const                              vtable_ptr = APIInterceptor::get_vtable_ptr(in_object_ptr);
+    const DWORD                               flags      = get_u32_argument          (*m_context_ptr,
+                                                                                     spec_ptr->n_flags_argument);
 
     {
         size_t         n_bytes  = 0;
@@ -205,7 +208,7 @@ bool Replay::ReplayEngineDLL::D3D8LockReplayer::lock_box(const Capture::APIDumpL
 
     if (spec_ptr->n_level_argument != ARGUMENT_ABSENT)
     {
-        hresult = reinterpret_cast<PFNLEVELBOXLOCKPROC>(vtable_ptr[spec_ptr->vtable_index])(in_object_ptr,
+        hresult = APIInterceptor::get_method_ptr<PFNLEVELBOXLOCKPROC>(vtable_ptr, spec_ptr->vtable_index)(in_object_ptr,
                                                                                             level,
                                                                                            &locked,
                                                                                             box_ptr,
@@ -213,21 +216,21 @@ bool Replay::ReplayEngineDLL::D3D8LockReplayer::lock_box(const Capture::APIDumpL
 
         if (hresult >= 0)
         {
-            reinterpret_cast<PFNLEVELBOXPROC>(vtable_ptr[spec_ptr->desc_vtable_index])(in_object_ptr,
+            APIInterceptor::get_method_ptr<PFNLEVELBOXPROC>(vtable_ptr, spec_ptr->desc_vtable_index)(in_object_ptr,
                                                                                        level,
                                                                                       &desc);
         }
     }
     else
     {
-        hresult = reinterpret_cast<PFNVOLUMELOCKPROC>(vtable_ptr[spec_ptr->vtable_index])(in_object_ptr,
+        hresult = APIInterceptor::get_method_ptr<PFNVOLUMELOCKPROC>(vtable_ptr, spec_ptr->vtable_index)(in_object_ptr,
                                                                                          &locked,
                                                                                           box_ptr,
                                                                                           flags);
 
         if (hresult >= 0)
         {
-            reinterpret_cast<PFNVOLUMEDESCPROC>(vtable_ptr[spec_ptr->desc_vtable_index])(in_object_ptr,
+            APIInterceptor::get_method_ptr<PFNVOLUMEDESCPROC>(vtable_ptr, spec_ptr->desc_vtable_index)(in_object_ptr,
                                                                                          &desc);
         }
     }
@@ -266,28 +269,29 @@ end:
 }
 
 bool Replay::ReplayEngineDLL::D3D8LockReplayer::lock_buffer(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                                     void*                               in_object_ptr,
-                                                                     const LockKey&                      in_key,
-                                                                     std::string*                        out_error_ptr)
+                                                              void*                                        in_object_ptr,
+                                                              const LockKey&                               in_key,
+                                                              std::string*                                 out_error_ptr)
 {
     typedef HRESULT (__stdcall* PFNBUFFERDESCPROC)(void*, Interception::Hooks::D3D8::D3DVERTEXBUFFER_DESC*);
     typedef HRESULT (__stdcall* PFNBUFFERLOCKPROC)(void*, UINT, UINT, BYTE**, DWORD);
 
-    BYTE*                      data_ptr   = nullptr;
+    BYTE*                                           data_ptr   = nullptr;
     Interception::Hooks::D3D8::D3DVERTEXBUFFER_DESC desc       = {};
-    HRESULT                    hresult    = E_FAIL;
-    LockRecord                 record     = {};
-    bool                       result     = false;
-    const auto                 spec_ptr   = get_lock_spec_ptr(in_call.func);
-    void** const               vtable_ptr = *reinterpret_cast<void***>(in_object_ptr);
-    const DWORD                flags      = get_u32_argument(*m_context_ptr,
-                                                             spec_ptr->n_flags_argument);
-    const UINT                 offset     = get_u32_argument(*m_context_ptr,
-                                                             spec_ptr->n_offset_argument);
-    const UINT                 size       = get_u32_argument(*m_context_ptr,
-                                                             spec_ptr->n_size_argument);
+    HRESULT                                         hresult    = E_FAIL;
+    LockRecord                                      record     = {};
+    bool                                            result     = false;
+    const auto                                      spec_ptr   = get_lock_spec_ptr         (in_call.func);
+    void** const                                    vtable_ptr = APIInterceptor::get_vtable_ptr(in_object_ptr);
+    const DWORD                                     flags      = get_u32_argument          (*m_context_ptr,
+                                                                                            spec_ptr->n_flags_argument);
 
-    hresult = reinterpret_cast<PFNBUFFERLOCKPROC>(vtable_ptr[spec_ptr->vtable_index])(in_object_ptr,
+    const UINT offset     = get_u32_argument(*m_context_ptr,
+                                             spec_ptr->n_offset_argument);
+    const UINT size       = get_u32_argument(*m_context_ptr,
+                                             spec_ptr->n_size_argument);
+
+    hresult = APIInterceptor::get_method_ptr<PFNBUFFERLOCKPROC>(vtable_ptr, spec_ptr->vtable_index)(in_object_ptr,
                                                                                       offset,
                                                                                       size,
                                                                                      &data_ptr,
@@ -300,7 +304,7 @@ bool Replay::ReplayEngineDLL::D3D8LockReplayer::lock_buffer(const Capture::APIDu
         goto end;
     }
 
-    reinterpret_cast<PFNBUFFERDESCPROC>(vtable_ptr[spec_ptr->desc_vtable_index])(in_object_ptr,
+    APIInterceptor::get_method_ptr<PFNBUFFERDESCPROC>(vtable_ptr, spec_ptr->desc_vtable_index)(in_object_ptr,
                                                                                 &desc);
 
     /* A size of 0 locks everything from the offset on. */
@@ -318,9 +322,9 @@ end:
 }
 
 bool Replay::ReplayEngineDLL::D3D8LockReplayer::lock_rect(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                                   void*                               in_object_ptr,
-                                                                   const LockKey&                      in_key,
-                                                                   std::string*                        out_error_ptr)
+                                                            void*                                        in_object_ptr,
+                                                            const LockKey&                               in_key,
+                                                            std::string*                                 out_error_ptr)
 {
     typedef HRESULT (__stdcall* PFNCUBELOCKPROC)   (void*, UINT, UINT, Interception::Hooks::D3D8::D3DLOCKED_RECT*, const RECT*, DWORD);
     typedef HRESULT (__stdcall* PFNLEVELDESCPROC)  (void*, UINT, Interception::Hooks::D3D8::D3DSURFACE_DESC*);
@@ -329,18 +333,18 @@ bool Replay::ReplayEngineDLL::D3D8LockReplayer::lock_rect(const Capture::APIDump
     typedef HRESULT (__stdcall* PFNSURFACELOCKPROC)(void*, Interception::Hooks::D3D8::D3DLOCKED_RECT*, const RECT*, DWORD);
 
     Interception::Hooks::D3D8::D3DSURFACE_DESC desc       = {};
-    const uint32_t        face       = std::get<1>(in_key);
-    HRESULT               hresult    = E_FAIL;
-    const uint32_t        level      = std::get<2>(in_key);
+    const uint32_t                             face       = std::get<1>(in_key);
+    HRESULT                                    hresult    = E_FAIL;
+    const uint32_t                             level      = std::get<2>(in_key);
     Interception::Hooks::D3D8::D3DLOCKED_RECT  locked     = {};
-    LockRecord            record     = {};
-    RECT                  rect       = {};
-    const RECT*           rect_ptr   = nullptr;
-    bool                  result     = false;
-    const auto            spec_ptr   = get_lock_spec_ptr(in_call.func);
-    void** const          vtable_ptr = *reinterpret_cast<void***>(in_object_ptr);
-    const DWORD           flags      = get_u32_argument(*m_context_ptr,
-                                                        spec_ptr->n_flags_argument);
+    LockRecord                                 record     = {};
+    RECT                                       rect       = {};
+    const RECT*                                rect_ptr   = nullptr;
+    bool                                       result     = false;
+    const auto                                 spec_ptr   = get_lock_spec_ptr         ( in_call.func);
+    void** const                               vtable_ptr = APIInterceptor::get_vtable_ptr( in_object_ptr);
+    const DWORD                                flags      = get_u32_argument          (*m_context_ptr,
+                                                                                        spec_ptr->n_flags_argument);
 
     {
         /* The rectangle is the data the dumper stored after the arguments of the method. */
@@ -360,7 +364,7 @@ bool Replay::ReplayEngineDLL::D3D8LockReplayer::lock_rect(const Capture::APIDump
 
     if (spec_ptr->n_face_argument != ARGUMENT_ABSENT)
     {
-        hresult = reinterpret_cast<PFNCUBELOCKPROC>(vtable_ptr[spec_ptr->vtable_index])(in_object_ptr,
+        hresult = APIInterceptor::get_method_ptr<PFNCUBELOCKPROC>(vtable_ptr, spec_ptr->vtable_index)(in_object_ptr,
                                                                                         face,
                                                                                         level,
                                                                                        &locked,
@@ -370,7 +374,7 @@ bool Replay::ReplayEngineDLL::D3D8LockReplayer::lock_rect(const Capture::APIDump
     else
     if (spec_ptr->n_level_argument != ARGUMENT_ABSENT)
     {
-        hresult = reinterpret_cast<PFNLEVELLOCKPROC>(vtable_ptr[spec_ptr->vtable_index])(in_object_ptr,
+        hresult = APIInterceptor::get_method_ptr<PFNLEVELLOCKPROC>(vtable_ptr, spec_ptr->vtable_index)(in_object_ptr,
                                                                                          level,
                                                                                         &locked,
                                                                                          rect_ptr,
@@ -378,7 +382,7 @@ bool Replay::ReplayEngineDLL::D3D8LockReplayer::lock_rect(const Capture::APIDump
     }
     else
     {
-        hresult = reinterpret_cast<PFNSURFACELOCKPROC>(vtable_ptr[spec_ptr->vtable_index])(in_object_ptr,
+        hresult = APIInterceptor::get_method_ptr<PFNSURFACELOCKPROC>(vtable_ptr, spec_ptr->vtable_index)(in_object_ptr,
                                                                                           &locked,
                                                                                            rect_ptr,
                                                                                            flags);
@@ -393,13 +397,13 @@ bool Replay::ReplayEngineDLL::D3D8LockReplayer::lock_rect(const Capture::APIDump
 
     if (spec_ptr->n_level_argument != ARGUMENT_ABSENT)
     {
-        reinterpret_cast<PFNLEVELDESCPROC>(vtable_ptr[spec_ptr->desc_vtable_index])(in_object_ptr,
+        APIInterceptor::get_method_ptr<PFNLEVELDESCPROC>(vtable_ptr, spec_ptr->desc_vtable_index)(in_object_ptr,
                                                                                     level,
                                                                                    &desc);
     }
     else
     {
-        reinterpret_cast<PFNSURFACEDESCPROC>(vtable_ptr[spec_ptr->desc_vtable_index])(in_object_ptr,
+        APIInterceptor::get_method_ptr<PFNSURFACEDESCPROC>(vtable_ptr, spec_ptr->desc_vtable_index)(in_object_ptr,
                                                                                      &desc);
     }
 
@@ -430,7 +434,7 @@ void Replay::ReplayEngineDLL::D3D8LockReplayer::reset()
 }
 
 bool Replay::ReplayEngineDLL::D3D8LockReplayer::unlock(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                                std::string*                        out_error_ptr)
+                                                         std::string*                                 out_error_ptr)
 {
     typedef HRESULT (__stdcall* PFNUNLOCK0PROC)(void*);
     typedef HRESULT (__stdcall* PFNUNLOCK1PROC)(void*, UINT);
@@ -457,20 +461,23 @@ bool Replay::ReplayEngineDLL::D3D8LockReplayer::unlock(const Capture::APIDumpLoa
 
     {
         const LockKey key(object_ptr,
-                          get_u32_argument(*m_context_ptr, spec_ptr->n_face_argument), get_u32_argument(*m_context_ptr,
-                          spec_ptr->n_level_argument));
+                          get_u32_argument(*m_context_ptr,
+                                            spec_ptr->n_face_argument),
+                          get_u32_argument(*m_context_ptr,
+                                            spec_ptr->n_level_argument));
+
         const uint8_t* data_ptr   = m_context_ptr->get_chunk_data_ptr(&in_call.arg_in_vec.back(), /* the data the dumper stored is the last argument */
                                                                       &n_bytes);
-        const uint32_t face       = std::get<1>(key);
-        const auto     iterator   = m_lock_record_map.find(key);
-        const uint32_t level      = std::get<2>(key);
-        void** const   vtable_ptr = *reinterpret_cast<void***>(object_ptr);
+        const uint32_t face       = std::get<1>                      (key);
+        const auto     iterator   = m_lock_record_map.find           (key);
+        const uint32_t level      = std::get<2>                      (key);
+        void** const   vtable_ptr = APIInterceptor::get_vtable_ptr(object_ptr);
 
         if (iterator != m_lock_record_map.end() )
         {
             const LockRecord& record = iterator->second;
 
-            if (data_ptr != nullptr &&
+            if (data_ptr                                                     != nullptr &&
                 (record.flags & Interception::Hooks::D3D8::D3DLOCK_READONLY) == 0)
             {
                 if (spec_ptr->kind == LockKind::BUFFER)
@@ -495,7 +502,7 @@ bool Replay::ReplayEngineDLL::D3D8LockReplayer::unlock(const Capture::APIDumpLoa
                             const int64_t target_offset = static_cast<int64_t>(n_slice) * record.live_slice_pitch   +
                                                           static_cast<int64_t>(n_row)   * record.live_row_pitch;
 
-                            if (source_offset < 0                                                 ||
+                            if (source_offset                                             < 0        ||
                                 static_cast<uint64_t>(source_offset) + record.n_row_bytes > n_bytes)
                             {
                                 break;
@@ -513,19 +520,19 @@ bool Replay::ReplayEngineDLL::D3D8LockReplayer::unlock(const Capture::APIDumpLoa
 
             if (spec_ptr->n_face_argument != ARGUMENT_ABSENT)
             {
-                reinterpret_cast<PFNUNLOCK2PROC>(vtable_ptr[spec_ptr->vtable_index])(object_ptr,
+                APIInterceptor::get_method_ptr<PFNUNLOCK2PROC>(vtable_ptr, spec_ptr->vtable_index)(object_ptr,
                                                                                      face,
                                                                                      level);
             }
             else
             if (spec_ptr->n_level_argument != ARGUMENT_ABSENT)
             {
-                reinterpret_cast<PFNUNLOCK1PROC>(vtable_ptr[spec_ptr->vtable_index])(object_ptr,
+                APIInterceptor::get_method_ptr<PFNUNLOCK1PROC>(vtable_ptr, spec_ptr->vtable_index)(object_ptr,
                                                                                      level);
             }
             else
             {
-                reinterpret_cast<PFNUNLOCK0PROC>(vtable_ptr[spec_ptr->vtable_index])(object_ptr);
+                APIInterceptor::get_method_ptr<PFNUNLOCK0PROC>(vtable_ptr, spec_ptr->vtable_index)(object_ptr);
             }
         }
     }

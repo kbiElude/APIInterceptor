@@ -42,7 +42,9 @@ Replay::ReplayEngineDLL::GlCallExecutor::GlCallExecutor(ObjectRemapper* in_remap
                          &FunctionReplay::invoke, \
                          FunctionReplay::get_n_arguments()); \
         }
+
     #include "gl_replay_table.inl"
+
     #undef GL_REPLAY_FUNCTION
 }
 
@@ -52,12 +54,12 @@ Replay::ReplayEngineDLL::GlCallExecutor::~GlCallExecutor()
 }
 
 void Replay::ReplayEngineDLL::GlCallExecutor::add_function(const APIInterceptor::APIFunction& in_function,
-                                                           const char*                        in_name_ptr,
-                                                           const ObjectKind&                  in_return_kind,
-                                                           const std::vector<ObjectKind>&     in_param_kind_vec,
-                                                           const uint32_t&                    in_ignored_param_mask,
-                                                           const InvokeFuncPtr&               in_invoke_func_ptr,
-                                                           const size_t&                      in_n_head_arguments)
+                                                             const char*                        in_name_ptr,
+                                                             const ObjectKind&                  in_return_kind,
+                                                             const std::vector<ObjectKind>&     in_param_kind_vec,
+                                                             const uint32_t&                    in_ignored_param_mask,
+                                                             const InvokeFuncPtr&               in_invoke_func_ptr,
+                                                             const size_t&                      in_n_head_arguments)
 {
     FunctionEntry entry;
 
@@ -89,7 +91,7 @@ void Replay::ReplayEngineDLL::GlCallExecutor::after_call(const Capture::APIDumpL
                 read_number(*in_call.returned_value_ptr,
                             &dumped_location);
 
-                if (dumped_location >= 0 &&
+                if (dumped_location                                    >= 0 &&
                     static_cast<int32_t>(m_context.get_live_return() ) >= 0)
                 {
                     m_context.register_attrib_location(static_cast<uint32_t>(dumped_location),
@@ -110,7 +112,7 @@ void Replay::ReplayEngineDLL::GlCallExecutor::after_call(const Capture::APIDumpL
                 read_number(in_call.arg_in_vec.at(0),
                             &dumped_program);
 
-                if (dumped_location >= 0 &&
+                if (dumped_location                                    >= 0 &&
                     static_cast<int32_t>(m_context.get_live_return() ) >= 0)
                 {
                     m_context.register_uniform_location(dumped_program,
@@ -204,8 +206,8 @@ void Replay::ReplayEngineDLL::GlCallExecutor::after_call(const Capture::APIDumpL
 }
 
 bool Replay::ReplayEngineDLL::GlCallExecutor::execute(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                               const CallWalker&                   in_walker,
-                                                               std::string*                        out_error_ptr)
+                                                        const IChunkSource&                          in_chunk_source,
+                                                        std::string*                                 out_error_ptr)
 {
     const auto entry_iterator = m_entry_map.find(in_call.func);
     void*      proc_ptr       = nullptr;
@@ -226,7 +228,7 @@ bool Replay::ReplayEngineDLL::GlCallExecutor::execute(const Capture::APIDumpLoad
     }
 
     m_context.begin_call(&in_call,
-                         &in_walker,
+                         &in_chunk_source,
                          entry_iterator->second.n_head_arguments,
                          &entry_iterator->second.info);
 
@@ -324,7 +326,7 @@ bool Replay::ReplayEngineDLL::GlCallExecutor::is_valid_proc(const void* in_proc_
 
     const uintptr_t value = reinterpret_cast<uintptr_t>(in_proc_ptr);
 
-    return (value > MAX_INVALID_PROC_VALUE &&
+    return (value >  MAX_INVALID_PROC_VALUE     &&
             value != static_cast<uintptr_t>(-1) );
 }
 
@@ -334,8 +336,8 @@ void Replay::ReplayEngineDLL::GlCallExecutor::on_frame_presented()
 }
 
 void Replay::ReplayEngineDLL::GlCallExecutor::register_returned_index(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                                               const ObjectKind&                   in_kind,
-                                                                               const bool&                         in_has_scope)
+                                                                        const ObjectKind&                            in_kind,
+                                                                        const bool&                                  in_has_scope)
 {
     constexpr uint32_t INVALID_INDEX = 0xFFFFFFFFu;
 
@@ -352,7 +354,7 @@ void Replay::ReplayEngineDLL::GlCallExecutor::register_returned_index(const Capt
                     &dumped_program);
 
         /* The shader stage is the second argument of the functions which have a scope. */
-        if (in_has_scope &&
+        if (in_has_scope                  &&
             in_call.arg_in_vec.size() > 1)
         {
             read_number(in_call.arg_in_vec.at(1),
@@ -360,9 +362,9 @@ void Replay::ReplayEngineDLL::GlCallExecutor::register_returned_index(const Capt
         }
 
         /* An index which does not exist is -1, or GL_INVALID_INDEX. */
-        if (dumped_index >= 0                                                                       &&
-            static_cast<uint32_t>(dumped_index)                    != INVALID_INDEX                  &&
-            static_cast<uint32_t>(m_context.get_live_return() )    != INVALID_INDEX)
+        if (dumped_index                                        >= 0             &&
+            static_cast<uint32_t>(dumped_index)                 != INVALID_INDEX &&
+            static_cast<uint32_t>(m_context.get_live_return() ) != INVALID_INDEX)
         {
             m_context.register_index(in_kind,
                                      dumped_program,
@@ -376,6 +378,6 @@ void Replay::ReplayEngineDLL::GlCallExecutor::register_returned_index(const Capt
 void Replay::ReplayEngineDLL::GlCallExecutor::reset()
 {
     m_context.forget_locations();
-    m_mapping_replayer.reset();
-    m_proc_ptr_map.clear();
+    m_mapping_replayer.reset  ();
+    m_proc_ptr_map.clear      ();
 }

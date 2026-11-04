@@ -8,14 +8,14 @@
 namespace Replay
 {
     namespace ReplayEngineDLL
-    {
-        /* What a handle or an ID of the dumped process stands for. An object is told apart by the kind and the value it had
+    {        /* What a handle or an ID of the dumped process stands for. An object is told apart by the kind and the value it had
          * in the dump (see ObjectRemapper). NONE stands for a value which is not one of those.
          */
         enum class ObjectKind
         {
             ATTRIB_LOCATION,
             BUFFER,
+            D3D7_OBJECT,
             D3D8_OBJECT,
             D3D8_PIXEL_SHADER,
             D3D8_STATE_BLOCK,

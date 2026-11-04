@@ -2,23 +2,25 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
+#include "Common/vtable.h"
 #include "d3d8_replay_context.h"
 #include "Interception/Hooks/D3D8/types.h"
 #include <algorithm>
 
 Replay::ReplayEngineDLL::D3D8ReplayContext::D3D8ReplayContext(ObjectRemapper* in_remapper_ptr)
     :CallContext           (in_remapper_ptr),
+     m_device_ptr          (nullptr),
      m_is_creation_expected(false)
 {
     /* Stub */
 }
 
 void Replay::ReplayEngineDLL::D3D8ReplayContext::begin_call(const Capture::APIDumpLoader::DumpedAPICall* in_call_ptr,
-                                                                     const CallWalker*                   in_walker_ptr,
-                                                                     const size_t&                       in_n_head_arguments)
+                                                              const IChunkSource*                          in_chunk_source_ptr,
+                                                              const size_t&                                in_n_head_arguments)
 {
     CallContext::begin_call(in_call_ptr,
-                            in_walker_ptr,
+                            in_chunk_source_ptr,
                             in_n_head_arguments);
 
     m_is_creation_expected = false;
@@ -37,18 +39,25 @@ void Replay::ReplayEngineDLL::D3D8ReplayContext::forget_object(const uint64_t& i
                                 in_dumped_value,
                                &live_value) )
     {
-        m_live_object_ptr_vec.erase(std::remove(m_live_object_ptr_vec.begin(),
-                                                m_live_object_ptr_vec.end  (),
-                                                reinterpret_cast<void*>(live_value) ),
-                                    m_live_object_ptr_vec.end() );
+        if (reinterpret_cast<void*>(live_value) == m_device_ptr)
+        {
+            m_device_ptr = nullptr;
+        }
+
+        m_live_objects.remove(reinterpret_cast<void*>(live_value) );
     }
 
     get_remapper_ptr()->remove(ObjectKind::D3D8_OBJECT,
                                in_dumped_value);
 }
 
+void* Replay::ReplayEngineDLL::D3D8ReplayContext::get_device_ptr() const
+{
+    return m_device_ptr;
+}
+
 const uint8_t* Replay::ReplayEngineDLL::D3D8ReplayContext::get_extra_data_ptr(const size_t& in_n_argument,
-                                                                              size_t*       out_n_bytes_ptr) const
+                                                                                size_t*       out_n_bytes_ptr) const
 {
     static const ExtraBinding EXTRA_BINDING_ARRAY[] =
     {
@@ -93,8 +102,8 @@ const uint8_t* Replay::ReplayEngineDLL::D3D8ReplayContext::get_extra_data_ptr(co
 }
 
 const Replay::ReplayEngineDLL::D3D8ReplayContext::HandleBinding* Replay::ReplayEngineDLL::D3D8ReplayContext::get_handle_binding_ptr(const APIInterceptor::APIFunction& in_function,
-                                                                                                                            const size_t&                      in_n_argument,
-                                                                                                                            const bool&                        in_is_output)
+                                                                                                                                        const size_t&                      in_n_argument,
+                                                                                                                                        const bool&                        in_is_output)
 {
     static const HandleBinding HANDLE_BINDING_ARRAY[] =
     {
@@ -129,8 +138,8 @@ const Replay::ReplayEngineDLL::D3D8ReplayContext::HandleBinding* Replay::ReplayE
 }
 
 bool Replay::ReplayEngineDLL::D3D8ReplayContext::get_live_handle(const ObjectKind&                          in_kind,
-                                                                 const APIInterceptor::APIFunctionArgument& in_argument,
-                                                                 uint64_t*                                  out_live_value_ptr) const
+                                                                   const APIInterceptor::APIFunctionArgument& in_argument,
+                                                                   uint64_t*                                  out_live_value_ptr) const
 {
     return get_remapper_ptr()->get(in_kind,
                                    in_argument.get_ptr_as_u64(),
@@ -138,8 +147,8 @@ bool Replay::ReplayEngineDLL::D3D8ReplayContext::get_live_handle(const ObjectKin
 }
 
 bool Replay::ReplayEngineDLL::D3D8ReplayContext::get_live_object(const APIInterceptor::APIFunctionArgument& in_argument,
-                                                                 void**                                     out_live_object_ptr,
-                                                                 std::string*                               out_error_ptr) const
+                                                                   void**                                     out_live_object_ptr,
+                                                                   std::string*                               out_error_ptr) const
 {
     uint64_t live_value = 0;
     bool     result     = get_live_handle(ObjectKind::D3D8_OBJECT,
@@ -164,7 +173,7 @@ bool Replay::ReplayEngineDLL::D3D8ReplayContext::is_creation_expected() const
 }
 
 uint32_t Replay::ReplayEngineDLL::D3D8ReplayContext::map_handle_argument(const size_t&   in_n_argument,
-                                                                         const uint32_t& in_dumped_value) const
+                                                                           const uint32_t& in_dumped_value) const
 {
     const auto binding_ptr = get_handle_binding_ptr(get_call().func,
                                                     in_n_argument,
@@ -186,7 +195,7 @@ uint32_t Replay::ReplayEngineDLL::D3D8ReplayContext::map_handle_argument(const s
 }
 
 void Replay::ReplayEngineDLL::D3D8ReplayContext::register_handle(const size_t&   in_n_argument,
-                                                                 const uint32_t& in_live_value)
+                                                                   const uint32_t& in_live_value)
 {
     const auto binding_ptr = get_handle_binding_ptr(get_call().func,
                                                     in_n_argument,
@@ -203,7 +212,7 @@ void Replay::ReplayEngineDLL::D3D8ReplayContext::register_handle(const size_t&  
 }
 
 void Replay::ReplayEngineDLL::D3D8ReplayContext::register_object(const uint64_t& in_dumped_value,
-                                                                 void*           in_live_object_ptr)
+                                                                   void*           in_live_object_ptr)
 {
     if (in_dumped_value != 0)
     {
@@ -211,11 +220,24 @@ void Replay::ReplayEngineDLL::D3D8ReplayContext::register_object(const uint64_t&
                                 in_dumped_value,
                                 reinterpret_cast<uint64_t>(in_live_object_ptr) );
 
-        if (std::find(m_live_object_ptr_vec.begin(),
-                      m_live_object_ptr_vec.end  (),
-                      in_live_object_ptr) == m_live_object_ptr_vec.end() )
+        m_live_objects.add(in_live_object_ptr);
+    }
+}
+
+void Replay::ReplayEngineDLL::D3D8ReplayContext::set_device_from_argument(const size_t& in_n_argument)
+{
+    uint64_t   live_value       = 0;
+    const auto out_argument_ptr = get_out_argument_ptr(in_n_argument);
+
+    if (out_argument_ptr != nullptr)
+    {
+        const bool is_live = get_remapper_ptr()->get(ObjectKind::D3D8_OBJECT,
+                                                     out_argument_ptr->get_ptr_as_u64(),
+                                                    &live_value);
+
+        if (is_live)
         {
-            m_live_object_ptr_vec.push_back(in_live_object_ptr);
+            m_device_ptr = reinterpret_cast<void*>(live_value);
         }
     }
 }
@@ -227,21 +249,21 @@ void Replay::ReplayEngineDLL::D3D8ReplayContext::release_all_objects()
     typedef ULONG (__stdcall* PFNRELEASEPROC)(void*);
 
     /* The device is the first one to be created, so it is the last one to go. */
-    for (auto iterator  = m_live_object_ptr_vec.rbegin();
-              iterator != m_live_object_ptr_vec.rend  ();
-            ++iterator)
+    for (void* const object_ptr : m_live_objects.get_newest_first_vec() )
     {
-        void* const    object_ptr       = *iterator;
-        void** const   vtable_ptr       = *reinterpret_cast<void***>(object_ptr);
-        const auto     release_func_ptr = reinterpret_cast<PFNRELEASEPROC>(vtable_ptr[Interception::Hooks::D3D8::VTABLE_INDEX_IDIRECT3DDEVICE8_RELEASE]);
+        void** const   vtable_ptr       = APIInterceptor::get_vtable_ptr(object_ptr);
+        const auto     release_func_ptr = APIInterceptor::get_method_ptr<PFNRELEASEPROC>(vtable_ptr, Interception::Hooks::D3D8::VTABLE_INDEX_IDIRECT3DDEVICE8_RELEASE);
 
-        for (size_t n_release = 0;
-                    n_release < MAX_N_RELEASES_PER_OBJECT && release_func_ptr(object_ptr) > 0;
-                  ++n_release)
+        size_t n_release = 0;
+
+        while (n_release < MAX_N_RELEASES_PER_OBJECT &&
+               release_func_ptr(object_ptr) > 0)
         {
-            /* The loop does the work. */
+            ++n_release;
         }
     }
 
-    m_live_object_ptr_vec.clear();
+    m_device_ptr = nullptr;
+
+    m_live_objects.clear();
 }

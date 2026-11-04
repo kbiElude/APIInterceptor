@@ -479,6 +479,11 @@ void Replay::ReplayPlayer::ControlWindow::on_state_changed(const Replay::ReplayE
     (void) in_new_state;
 }
 
+void Replay::ReplayPlayer::ControlWindow::on_window_closed()
+{
+    /* Stub */
+}
+
 void Replay::ReplayPlayer::ControlWindow::on_window_placed(const Replay::ReplayEngineDLL::WindowPlacement& in_placement)
 {
     {

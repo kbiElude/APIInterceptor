@@ -13,27 +13,38 @@
 #include <mmsystem.h>
 
 Replay::ReplayEngineDLL::ReplayEngine::ReplayEngine()
-    :m_is_loaded(false)
+    :m_frame_executor_ptr(&m_default_frame_executor),
+     m_is_loaded         (false)
 {
     for (const auto& group : Capture::APIDumpLoader::get_api_groups() )
     {
-        m_executor_ptr_map[group] = std::make_shared<NullCallExecutor>();
+        m_executors.add(group,
+                        std::make_shared<NullCallExecutor>() );
     }
 
     {
         const auto win32_executor_ptr = std::make_shared<Win32CallExecutor>(&m_remapper,
-                                                                             [this](const WindowPlacement& in_placement)
-                                                                             {
-                                                                                 notify_window_placed(in_placement);
-                                                                             });
+                                                                            [this]()
+                                                                            {
+                                                                                notify_window_closed();
+                                                                            },
+                                                                            [this](const WindowPlacement& in_placement)
+                                                                            {
+                                                                                notify_window_placed(in_placement);
+                                                                            });
 
-        m_executor_ptr_map[Capture::APIDumpLoader::APIGroup::GDI32]  = win32_executor_ptr;
-        m_executor_ptr_map[Capture::APIDumpLoader::APIGroup::USER32] = win32_executor_ptr;
-        m_executor_ptr_map[Capture::APIDumpLoader::APIGroup::WGL]    = win32_executor_ptr;
+        m_executors.add(Capture::APIDumpLoader::APIGroup::GDI32,
+                        win32_executor_ptr);
+        m_executors.add(Capture::APIDumpLoader::APIGroup::USER32,
+                        win32_executor_ptr);
+        m_executors.add(Capture::APIDumpLoader::APIGroup::WGL,
+                        win32_executor_ptr);
     }
 
-    m_executor_ptr_map[Capture::APIDumpLoader::APIGroup::D3D8] = std::make_shared<D3D8CallExecutor>(&m_remapper);
-    m_executor_ptr_map[Capture::APIDumpLoader::APIGroup::GL]   = std::make_shared<GlCallExecutor>(&m_remapper);
+    m_executors.add(Capture::APIDumpLoader::APIGroup::D3D8,
+                    std::make_shared<D3D8CallExecutor>(&m_remapper) );
+    m_executors.add(Capture::APIDumpLoader::APIGroup::GL,
+                    std::make_shared<GlCallExecutor>(&m_remapper) );
 }
 
 Replay::ReplayEngineDLL::ReplayEngine::~ReplayEngine()
@@ -52,21 +63,64 @@ Replay::ReplayEngineDLL::ReplayEngine::~ReplayEngine()
     }
 }
 
+void Replay::ReplayEngineDLL::ReplayEngine::add_call_executor(const Capture::APIDumpLoader::APIGroup& in_group,
+                                                              const std::shared_ptr<ICallExecutor>&   in_executor_ptr)
+{
+    m_executors.add(in_group,
+                    in_executor_ptr);
+}
+
 void Replay::ReplayEngineDLL::ReplayEngine::add_call_interceptor(ICallInterceptor* in_interceptor_ptr)
 {
     std::lock_guard<std::mutex> lock(m_listeners.mutex);
 
     m_listeners.interceptor_ptr_vec.push_back(in_interceptor_ptr);
+
+    m_listeners.n_interceptors = m_listeners.interceptor_ptr_vec.size();
 }
 
 void Replay::ReplayEngineDLL::ReplayEngine::add_replay_observer(IReplayObserver* in_observer_ptr)
 {
-    std::lock_guard<std::mutex> lock(m_listeners.mutex);
-
-    m_listeners.observer_ptr_vec.push_back(in_observer_ptr);
+    m_observers.add(in_observer_ptr);
 }
 
-bool Replay::ReplayEngineDLL::ReplayEngine::execute_call(const Capture::APIDumpLoader::DumpedAPICall& in_call)
+void Replay::ReplayEngineDLL::ReplayEngine::complete_frame(bool* out_is_done_ptr)
+{
+    bool     is_interrupted = false;
+    uint32_t n_frame        = 0;
+    bool     should_stop    = false;
+
+    for (const auto executor_ptr : m_executors.get_executor_ptr_vec() )
+    {
+        executor_ptr->on_frame_presented();
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(m_control.mutex);
+
+        n_frame        = m_control.n_frames_presented;
+        is_interrupted = (m_control.is_reset_requested || m_control.is_stop_requested);
+        should_stop    = (is_interrupted               || m_control.should_play       == false);
+
+        m_control.n_frames_presented++;
+    }
+
+    notify_frame_presented(n_frame);
+
+    if (should_stop)
+    {
+        /* Reset and stop are handled by the caller. */
+        if (is_interrupted == false)
+        {
+            set_state(PlaybackState::PAUSED);
+        }
+
+        *out_is_done_ptr = true;
+    }
+}
+
+bool Replay::ReplayEngineDLL::ReplayEngine::execute_call(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                         const IChunkSource&                          in_chunk_source)
 {
     std::string                    error;
     std::vector<ICallInterceptor*> interceptor_ptr_vec;
@@ -74,19 +128,17 @@ bool Replay::ReplayEngineDLL::ReplayEngine::execute_call(const Capture::APIDumpL
     bool                           result         = false;
     bool                           should_execute = true;
 
+    n_frame = m_control.n_frames_presented;
+
+    /* Most replays have no interceptor, and then nothing is locked or copied for the call. */
+    if (m_listeners.n_interceptors != 0)
     {
         std::lock_guard<std::mutex> lock(m_listeners.mutex);
 
         interceptor_ptr_vec = m_listeners.interceptor_ptr_vec;
     }
 
-    {
-        std::lock_guard<std::mutex> lock(m_control.mutex);
-
-        n_frame = m_control.n_frames_presented;
-    }
-
-    /* Every interceptor gets to see the call, even if another one has skipped it already. */
+    /* Every interceptor sees the call, even if another one has skipped it. */
     for (auto interceptor_ptr : interceptor_ptr_vec)
     {
         if (interceptor_ptr->should_execute_call(in_call,
@@ -98,29 +150,25 @@ bool Replay::ReplayEngineDLL::ReplayEngine::execute_call(const Capture::APIDumpL
 
     if (should_execute)
     {
-        const auto executor_iterator = m_executor_ptr_map.find(Capture::APIDumpLoader::get_api_group(in_call.func) );
+        const auto group = Capture::APIDumpLoader::get_api_group(in_call.func);
 
-        if (executor_iterator == m_executor_ptr_map.end() )
+        if (m_executors.has_executor(group) == false)
         {
             fail("The workload holds a call of an unknown API.");
 
             goto end;
         }
 
-        if (executor_iterator->second->execute(in_call,
-                                               m_walker,
-                                              &error) == false)
+        if (m_executors.get_executor_ptr(group)->execute(in_call,
+                                                         in_chunk_source,
+                                                        &error) == false)
         {
             fail(error);
 
             goto end;
         }
 
-        {
-            std::lock_guard<std::mutex> lock(m_control.mutex);
-
-            m_control.n_calls_executed++;
-        }
+        m_control.n_calls_executed++;
     }
 
     for (auto interceptor_ptr : interceptor_ptr_vec)
@@ -149,36 +197,34 @@ void Replay::ReplayEngineDLL::ReplayEngine::fail(const std::string& in_message)
     notify_error(in_message);
 }
 
-std::vector<Replay::ReplayEngineDLL::ICallExecutor*> Replay::ReplayEngineDLL::ReplayEngine::get_executor_ptr_vec() const
+const std::vector<Replay::ReplayEngineDLL::ICallExecutor*>& Replay::ReplayEngineDLL::ReplayEngine::get_call_executor_ptr_vec() const
 {
-    std::vector<ICallExecutor*> result_vec;
-
-    /* An executor can serve more than one API. */
-    for (const auto& executor_item : m_executor_ptr_map)
-    {
-        ICallExecutor* const executor_ptr = executor_item.second.get();
-
-        if (std::find(result_vec.begin(),
-                      result_vec.end  (),
-                      executor_ptr) == result_vec.end() )
-        {
-            result_vec.push_back(executor_ptr);
-        }
-    }
-
-    return result_vec;
+    return m_executors.get_executor_ptr_vec();
 }
 
-std::vector<Replay::ReplayEngineDLL::IReplayObserver*> Replay::ReplayEngineDLL::ReplayEngine::get_observer_ptr_vec() const
+const Replay::ReplayEngineDLL::IChunkSource& Replay::ReplayEngineDLL::ReplayEngine::get_chunk_source() const
 {
-    std::lock_guard<std::mutex> lock(m_listeners.mutex);
+    return m_walker;
+}
 
-    return m_listeners.observer_ptr_vec;
+uint32_t Replay::ReplayEngineDLL::ReplayEngine::get_n_frames_presented() const
+{
+    return m_control.n_frames_presented;
 }
 
 Replay::ReplayEngineDLL::IPlaybackController* Replay::ReplayEngineDLL::ReplayEngine::get_playback_controller_ptr()
 {
     return this;
+}
+
+Replay::ReplayEngineDLL::ObjectRemapper* Replay::ReplayEngineDLL::ReplayEngine::get_remapper_ptr()
+{
+    return &m_remapper;
+}
+
+const Capture::APIDumpLoader::Workload& Replay::ReplayEngineDLL::ReplayEngine::get_segment() const
+{
+    return m_walker.get_segment();
 }
 
 Replay::ReplayEngineDLL::PlaybackStatus Replay::ReplayEngineDLL::ReplayEngine::get_status() const
@@ -229,40 +275,42 @@ end:
 
 void Replay::ReplayEngineDLL::ReplayEngine::notify_error(const std::string& in_message)
 {
-    const auto observer_ptr_vec = get_observer_ptr_vec();
-
-    for (auto observer_ptr : observer_ptr_vec)
-    {
-        observer_ptr->on_error(in_message);
-    }
+    m_observers.for_each([&](IReplayObserver* in_observer_ptr)
+                         {
+                             in_observer_ptr->on_error(in_message);
+                         });
 }
 
 void Replay::ReplayEngineDLL::ReplayEngine::notify_frame_presented(const uint32_t& in_n_frame)
 {
-    const auto observer_ptr_vec = get_observer_ptr_vec();
-
-    for (auto observer_ptr : observer_ptr_vec)
-    {
-        observer_ptr->on_frame_presented(in_n_frame);
-    }
+    m_observers.for_each([&](IReplayObserver* in_observer_ptr)
+                         {
+                             in_observer_ptr->on_frame_presented(in_n_frame);
+                         });
 }
 
 void Replay::ReplayEngineDLL::ReplayEngine::notify_idle()
 {
-    for (const auto executor_ptr : get_executor_ptr_vec() )
+    for (const auto executor_ptr : m_executors.get_executor_ptr_vec() )
     {
         executor_ptr->on_idle();
     }
 }
 
+void Replay::ReplayEngineDLL::ReplayEngine::notify_window_closed()
+{
+    m_observers.for_each([](IReplayObserver* in_observer_ptr)
+                         {
+                             in_observer_ptr->on_window_closed();
+                         });
+}
+
 void Replay::ReplayEngineDLL::ReplayEngine::notify_window_placed(const WindowPlacement& in_placement)
 {
-    const auto observer_ptr_vec = get_observer_ptr_vec();
-
-    for (auto observer_ptr : observer_ptr_vec)
-    {
-        observer_ptr->on_window_placed(in_placement);
-    }
+    m_observers.for_each([&](IReplayObserver* in_observer_ptr)
+                         {
+                             in_observer_ptr->on_window_placed(in_placement);
+                         });
 }
 
 void Replay::ReplayEngineDLL::ReplayEngine::pause()
@@ -289,14 +337,19 @@ void Replay::ReplayEngineDLL::ReplayEngine::play_until_frame_boundary()
 
     set_state(PlaybackState::PLAYING);
 
-    /* A pause, or a reset, must not make the replay hurry to catch up. */
-    m_pacer.reset();
+    m_frame_executor_ptr->on_play_started();
 
     while (is_done == false)
     {
-        const Capture::APIDumpLoader::DumpedAPICall* call_ptr = nullptr;
+        bool has_workload_ended = false;
 
-        if (m_walker.read_next_call(&call_ptr) == false)
+        if (m_frame_executor_ptr->execute_frame(this,
+                                               &has_workload_ended) == false)
+        {
+            is_done = true;
+        }
+        else
+        if (has_workload_ended)
         {
             {
                 std::lock_guard<std::mutex> lock(m_control.mutex);
@@ -307,62 +360,17 @@ void Replay::ReplayEngineDLL::ReplayEngine::play_until_frame_boundary()
             set_state(PlaybackState::FINISHED);
 
             is_done = true;
-
-            continue;
         }
-
-        const bool is_frame_boundary = Capture::APIDumpLoader::is_frame_boundary(*call_ptr);
-
-        if (is_frame_boundary)
+        else
         {
-            m_pacer.wait_for_frame(call_ptr->timestamp_qpc,
-                                   m_walker.get_segment().qpc_frequency);
-        }
-
-        if (execute_call(*call_ptr) == false)
-        {
-            is_done = true;
-
-            continue;
-        }
-
-        if (is_frame_boundary)
-        {
-            for (const auto executor_ptr : get_executor_ptr_vec() )
-            {
-                executor_ptr->on_frame_presented();
-            }
-
-            bool     is_interrupted = false;
-            uint32_t n_frame        = 0;
-            bool     should_stop    = false;
-
-            {
-                std::lock_guard<std::mutex> lock(m_control.mutex);
-
-                n_frame        = m_control.n_frames_presented;
-                is_interrupted = (m_control.is_reset_requested ||
-                                  m_control.is_stop_requested);
-                should_stop    = (is_interrupted ||
-                                  m_control.should_play == false);
-
-                m_control.n_frames_presented++;
-            }
-
-            notify_frame_presented(n_frame);
-
-            if (should_stop)
-            {
-                /* A reset or a stop is handled by the caller; only a pause leaves a state to set. */
-                if (is_interrupted == false)
-                {
-                    set_state(PlaybackState::PAUSED);
-                }
-
-                is_done = true;
-            }
+            complete_frame(&is_done);
         }
     }
+}
+
+bool Replay::ReplayEngineDLL::ReplayEngine::read_next_call(const Capture::APIDumpLoader::DumpedAPICall** out_call_ptr_ptr)
+{
+    return m_walker.read_next_call(out_call_ptr_ptr);
 }
 
 void Replay::ReplayEngineDLL::ReplayEngine::remove_call_interceptor(ICallInterceptor* in_interceptor_ptr)
@@ -373,16 +381,13 @@ void Replay::ReplayEngineDLL::ReplayEngine::remove_call_interceptor(ICallInterce
                                                       m_listeners.interceptor_ptr_vec.end  (),
                                                       in_interceptor_ptr),
                                           m_listeners.interceptor_ptr_vec.end() );
+
+    m_listeners.n_interceptors = m_listeners.interceptor_ptr_vec.size();
 }
 
 void Replay::ReplayEngineDLL::ReplayEngine::remove_replay_observer(IReplayObserver* in_observer_ptr)
 {
-    std::lock_guard<std::mutex> lock(m_listeners.mutex);
-
-    m_listeners.observer_ptr_vec.erase(std::remove(m_listeners.observer_ptr_vec.begin(),
-                                                   m_listeners.observer_ptr_vec.end  (),
-                                                   in_observer_ptr),
-                                       m_listeners.observer_ptr_vec.end() );
+    m_observers.remove(in_observer_ptr);
 }
 
 void Replay::ReplayEngineDLL::ReplayEngine::reset()
@@ -400,7 +405,7 @@ void Replay::ReplayEngineDLL::ReplayEngine::reset()
 void Replay::ReplayEngineDLL::ReplayEngine::reset_executors(const bool& in_is_final)
 {
     /* The executors which came later depend on the ones which came earlier (a device needs its window). */
-    const auto executor_ptr_vec = get_executor_ptr_vec();
+    const auto executor_ptr_vec = m_executors.get_executor_ptr_vec();
 
     for (auto iterator  = executor_ptr_vec.rbegin();
               iterator != executor_ptr_vec.rend  ();
@@ -424,6 +429,8 @@ bool Replay::ReplayEngineDLL::ReplayEngine::rewind()
     std::string error;
     const bool  is_rewound = m_walker.rewind(&error);
 
+    m_frame_executor_ptr->on_rewind();
+
     reset_executors(false); /* in_is_final */
 
     {
@@ -442,9 +449,10 @@ bool Replay::ReplayEngineDLL::ReplayEngine::rewind()
     return is_rewound;
 }
 
-void Replay::ReplayEngineDLL::ReplayEngine::set_speed(const double& in_speed)
+void Replay::ReplayEngineDLL::ReplayEngine::set_frame_executor(IFrameExecutor* in_executor_ptr)
 {
-    m_pacer.set_speed(in_speed);
+    m_frame_executor_ptr = (in_executor_ptr != nullptr) ? in_executor_ptr
+                                                        : &m_default_frame_executor;
 }
 
 void Replay::ReplayEngineDLL::ReplayEngine::set_state(const PlaybackState& in_state)
@@ -460,13 +468,19 @@ void Replay::ReplayEngineDLL::ReplayEngine::set_state(const PlaybackState& in_st
 
     if (old_state != in_state)
     {
-        const auto observer_ptr_vec = get_observer_ptr_vec();
+        m_observers.for_each([&](IReplayObserver* in_observer_ptr)
+                             {
+                                 in_observer_ptr->on_state_changed(old_state,
+                                                                   in_state);
+                             });
+    }
+}
 
-        for (auto observer_ptr : observer_ptr_vec)
-        {
-            observer_ptr->on_state_changed(old_state,
-                                           in_state);
-        }
+void Replay::ReplayEngineDLL::ReplayEngine::set_windows_visible(const bool& in_are_visible)
+{
+    for (const auto executor_ptr : m_executors.get_executor_ptr_vec() )
+    {
+        executor_ptr->set_windows_visible(in_are_visible);
     }
 }
 
@@ -474,16 +488,13 @@ void Replay::ReplayEngineDLL::ReplayEngine::thread_main()
 {
     constexpr std::chrono::milliseconds IDLE_INTERVAL(10);
 
-    /* Sleep() is exact to a millisecond only if asked for. */
-    ::timeBeginPeriod(1);
-
     const auto can_proceed_func = [this]()
     {
         const bool is_playable = (m_control.state == PlaybackState::IDLE ||
                                   m_control.state == PlaybackState::PAUSED);
 
-        return (m_control.is_reset_requested ||
-                m_control.is_stop_requested  ||
+        return (m_control.is_reset_requested           ||
+                m_control.is_stop_requested            ||
                 (m_control.should_play && is_playable) );
     };
     bool is_stopping = false;
@@ -537,6 +548,4 @@ void Replay::ReplayEngineDLL::ReplayEngine::thread_main()
     }
 
     reset_executors(true); /* in_is_final */
-
-    ::timeEndPeriod(1);
 }

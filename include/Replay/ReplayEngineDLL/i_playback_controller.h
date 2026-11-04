@@ -32,10 +32,6 @@ namespace Replay
              */
             virtual void reset() = 0;
 
-            /* The pace of the replay: 1 is the pace at which the dumped process presented its frames, 2 is twice as fast, 0 is as
-             * fast as the machine can go. Takes effect at once.
-             */
-            virtual void set_speed(const double& in_speed) = 0;
         };
     }
 }

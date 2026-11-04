@@ -42,6 +42,9 @@ namespace Replay
             void on_state_changed  (const Replay::ReplayEngineDLL::PlaybackState& in_old_state,
                                             const Replay::ReplayEngineDLL::PlaybackState& in_new_state) override;
 
+            /* The application closed its window: nothing to do here, the replay goes on. */
+            void on_window_closed() override;
+
             /* The window which the replay puts in place decides where this one goes: below it, in the middle. Any thread. */
             void on_window_placed(const Replay::ReplayEngineDLL::WindowPlacement& in_placement) override;
 

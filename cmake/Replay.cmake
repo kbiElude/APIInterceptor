@@ -2,14 +2,22 @@
 # The replayer needs the D3D8 description of the interceptor (D3D8Utils).
 if (APIINTERCEPTOR_BUILD_INTERCEPTOR AND APIINTERCEPTOR_BUILD_LIBS)
     file(GLOB ReplayEngineDLLIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Replay/ReplayEngineDLL/*.h")
-    file(GLOB ReplayEngineDLLSources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL/*.cpp"
+    file(GLOB ReplayEngineCoreSources CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL/*.cpp"
                                                         "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL/*.h")
 
-    add_library(ReplayEngineDLL SHARED ${ReplayEngineDLLIncludes} ${ReplayEngineDLLSources})
+    # The engine itself. A program which replays more than the plain sequence of calls links it and plugs its own executors
+    # and frame executor in (see ReplayEngine); the DLL below is the engine as the player uses it.
+    list(REMOVE_ITEM ReplayEngineCoreSources "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL/entrypoints.cpp")
+
+    add_library(ReplayEngineCore STATIC ${ReplayEngineDLLIncludes} ${ReplayEngineCoreSources})
+
+    target_include_directories(ReplayEngineCore PUBLIC "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL")
+    target_link_libraries     (ReplayEngineCore PUBLIC APIDumpLoader D3D8Utils gdi32 opengl32 user32 winmm)
+
+    add_library(ReplayEngineDLL SHARED ${ReplayEngineDLLIncludes} "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL/entrypoints.cpp")
 
     target_compile_definitions(ReplayEngineDLL PRIVATE REPLAYENGINEDLL_BUILDING_DLL)
-    target_include_directories(ReplayEngineDLL PRIVATE "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL")
-    target_link_libraries     (ReplayEngineDLL APIDumpLoader D3D8Utils gdi32 opengl32 user32 winmm)
+    target_link_libraries     (ReplayEngineDLL ReplayEngineCore)
 
     # The control window of the player. Win32 + Direct3D 11 backends of Dear ImGui.
     add_library(ImGui STATIC "${APIInterceptor_SOURCE_DIR}/deps/imgui/imgui.cpp"
@@ -37,5 +45,5 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR AND APIINTERCEPTOR_BUILD_LIBS)
     endif()
 
     source_group ("Replay Engine include files" FILES ${ReplayEngineDLLIncludes})
-    source_group ("Replay Engine source files"  FILES ${ReplayEngineDLLSources})
+    source_group ("Replay Engine source files"  FILES ${ReplayEngineCoreSources})
 endif()

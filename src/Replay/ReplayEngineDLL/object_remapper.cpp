@@ -10,8 +10,8 @@ Replay::ReplayEngineDLL::ObjectRemapper::ObjectRemapper()
 }
 
 void Replay::ReplayEngineDLL::ObjectRemapper::add(const ObjectKind& in_kind,
-                                                  const uint64_t&   in_dumped_value,
-                                                  const uint64_t&   in_live_value)
+                                                    const uint64_t&   in_dumped_value,
+                                                    const uint64_t&   in_live_value)
 {
     m_live_value_map[std::make_pair(in_kind,
                                     in_dumped_value)] = in_live_value;
@@ -23,8 +23,8 @@ void Replay::ReplayEngineDLL::ObjectRemapper::clear()
 }
 
 bool Replay::ReplayEngineDLL::ObjectRemapper::get(const ObjectKind& in_kind,
-                                                  const uint64_t&   in_dumped_value,
-                                                  uint64_t*         out_live_value_ptr) const
+                                                    const uint64_t&   in_dumped_value,
+                                                    uint64_t*         out_live_value_ptr) const
 {
     bool result = false;
 
@@ -52,7 +52,7 @@ end:
 }
 
 void Replay::ReplayEngineDLL::ObjectRemapper::remove(const ObjectKind& in_kind,
-                                                     const uint64_t&   in_dumped_value)
+                                                       const uint64_t&   in_dumped_value)
 {
     m_live_value_map.erase(std::make_pair(in_kind,
                                           in_dumped_value) );

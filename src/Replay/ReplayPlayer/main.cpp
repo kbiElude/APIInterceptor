@@ -3,7 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  *
  * Replays a workload file. This is the front-end of APIDumpReplayer.dll: a window with the playback controls, or the
- * console (--console), which also gives the speed.
+ * console (--console).
  */
 #include "Replay/ReplayEngineDLL/entrypoints.h"
 #include "control_window.h"
@@ -32,6 +32,7 @@ namespace Replay
             void on_frame_presented(const uint32_t&                       in_n_frame) override;
             void on_state_changed  (const Replay::ReplayEngineDLL::PlaybackState& in_old_state,
                                             const Replay::ReplayEngineDLL::PlaybackState& in_new_state) override;
+            void on_window_closed  ()                                                                  override;
             void on_window_placed  (const Replay::ReplayEngineDLL::WindowPlacement& in_placement) override;
 
         private:
@@ -104,6 +105,11 @@ void Replay::ReplayPlayer::ConsoleObserver::on_state_changed(const Replay::Repla
     }
 }
 
+void Replay::ReplayPlayer::ConsoleObserver::on_window_closed()
+{
+    /* Stub */
+}
+
 void Replay::ReplayPlayer::ConsoleObserver::on_window_placed(const Replay::ReplayEngineDLL::WindowPlacement& in_placement)
 {
     (void) in_placement;
@@ -167,7 +173,7 @@ int Replay::ReplayPlayer::run(int   in_argc,
                 "Usage: ReplayPlayer [--console] [file.workload]\n"
                 "Without a file, a window asks for one. The window has the play / pause and reset buttons. With --console,\n"
                 "the commands are typed instead:\n"
-                "p = play / pause, r = reset, s = status, x <speed> = speed (1 = the recorded pace, 0 = unlimited), q = quit\n");
+                "p = play / pause, r = reset, s = status, q = quit\n");
 
         goto end;
     }
@@ -302,13 +308,6 @@ void Replay::ReplayPlayer::run_console(Replay::ReplayEngineDLL::IPlaybackControl
                     StateNames::get_state_name_ptr(status.state),
                     static_cast<unsigned long long>(status.n_calls_executed),
                     status.n_frames_presented);
-        }
-
-        if (command.compare(0,
-                            2,
-                            "x ") == 0)
-        {
-            in_controller_ptr->set_speed(::atof(command.c_str() + 2) );
         }
     }
 }

@@ -8,7 +8,7 @@
 #include "Khronos/GL/glcorearb.h"
 
 Replay::ReplayEngineDLL::GlMappingReplayer::GlMappingReplayer(GlReplayContext* in_context_ptr,
-                                                              ResolveFunc      in_resolve_func)
+                                                                ResolveFunc      in_resolve_func)
     :m_context_ptr (in_context_ptr),
      m_resolve_func(in_resolve_func)
 {
@@ -16,8 +16,8 @@ Replay::ReplayEngineDLL::GlMappingReplayer::GlMappingReplayer(GlReplayContext* i
 }
 
 bool Replay::ReplayEngineDLL::GlMappingReplayer::flush(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                                const bool&                         in_is_named,
-                                                                std::string*                        out_error_ptr)
+                                                         const bool&                                  in_is_named,
+                                                         std::string*                                 out_error_ptr)
 {
     constexpr size_t N_ARGUMENT_DATA   = 3;
     constexpr size_t N_ARGUMENT_LENGTH = 2;
@@ -72,7 +72,7 @@ bool Replay::ReplayEngineDLL::GlMappingReplayer::flush(const Capture::APIDumpLoa
             {
                 flush_func_ptr(m_context_ptr->map_name(ObjectKind::BUFFER,
                                                        get_first_argument(in_call)),
-                               static_cast<GLintptr>(offset),
+                               static_cast<GLintptr>  (offset),
                                static_cast<GLsizeiptr>(length) );
             }
         }
@@ -82,8 +82,8 @@ bool Replay::ReplayEngineDLL::GlMappingReplayer::flush(const Capture::APIDumpLoa
 
             if (flush_func_ptr != nullptr)
             {
-                flush_func_ptr(get_first_argument(in_call),
-                               static_cast<GLintptr>(offset),
+                flush_func_ptr(get_first_argument     (in_call),
+                               static_cast<GLintptr>  (offset),
                                static_cast<GLsizeiptr>(length) );
             }
         }
@@ -109,7 +109,7 @@ uint32_t Replay::ReplayEngineDLL::GlMappingReplayer::get_first_argument(const Ca
 }
 
 uint64_t Replay::ReplayEngineDLL::GlMappingReplayer::get_mapping_key(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                                              const bool&                         in_is_named) const
+                                                                       const bool&                                  in_is_named) const
 {
     /* The mappings of named buffers are kept apart from those of the binding points. */
     constexpr uint64_t NAMED_BUFFER_KEY_FLAG = 0x100000000ull;
@@ -138,9 +138,9 @@ bool Replay::ReplayEngineDLL::GlMappingReplayer::is_mapping_function(const APIIn
 }
 
 bool Replay::ReplayEngineDLL::GlMappingReplayer::map(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                              const bool&                         in_is_named,
-                                                              const bool&                         in_is_range,
-                                                              std::string*                        out_error_ptr)
+                                                       const bool&                                  in_is_named,
+                                                       const bool&                                  in_is_range,
+                                                       std::string*                                 out_error_ptr)
 {
     constexpr size_t N_ARGUMENT_ACCESS         = 1;
     constexpr size_t N_ARGUMENT_LENGTH         = 2;
@@ -212,7 +212,7 @@ bool Replay::ReplayEngineDLL::GlMappingReplayer::map(const Capture::APIDumpLoade
 
             data_ptr = (map_func_ptr != nullptr) ? map_func_ptr(buffer,
                                                                 access)
-                                            : nullptr;
+                                                 : nullptr;
         }
         else
         {
@@ -222,7 +222,7 @@ bool Replay::ReplayEngineDLL::GlMappingReplayer::map(const Capture::APIDumpLoade
                                                                 static_cast<GLintptr>(offset),
                                                                 static_cast<GLsizeiptr>(length),
                                                                 access)
-                                            : nullptr;
+                                                 : nullptr;
         }
     }
     else
@@ -230,7 +230,7 @@ bool Replay::ReplayEngineDLL::GlMappingReplayer::map(const Capture::APIDumpLoade
         if (in_is_range == false)
         {
             const auto get_func_ptr = reinterpret_cast<PFNGETPARAMPROC>(m_resolve_func("glGetBufferParameteriv") );
-            const auto map_func_ptr = reinterpret_cast<PFNMAPPROC>(m_resolve_func("glMapBuffer") );
+            const auto map_func_ptr = reinterpret_cast<PFNMAPPROC>     (m_resolve_func("glMapBuffer") );
 
             if (get_func_ptr != nullptr)
             {
@@ -242,7 +242,7 @@ bool Replay::ReplayEngineDLL::GlMappingReplayer::map(const Capture::APIDumpLoade
             length   = buffer_size;
             data_ptr = (map_func_ptr != nullptr) ? map_func_ptr(target_or_buffer,
                                                                 access)
-                                            : nullptr;
+                                                 : nullptr;
         }
         else
         {
@@ -275,7 +275,7 @@ end:
 }
 
 bool Replay::ReplayEngineDLL::GlMappingReplayer::replay(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                                 std::string*                        out_error_ptr)
+                                                          std::string*                                 out_error_ptr)
 {
     bool result = false;
 
@@ -374,8 +374,8 @@ void Replay::ReplayEngineDLL::GlMappingReplayer::reset()
 }
 
 bool Replay::ReplayEngineDLL::GlMappingReplayer::unmap(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                                const bool&                         in_is_named,
-                                                                std::string*                        out_error_ptr)
+                                                         const bool&                                  in_is_named,
+                                                         std::string*                                 out_error_ptr)
 {
     typedef GLboolean (APIENTRY* PFNUNMAPPROC)     (GLenum);
     typedef GLboolean (APIENTRY* PFNUNMAPNAMEDPROC)(GLuint);
