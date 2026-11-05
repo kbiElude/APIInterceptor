@@ -105,7 +105,17 @@ void Replay::ReplayEngineDLL::ReplayEngine::complete_frame(bool* out_is_done_ptr
 
         n_frame        = m_control.n_frames_presented;
         is_interrupted = (m_control.is_reset_requested || m_control.is_stop_requested);
-        should_stop    = (is_interrupted               || m_control.should_play       == false);
+
+        /* A frame which is the one asked for ends the playing, unless a reset is on its way: it is the frame to start over for that. */
+        if (is_interrupted == false         &&
+            m_control.has_stop_frame        &&
+            n_frame >= m_control.stop_frame)
+        {
+            m_control.has_stop_frame = false;
+            m_control.should_play    = false;
+        }
+
+        should_stop = (is_interrupted || m_control.should_play == false);
 
         m_control.n_frames_presented++;
     }
@@ -194,8 +204,9 @@ void Replay::ReplayEngineDLL::ReplayEngine::fail(const std::string& in_message)
     {
         std::lock_guard<std::mutex> lock(m_control.mutex);
 
-        m_control.error_message = in_message;
-        m_control.should_play   = false;
+        m_control.error_message  = in_message;
+        m_control.has_stop_frame = false;
+        m_control.should_play    = false;
     }
 
     set_state   (PlaybackState::FAILED);
@@ -327,7 +338,8 @@ void Replay::ReplayEngineDLL::ReplayEngine::pause()
 {
     std::lock_guard<std::mutex> lock(m_control.mutex);
 
-    m_control.should_play = false;
+    m_control.has_stop_frame = false;
+    m_control.should_play    = false;
 }
 
 void Replay::ReplayEngineDLL::ReplayEngine::play()
@@ -335,7 +347,34 @@ void Replay::ReplayEngineDLL::ReplayEngine::play()
     {
         std::lock_guard<std::mutex> lock(m_control.mutex);
 
-        m_control.should_play = true;
+        m_control.has_stop_frame = false;
+        m_control.should_play    = true;
+    }
+
+    m_control.cv.notify_all();
+}
+
+void Replay::ReplayEngineDLL::ReplayEngine::play_to_frame(const uint32_t& in_n_frame)
+{
+    {
+        std::lock_guard<std::mutex> lock(m_control.mutex);
+
+        /* The frame which was presented last is the one before the count; the replay is at the frame asked for already. */
+        const bool is_at_frame = (m_control.n_frames_presented == static_cast<uint32_t>(in_n_frame + 1) &&
+                                  m_control.is_reset_requested == false);
+
+        m_control.has_stop_frame = (is_at_frame == false);
+        m_control.stop_frame     = in_n_frame;
+        m_control.should_play    = (is_at_frame == false);
+
+        /* A frame behind the replay is reached by starting over, which plays on (the first frame is played by it, and the playing goes on to the
+         * frame because play is asked for as well).
+         */
+        if (is_at_frame == false &&
+            m_control.n_frames_presented > in_n_frame)
+        {
+            m_control.is_reset_requested = true;
+        }
     }
 
     m_control.cv.notify_all();
@@ -364,7 +403,8 @@ void Replay::ReplayEngineDLL::ReplayEngine::play_until_frame_boundary()
             {
                 std::lock_guard<std::mutex> lock(m_control.mutex);
 
-                m_control.should_play = false;
+                m_control.has_stop_frame = false;
+                m_control.should_play    = false;
             }
 
             set_state(PlaybackState::FINISHED);
@@ -405,6 +445,7 @@ void Replay::ReplayEngineDLL::ReplayEngine::reset()
     {
         std::lock_guard<std::mutex> lock(m_control.mutex);
 
+        m_control.has_stop_frame     = false;
         m_control.is_reset_requested = true;
         m_control.should_play        = false;
     }

@@ -102,6 +102,29 @@ namespace
             return result;
         }
 
+        /* The count of the frames presented is what tells that a request was taken: the state may be the one it was. */
+        bool wait_for_frames_presented(const uint32_t& in_n_frames)
+        {
+            constexpr auto TIMEOUT = std::chrono::seconds(10);
+
+            const auto deadline = std::chrono::steady_clock::now() + TIMEOUT;
+            bool       result   = false;
+
+            while (std::chrono::steady_clock::now() < deadline)
+            {
+                if (m_engine_ptr->get_playback_controller_ptr()->get_status().n_frames_presented == in_n_frames)
+                {
+                    result = true;
+
+                    break;
+                }
+
+                std::this_thread::sleep_for(std::chrono::milliseconds(1) );
+            }
+
+            return result;
+        }
+
         Replay::ReplayEngineDLL::IReplayEngine* m_engine_ptr = nullptr;
     };
 }
@@ -218,4 +241,101 @@ TEST_F(ReplayEngineTest, SkippedCallsAreNotExecuted)
               N_FRAMES);
 
     m_engine_ptr->remove_call_interceptor(&interceptor);
+}
+
+TEST_F(ReplayEngineTest, PlayToFramePausesAfterThatFrame)
+{
+    ASSERT_TRUE(m_engine_ptr->load(Tests::WorkloadFileBuilder::get_filename_ptr(),
+                                   nullptr) );
+
+    auto* controller_ptr = m_engine_ptr->get_playback_controller_ptr();
+
+    controller_ptr->play_to_frame(1);
+
+    ASSERT_TRUE(wait_for_state(Replay::ReplayEngineDLL::PlaybackState::PAUSED) );
+
+    /* Frames 0 and 1 were presented, and nothing of the third. */
+    EXPECT_EQ(controller_ptr->get_status().n_frames_presented,
+              2u);
+    EXPECT_EQ(controller_ptr->get_status().n_calls_executed,
+              static_cast<uint64_t>(2 * (N_CALLS_PER_FRAME + 1) ));
+
+    /* The last frame is one that it can pause after, too; and play() goes on from there. */
+    controller_ptr->play_to_frame(N_FRAMES - 1);
+
+    ASSERT_TRUE(wait_for_frames_presented(N_FRAMES) );
+    ASSERT_TRUE(wait_for_state(Replay::ReplayEngineDLL::PlaybackState::PAUSED) );
+
+    EXPECT_EQ(controller_ptr->get_status().n_frames_presented,
+              N_FRAMES);
+
+    controller_ptr->play();
+
+    ASSERT_TRUE(wait_for_state(Replay::ReplayEngineDLL::PlaybackState::FINISHED) );
+}
+
+TEST_F(ReplayEngineTest, PlayToFrameBehindTheReplayStartsOverAndPausesAfterThatFrame)
+{
+    ASSERT_TRUE(m_engine_ptr->load(Tests::WorkloadFileBuilder::get_filename_ptr(),
+                                   nullptr) );
+
+    auto* controller_ptr = m_engine_ptr->get_playback_controller_ptr();
+
+    controller_ptr->play();
+
+    ASSERT_TRUE(wait_for_state(Replay::ReplayEngineDLL::PlaybackState::FINISHED) );
+
+    controller_ptr->play_to_frame(1);
+
+    ASSERT_TRUE(wait_for_state(Replay::ReplayEngineDLL::PlaybackState::PAUSED) );
+
+    /* It started over: the calls and the frames are those of frames 0 and 1 alone. */
+    EXPECT_EQ(controller_ptr->get_status().n_frames_presented,
+              2u);
+    EXPECT_EQ(controller_ptr->get_status().n_calls_executed,
+              static_cast<uint64_t>(2 * (N_CALLS_PER_FRAME + 1) ));
+
+    controller_ptr->play_to_frame(0);
+
+    ASSERT_TRUE(wait_for_frames_presented(1u) );
+    ASSERT_TRUE(wait_for_state(Replay::ReplayEngineDLL::PlaybackState::PAUSED) );
+
+    EXPECT_EQ(controller_ptr->get_status().n_frames_presented,
+              1u);
+}
+
+TEST_F(ReplayEngineTest, PlayToTheFrameTheReplayIsAtLeavesItAlone)
+{
+    ASSERT_TRUE(m_engine_ptr->load(Tests::WorkloadFileBuilder::get_filename_ptr(),
+                                   nullptr) );
+
+    auto* controller_ptr = m_engine_ptr->get_playback_controller_ptr();
+
+    controller_ptr->play_to_frame(1);
+
+    ASSERT_TRUE(wait_for_state(Replay::ReplayEngineDLL::PlaybackState::PAUSED) );
+
+    controller_ptr->play_to_frame(1);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100) );
+
+    EXPECT_EQ(controller_ptr->get_status().state,
+              Replay::ReplayEngineDLL::PlaybackState::PAUSED);
+    EXPECT_EQ(controller_ptr->get_status().n_frames_presented,
+              2u);
+}
+
+TEST_F(ReplayEngineTest, PlayToAFrameBeyondTheEndFinishesTheReplay)
+{
+    ASSERT_TRUE(m_engine_ptr->load(Tests::WorkloadFileBuilder::get_filename_ptr(),
+                                   nullptr) );
+
+    auto* controller_ptr = m_engine_ptr->get_playback_controller_ptr();
+
+    controller_ptr->play_to_frame(1000);
+
+    ASSERT_TRUE(wait_for_state(Replay::ReplayEngineDLL::PlaybackState::FINISHED) );
+
+    EXPECT_EQ(controller_ptr->get_status().n_frames_presented,
+              N_FRAMES);
 }

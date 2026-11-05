@@ -54,6 +54,7 @@ namespace Replay
                                                                                 std::string*                                  out_error_ptr) override;
             void                                    pause                      ()                                                                 override;
             void                                    play                       ()                                                                 override;
+            void                                    play_to_frame              (const uint32_t&                               in_n_frame)         override;
             bool                                    read_next_call             (const Capture::APIDumpLoader::DumpedAPICall** out_call_ptr_ptr)   override;
             void                                    remove_call_interceptor    (ICallInterceptor*                             in_interceptor_ptr) override;
             void                                    remove_replay_observer     (IReplayObserver*                              in_observer_ptr)    override;
@@ -67,6 +68,7 @@ namespace Replay
             {
                 std::condition_variable cv;
                 std::string             error_message;
+                bool                    has_stop_frame     = false; /* the replay pauses after the frame which stop_frame says */
                 bool                    is_reset_requested = false;
                 bool                    is_stop_requested  = false;
                 std::mutex              mutex;
@@ -74,6 +76,7 @@ namespace Replay
                 std::atomic<uint32_t>   n_frames_presented{0};
                 bool                    should_play        = false;
                 PlaybackState           state              = PlaybackState::IDLE;
+                uint32_t                stop_frame         = 0;
             };
 
             /* Lock order: Control::mutex is never held while a listener is called. */

@@ -6,6 +6,7 @@
 #define REPLAYENGINEDLL_I_FRAME_EXECUTOR_H
 
 #include "Capture/APIDumpLoader/APIDumpLoader.h"
+#include "Capture/APIDumpLoader/api_info.h"
 #include "i_call_executor.h"
 #include "i_chunk_source.h"
 #include <stdint.h>
