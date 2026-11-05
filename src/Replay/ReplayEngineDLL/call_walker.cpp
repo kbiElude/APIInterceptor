@@ -246,10 +246,11 @@ bool Replay::ReplayEngineDLL::CallWalker::start_reader(const char*     in_filena
     /* Segments are decompressed and read by threads of the loader, which a replay needs: playing the first frames of a long workload means
      * reading all the segments before them. A segment held is some 100 to 200 MB, and the replay of a 32-bit application is a 32-bit process
      * with two gigabytes to put them in (the segments being read, this walker's own two, and the one that is being freed), so it has a few. What
-     * more threads would do (the work is of the memory) is not worth the risk of running out.
+     * more threads would do for segments that are read in full (the work is of the memory) is not worth the risk of running out.
      */
-    constexpr uint32_t N_READER_THREADS_32_BIT = 3;
-    constexpr uint32_t N_READER_THREADS_64_BIT = 6;
+    constexpr uint32_t N_READER_THREADS_32_BIT   = 3;
+    constexpr uint32_t N_READER_THREADS_64_BIT   = 6;
+    constexpr uint32_t N_READER_THREADS_FILTERED = 6; /* when chunks are left out: see below */
 
     const uint32_t                                  n_threads_wanted = (sizeof(void*) == sizeof(uint32_t) ) ? N_READER_THREADS_32_BIT
                                                                                                            : N_READER_THREADS_64_BIT;
@@ -282,6 +283,18 @@ bool Replay::ReplayEngineDLL::CallWalker::start_reader(const char*     in_filena
         {
             reader_options.chunk_wanted_func = Capture::APIDumpLoader::ChunkWantedFunc();
         }
+    }
+
+    /* With the chunks of the frames that nothing reads left out, the segments are small (a few MB, and not 100 to 200), and what takes the time is the
+     * decompression, which more threads speed up: a seek to a frame of Kasparov takes 6.5 s with 3 threads, 4.9 s with 6, 4.8 s with 8. The peak memory of the
+     * process is 1.2 GB with 6 (0.8 GB with 3), and 1.5 GB when it plays on from the frame, with the chunks of every frame again.
+     */
+    if (reader_options.chunk_wanted_func)
+    {
+        reader_options.n_threads            = std::min<uint32_t>(std::max<uint32_t>(n_threads_wanted,
+                                                                                    N_READER_THREADS_FILTERED),
+                                                                 n_cores - 1);
+        reader_options.n_segments_in_flight = reader_options.n_threads + 1;
     }
 
     Capture::APIDumpLoader::WorkloadReaderUniquePtr reader_ptr = Capture::APIDumpLoader::WorkloadReader::create(in_filename_ptr,
