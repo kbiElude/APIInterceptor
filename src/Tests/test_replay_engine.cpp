@@ -6,7 +6,10 @@
  */
 #include <gtest/gtest.h>
 #include "Replay/ReplayEngineDLL/entrypoints.h"
+#include "Replay/ReplayEngineDLL/replay_engine.h"
+#include "Replay/ReplayEngineDLL/sequential_frame_executor.h"
 #include "workload_file_builder.h"
+#include <atomic>
 #include <chrono>
 #include <thread>
 
@@ -14,6 +17,20 @@ namespace
 {
     constexpr uint32_t N_CALLS_PER_FRAME = 2;
     constexpr uint32_t N_FRAMES          = 3;
+
+    /* Takes its time to go back to the start, as a replay of a window and a device does. */
+    class SlowRewindExecutor : public Replay::ReplayEngineDLL::SequentialFrameExecutor
+    {
+    public:
+        void on_rewind() override
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(300) );
+
+            n_rewinds_done++;
+        }
+
+        std::atomic<uint32_t> n_rewinds_done {0};
+    };
 
     /* Pauses the replay, or skips the calls, as told. */
     class TestInterceptor : public Replay::ReplayEngineDLL::ICallInterceptor
@@ -369,4 +386,81 @@ TEST_F(ReplayEngineTest, TheReplayIsNotSeekingOnceItHasReachedTheFrameItWasAsked
     ASSERT_TRUE(wait_for_state(Replay::ReplayEngineDLL::PlaybackState::FINISHED) );
 
     EXPECT_FALSE(controller_ptr->get_status().is_seeking);
+}
+
+TEST_F(ReplayEngineTest, ResetFollowedByPlayToTheFrameTheReplayIsAtShowsThatFrameAgain)
+{
+    ASSERT_TRUE(m_engine_ptr->load(Tests::WorkloadFileBuilder::get_filename_ptr(),
+                                   nullptr) );
+
+    auto* controller_ptr = m_engine_ptr->get_playback_controller_ptr();
+
+    controller_ptr->play_to_frame(N_FRAMES - 1);
+
+    ASSERT_TRUE(wait_for_frames_presented(N_FRAMES) );
+    ASSERT_TRUE(wait_for_state(Replay::ReplayEngineDLL::PlaybackState::PAUSED) );
+
+    controller_ptr->reset();
+    controller_ptr->play_to_frame(N_FRAMES - 1);
+
+    /* The replay starts over, so the count falls to 0 and climbs again; the wait is for the state of the end. */
+    std::this_thread::sleep_for(std::chrono::milliseconds(500) );
+
+    EXPECT_EQ(controller_ptr->get_status().n_frames_presented,
+              N_FRAMES);
+    EXPECT_EQ(controller_ptr->get_status().state,
+              Replay::ReplayEngineDLL::PlaybackState::PAUSED);
+}
+
+TEST_F(ReplayEngineTest, PlayToTheFrameAskedForWhileTheReplayRewindsForAResetIsNotTakenForBeingAtIt)
+{
+    constexpr auto TIMEOUT = std::chrono::seconds(10);
+
+    SlowRewindExecutor                    executor;
+    Replay::ReplayEngineDLL::ReplayEngine engine;
+
+    engine.set_frame_executor(&executor);
+
+    ASSERT_TRUE(engine.load(Tests::WorkloadFileBuilder::get_filename_ptr(),
+                            nullptr) );
+
+    engine.play_to_frame(N_FRAMES - 1);
+
+    auto deadline = std::chrono::steady_clock::now() + TIMEOUT;
+
+    while (engine.get_status().n_frames_presented < N_FRAMES &&
+           std::chrono::steady_clock::now()       < deadline)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1) );
+    }
+
+    ASSERT_EQ(engine.get_status().n_frames_presented,
+              N_FRAMES);
+
+    const uint32_t n_rewinds_before = executor.n_rewinds_done;
+
+    /* The replay thread has taken the reset and is rewinding when the frame is asked for: the count of the frames must not be the old one, or the
+     * replay is taken to be at the frame already.
+     */
+    engine.reset();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100) );
+
+    engine.play_to_frame(N_FRAMES - 1);
+
+    deadline = std::chrono::steady_clock::now() + TIMEOUT;
+
+    while (executor.n_rewinds_done            == n_rewinds_before &&
+           std::chrono::steady_clock::now()   <  deadline)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1) );
+    }
+
+    /* The replay plays on to the frame after the rewind; the frames are a few calls. */
+    std::this_thread::sleep_for(std::chrono::milliseconds(300) );
+
+    EXPECT_EQ(engine.get_status().n_frames_presented,
+              N_FRAMES);
+    EXPECT_EQ(engine.get_status().state,
+              Replay::ReplayEngineDLL::PlaybackState::PAUSED);
 }

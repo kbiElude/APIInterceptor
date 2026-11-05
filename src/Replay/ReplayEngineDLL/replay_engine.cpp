@@ -590,6 +590,14 @@ void Replay::ReplayEngineDLL::ReplayEngine::thread_main()
             is_stopping                  = m_control.is_stop_requested;
             should_reset                 = m_control.is_reset_requested;
             m_control.is_reset_requested = false;
+
+            /* The rewind takes a while, and play_to_frame() in the meantime must see a replay at its start, not one at the frame it was at: that would
+             * be taken as the frame asked for.
+             */
+            if (should_reset)
+            {
+                m_control.n_frames_presented = 0;
+            }
         }
 
         if (is_stopping)
