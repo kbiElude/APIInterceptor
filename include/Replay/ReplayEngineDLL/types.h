@@ -24,6 +24,7 @@ namespace Replay
         struct PlaybackStatus
         {
             std::string   error_message;       /* set in the Failed state */
+            bool          is_seeking         = false; /* going to a frame asked for with play_to_frame, which is not the next one */
             uint64_t      n_calls_executed   = 0;
             uint32_t      n_frames_presented = 0;
             PlaybackState state              = PlaybackState::IDLE;

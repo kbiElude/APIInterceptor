@@ -339,3 +339,34 @@ TEST_F(ReplayEngineTest, PlayToAFrameBeyondTheEndFinishesTheReplay)
     EXPECT_EQ(controller_ptr->get_status().n_frames_presented,
               N_FRAMES);
 }
+
+TEST_F(ReplayEngineTest, TheReplayIsNotSeekingOnceItHasReachedTheFrameItWasAskedFor)
+{
+    ASSERT_TRUE(m_engine_ptr->load(Tests::WorkloadFileBuilder::get_filename_ptr(),
+                                   nullptr) );
+
+    auto* controller_ptr = m_engine_ptr->get_playback_controller_ptr();
+
+    EXPECT_FALSE(controller_ptr->get_status().is_seeking);
+
+    controller_ptr->play_to_frame(1);
+
+    ASSERT_TRUE(wait_for_frames_presented(2u) );
+    ASSERT_TRUE(wait_for_state(Replay::ReplayEngineDLL::PlaybackState::PAUSED) );
+
+    EXPECT_FALSE(controller_ptr->get_status().is_seeking);
+
+    /* A step to the next frame is not a seek. */
+    controller_ptr->play_to_frame(2);
+
+    ASSERT_TRUE(wait_for_frames_presented(3u) );
+    ASSERT_TRUE(wait_for_state(Replay::ReplayEngineDLL::PlaybackState::PAUSED) );
+
+    EXPECT_FALSE(controller_ptr->get_status().is_seeking);
+
+    controller_ptr->play();
+
+    ASSERT_TRUE(wait_for_state(Replay::ReplayEngineDLL::PlaybackState::FINISHED) );
+
+    EXPECT_FALSE(controller_ptr->get_status().is_seeking);
+}

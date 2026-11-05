@@ -256,6 +256,16 @@ Replay::ReplayEngineDLL::PlaybackStatus Replay::ReplayEngineDLL::ReplayEngine::g
         std::lock_guard<std::mutex> lock(m_control.mutex);
 
         result.error_message      = m_control.error_message;
+        /* Past the end there is nothing to go on to; a stop frame that is the next one is a step. */
+        const bool is_before_stop_frame = (m_control.is_reset_requested ||
+                                           m_control.stop_frame > m_control.n_frames_presented);
+        const bool is_going_on          = (m_control.state != PlaybackState::FAILED   &&
+                                           m_control.state != PlaybackState::FINISHED);
+
+        result.is_seeking         = (m_control.has_stop_frame &&
+                                     m_control.should_play    &&
+                                     is_before_stop_frame     &&
+                                     is_going_on);
         result.n_calls_executed   = m_control.n_calls_executed;
         result.n_frames_presented = m_control.n_frames_presented;
         result.state              = m_control.state;
