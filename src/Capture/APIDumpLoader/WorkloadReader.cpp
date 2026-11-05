@@ -2,6 +2,7 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
+#define ZSTD_STATIC_LINKING_ONLY /* ZSTD_d_forceIgnoreChecksum */
 #include "Capture/APIDumpLoader/SegmentDecoder.h"
 #include "Capture/APIDumpLoader/WorkloadReader.h"
 #include "Common/workload_format.h"
@@ -155,8 +156,10 @@ struct Capture::APIDumpLoader::WorkloadReader::Pipeline
     Pipeline(FrameSource*    in_frame_source_ptr,
              const uint32_t& in_n_threads,
              const uint32_t& in_n_segments_in_flight,
-             const uint32_t& in_skip_data_chunks_above_n_bytes)
+             const uint32_t& in_skip_data_chunks_above_n_bytes,
+             const bool&     in_ignores_checksums)
         :frame_source_ptr                (in_frame_source_ptr),
+         ignores_checksums               (in_ignores_checksums),
          is_damaged                      (false),
          is_producer_done                (false),
          is_stopping                     (false),
@@ -300,6 +303,13 @@ struct Capture::APIDumpLoader::WorkloadReader::Pipeline
     {
         ZSTD_DCtx* decompressor_ptr = ::ZSTD_createDCtx();
 
+        if (ignores_checksums)
+        {
+            ::ZSTD_DCtx_setParameter(decompressor_ptr,
+                                     ZSTD_d_forceIgnoreChecksum,
+                                     1);
+        }
+
         for (;;)
         {
             Job            job;
@@ -356,6 +366,7 @@ struct Capture::APIDumpLoader::WorkloadReader::Pipeline
 
     std::condition_variable    job_available_condition;
     FrameSource*               frame_source_ptr;
+    bool                       ignores_checksums; /* the decompressors do not check the checksum of a frame */
     bool                       is_damaged;        /* the producer found bytes which are not a frame        */
     bool                       is_producer_done;
     bool                       is_stopping;
@@ -500,6 +511,13 @@ Capture::APIDumpLoader::WorkloadReaderUniquePtr Capture::APIDumpLoader::Workload
     result_ptr->m_qpc_frequency                  = header.qpc_frequency;
     result_ptr->m_skip_data_chunks_above_n_bytes = in_options.skip_data_chunks_above_n_bytes;
 
+    if (in_options.ignores_checksums)
+    {
+        ::ZSTD_DCtx_setParameter(result_ptr->m_decompressor_ptr,
+                                 ZSTD_d_forceIgnoreChecksum,
+                                 1);
+    }
+
     /* The frames follow the header; a reader that is to start later is given where. */
     result_ptr->m_n_data_chunks_read = in_options.n_data_chunks_before;
 
@@ -528,7 +546,8 @@ Capture::APIDumpLoader::WorkloadReaderUniquePtr Capture::APIDumpLoader::Workload
         result_ptr->m_pipeline_ptr.reset(new Pipeline(result_ptr->m_frame_source_ptr.get(),
                                                       in_options.n_threads,
                                                       n_segments_in_flight,
-                                                      in_options.skip_data_chunks_above_n_bytes) );
+                                                      in_options.skip_data_chunks_above_n_bytes,
+                                                      in_options.ignores_checksums) );
     }
 
     goto end;

@@ -35,6 +35,11 @@ namespace Capture
             /* How a reader goes about it. */
             struct Options
             {
+                /* The checksums which the dumper writes with each compressed frame are not checked: a quarter of the time of reading a workload goes to them. For the
+                 * replay of a workload which was checked when it was made or read before; the tools which say what is in a workload check them. false: they are.
+                 */
+                bool ignores_checksums = false;
+
                 /* The segments which are being read or are waiting for the caller, at most; each is held in memory in full (a segment is as
                  * large as the dumper's memory was when it spilled). 0 is n_threads + 2.
                  */
