@@ -358,3 +358,92 @@ TEST(WorkloadReaderThreads, AReaderCanBeLetGoOfBeforeTheFileIsRead)
 
     ::remove(Tests::WorkloadFileBuilder::get_filename_ptr() );
 }
+
+TEST(WorkloadReaderThreads, ChunksWhichOnlyUnwantedCallsReferToAreLeftOut)
+{
+    std::vector<uint8_t> file_u8_vec;
+
+    /* Chunks 0 to 3 are of 1 to 4 bytes. Frame 0 refers to chunk 0, frame 1 to chunks 1 and 0, frame 2 to chunk 2; chunk 3 is referred to by none. */
+    Tests::WorkloadFileBuilder::build_chunk_references(&file_u8_vec);
+
+    for (const uint32_t n_threads : {0u, 2u})
+    {
+        for (const uint64_t wanted_frame_index : {1u, 99u})
+        {
+            Capture::APIDumpLoader::WorkloadReader::Options options;
+            Capture::APIDumpLoader::WorkloadReader::SegmentStart start;
+            Capture::APIDumpLoader::Workload                segment;
+
+            start.file_offset_n_bytes = sizeof(APIInterceptor::WorkloadFormat::WorkloadFileHeader);
+
+            options.chunk_wanted_func = [wanted_frame_index](const Capture::APIDumpLoader::DumpedAPICall&,
+                                                             const uint64_t&                              in_frame_index)
+                                        {
+                                            return (in_frame_index == wanted_frame_index);
+                                        };
+            options.n_threads         = n_threads;
+
+            options.segment_start_vec.push_back(start);
+
+            Tests::WorkloadFileBuilder::write_file(file_u8_vec);
+
+            auto reader_ptr = Capture::APIDumpLoader::WorkloadReader::create(Tests::WorkloadFileBuilder::get_filename_ptr(),
+                                                                             options);
+
+            ASSERT_NE(reader_ptr,
+                      nullptr);
+            ASSERT_TRUE(reader_ptr->read_next_segment(&segment) );
+            ASSERT_EQ(segment.data_chunk_ptr_vec.size(),
+                      4u);
+
+            /* A chunk which a wanted call refers to is read, whoever else refers to it; the numbers of the chunks stay. */
+            EXPECT_EQ(segment.data_chunk_ptr_vec.at(0)->size(),
+                      (wanted_frame_index == 1) ? 1u : 0u);
+            EXPECT_EQ(segment.data_chunk_ptr_vec.at(1)->size(),
+                      (wanted_frame_index == 1) ? 2u : 0u);
+            EXPECT_EQ(segment.data_chunk_ptr_vec.at(2)->size(),
+                      0u);
+            EXPECT_EQ(segment.data_chunk_ptr_vec.at(3)->size(),
+                      4u);
+
+            reader_ptr.reset();
+            ::remove(Tests::WorkloadFileBuilder::get_filename_ptr() );
+        }
+    }
+}
+
+TEST(WorkloadReaderThreads, ASegmentWhichTheIndexDoesNotHaveIsReadInFull)
+{
+    std::vector<uint8_t> file_u8_vec;
+
+    Tests::WorkloadFileBuilder::build_chunk_references(&file_u8_vec);
+
+    Capture::APIDumpLoader::WorkloadReader::Options options;
+    Capture::APIDumpLoader::Workload                segment;
+
+    options.chunk_wanted_func = [](const Capture::APIDumpLoader::DumpedAPICall&,
+                                   const uint64_t&)
+                                {
+                                    return false;
+                                };
+
+    Tests::WorkloadFileBuilder::write_file(file_u8_vec);
+
+    auto reader_ptr = Capture::APIDumpLoader::WorkloadReader::create(Tests::WorkloadFileBuilder::get_filename_ptr(),
+                                                                     options);
+
+    ASSERT_NE(reader_ptr,
+              nullptr);
+    ASSERT_TRUE(reader_ptr->read_next_segment(&segment) );
+
+    for (size_t n_chunk = 0;
+                n_chunk < segment.data_chunk_ptr_vec.size();
+              ++n_chunk)
+    {
+        EXPECT_EQ(segment.data_chunk_ptr_vec.at(n_chunk)->size(),
+                  n_chunk + 1);
+    }
+
+    reader_ptr.reset();
+    ::remove(Tests::WorkloadFileBuilder::get_filename_ptr() );
+}

@@ -59,6 +59,7 @@ namespace Replay
             void                                    remove_call_interceptor    (ICallInterceptor*                             in_interceptor_ptr) override;
             void                                    remove_replay_observer     (IReplayObserver*                              in_observer_ptr)    override;
             void                                    reset                      ()                                                                 override;
+            void                                    set_chunk_wanted_func      (const Capture::APIDumpLoader::ChunkWantedFunc& in_func);
             void                                    set_frame_executor         (IFrameExecutor*                               in_executor_ptr);
             void                                    set_windows_visible        (const bool&                                   in_are_visible);
 

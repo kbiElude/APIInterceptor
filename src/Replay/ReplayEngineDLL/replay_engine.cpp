@@ -500,6 +500,11 @@ bool Replay::ReplayEngineDLL::ReplayEngine::rewind()
     return is_rewound;
 }
 
+void Replay::ReplayEngineDLL::ReplayEngine::set_chunk_wanted_func(const Capture::APIDumpLoader::ChunkWantedFunc& in_func)
+{
+    m_walker.set_chunk_wanted_func(in_func);
+}
+
 void Replay::ReplayEngineDLL::ReplayEngine::set_frame_executor(IFrameExecutor* in_executor_ptr)
 {
     m_frame_executor_ptr = (in_executor_ptr != nullptr) ? in_executor_ptr

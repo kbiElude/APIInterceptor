@@ -191,6 +191,54 @@ void Tests::WorkloadFileBuilder::append_surface(std::vector<uint8_t>*       inou
                  in_data_u8_vec.size() );
 }
 
+void Tests::WorkloadFileBuilder::build_chunk_references(std::vector<uint8_t>* out_u8_vec_ptr)
+{
+    constexpr uint32_t N_FRAMES = 3;
+
+    std::vector<uint8_t> segment_u8_vec;
+
+    append_file_header(out_u8_vec_ptr);
+    append_header     (&segment_u8_vec,
+                       N_FRAMES * 2 + 1, /* a call and a SwapBuffers call for each frame, and the second reference of frame 1 */
+                       4,                /* in_n_data_chunks */
+                       0);               /* in_n_surfaces    */
+
+    for (uint32_t n_frame = 0;
+                  n_frame < N_FRAMES;
+                ++n_frame)
+    {
+        append_call_with_argument(&segment_u8_vec,
+                                  APIInterceptor::APIFUNCTION_GL_GLACCUM,
+                                  APIInterceptor::APIFunctionArgument::create_data_chunk_id(n_frame),
+                                  n_frame);
+
+        if (n_frame == 1)
+        {
+            append_call_with_argument(&segment_u8_vec,
+                                      APIInterceptor::APIFUNCTION_GL_GLACCUM,
+                                      APIInterceptor::APIFunctionArgument::create_data_chunk_id(0),
+                                      n_frame);
+        }
+
+        append_call_with_argument(&segment_u8_vec,
+                                  APIInterceptor::APIFUNCTION_GDI32_SWAPBUFFERS,
+                                  APIInterceptor::APIFunctionArgument::create_void_ptr(nullptr),
+                                  n_frame);
+    }
+
+    for (uint32_t n_chunk = 0;
+                  n_chunk < 4;
+                ++n_chunk)
+    {
+        append_chunk(&segment_u8_vec,
+                     std::vector<uint8_t>(n_chunk + 1,
+                                          static_cast<uint8_t>(n_chunk + 1) ) );
+    }
+
+    append_compressed_segment(out_u8_vec_ptr,
+                              segment_u8_vec);
+}
+
 void Tests::WorkloadFileBuilder::build_file_without_header(std::vector<uint8_t>* out_u8_vec_ptr)
 {
     append_header(out_u8_vec_ptr,

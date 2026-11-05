@@ -33,8 +33,22 @@ namespace Capture
         {
         public:
             /* How a reader goes about it. */
+            /* Where a segment is in the file and what it numbers from, as the index of the workload has it (see WorkloadIndex). */
+            struct SegmentStart
+            {
+                uint64_t file_offset_n_bytes = 0;
+                uint32_t first_data_chunk_id = 0;
+                uint64_t first_frame_index   = 0;
+            };
+
             struct Options
             {
+                /* Asked of each call, with the number of its frame: the data chunks that calls refer to and none of them wants come as empty chunks (the
+                 * chunks after them keep their numbers). For a replay that leaves out what some frames make. It is asked by the threads of the reader, as
+                 * a segment is decoded, and only of the segments that segment_start_vec has. Empty: all chunks are wanted.
+                 */
+                ChunkWantedFunc chunk_wanted_func;
+
                 /* The checksums which the dumper writes with each compressed frame are not checked: a quarter of the time of reading a workload goes to them. For the
                  * replay of a workload which was checked when it was made or read before; the tools which say what is in a workload check them. false: they are.
                  */
@@ -52,6 +66,9 @@ namespace Capture
 
                 /* The threads which read segments ahead of the caller. 0: the caller reads a segment itself when it asks for it. */
                 uint32_t n_threads = 0;
+
+                /* The segments (by file offset, ascending) whose chunks chunk_wanted_func is asked about: the segments of the workload, from its index. */
+                std::vector<SegmentStart> segment_start_vec;
 
                 /* A data chunk of more bytes than this comes as an empty one (the chunks after it keep their numbers), and is not copied
                  * anywhere: for tools which look at the calls and not at the vertices and pixels, which are most of a workload. 0: none is left out.
@@ -121,7 +138,8 @@ namespace Capture
             /* Makes a segment of the bytes of a frame. A frame which is cut is decompressed as far as it goes. */
             static void decode_frame(ZSTD_DCtx*                  in_decompressor_ptr,
                                      const std::vector<uint8_t>& in_frame_byte_vec,
-                                     const uint32_t&             in_skip_data_chunks_above_n_bytes,
+                                     const uint64_t&             in_file_offset_n_bytes,
+                                     const Options&              in_options,
                                      DecodedSegment*             out_segment_ptr);
 
             /* The next segment of the file, in order. */
@@ -133,10 +151,10 @@ namespace Capture
             bool                           m_is_finished;
             bool                           m_is_truncated;
             uint32_t                       m_n_data_chunks_read;
+            Options                        m_options;
             std::unique_ptr<Pipeline>      m_pipeline_ptr;        /* the threads, if there are any */
             uint32_t                       m_pointer_n_bytes;
             uint64_t                       m_qpc_frequency;
-            uint32_t                       m_skip_data_chunks_above_n_bytes;
         };
     }
 }

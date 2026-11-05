@@ -3,6 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "Capture/APIDumpLoader/SegmentDecoder.h"
+#include "Capture/APIDumpLoader/api_info.h"
 #include "Common/workload_format.h"
 #include <algorithm>
 #include <string.h>
@@ -185,6 +186,69 @@ bool Capture::APIDumpLoader::FrameStream::skip_bytes(const size_t& in_n_bytes)
     return (n_bytes_left == 0);
 }
 
+std::vector<bool> Capture::APIDumpLoader::SegmentDecoder::find_unwanted_chunks(const DumpedAPICallVector& in_call_vec,
+                                                                               const Options&             in_options,
+                                                                               const size_t&              in_n_chunks)
+{
+    enum class ChunkUse : uint8_t
+    {
+        NOT_REFERRED,
+        REFERRED_BY_UNWANTING_CALLS_ONLY,
+        WANTED
+    };
+
+    uint64_t              frame_index = in_options.first_frame_index;
+    std::vector<ChunkUse> use_vec(in_n_chunks,
+                                  ChunkUse::NOT_REFERRED);
+    std::vector<bool>     result(in_n_chunks,
+                                 false);
+
+    for (const auto& call : in_call_vec)
+    {
+        const bool is_wanted = in_options.chunk_wanted_func(call,
+                                                            frame_index);
+
+        for (const auto* arg_vec_ptr : {&call.arg_in_vec, &call.arg_out_vec})
+        {
+            for (const auto& arg : *arg_vec_ptr)
+            {
+                if (arg.type == APIInterceptor::ARGTYPE_DATA_CHUNK_ID)
+                {
+                    const uint32_t n_chunk = arg.get_data_chunk_id() - in_options.first_data_chunk_id;
+
+                    if (arg.get_data_chunk_id() >= in_options.first_data_chunk_id &&
+                        n_chunk                 <  in_n_chunks)
+                    {
+                        if (is_wanted)
+                        {
+                            use_vec.at(n_chunk) = ChunkUse::WANTED;
+                        }
+                        else
+                        if (use_vec.at(n_chunk) == ChunkUse::NOT_REFERRED)
+                        {
+                            use_vec.at(n_chunk) = ChunkUse::REFERRED_BY_UNWANTING_CALLS_ONLY;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (is_frame_boundary(call) )
+        {
+            frame_index++;
+        }
+    }
+
+    for (size_t n_chunk = 0;
+                n_chunk < in_n_chunks;
+              ++n_chunk)
+    {
+        result.at(n_chunk) = (use_vec.at(n_chunk) == ChunkUse::REFERRED_BY_UNWANTING_CALLS_ONLY);
+    }
+
+    return result;
+}
+
 bool Capture::APIDumpLoader::SegmentDecoder::parse_api_call(FrameStream*   inout_stream_ptr,
                                                             DumpedAPICall* out_api_call_ptr)
 {
@@ -293,6 +357,7 @@ end:
 
 bool Capture::APIDumpLoader::SegmentDecoder::parse_data_chunk(FrameStream*   inout_stream_ptr,
                                                               const Options& in_options,
+                                                              const bool&    in_is_unwanted,
                                                               DataChunk*     out_data_chunk_ptr)
 {
     uint32_t n_bytes = 0;
@@ -314,8 +379,9 @@ bool Capture::APIDumpLoader::SegmentDecoder::parse_data_chunk(FrameStream*   ino
         goto end;
     }
 
-    if (in_options.skip_data_chunks_above_n_bytes != 0           &&
-        n_bytes                                   >  in_options.skip_data_chunks_above_n_bytes)
+    if (in_is_unwanted                                           ||
+        (in_options.skip_data_chunks_above_n_bytes != 0           &&
+         n_bytes                                   >  in_options.skip_data_chunks_above_n_bytes) )
     {
         result = inout_stream_ptr->skip_bytes(n_bytes);
 
@@ -337,8 +403,9 @@ bool Capture::APIDumpLoader::SegmentDecoder::parse_segment(FrameStream*   inout_
 {
     constexpr size_t N_COUNTS = 3; /* API calls, data chunks, surfaces */
 
-    uint32_t     counts_u32vec3[N_COUNTS] = {};
-    bool         result                   = false;
+    uint32_t          counts_u32vec3[N_COUNTS] = {};
+    std::vector<bool> is_unwanted_vec;
+    bool              result                   = false;
     const size_t segment_header_n_bytes   = sizeof(uint32_t) * N_COUNTS;
 
     *out_is_truncated_ptr = false;
@@ -379,6 +446,13 @@ bool Capture::APIDumpLoader::SegmentDecoder::parse_segment(FrameStream*   inout_
         out_workload_ptr->dumped_api_call_vec_ptr->emplace_back(std::move(new_api_call) );
     }
 
+    if (in_options.chunk_wanted_func)
+    {
+        is_unwanted_vec = find_unwanted_chunks(*out_workload_ptr->dumped_api_call_vec_ptr,
+                                               in_options,
+                                               counts_u32vec3[1]);
+    }
+
     for (uint32_t n_data_chunk = 0;
                   n_data_chunk < counts_u32vec3[1];
                 ++n_data_chunk)
@@ -387,6 +461,7 @@ bool Capture::APIDumpLoader::SegmentDecoder::parse_segment(FrameStream*   inout_
 
         if (parse_data_chunk(inout_stream_ptr,
                              in_options,
+                             (is_unwanted_vec.empty() == false) && is_unwanted_vec.at(n_data_chunk),
                              new_data_chunk_ptr.get() ) == false)
         {
             *out_is_truncated_ptr = true;

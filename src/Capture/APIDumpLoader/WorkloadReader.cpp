@@ -156,7 +156,7 @@ struct Capture::APIDumpLoader::WorkloadReader::Pipeline
     Pipeline(FrameSource*    in_frame_source_ptr,
              const uint32_t& in_n_threads,
              const uint32_t& in_n_segments_in_flight,
-             const uint32_t& in_skip_data_chunks_above_n_bytes,
+             const Options&  in_options,
              const bool&     in_ignores_checksums)
         :frame_source_ptr                (in_frame_source_ptr),
          ignores_checksums               (in_ignores_checksums),
@@ -167,7 +167,7 @@ struct Capture::APIDumpLoader::WorkloadReader::Pipeline
          n_in_flight                     (0),
          n_segments_in_flight            (in_n_segments_in_flight),
          next_sequence                   (0),
-         skip_data_chunks_above_n_bytes  (in_skip_data_chunks_above_n_bytes)
+         options                         (in_options)
     {
         producer_thread = std::thread(&Pipeline::run_producer,
                                       this);
@@ -341,7 +341,8 @@ struct Capture::APIDumpLoader::WorkloadReader::Pipeline
             {
                 decode_frame(decompressor_ptr,
                              job.frame_byte_vec,
-                             skip_data_chunks_above_n_bytes,
+                             job.file_offset,
+                             options,
                             &decoded_segment);
             }
 
@@ -376,10 +377,10 @@ struct Capture::APIDumpLoader::WorkloadReader::Pipeline
     uint32_t                   n_in_flight;       /* jobs queued, being decoded, or decoded and not taken  */
     uint32_t                   n_segments_in_flight;
     uint64_t                   next_sequence;     /* of the segment which the caller is to get next        */
+    Options                    options;
     std::thread                producer_thread;
     std::condition_variable    result_ready_condition;
     std::map<uint64_t, DecodedSegment> result_map;
-    uint32_t                   skip_data_chunks_above_n_bytes;
     std::condition_variable    slot_free_condition;
     std::vector<std::thread>   worker_thread_vec;
 };
@@ -391,8 +392,7 @@ Capture::APIDumpLoader::WorkloadReader::WorkloadReader()
      m_is_truncated       (false),
      m_n_data_chunks_read (0),
      m_pointer_n_bytes    (0),
-     m_qpc_frequency      (0),
-     m_skip_data_chunks_above_n_bytes(0)
+     m_qpc_frequency      (0)
 {
     /* Stub */
 }
@@ -509,7 +509,7 @@ Capture::APIDumpLoader::WorkloadReaderUniquePtr Capture::APIDumpLoader::Workload
 
     result_ptr->m_pointer_n_bytes                = header.pointer_n_bytes;
     result_ptr->m_qpc_frequency                  = header.qpc_frequency;
-    result_ptr->m_skip_data_chunks_above_n_bytes = in_options.skip_data_chunks_above_n_bytes;
+    result_ptr->m_options                        = in_options;
 
     if (in_options.ignores_checksums)
     {
@@ -546,7 +546,7 @@ Capture::APIDumpLoader::WorkloadReaderUniquePtr Capture::APIDumpLoader::Workload
         result_ptr->m_pipeline_ptr.reset(new Pipeline(result_ptr->m_frame_source_ptr.get(),
                                                       in_options.n_threads,
                                                       n_segments_in_flight,
-                                                      in_options.skip_data_chunks_above_n_bytes,
+                                                      in_options,
                                                       in_options.ignores_checksums) );
     }
 
@@ -565,7 +565,8 @@ end:
 
 void Capture::APIDumpLoader::WorkloadReader::decode_frame(ZSTD_DCtx*                  in_decompressor_ptr,
                                                           const std::vector<uint8_t>& in_frame_byte_vec,
-                                                          const uint32_t&             in_skip_data_chunks_above_n_bytes,
+                                                          const uint64_t&             in_file_offset_n_bytes,
+                                                          const Options&              in_options,
                                                           DecodedSegment*             out_segment_ptr)
 {
     FrameStream            stream(in_decompressor_ptr,
@@ -574,7 +575,28 @@ void Capture::APIDumpLoader::WorkloadReader::decode_frame(ZSTD_DCtx*            
     bool                   is_short = false;
     SegmentDecoder::Options options;
 
-    options.skip_data_chunks_above_n_bytes = in_skip_data_chunks_above_n_bytes;
+    options.skip_data_chunks_above_n_bytes = in_options.skip_data_chunks_above_n_bytes;
+
+    /* The segments the reader has no start of are read in full. */
+    if (in_options.chunk_wanted_func)
+    {
+        const auto start_iterator = std::lower_bound(in_options.segment_start_vec.begin(),
+                                                     in_options.segment_start_vec.end(),
+                                                     in_file_offset_n_bytes,
+                                                     [](const SegmentStart& in_start,
+                                                        const uint64_t&     in_offset_n_bytes)
+                                                     {
+                                                         return (in_start.file_offset_n_bytes < in_offset_n_bytes);
+                                                     });
+
+        if (start_iterator                      != in_options.segment_start_vec.end() &&
+            start_iterator->file_offset_n_bytes == in_file_offset_n_bytes)
+        {
+            options.chunk_wanted_func   = in_options.chunk_wanted_func;
+            options.first_data_chunk_id = start_iterator->first_data_chunk_id;
+            options.first_frame_index   = start_iterator->first_frame_index;
+        }
+    }
 
     out_segment_ptr->workload_ptr.reset(new Workload() );
 
@@ -611,7 +633,8 @@ Capture::APIDumpLoader::WorkloadReader::Fetch Capture::APIDumpLoader::WorkloadRe
         {
             decode_frame(m_decompressor_ptr,
                          frame_byte_vec,
-                         m_skip_data_chunks_above_n_bytes,
+                         m_frame_source_ptr->last_frame_offset,
+                         m_options,
                          out_segment_ptr);
 
             out_segment_ptr->file_offset_n_bytes = m_frame_source_ptr->last_frame_offset;

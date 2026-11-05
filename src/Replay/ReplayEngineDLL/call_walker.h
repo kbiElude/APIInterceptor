@@ -43,7 +43,20 @@ namespace Replay
             /* Goes back to the start of the file opened before. */
             bool rewind(std::string* out_error_ptr);
 
+            /* The data chunks that the function says no call needs are left out when the file is opened (again), as far as the index of the file is
+             * there to say where its segments are (see WorkloadReader::Options::chunk_wanted_func). Empty: all chunks are read. Any thread.
+             */
+            void set_chunk_wanted_func(const Capture::APIDumpLoader::ChunkWantedFunc& in_func);
+
         private:
+            /* The chunk filter that the next opening of the file uses. */
+            struct ChunkFilter
+            {
+                Capture::APIDumpLoader::ChunkWantedFunc func;
+                bool                                    is_pending = false; /* set after the reader was started, so the segments yet to be read are to be read with it */
+                std::mutex                              mutex;
+            };
+
             /* The segment which the thread has read ahead, shared with it. */
             struct Prefetch
             {
@@ -57,8 +70,25 @@ namespace Replay
 
             void prefetch_main    ();
             bool read_next_segment();
+
+            /* Starts the reader (and the thread that reads ahead with it) at the segment that starts at the offset, with the filter that is set. The old reader
+             * goes only if the new one can be started.
+             */
+            bool start_reader(const char*     in_filename_ptr,
+                              const uint64_t& in_start_offset_n_bytes,
+                              const uint32_t& in_n_data_chunks_before,
+                              std::string*    out_error_ptr);
+
             void stop_prefetching ();
 
+            /* Whether a filter was set since the reader was started; clears that. */
+            bool takes_pending_chunk_filter();
+
+            /* The start of each segment of the file by its index; false if the file has no index (of the file as it is). */
+            static bool read_segment_starts(const char*                                                        in_filename_ptr,
+                                            std::vector<Capture::APIDumpLoader::WorkloadReader::SegmentStart>* out_start_vec_ptr);
+
+            ChunkFilter                                     m_chunk_filter;
             std::string                                     m_filename;
             size_t                                          m_n_next_call;
             Prefetch                                        m_prefetch;

@@ -7,6 +7,7 @@
 
 #include "Common/types.h"
 #include <array>
+#include <functional>
 #include <memory>
 #include <vector>
 
@@ -30,6 +31,10 @@ namespace Capture
             std::vector<uint8_t>    data_u8_vec;
             std::array<uint32_t, 2> extents_u32vec2;
         } DumpedSurface;
+
+        /* Whether the data chunks that a call refers to are wanted: asked with the call and the number of the frame it is in (see is_frame_boundary()). */
+        typedef std::function<bool(const DumpedAPICall& in_call,
+                                   const uint64_t&      in_frame_index)> ChunkWantedFunc;
 
         typedef std::vector<uint8_t>                 DataChunk;
         typedef std::unique_ptr<DataChunk>           DataChunkUniquePtr;

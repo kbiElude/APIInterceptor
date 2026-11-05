@@ -25,6 +25,11 @@ namespace Tests
         static constexpr uint32_t THREAD_ID           = 7;
         static constexpr uint64_t TIMESTAMP_BASE      = 1000;            /* a call with argument N is stamped TIMESTAMP_BASE + N */
 
+        /* One segment of 3 frames, one call in each followed by a SwapBuffers call, and 4 data chunks (of 1 to 4 bytes, all of the value of their
+         * number plus 1). The call of frame N refers to chunk N, a second call of frame 1 refers to chunk 0 too, and no call refers to chunk 3.
+         */
+        static void build_chunk_references(std::vector<uint8_t>* out_u8_vec_ptr);
+
         /* A file in the layout which preceded the file header: one segment, one call. */
         static void build_file_without_header(std::vector<uint8_t>* out_u8_vec_ptr);
 

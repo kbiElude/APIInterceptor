@@ -77,6 +77,18 @@ namespace Capture
             /* How a segment is read. */
             struct Options
             {
+                /* Asked of each call of the segment: a data chunk which calls refer to, and none of them wants, is left out (it comes as an empty
+                 * chunk, as below). Chunks which no call refers to are kept. For a replay which leaves out what some frames make, and so does not
+                 * read their chunks. Empty: every chunk is wanted.
+                 */
+                ChunkWantedFunc chunk_wanted_func;
+
+                /* What the calls of the segment number their chunks from (the chunk IDs of the dump), and the frame of the first call; both are
+                 * used with chunk_wanted_func only.
+                 */
+                uint32_t first_data_chunk_id = 0;
+                uint64_t first_frame_index   = 0;
+
                 /* A data chunk of more bytes than this is left out: it comes as an empty chunk (the chunks after it keep their numbers). For
                  * tools which look at the calls and not at the vertices and pixels. 0: none is left out.
                  */
@@ -93,10 +105,16 @@ namespace Capture
                                       bool*          out_is_truncated_ptr);
 
         private:
+            /* By the number of the chunk in the segment: whether the options leave it out because of the calls. */
+            static std::vector<bool> find_unwanted_chunks(const DumpedAPICallVector& in_call_vec,
+                                                          const Options&             in_options,
+                                                          const size_t&              in_n_chunks);
+
             static bool parse_api_call  (FrameStream*    inout_stream_ptr,
                                          DumpedAPICall*  out_api_call_ptr);
             static bool parse_data_chunk(FrameStream*    inout_stream_ptr,
                                          const Options&  in_options,
+                                         const bool&     in_is_unwanted,
                                          DataChunk*      out_data_chunk_ptr);
             static bool parse_surface   (FrameStream*    inout_stream_ptr,
                                          DumpedSurface*  out_surface_ptr);
