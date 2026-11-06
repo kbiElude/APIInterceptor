@@ -120,6 +120,9 @@ private:
     /* Does the work of cut_segment(), with m_cut.mutex held. */
     void perform_cut(const bool& in_is_last);
 
+    /* Keeps a surface which was read, so that it is written with the segment it belongs to. Takes the mutex of the recorded state. */
+    void store_surface(DumpedSurface in_surface);
+
     /* Hands over what has been recorded to the writer thread, which writes it out as a segment. Blocks only until the
      * previous segment is on disk. Must be called with the dumper's mutex held.
      */
@@ -140,6 +143,14 @@ private:
                                    void*                                      in_user_arg_ptr,
                                    bool*                                      out_should_pass_through_ptr);
     static void on_process_exiting(void*                                      in_user_arg_ptr);
+
+    /* Reads the frame which a call is about to present, if the call is one which presents a frame of an API the dumper can
+     * read. Every reader is of one API; this is the only place which tells which is which. False if there is nothing to store.
+     */
+    static bool read_frame_surface(const APIInterceptor::APIFunction&         in_api_func,
+                                   const APIInterceptor::APIFunctionArgument* in_arguments_in_ptr,
+                                   DumpedSurface*                             out_surface_ptr);
+
     static void write_segment     (SegmentJobUniquePtr                        in_job_ptr);
 
     /* Private vars */

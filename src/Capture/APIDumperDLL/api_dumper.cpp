@@ -7,11 +7,10 @@
 #include "Common/frame_boundary.h"
 #include "Common/macros.h"
 #include "Common/workload_format.h"
-#include "GL/gl.h"
 #include "Interception/Hooks/Kernel32/callbacks.h"
-#include "Interception/Hooks/OpenGL/types.h"
 #include "api_dumper.h"
 #include "d3d8_swapchain_reader.h"
+#include "opengl_swapchain_reader.h"
 #include "zstd_file_writer.h"
 #include <algorithm>
 #include <cassert>
@@ -300,72 +299,16 @@ void APIDumper::on_pre_callback(APIInterceptor::APIFunction                in_ap
         AI_FAIL_UNSUPPORTED(in_n_arguments_in);
     }
 
-    if (in_api_func                                    == APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_PRESENT &&
-        this_ptr->m_recorded.n_frames_dumped           <  this_ptr->m_settings.n_frames_to_dump                     &&
+    if (this_ptr->m_recorded.n_frames_dumped < this_ptr->m_settings.n_frames_to_dump &&
         this_ptr->m_settings.dump_swapchain_on_present)
     {
         DumpedSurface new_surface;
-        auto          rgba_u8_vec_ptr = std::unique_ptr<std::vector<uint8_t> >(new std::vector<uint8_t>() );
 
-        /* The device is the first argument of the call. */
-        if (Capture::APIDumperDLL::D3D8SwapchainReader::read(const_cast<void*>(in_arguments_in_ptr[0].get_ptr() ),
-                                                            &new_surface.extents_u32vec2,
-                                                             rgba_u8_vec_ptr.get() ))
+        if (read_frame_surface(in_api_func,
+                               in_arguments_in_ptr,
+                              &new_surface) )
         {
-            new_surface.u8_vec_ptr = std::move(rgba_u8_vec_ptr);
-
-            {
-                std::lock_guard<std::mutex> guard(this_ptr->m_recorded.mutex);
-
-                this_ptr->m_recorded.n_surface_bytes += new_surface.u8_vec_ptr->size();
-
-                this_ptr->m_recorded.surface_vec.emplace_back(std::move(new_surface) );
-            }
-        }
-    }
-
-    if (in_api_func                                    == APIInterceptor::APIFUNCTION_GDI32_SWAPBUFFERS &&
-        this_ptr->m_recorded.n_frames_dumped           <  this_ptr->m_settings.n_frames_to_dump         &&
-        this_ptr->m_settings.dump_swapchain_on_present)
-    {
-        std::unique_ptr<std::vector<uint8_t> > swapchain_data_u8_vec_ptr;
-        std::array<uint32_t, 2>                swapchain_extents_u32vec2 = {640, 480};
-        RECT                                   window_client_rect        = {};
-        const auto                             window_handle             = ::WindowFromDC(reinterpret_cast<HDC>(const_cast<void*>(in_arguments_in_ptr[0].get_ptr() )));
-
-        ::GetClientRect(window_handle,
-                       &window_client_rect);
-
-        swapchain_extents_u32vec2[0] = window_client_rect.right  - window_client_rect.left;
-        swapchain_extents_u32vec2[1] = window_client_rect.bottom - window_client_rect.top;
-
-        swapchain_data_u8_vec_ptr.reset(
-            new std::vector<uint8_t>(swapchain_extents_u32vec2[0] * swapchain_extents_u32vec2[1] * 4 /* rgba8_unorm */)
-        );
-
-        /* Read color buffer */
-        ::glReadPixels(0, /* x */
-                       0, /* y */
-                       swapchain_extents_u32vec2[0],
-                       swapchain_extents_u32vec2[1],
-                       GL_RGBA,
-                       GL_UNSIGNED_BYTE,
-                       swapchain_data_u8_vec_ptr->data() );
-        ::glFinish    ();
-
-        /* Store for later use */
-        {
-            std::lock_guard<std::mutex> guard      (this_ptr->m_recorded.mutex);
-            DumpedSurface               new_surface;
-
-            new_surface.extents_u32vec2 = swapchain_extents_u32vec2;
-            new_surface.u8_vec_ptr      = std::move(swapchain_data_u8_vec_ptr);
-
-            this_ptr->m_recorded.n_surface_bytes += new_surface.u8_vec_ptr->size();
-
-            this_ptr->m_recorded.surface_vec.emplace_back(
-                std::move(new_surface)
-            );
+            this_ptr->store_surface(std::move(new_surface) );
         }
     }
 
@@ -467,6 +410,68 @@ void APIDumper::perform_cut(const bool& in_is_last)
 end:
     ;
 }
+
+bool APIDumper::read_frame_surface(const APIInterceptor::APIFunction&         in_api_func,
+                                   const APIInterceptor::APIFunctionArgument* in_arguments_in_ptr,
+                                   DumpedSurface*                             out_surface_ptr)
+{
+    typedef std::unique_ptr<std::vector<uint8_t> > RGBAUniquePtr;
+
+    RGBAUniquePtr         rgba_u8_vec_ptr(new std::vector<uint8_t>() );
+    std::vector<uint8_t>* rgba_ptr = rgba_u8_vec_ptr.get();
+    bool                  result   = false;
+
+    /* The frame is read before the call which presents it. Every API says it in the first argument, which is what is read from. */
+    switch (in_api_func)
+    {
+        case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_PRESENT:
+        {
+            void* const device_ptr = const_cast<void*>(in_arguments_in_ptr[0].get_ptr() );
+
+            result = Capture::APIDumperDLL::D3D8SwapchainReader::read(device_ptr,
+                                                                     &out_surface_ptr->extents_u32vec2,
+                                                                      rgba_ptr);
+
+            break;
+        }
+
+        case APIInterceptor::APIFUNCTION_GDI32_SWAPBUFFERS:
+        {
+            void* const device_context_ptr = const_cast<void*>(in_arguments_in_ptr[0].get_ptr() );
+
+            result = Capture::APIDumperDLL::OpenGLSwapchainReader::read(device_context_ptr,
+                                                                       &out_surface_ptr->extents_u32vec2,
+                                                                        rgba_ptr);
+
+            break;
+        }
+
+        default:
+        {
+            /* A call which does not present a frame of an API the dumper can read. */
+            break;
+        }
+    }
+
+    if (result)
+    {
+        out_surface_ptr->u8_vec_ptr = std::move(rgba_u8_vec_ptr);
+    }
+
+    return result;
+}
+
+void APIDumper::store_surface(DumpedSurface in_surface)
+{
+    {
+        std::lock_guard<std::mutex> guard(m_recorded.mutex);
+
+        m_recorded.n_surface_bytes += in_surface.u8_vec_ptr->size();
+
+        m_recorded.surface_vec.emplace_back(std::move(in_surface) );
+    }
+}
+
 
 void APIDumper::submit_segment(const bool& in_is_last)
 {
