@@ -5,6 +5,7 @@
 #ifndef COMMON_CALLBACKS_H
 #define COMMON_CALLBACKS_H
 
+#include "common/api_function_argument.h"
 #include "types.h"
 
 namespace APIInterceptor

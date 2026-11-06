@@ -7,6 +7,7 @@
 #ifndef HOOKS_COMMON_ARGUMENT_FACTORY_H
 #define HOOKS_COMMON_ARGUMENT_FACTORY_H
 
+#include "common/api_function_argument.h"
 #include "interception/hooks/common/types.h"
 
 namespace Interception

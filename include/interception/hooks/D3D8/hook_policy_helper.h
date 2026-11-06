@@ -7,6 +7,7 @@
 #ifndef D3D8_HOOK_POLICY_HELPER_H
 #define D3D8_HOOK_POLICY_HELPER_H
 
+#include "common/api_function_argument.h"
 #include "interception/hooks/D3D8/types.h"
 
 namespace Interception

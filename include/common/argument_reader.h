@@ -9,6 +9,7 @@
 #ifndef COMMON_ARGUMENT_READER_H
 #define COMMON_ARGUMENT_READER_H
 
+#include "common/api_function_argument.h"
 #include "common/types.h"
 
 namespace APIInterceptor

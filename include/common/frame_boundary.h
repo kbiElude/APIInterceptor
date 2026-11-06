@@ -5,6 +5,7 @@
 #ifndef COMMON_FRAME_BOUNDARY_H
 #define COMMON_FRAME_BOUNDARY_H
 
+#include "common/api_function_argument.h"
 #include "common/types.h"
 
 namespace APIInterceptor

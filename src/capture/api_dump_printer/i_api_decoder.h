@@ -8,6 +8,7 @@
 #define APIDUMPPRINTER_I_API_DECODER_H
 
 #include "capture/api_dump_loader/api_dump_loader.h"
+#include "common/api_function_argument.h"
 #include <stdio.h>
 
 namespace Capture

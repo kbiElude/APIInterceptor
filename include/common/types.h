@@ -6,7 +6,6 @@
 #define COMMON_TYPES_H
 
 #include "globals.h"
-#include "common/api_function_argument.h"
 #include "common/macros.h"
 #include <cstdint>
 #include <vector>
@@ -1121,17 +1120,41 @@ namespace APIInterceptor
         APIFUNCTION_UNKNOWN = APIFUNCTION_COUNT
     };
 
-    struct APICommand
+    enum APIFunctionArgumentType : uint8_t
     {
-        APIFunction                      api_func;
-        std::vector<APIFunctionArgument> api_arg_vec;
+        ARGTYPE_F32,
+        ARGTYPE_F32_PTR,
+        ARGTYPE_F64,
+        ARGTYPE_F64_PTR,
+        ARGTYPE_I8,
+        ARGTYPE_I8_PTR,
+        ARGTYPE_I16,
+        ARGTYPE_I16_PTR,
+        ARGTYPE_I32,
+        ARGTYPE_I32_PTR,
+        ARGTYPE_U8,
+        ARGTYPE_U8_PTR,
+        ARGTYPE_U16,
+        ARGTYPE_U16_PTR,
+        ARGTYPE_U32,
+        ARGTYPE_U32_PTR,
+        ARGTYPE_VOID_PTR,
 
-        APICommand()
-            :api_func(APIInterceptor::APIFUNCTION_UNKNOWN)
-        {
-            /* Stub */
-        }
+        ARGTYPE_DATA_CHUNK_ID,
+
+        ARGTYPE_I32_GLENUM,
+        ARGTYPE_U32_GLENUM,
+
+        ARGTYPE_I64,
+        ARGTYPE_U64,
+
+        UNKNOWN
     };
+
+    typedef uint32_t DataChunkID;
+
+    /* The most arguments of an API function that a callback is given, the extra ones which a hook adds included. */
+    constexpr uint32_t MAX_N_FUNCTION_ARGUMENTS = 14;
 
     struct FunctionInterceptor
     {

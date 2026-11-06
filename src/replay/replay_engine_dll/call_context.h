@@ -5,6 +5,7 @@
 #ifndef REPLAYENGINEDLL_CALL_CONTEXT_H
 #define REPLAYENGINEDLL_CALL_CONTEXT_H
 
+#include "common/api_function_argument.h"
 #include "common/argument_reader.h"
 #include "i_chunk_source.h"
 #include "object_remapper.h"

@@ -6,6 +6,7 @@
 #define REPLAYENGINEDLL_D3D8_REPLAY_CONTEXT_H
 
 #include "call_context.h"
+#include "common/api_function_argument.h"
 #include "live_object_list.h"
 #include <string>
 #include <vector>

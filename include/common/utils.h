@@ -5,7 +5,7 @@
 #ifndef COMMON_UTILS_H
 #define COMMON_UTILS_H
 
-#include "types.h"
+#include "api_command.h"
 #include <string>
 
 namespace APIInterceptor

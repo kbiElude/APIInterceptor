@@ -5,6 +5,7 @@
 #ifndef REPLAYENGINEDLL_WIN32_CALL_EXECUTOR_H
 #define REPLAYENGINEDLL_WIN32_CALL_EXECUTOR_H
 
+#include "common/api_function_argument.h"
 #include "i_call_executor.h"
 #include "object_remapper.h"
 #include "replay/replay_engine_dll/types.h"

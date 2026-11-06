@@ -1,3 +1,4 @@
+#include "common/api_function_argument.h"
 /* API Interceptor (c) 2025 Dominik Witczak
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)

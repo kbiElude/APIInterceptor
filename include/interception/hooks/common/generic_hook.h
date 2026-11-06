@@ -16,6 +16,7 @@
 #ifndef HOOKS_COMMON_GENERIC_HOOK_H
 #define HOOKS_COMMON_GENERIC_HOOK_H
 
+#include "common/api_function_argument.h"
 #include "common/callbacks.h"
 #include "common/logger.h"
 #include "common/macros.h"

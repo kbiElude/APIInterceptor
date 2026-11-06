@@ -10,6 +10,7 @@
 
 #include "capture/api_dump_loader/api_dump_loader.h"
 #include "capture/api_dump_loader/object_namer.h"
+#include "common/api_function_argument.h"
 #include "d3d7_names.h"
 #include "i_api_decoder.h"
 #include "interception/hooks/D3D7/types.h"

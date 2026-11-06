@@ -7,6 +7,7 @@
 #ifndef HOOKS_COMMON_HOOK_RESULT_H
 #define HOOKS_COMMON_HOOK_RESULT_H
 
+#include "common/api_function_argument.h"
 #include "interception/hooks/common/argument_factory.h"
 #include "interception/hooks/common/success_traits.h"
 #include <utility>

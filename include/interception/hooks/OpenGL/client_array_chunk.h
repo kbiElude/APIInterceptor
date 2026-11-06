@@ -5,6 +5,7 @@
 #if !defined(OPENGL_CLIENT_ARRAY_CHUNK_H)
 #define OPENGL_CLIENT_ARRAY_CHUNK_H
 
+#include "common/api_function_argument.h"
 #include "common/callbacks.h"
 #include <vector>
 

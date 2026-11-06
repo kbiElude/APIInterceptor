@@ -7,6 +7,7 @@
 #ifndef TESTS_WORKLOAD_FILE_BUILDER_H
 #define TESTS_WORKLOAD_FILE_BUILDER_H
 
+#include "common/api_function_argument.h"
 #include "common/types.h"
 #include <stddef.h>
 #include <stdint.h>

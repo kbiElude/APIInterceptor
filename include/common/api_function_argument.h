@@ -7,47 +7,12 @@
 #ifndef COMMON_API_FUNCTION_ARGUMENT_H
 #define COMMON_API_FUNCTION_ARGUMENT_H
 
+#include "common/types.h"
 #include <cstdint>
 #include <vector>
 
 namespace APIInterceptor
 {
-    enum APIFunctionArgumentType : uint8_t
-    {
-        ARGTYPE_F32,
-        ARGTYPE_F32_PTR,
-        ARGTYPE_F64,
-        ARGTYPE_F64_PTR,
-        ARGTYPE_I8,
-        ARGTYPE_I8_PTR,
-        ARGTYPE_I16,
-        ARGTYPE_I16_PTR,
-        ARGTYPE_I32,
-        ARGTYPE_I32_PTR,
-        ARGTYPE_U8,
-        ARGTYPE_U8_PTR,
-        ARGTYPE_U16,
-        ARGTYPE_U16_PTR,
-        ARGTYPE_U32,
-        ARGTYPE_U32_PTR,
-        ARGTYPE_VOID_PTR,
-
-        ARGTYPE_DATA_CHUNK_ID,
-
-        ARGTYPE_I32_GLENUM,
-        ARGTYPE_U32_GLENUM,
-
-        ARGTYPE_I64,
-        ARGTYPE_U64,
-
-        UNKNOWN
-    };
-
-    typedef uint32_t DataChunkID;
-
-    /* The most arguments of an API function that a callback is given, the extra ones which a hook adds included. */
-    constexpr uint32_t MAX_N_FUNCTION_ARGUMENTS = 14;
-
     typedef struct APIFunctionArgument
     {
         APIFunctionArgumentType type;

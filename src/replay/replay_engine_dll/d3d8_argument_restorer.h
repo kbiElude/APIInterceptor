@@ -11,6 +11,7 @@
 #ifndef REPLAYENGINEDLL_D3D8_ARGUMENT_RESTORER_H
 #define REPLAYENGINEDLL_D3D8_ARGUMENT_RESTORER_H
 
+#include "common/api_function_argument.h"
 #include "common/vtable.h"
 #include "interception/core/D3D8Utils/types.h"
 #include "d3d8_replay_context.h"

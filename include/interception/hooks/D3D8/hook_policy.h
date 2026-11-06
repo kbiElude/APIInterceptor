@@ -9,6 +9,7 @@
 #ifndef D3D8_HOOK_POLICY_H
 #define D3D8_HOOK_POLICY_H
 
+#include "common/api_function_argument.h"
 #include "interception/hooks/common/hook_policy_base.h"
 #include "interception/hooks/D3D8/hook_policy_helper.h"
 

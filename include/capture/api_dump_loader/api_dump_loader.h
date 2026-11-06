@@ -5,6 +5,7 @@
 #if !defined(APIDUMPLOADER_H)
 #define APIDUMPLOADER_H
 
+#include "common/api_function_argument.h"
 #include "common/types.h"
 #include <array>
 #include <functional>

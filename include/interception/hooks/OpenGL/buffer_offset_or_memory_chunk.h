@@ -5,6 +5,7 @@
 #if !defined(OPENGL_BUFFER_OFFSET_OR_MEMORY_CHUNK_H)
 #define OPENGL_BUFFER_OFFSET_OR_MEMORY_CHUNK_H
 
+#include "common/api_function_argument.h"
 #include "common/memory_chunk.h"
 #include "common/types.h"
 

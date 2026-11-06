@@ -7,6 +7,7 @@
 #ifndef HOOKS_COMMON_LOCK_CAPTURE_H
 #define HOOKS_COMMON_LOCK_CAPTURE_H
 
+#include "common/api_function_argument.h"
 #include "common/types.h"
 #include <cstdint>
 

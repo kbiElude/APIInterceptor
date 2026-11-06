@@ -10,6 +10,7 @@
 #ifndef HOOKS_COMMON_ARGUMENT_CAPTURE_SELECTOR_H
 #define HOOKS_COMMON_ARGUMENT_CAPTURE_SELECTOR_H
 
+#include "common/api_function_argument.h"
 #include "interception/hooks/common/argument_factory.h"
 #include "interception/hooks/common/types.h"
 

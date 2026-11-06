@@ -10,6 +10,7 @@
 #ifndef REPLAYENGINEDLL_GL_ARGUMENT_RESTORER_H
 #define REPLAYENGINEDLL_GL_ARGUMENT_RESTORER_H
 
+#include "common/api_function_argument.h"
 #include "gl_replay_context.h"
 #include "passive_restorer.h"
 #include <string.h>
