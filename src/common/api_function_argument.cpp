@@ -2,8 +2,8 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
+#include "common/api_function_argument.h"
 #include "common/macros.h"
-#include "common/types.h"
 #include <assert.h>
 
 uint32_t APIInterceptor::APIFunctionArgument::deserialize_from_u8_ptr(const uint8_t* in_u8_ptr)
