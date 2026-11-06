@@ -58,9 +58,11 @@ APIInterceptor::APIFunctionArgument Interception::Hooks::D3D7::HookPolicyHelper:
     {
         if (Interception::Core::D3D7Utils::VertexFormat::has_position(in_vertex_format) )
         {
+            const uint32_t position_n_bytes = Interception::Core::D3D7Utils::VertexFormat::get_n_position_bytes(in_vertex_format);
+
             set_array_func(POSITION_ARRAY,
                            in_strided_data_ptr->position,
-                           Interception::Core::D3D7Utils::VertexFormat::get_n_position_bytes(in_vertex_format) );
+                           position_n_bytes);
         }
 
         if (Interception::Core::D3D7Utils::VertexFormat::has_normal(in_vertex_format) )
@@ -88,10 +90,12 @@ APIInterceptor::APIFunctionArgument Interception::Hooks::D3D7::HookPolicyHelper:
                       n_stage < Interception::Core::D3D7Utils::VertexFormat::get_n_texture_stages(in_vertex_format);
                     ++n_stage)
         {
+            const uint32_t coordinate_n_bytes = Interception::Core::D3D7Utils::VertexFormat::get_n_texture_coordinate_bytes(in_vertex_format,
+                                                                                                                            n_stage);
+
             set_array_func(TEXTURE_ARRAY + n_stage,
                            in_strided_data_ptr->textureCoords[n_stage],
-                           Interception::Core::D3D7Utils::VertexFormat::get_n_texture_coordinate_bytes(in_vertex_format,
-                                                                                                       n_stage) );
+                           coordinate_n_bytes);
         }
     }
 

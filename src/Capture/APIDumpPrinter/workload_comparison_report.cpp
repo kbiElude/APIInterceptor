@@ -156,13 +156,18 @@ int Capture::APIDumpPrinter::compare_workloads(const Options& in_options)
                                           N_FUNCTIONS_LISTED);
                   ++n_function)
         {
+            const auto&    function          = function_vec.at(n_function);
+            const char*    function_name_ptr = Capture::APIDumpNames::get_function_name(function);
+            const uint64_t first_count       = get_count(comparison.first,
+                                                         function);
+            const uint64_t second_count      = get_count(comparison.second,
+                                                         function);
+
             fprintf(stdout,
                     "  %-48s %12llu %12llu\n",
-                    Capture::APIDumpNames::get_function_name(function_vec.at(n_function) ),
-                    static_cast<unsigned long long>(get_count(comparison.first,
-                                                              function_vec.at(n_function) ) ),
-                    static_cast<unsigned long long>(get_count(comparison.second,
-                                                              function_vec.at(n_function) ) ) );
+                    function_name_ptr,
+                    static_cast<unsigned long long>(first_count),
+                    static_cast<unsigned long long>(second_count) );
         }
     }
 
@@ -173,14 +178,17 @@ int Capture::APIDumpPrinter::compare_workloads(const Options& in_options)
     }
     else
     {
+        const char* first_function_name_ptr  = (comparison.first_difference_first_function == APIInterceptor::APIFUNCTION_UNKNOWN)  ? "ended"
+                                                                                                                                    : Capture::APIDumpNames::get_function_name(comparison.first_difference_first_function);
+        const char* second_function_name_ptr = (comparison.first_difference_second_function == APIInterceptor::APIFUNCTION_UNKNOWN) ? "ended"
+                                                                                                                                    : Capture::APIDumpNames::get_function_name(comparison.first_difference_second_function);
+
         fprintf(stdout,
                 "\nThe calls are the same functions in the same order up to call %llu (in frame %llu of the first): there the first has %s, and the second %s.\n",
                 static_cast<unsigned long long>(comparison.first_difference_call_index),
                 static_cast<unsigned long long>(comparison.first_difference_frame_index),
-                (comparison.first_difference_first_function == APIInterceptor::APIFUNCTION_UNKNOWN)  ? "ended"
-                                                                                                    : Capture::APIDumpNames::get_function_name(comparison.first_difference_first_function),
-                (comparison.first_difference_second_function == APIInterceptor::APIFUNCTION_UNKNOWN) ? "ended"
-                                                                                                     : Capture::APIDumpNames::get_function_name(comparison.first_difference_second_function) );
+                first_function_name_ptr,
+                second_function_name_ptr);
     }
 
     result = (comparison.has_same_call_sequence) ? EXIT_SUCCESS

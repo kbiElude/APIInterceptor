@@ -81,9 +81,10 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiTexStorage2DMultisample(GLenum  
 
             if (is_binding_target_known)
             {
-                auto& context = get_context_state();
+                auto&          context       = get_context_state();
+                const uint32_t bound_texture = context.texture_manager.get_bound_texture(binding_target);
 
-                context.texture_manager.set_level_props(context.texture_manager.get_bound_texture(binding_target),
+                context.texture_manager.set_level_props(bound_texture,
                                                 0, /* multisample textures have a single implicit level */
                                                 static_cast<uint32_t>(width),
                                                 static_cast<uint32_t>(height),

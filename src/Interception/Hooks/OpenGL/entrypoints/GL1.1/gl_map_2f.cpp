@@ -24,12 +24,13 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiMap2f(GLenum         target,
                                                       GLint          vorder,
                                                       const GLfloat* points)
 {
+    const uint32_t                          n_points = Interception::Hooks::OpenGL::Utils::get_n_map2_values(target,
+                                                                                                             ustride,
+                                                                                                             uorder,
+                                                                                                             vstride,
+                                                                                                             vorder);
     APIInterceptor::MemoryChunk             points_chunk(points,
-                                                         Interception::Hooks::OpenGL::Utils::get_n_map2_values(target,
-                                                                                                               ustride,
-                                                                                                               uorder,
-                                                                                                               vstride,
-                                                                                                               vorder),
+                                                         n_points,
                                                          sizeof(GLfloat) );
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;

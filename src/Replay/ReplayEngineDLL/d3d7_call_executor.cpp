@@ -218,13 +218,19 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::blt(std::string* out_error_ptr)
         goto end;
     }
 
-    result = (call_method<HRESULT>(surface_ptr,
-                                   Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECTDRAWSURFACE7_BLT,
-                                   reinterpret_cast<const RECT*>(get_chunk_ptr(DESTINATION_RECT_ARGUMENT) ),
-                                   source_ptr,
-                                   reinterpret_cast<const RECT*>(get_chunk_ptr(SOURCE_RECT_ARGUMENT) ),
-                                   static_cast<DWORD>(flags),
-                                   const_cast<uint8_t*>(get_chunk_ptr(EFFECTS_ARGUMENT) ) ) >= 0);
+    {
+        const RECT* const destination_rect_ptr = reinterpret_cast<const RECT*>(get_chunk_ptr(DESTINATION_RECT_ARGUMENT));
+        uint8_t* const    effects_ptr          = const_cast<uint8_t*>(get_chunk_ptr(EFFECTS_ARGUMENT));
+        const RECT* const source_rect_ptr      = reinterpret_cast<const RECT*>(get_chunk_ptr(SOURCE_RECT_ARGUMENT));
+
+        result = (call_method<HRESULT>(surface_ptr,
+                                       Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECTDRAWSURFACE7_BLT,
+                                       destination_rect_ptr,
+                                       source_ptr,
+                                       source_rect_ptr,
+                                       static_cast<DWORD>(flags),
+                                       effects_ptr) >= 0);
+    }
 
     if (result == false)
     {
@@ -266,13 +272,17 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::blt_fast(std::string* out_error_
         goto end;
     }
 
-    result = (call_method<HRESULT>(surface_ptr,
-                                   Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECTDRAWSURFACE7_BLTFAST,
-                                   static_cast<DWORD>(x),
-                                   static_cast<DWORD>(y),
-                                   source_ptr,
-                                   reinterpret_cast<const RECT*>(get_chunk_ptr(SOURCE_RECT_ARGUMENT) ),
-                                   static_cast<DWORD>(flags) ) >= 0);
+    {
+        const RECT* const source_rect_ptr = reinterpret_cast<const RECT*>(get_chunk_ptr(SOURCE_RECT_ARGUMENT));
+
+        result = (call_method<HRESULT>(surface_ptr,
+                                       Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECTDRAWSURFACE7_BLTFAST,
+                                       static_cast<DWORD>(x),
+                                       static_cast<DWORD>(y),
+                                       source_ptr,
+                                       source_rect_ptr,
+                                       static_cast<DWORD>(flags) ) >= 0);
+    }
 
     if (result == false)
     {
@@ -292,13 +302,14 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::clear(std::string* out_error_ptr
     constexpr size_t RECTS_ARGUMENT   = 7; /* follows the arguments of the method, in a data chunk */
     constexpr size_t STENCIL_ARGUMENT = 6;
 
-    uint32_t color     = 0;
-    float    depth     = 0.0f;
-    void*    device_ptr = nullptr;
-    uint32_t flags     = 0;
-    uint32_t n_rects   = 0;
-    uint32_t stencil   = 0;
-    bool     result    = false;
+    uint32_t                                   color              = 0;
+    const APIInterceptor::APIFunctionArgument* depth_argument_ptr = m_context.get_in_argument_ptr(DEPTH_ARGUMENT);
+    float                                      depth              = 0.0f;
+    void*                                      device_ptr         = nullptr;
+    uint32_t                                   flags              = 0;
+    uint32_t                                   n_rects            = 0;
+    uint32_t                                   stencil            = 0;
+    bool                                       result             = false;
 
     if (get_live_object(0,
                        &device_ptr,
@@ -311,7 +322,7 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::clear(std::string* out_error_ptr
                &n_rects)               == false ||
         get_u32(STENCIL_ARGUMENT,
                &stencil)               == false ||
-        read_number(*m_context.get_in_argument_ptr(DEPTH_ARGUMENT),
+        read_number(*depth_argument_ptr,
                     &depth)            == false)
     {
         goto end;
@@ -319,14 +330,18 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::clear(std::string* out_error_ptr
 
     result = true;
 
-    call_method<HRESULT>(device_ptr,
-                         Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_CLEAR,
-                         static_cast<DWORD>(n_rects),
-                         reinterpret_cast<const Interception::Hooks::D3D7::D3DRECT*>(get_chunk_ptr(RECTS_ARGUMENT) ),
-                         static_cast<DWORD>(flags),
-                         static_cast<DWORD>(color),
-                         depth,
-                         static_cast<DWORD>(stencil) );
+    {
+        const Interception::Hooks::D3D7::D3DRECT* const rects_ptr = reinterpret_cast<const Interception::Hooks::D3D7::D3DRECT*>(get_chunk_ptr(RECTS_ARGUMENT));
+
+        call_method<HRESULT>(device_ptr,
+                             Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_CLEAR,
+                             static_cast<DWORD>(n_rects),
+                             rects_ptr,
+                             static_cast<DWORD>(flags),
+                             static_cast<DWORD>(color),
+                             depth,
+                             static_cast<DWORD>(stencil) );
+    }
 
 end:
     return result;
@@ -617,15 +632,20 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_indexed_primitive(std::stri
 
     result = true;
 
-    call_method<HRESULT>(device_ptr,
-                         Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_DRAWINDEXEDPRIMITIVE,
-                         static_cast<Interception::Hooks::D3D7::D3DPRIMITIVETYPE>(type),
-                         static_cast<DWORD>(fvf),
-                         const_cast<uint8_t*>(get_chunk_ptr(VERTICES_ARGUMENT) ),
-                         static_cast<DWORD>(n_vertices),
-                         reinterpret_cast<WORD*>(const_cast<uint8_t*>(get_chunk_ptr(INDICES_ARGUMENT) )),
-                         static_cast<DWORD>(n_indices),
-                         static_cast<DWORD>(flags) );
+    {
+        WORD* const    indices_ptr  = reinterpret_cast<WORD*>(const_cast<uint8_t*>(get_chunk_ptr(INDICES_ARGUMENT)));
+        uint8_t* const vertices_ptr = const_cast<uint8_t*>(get_chunk_ptr(VERTICES_ARGUMENT));
+
+        call_method<HRESULT>(device_ptr,
+                             Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_DRAWINDEXEDPRIMITIVE,
+                             static_cast<Interception::Hooks::D3D7::D3DPRIMITIVETYPE>(type),
+                             static_cast<DWORD>(fvf),
+                             vertices_ptr,
+                             static_cast<DWORD>(n_vertices),
+                             indices_ptr,
+                             static_cast<DWORD>(n_indices),
+                             static_cast<DWORD>(flags) );
+    }
 
 end:
     return result;
@@ -679,15 +699,19 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_indexed_primitive_strided(s
 
     result = true;
 
-    call_method<HRESULT>(device_ptr,
-                         Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_DRAWINDEXEDPRIMITIVESTRIDED,
-                         static_cast<Interception::Hooks::D3D7::D3DPRIMITIVETYPE>(type),
-                         static_cast<DWORD>(fvf),
-                        &strided,
-                         static_cast<DWORD>(n_vertices),
-                         reinterpret_cast<WORD*>(const_cast<uint8_t*>(get_chunk_ptr(INDICES_ARGUMENT) )),
-                         static_cast<DWORD>(n_indices),
-                         static_cast<DWORD>(flags) );
+    {
+        WORD* const indices_ptr = reinterpret_cast<WORD*>(const_cast<uint8_t*>(get_chunk_ptr(INDICES_ARGUMENT)));
+
+        call_method<HRESULT>(device_ptr,
+                             Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_DRAWINDEXEDPRIMITIVESTRIDED,
+                             static_cast<Interception::Hooks::D3D7::D3DPRIMITIVETYPE>(type),
+                             static_cast<DWORD>(fvf),
+                            &strided,
+                             static_cast<DWORD>(n_vertices),
+                             indices_ptr,
+                             static_cast<DWORD>(n_indices),
+                             static_cast<DWORD>(flags) );
+    }
 
 end:
     return result;
@@ -734,15 +758,19 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_indexed_primitive_vb(std::s
 
     result = true;
 
-    call_method<HRESULT>(device_ptr,
-                         Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_DRAWINDEXEDPRIMITIVEVB,
-                         static_cast<Interception::Hooks::D3D7::D3DPRIMITIVETYPE>(type),
-                         vertex_buffer_ptr,
-                         static_cast<DWORD>(start_vertex),
-                         static_cast<DWORD>(n_vertices),
-                         reinterpret_cast<WORD*>(const_cast<uint8_t*>(get_chunk_ptr(INDICES_ARGUMENT) )),
-                         static_cast<DWORD>(n_indices),
-                         static_cast<DWORD>(flags) );
+    {
+        WORD* const indices_ptr = reinterpret_cast<WORD*>(const_cast<uint8_t*>(get_chunk_ptr(INDICES_ARGUMENT)));
+
+        call_method<HRESULT>(device_ptr,
+                             Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_DRAWINDEXEDPRIMITIVEVB,
+                             static_cast<Interception::Hooks::D3D7::D3DPRIMITIVETYPE>(type),
+                             vertex_buffer_ptr,
+                             static_cast<DWORD>(start_vertex),
+                             static_cast<DWORD>(n_vertices),
+                             indices_ptr,
+                             static_cast<DWORD>(n_indices),
+                             static_cast<DWORD>(flags) );
+    }
 
 end:
     return result;
@@ -780,13 +808,17 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_primitive(std::string* out_
 
     result = true;
 
-    call_method<HRESULT>(device_ptr,
-                         Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_DRAWPRIMITIVE,
-                         static_cast<Interception::Hooks::D3D7::D3DPRIMITIVETYPE>(type),
-                         static_cast<DWORD>(fvf),
-                         const_cast<uint8_t*>(get_chunk_ptr(VERTICES_ARGUMENT) ),
-                         static_cast<DWORD>(n_vertices),
-                         static_cast<DWORD>(flags) );
+    {
+        uint8_t* const vertices_ptr = const_cast<uint8_t*>(get_chunk_ptr(VERTICES_ARGUMENT));
+
+        call_method<HRESULT>(device_ptr,
+                             Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_DRAWPRIMITIVE,
+                             static_cast<Interception::Hooks::D3D7::D3DPRIMITIVETYPE>(type),
+                             static_cast<DWORD>(fvf),
+                             vertices_ptr,
+                             static_cast<DWORD>(n_vertices),
+                             static_cast<DWORD>(flags) );
+    }
 
 end:
     return result;
@@ -926,9 +958,13 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::execute(const Capture::APIDumpLo
         goto end;
     }
 
-    m_context.begin_call(&in_call,
-                         &in_chunk_source,
-                         Interception::Core::D3D7Utils::get_n_arguments(in_call.func) );
+    {
+        const uint32_t n_arguments = Interception::Core::D3D7Utils::get_n_arguments(in_call.func);
+
+        m_context.begin_call(&in_call,
+                             &in_chunk_source,
+                             n_arguments);
+    }
 
     /* A call which failed in the dump changed nothing. */
     if (in_call.returned_value_ptr       != nullptr                     &&
@@ -1100,10 +1136,10 @@ end:
 const uint8_t* Replay::ReplayEngineDLL::D3D7CallExecutor::get_chunk_ptr(const size_t& in_n_argument,
                                                                         size_t*       out_n_bytes_ptr) const
 {
-    size_t n_bytes = 0;
-
-    const uint8_t* result_ptr = m_context.get_chunk_data_ptr(m_context.get_in_argument_ptr(in_n_argument),
-                                                            &n_bytes);
+    const APIInterceptor::APIFunctionArgument* argument_ptr = m_context.get_in_argument_ptr(in_n_argument);
+    size_t                                     n_bytes      = 0;
+    const uint8_t*                             result_ptr   = m_context.get_chunk_data_ptr(argument_ptr,
+                                                                                           &n_bytes);
 
     if (out_n_bytes_ptr != nullptr)
     {
@@ -1295,9 +1331,11 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::is_ignored_method(const char* in
 
     for (const char* prefix_ptr : prefix_ptr_array)
     {
+        const size_t prefix_n_chars = ::strlen(prefix_ptr);
+
         if (::strncmp(in_method_name_ptr,
                       prefix_ptr,
-                      ::strlen(prefix_ptr) ) == 0)
+                      prefix_n_chars) == 0)
         {
             result = true;
 
@@ -1380,13 +1418,18 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::load(std::string* out_error_ptr)
         goto end;
     }
 
-    result = (call_method<HRESULT>(device_ptr,
-                                   Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_LOAD,
-                                   destination_ptr,
-                                   reinterpret_cast<const POINT*>(get_chunk_ptr(DESTINATION_POINT_ARGUMENT) ),
-                                   source_ptr,
-                                   reinterpret_cast<const RECT*>(get_chunk_ptr(SOURCE_RECT_ARGUMENT) ),
-                                   static_cast<DWORD>(flags) ) >= 0);
+    {
+        const POINT* const destination_point_ptr = reinterpret_cast<const POINT*>(get_chunk_ptr(DESTINATION_POINT_ARGUMENT));
+        const RECT* const  source_rect_ptr       = reinterpret_cast<const RECT*>(get_chunk_ptr(SOURCE_RECT_ARGUMENT));
+
+        result = (call_method<HRESULT>(device_ptr,
+                                       Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_LOAD,
+                                       destination_ptr,
+                                       destination_point_ptr,
+                                       source_ptr,
+                                       source_rect_ptr,
+                                       static_cast<DWORD>(flags) ) >= 0);
+    }
 
     if (result == false)
     {
@@ -1941,9 +1984,11 @@ void Replay::ReplayEngineDLL::D3D7CallExecutor::restore_state()
     if (m_saved_device_state.render_target_ptr != nullptr &&
         m_saved_device_state.render_target_ptr != m_render_target_ptr)
     {
+        void* const live_render_target_ptr = resolve_object(m_saved_device_state.render_target_ptr);
+
         call_method<HRESULT>(m_device_ptr,
                              Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_SETRENDERTARGET,
-                             resolve_object(m_saved_device_state.render_target_ptr),
+                             live_render_target_ptr,
                              static_cast<DWORD>(0) );
     }
 
@@ -1954,10 +1999,12 @@ void Replay::ReplayEngineDLL::D3D7CallExecutor::restore_state()
         if (current_iterator == m_stage_texture_map.end() ||
             current_iterator->second != stage_texture.second)
         {
+            void* const live_texture_ptr = resolve_object(stage_texture.second);
+
             call_method<HRESULT>(m_device_ptr,
                                  Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_SETTEXTURE,
                                  static_cast<DWORD>(stage_texture.first),
-                                 resolve_object(stage_texture.second) );
+                                 live_texture_ptr);
         }
     }
 
@@ -2010,11 +2057,15 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::set_cooperative_level(std::strin
     }
 
     /* The replay is in a window of its own, however the application was. */
-    if (m_context.get_remapper_ptr()->get(ObjectKind::HWND,
-                                          m_context.get_in_argument_ptr(WINDOW_ARGUMENT)->get_ptr_as_u64(),
-                                         &live_window) )
     {
-        m_window = reinterpret_cast<HWND>(live_window);
+        const uint64_t window_value = m_context.get_in_argument_ptr(WINDOW_ARGUMENT)->get_ptr_as_u64();
+
+        if (m_context.get_remapper_ptr()->get(ObjectKind::HWND,
+                                              window_value,
+                                             &live_window) )
+        {
+            m_window = reinterpret_cast<HWND>(live_window);
+        }
     }
 
     result = true;
@@ -2081,10 +2132,14 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::set_light(std::string* out_error
 
     result = true;
 
-    call_method<HRESULT>(device_ptr,
-                         Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_SETLIGHT,
-                         static_cast<DWORD>(index),
-                         reinterpret_cast<const Interception::Hooks::D3D7::D3DLIGHT7*>(get_chunk_ptr(LIGHT_ARGUMENT) ) );
+    {
+        const Interception::Hooks::D3D7::D3DLIGHT7* const light_ptr = reinterpret_cast<const Interception::Hooks::D3D7::D3DLIGHT7*>(get_chunk_ptr(LIGHT_ARGUMENT));
+
+        call_method<HRESULT>(device_ptr,
+                             Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_SETLIGHT,
+                             static_cast<DWORD>(index),
+                             light_ptr);
+    }
 
 end:
     return result;
@@ -2101,9 +2156,13 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::set_material(std::string* out_er
 
     if (result)
     {
-        call_method<HRESULT>(device_ptr,
-                             Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_SETMATERIAL,
-                             reinterpret_cast<const Interception::Hooks::D3D7::D3DMATERIAL7*>(get_chunk_ptr(MATERIAL_ARGUMENT) ) );
+        {
+            const Interception::Hooks::D3D7::D3DMATERIAL7* const material_ptr = reinterpret_cast<const Interception::Hooks::D3D7::D3DMATERIAL7*>(get_chunk_ptr(MATERIAL_ARGUMENT));
+
+            call_method<HRESULT>(device_ptr,
+                                 Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_SETMATERIAL,
+                                 material_ptr);
+        }
     }
 
     return result;

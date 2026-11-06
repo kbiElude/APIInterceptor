@@ -17,9 +17,10 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiCallLists(GLsizei       n,
                                                           GLenum        type,
                                                           const GLvoid* lists)
 {
+    const uint32_t                          list_n_bytes = Interception::Hooks::OpenGL::Utils::get_n_call_lists_type_bytes(type);
     APIInterceptor::MemoryChunk             lists_chunk(lists,
                                                         n,
-                                                        Interception::Hooks::OpenGL::Utils::get_n_call_lists_type_bytes(type));
+                                                        list_n_bytes);
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
     void*                                   pre_callback_func_arg  = nullptr;

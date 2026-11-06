@@ -257,9 +257,11 @@ void Capture::APIDumpPrinter::print_statistics(const std::map<APIInterceptor::AP
 
     for (const auto& item : in_group_count_map)
     {
+        const char* group_name_ptr = Capture::APIDumpLoader::get_api_group_name(item.first);
+
         fprintf(stdout,
                 "  %-8s %u\n",
-                Capture::APIDumpLoader::get_api_group_name(item.first),
+                group_name_ptr,
                 item.second);
     }
 
@@ -268,10 +270,12 @@ void Capture::APIDumpPrinter::print_statistics(const std::map<APIInterceptor::AP
 
     for (const auto& item : sorted_vec)
     {
+        const char* function_name_ptr = Capture::APIDumpNames::get_function_name(item.second);
+
         fprintf(stdout,
                 "  %8u  %s\n",
                 item.first,
-                Capture::APIDumpNames::get_function_name(item.second) );
+                function_name_ptr);
     }
 }
 
@@ -388,9 +392,11 @@ int Capture::APIDumpPrinter::run(int   in_argc,
         {
             if (was_built)
             {
+                const std::string index_filename = Capture::APIDumpLoader::WorkloadIndex::get_default_filename(options.workload_filename_ptr);
+
                 fprintf(stderr,
                         "[*] The index of the workload has been made, and is kept in %s.\n",
-                        Capture::APIDumpLoader::WorkloadIndex::get_default_filename(options.workload_filename_ptr).c_str() );
+                        index_filename.c_str() );
             }
 
             if (index.find_segment_of_frame(options.first_frame,
@@ -432,13 +438,15 @@ int Capture::APIDumpPrinter::run(int   in_argc,
             goto end;
         }
 
+        const std::string index_filename = Capture::APIDumpLoader::WorkloadIndex::get_default_filename(options.workload_filename_ptr);
+
         fprintf(stdout,
                 "%s the index %s\n"
                 "  Segments: %zu\n"
                 "  Calls:    %llu\n"
                 "  Frames:   %llu%s\n",
                 (was_built) ? "Made" : "Read",
-                Capture::APIDumpLoader::WorkloadIndex::get_default_filename(options.workload_filename_ptr).c_str(),
+                index_filename.c_str(),
                 index.get_segment_vec().size(),
                 static_cast<unsigned long long>(index.get_n_calls() ),
                 static_cast<unsigned long long>(index.get_n_frames() ),

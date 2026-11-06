@@ -144,8 +144,10 @@ bool Capture::APIDumpLoader::parse_api_group_name(const char* in_name_ptr,
 
     for (const auto& group : get_api_groups() )
     {
+        const char* group_name_ptr = get_api_group_name(group);
+
         if (_stricmp(in_name_ptr,
-                     get_api_group_name(group) ) == 0)
+                     group_name_ptr) == 0)
         {
             *out_group_ptr = group;
             result         = true;

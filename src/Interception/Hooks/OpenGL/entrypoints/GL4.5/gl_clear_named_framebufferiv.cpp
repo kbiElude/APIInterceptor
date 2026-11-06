@@ -24,8 +24,9 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiClearNamedFramebufferiv(GLuint  
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
     APIInterceptor::Tracker                 tracker;
+    const uint32_t                          n_values = Interception::Hooks::OpenGL::Utils::get_n_clear_buffer_values(buffer);
     APIInterceptor::MemoryChunk             value_chunk(value,
-                                                        Interception::Hooks::OpenGL::Utils::get_n_clear_buffer_values(buffer),
+                                                        n_values,
                                                         sizeof(GLint));
 
     if (tracker.is_top_level_api_call() )

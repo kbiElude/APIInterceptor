@@ -151,9 +151,10 @@ namespace Replay
                 {
                     typedef typename Interception::Core::D3D8Utils::PointeeOf<T>::type StructType;
 
-                    size_t         n_bytes  = 0;
-                    const uint8_t* data_ptr = in_context_ptr->get_chunk_data_ptr(in_context_ptr->get_in_argument_ptr(in_n_argument),
-                                                                                 &n_bytes);
+                    const APIInterceptor::APIFunctionArgument* argument_ptr = in_context_ptr->get_in_argument_ptr(in_n_argument);
+                    size_t                                     n_bytes      = 0;
+                    const uint8_t*                             data_ptr     = in_context_ptr->get_chunk_data_ptr(argument_ptr,
+                                                                                                                 &n_bytes);
 
                     (void) out_error_ptr;
 
@@ -187,9 +188,10 @@ namespace Replay
                              const size_t&      in_n_argument,
                              std::string*       out_error_ptr)
                 {
-                    size_t         n_bytes  = 0;
-                    const uint8_t* data_ptr = in_context_ptr->get_chunk_data_ptr(in_context_ptr->get_in_argument_ptr(in_n_argument),
-                                                                                 &n_bytes);
+                    const APIInterceptor::APIFunctionArgument* argument_ptr = in_context_ptr->get_in_argument_ptr(in_n_argument);
+                    size_t                                     n_bytes      = 0;
+                    const uint8_t*                             data_ptr     = in_context_ptr->get_chunk_data_ptr(argument_ptr,
+                                                                                                                 &n_bytes);
 
                     (void) out_error_ptr;
 

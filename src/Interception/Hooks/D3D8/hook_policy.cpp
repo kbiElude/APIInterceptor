@@ -71,6 +71,8 @@ void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIR
     if (in_is_success)
     {
         D3DSURFACE_DESC description              = {};
+        const uint32_t  face_level_key           = HookPolicyHelper::get_cube_face_level_key(in_face,
+                                                                                             in_level);
         const auto      get_description_func_ptr = reinterpret_cast<PFN_IDIRECT3DCUBETEXTURE8_GETLEVELDESC>(
                                                 Interception::Hooks::Common::VTableRegistry::get_ptr()->get_original_function_ptr(in_self,
                                                                                                      VTABLE_INDEX_IDIRECT3DCUBETEXTURE8_GETLEVELDESC) );
@@ -83,8 +85,7 @@ void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIR
         }
 
         HookPolicyHelper::on_rect_locked(in_self,
-                                         HookPolicyHelper::get_cube_face_level_key(in_face,
-                                                                                   in_level),
+                                         face_level_key,
                                          description,
                                          in_locked_rect_ptr,
                                          in_rect_ptr,
@@ -97,9 +98,11 @@ void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIR
                                                                                                                                       D3DCUBEMAP_FACES                     in_face,
                                                                                                                                       UINT                                 in_level)
 {
+    const uint32_t face_level_key = HookPolicyHelper::get_cube_face_level_key(in_face,
+                                                                              in_level);
+
     out_arguments_ptr[0] = HookPolicyHelper::create_locked_data_argument(in_self,
-                                                                         HookPolicyHelper::get_cube_face_level_key(in_face,
-                                                                                                           in_level) );
+                                                                         face_level_key);
 }
 
 void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DCUBETEXTURE8_UNLOCKRECT>::on_call_finished(const bool&            in_is_success,
@@ -107,11 +110,13 @@ void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIR
                                                                                                                                 D3DCUBEMAP_FACES       in_face,
                                                                                                                                 UINT                   in_level)
 {
+    const uint32_t face_level_key = HookPolicyHelper::get_cube_face_level_key(in_face,
+                                                                              in_level);
+
     (void) in_is_success;
 
     Interception::Hooks::Common::LockTracker::get_ptr()->on_unlocked(in_self,
-                                                                     HookPolicyHelper::get_cube_face_level_key(in_face,
-                                                                                                               in_level) );
+                                                                     face_level_key);
 }
 
 void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_CLEAR>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
@@ -166,11 +171,13 @@ void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIR
                                                                                                                                         const DWORD*                         in_function_ptr,
                                                                                                                                         DWORD*                               in_handle_ptr)
 {
+    const uint32_t n_function_tokens = HookPolicyHelper::get_n_shader_function_tokens(in_function_ptr);
+
     (void) in_self;
     (void) in_handle_ptr;
 
     out_arguments_ptr[0] = Interception::Hooks::Common::ArgumentFactory::create_chunk(in_function_ptr,
-                                                                                      HookPolicyHelper::get_n_shader_function_tokens(in_function_ptr) * static_cast<uint32_t>(sizeof(DWORD) ));
+                                                                                      n_function_tokens * static_cast<uint32_t>(sizeof(DWORD) ));
 }
 
 void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_CREATEVERTEXSHADER>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
@@ -180,14 +187,17 @@ void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIR
                                                                                                                                          DWORD*                               in_handle_ptr,
                                                                                                                                          DWORD                                in_usage)
 {
+    const uint32_t n_declaration_tokens = HookPolicyHelper::get_n_vertex_declaration_tokens(in_declaration_ptr);
+    const uint32_t n_function_tokens    = HookPolicyHelper::get_n_shader_function_tokens(in_function_ptr);
+
     (void) in_self;
     (void) in_handle_ptr;
     (void) in_usage;
 
     out_arguments_ptr[0] = Interception::Hooks::Common::ArgumentFactory::create_chunk(in_declaration_ptr,
-                                                                                      HookPolicyHelper::get_n_vertex_declaration_tokens(in_declaration_ptr) * static_cast<uint32_t>(sizeof(DWORD) ));
+                                                                                      n_declaration_tokens * static_cast<uint32_t>(sizeof(DWORD) ));
     out_arguments_ptr[1] = Interception::Hooks::Common::ArgumentFactory::create_chunk(in_function_ptr,
-                                                                                      HookPolicyHelper::get_n_shader_function_tokens(in_function_ptr) * static_cast<uint32_t>(sizeof(DWORD) ));
+                                                                                      n_function_tokens * static_cast<uint32_t>(sizeof(DWORD) ));
 }
 
 void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_DRAWINDEXEDPRIMITIVEUP>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
@@ -203,12 +213,13 @@ void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIR
 {
     const uint32_t index_stride = (in_index_data_format == D3DFMT_INDEX32) ? sizeof(uint32_t)
                                                                            : sizeof(uint16_t);
+    const uint32_t n_vertices   = Interception::Hooks::Common::get_n_vertices(static_cast<Interception::Hooks::Common::PrimitiveType>(in_primitive_type),
+                                                                              in_primitive_count);
 
     (void) in_self;
 
     out_arguments_ptr[0] = Interception::Hooks::Common::ArgumentFactory::create_chunk(in_index_data_ptr,
-                                                                                      Interception::Hooks::Common::get_n_vertices(static_cast<Interception::Hooks::Common::PrimitiveType>(in_primitive_type),
-                                                                                                                                  in_primitive_count) * index_stride);
+                                                                                      n_vertices * index_stride);
     out_arguments_ptr[1] = Interception::Hooks::Common::ArgumentFactory::create_chunk(in_vertex_data_ptr,
                                                                                       (in_min_vertex_index + in_n_vertex_indices) * in_vertex_stride);
 }
@@ -220,11 +231,13 @@ void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIR
                                                                                                                                       const void*                          in_vertex_data_ptr,
                                                                                                                                       UINT                                 in_vertex_stride)
 {
+    const uint32_t n_vertices = Interception::Hooks::Common::get_n_vertices(static_cast<Interception::Hooks::Common::PrimitiveType>(in_primitive_type),
+                                                                            in_primitive_count);
+
     (void) in_self;
 
     out_arguments_ptr[0] = Interception::Hooks::Common::ArgumentFactory::create_chunk(in_vertex_data_ptr,
-                                                                                      Interception::Hooks::Common::get_n_vertices(static_cast<Interception::Hooks::Common::PrimitiveType>(in_primitive_type),
-                                                                                                                                  in_primitive_count) * in_vertex_stride);
+                                                                                      n_vertices * in_vertex_stride);
 }
 
 void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_DRAWRECTPATCH>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,

@@ -63,8 +63,12 @@ void Interception::Hooks::Common::ExportHook::on_attach()
                                                                         this);
 
     /* Covers the module having been loaded already. */
-    on_library_loaded(::GetModuleHandleW(m_module_name_ptr),
-                      this);
+    {
+        const HMODULE module = ::GetModuleHandleW(m_module_name_ptr);
+
+        on_library_loaded(module,
+                          this);
+    }
 }
 
 void Interception::Hooks::Common::ExportHook::on_detach()

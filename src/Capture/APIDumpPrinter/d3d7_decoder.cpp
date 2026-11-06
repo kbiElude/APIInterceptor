@@ -503,12 +503,14 @@ bool Capture::APIDumpPrinter::D3D7Decoder::format_struct(const Interception::Hoo
             if (read_func(&value,
                           sizeof(value) ))
             {
+                const size_t      driver_n_chars      = strnlen(value.szDriver,
+                                                                sizeof(value.szDriver) );
+                const size_t      description_n_chars = strnlen(value.szDescription,
+                                                                sizeof(value.szDescription) );
                 const std::string driver_name(value.szDriver,
-                                              strnlen(value.szDriver,
-                                                      sizeof(value.szDriver) ));
+                                              driver_n_chars);
                 const std::string description(value.szDescription,
-                                              strnlen(value.szDescription,
-                                                      sizeof(value.szDescription) ));
+                                              description_n_chars);
 
                 stream << "{Driver=\"" << driver_name << "\""
                        << " Description=\"" << description << "\""
@@ -1165,10 +1167,12 @@ bool Capture::APIDumpPrinter::D3D7Decoder::print_argument(FILE*                 
                                                            in_is_out,
                                                            [this, &in_call, &in_workload, &info](const void* in_pointer)
                                                            {
+                                                               const char* type_name_ptr = get_created_object_type_name_ptr(in_call,
+                                                                                                                            info,
+                                                                                                                            in_workload);
+
                                                                return m_object_namer.get_name(reinterpret_cast<uint64_t>(in_pointer),
-                                                                                              get_created_object_type_name_ptr(in_call,
-                                                                                                                               info,
-                                                                                                                               in_workload) );
+                                                                                              type_name_ptr);
                                                            },
                                                           &text);
 
@@ -1306,12 +1310,21 @@ void Capture::APIDumpPrinter::D3D7Decoder::register_created_objects(const Captur
         /* The exports, Create* methods and DuplicateSurface always return new objects; Get* ones return existing objects, which may be
          * unknown to us, and so does QueryInterface.
          */
-        const bool is_new = (method_info_ptr == nullptr)                                   ||
-                            (strncmp(method_info_ptr->method_name_ptr,
-                                     "Create",
-                                     strlen("Create") ) == 0)                              ||
-                            (strcmp(method_info_ptr->method_name_ptr,
-                                    "DuplicateSurface") == 0);
+        constexpr char CREATE_PREFIX[] = "Create";
+
+        bool is_new = true;
+
+        if (method_info_ptr != nullptr)
+        {
+            const bool is_create_method     = (strncmp(method_info_ptr->method_name_ptr,
+                                                       CREATE_PREFIX,
+                                                       sizeof(CREATE_PREFIX) - 1) == 0);
+            const bool is_duplicate_surface = (strcmp (method_info_ptr->method_name_ptr,
+                                                       "DuplicateSurface")        == 0);
+
+            is_new = (is_create_method     ||
+                      is_duplicate_surface);
+        }
 
         for (uint32_t n_argument = 0;
                       n_argument < in_call.arg_out_vec.size();

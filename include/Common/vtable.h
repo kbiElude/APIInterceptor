@@ -32,7 +32,9 @@ namespace APIInterceptor
     inline FunctionPointer get_method_ptr(void*           in_object_ptr,
                                           const uint32_t& in_vtable_index)
     {
-        return get_method_ptr<FunctionPointer>(get_vtable_ptr(in_object_ptr),
+        void** const vtable_ptr = get_vtable_ptr(in_object_ptr);
+
+        return get_method_ptr<FunctionPointer>(vtable_ptr,
                                                in_vtable_index);
     }
 }

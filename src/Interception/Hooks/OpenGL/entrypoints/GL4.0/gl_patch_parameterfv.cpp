@@ -22,8 +22,9 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiPatchParameterfv(GLenum         
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
     APIInterceptor::Tracker                 tracker;
+    const uint32_t                          n_values = Interception::Hooks::OpenGL::Utils::get_n_patch_parameter_values(pname);
     APIInterceptor::MemoryChunk             values_chunk(values,
-                                                         Interception::Hooks::OpenGL::Utils::get_n_patch_parameter_values(pname),
+                                                         n_values,
                                                          sizeof(GLfloat));
 
     if (tracker.is_top_level_api_call() )

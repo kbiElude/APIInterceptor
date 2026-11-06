@@ -24,8 +24,10 @@ HWND WINAPI Interception::Hooks::User32::create_window_ex_w(DWORD     in_ex_styl
                                                             HINSTANCE in_hinstance,
                                                             LPVOID    in_param_ptr)
 {
+    const size_t                            class_name_n_chars  = (in_class_name_ptr != nullptr && IS_INTRESOURCE(in_class_name_ptr) == FALSE) ? ::wcslen(in_class_name_ptr) + 1 : 0;
+    const size_t                            window_name_n_chars = (in_window_name_ptr != nullptr) ? ::wcslen(in_window_name_ptr) + 1 : 0;
     APIInterceptor::MemoryChunk             class_name_chunk(in_class_name_ptr,
-                                                             (in_class_name_ptr != nullptr && IS_INTRESOURCE(in_class_name_ptr) == FALSE) ? ::wcslen(in_class_name_ptr) + 1 : 0,
+                                                             class_name_n_chars,
                                                              sizeof(wchar_t) );
     APIInterceptor::GateScope               gate_scope;
     void*                                   post_callback_func_arg  = nullptr;
@@ -35,7 +37,7 @@ HWND WINAPI Interception::Hooks::User32::create_window_ex_w(DWORD     in_ex_styl
     HWND                                    result                  = 0;
     bool                                    should_pass_through     = true;
     APIInterceptor::MemoryChunk             window_name_chunk(in_window_name_ptr,
-                                                              (in_window_name_ptr != nullptr) ? ::wcslen(in_window_name_ptr) + 1 : 0,
+                                                              window_name_n_chars,
                                                               sizeof(wchar_t) );
 
     AI_TRACE("CreateWindowExW(\n"

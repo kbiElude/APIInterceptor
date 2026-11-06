@@ -38,9 +38,11 @@ namespace
                 continue;
             }
 
+            const char* function_name_ptr = Capture::APIDumpNames::get_function_name(entry.function);
+
             fprintf(stdout,
                     "    %-48s %10llu calls, the first is call %llu in frame %llu\n",
-                    Capture::APIDumpNames::get_function_name(entry.function),
+                    function_name_ptr,
                     static_cast<unsigned long long>(entry.n_calls),
                     static_cast<unsigned long long>(entry.first_call_index),
                     static_cast<unsigned long long>(entry.first_frame_index) );
@@ -74,12 +76,15 @@ int Capture::APIDumpPrinter::list_unreplayed_functions()
 
         if (support == Replay::ReplayEngineDLL::CallSupport::UNSUPPORTED)
         {
+            const char* function_name_ptr = Capture::APIDumpNames::get_function_name(function);
+            const char* group_name_ptr    = Capture::APIDumpLoader::get_api_group_name(group);
+
             n_unsupported++;
 
             fprintf(stdout,
                     "  [%s] %s\n",
-                    Capture::APIDumpLoader::get_api_group_name(group),
-                    Capture::APIDumpNames::get_function_name(function) );
+                    group_name_ptr,
+                    function_name_ptr);
         }
     }
 
@@ -161,11 +166,13 @@ int Capture::APIDumpPrinter::verify_replay(const Options& in_options)
 
     if (report.n_missing_chunk_references != 0)
     {
+        const char* function_name_ptr = Capture::APIDumpNames::get_function_name(report.first_missing_chunk_function);
+
         fprintf(stdout,
                 "  %llu references to data chunks which are not in the workload; the first is in call %llu (%s) in frame %llu.\n",
                 static_cast<unsigned long long>(report.n_missing_chunk_references),
                 static_cast<unsigned long long>(report.first_missing_chunk_call_index),
-                Capture::APIDumpNames::get_function_name(report.first_missing_chunk_function),
+                function_name_ptr,
                 static_cast<unsigned long long>(report.first_missing_chunk_frame_index) );
     }
 

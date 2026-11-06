@@ -243,12 +243,17 @@ bool Capture::InjectionLauncher::Launcher::launch_with_apc_injection(const Launc
     }
 
     /* kernel32 is mapped at the same address in every process of the same bitness. */
-    if (::QueueUserAPC(reinterpret_cast<PAPCFUNC>(::GetProcAddress(::GetModuleHandleA("kernel32.dll"),
-                                                                   "LoadLibraryA") ),
-                       out_process_info_ptr->hThread,
-                       reinterpret_cast<ULONG_PTR>(remote_path_ptr) ) == 0)
     {
-        goto end;
+        const HMODULE kernel32_module  = ::GetModuleHandleA("kernel32.dll");
+        const FARPROC load_library_ptr = ::GetProcAddress(kernel32_module,
+                                                          "LoadLibraryA");
+
+        if (::QueueUserAPC(reinterpret_cast<PAPCFUNC>(load_library_ptr),
+                           out_process_info_ptr->hThread,
+                           reinterpret_cast<ULONG_PTR>(remote_path_ptr) ) == 0)
+        {
+            goto end;
+        }
     }
 
     if (::ResumeThread(out_process_info_ptr->hThread) == static_cast<DWORD>(-1) )

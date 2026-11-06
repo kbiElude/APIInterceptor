@@ -437,9 +437,11 @@ void Replay::ReplayEngineDLL::ReplayEngine::remove_call_interceptor(ICallInterce
 {
     std::lock_guard<std::mutex> lock(m_listeners.mutex);
 
-    m_listeners.interceptor_ptr_vec.erase(std::remove(m_listeners.interceptor_ptr_vec.begin(),
-                                                      m_listeners.interceptor_ptr_vec.end  (),
-                                                      in_interceptor_ptr),
+    const auto removed_begin_iterator = std::remove(m_listeners.interceptor_ptr_vec.begin(),
+                                                    m_listeners.interceptor_ptr_vec.end  (),
+                                                    in_interceptor_ptr);
+
+    m_listeners.interceptor_ptr_vec.erase(removed_begin_iterator,
                                           m_listeners.interceptor_ptr_vec.end() );
 
     m_listeners.n_interceptors = m_listeners.interceptor_ptr_vec.size();

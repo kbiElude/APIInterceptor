@@ -16,8 +16,9 @@ HGLRC WINAPI Interception::Hooks::WGL::create_context_attribs_arb(HDC        in_
                                                                   HGLRC      in_share_context_handle,
                                                                   const int* in_attrib_list_ptr)
 {
+    const uint32_t                          n_attrib_list_ints = Interception::Hooks::WGL::Utils::get_n_context_attrib_list_ints(in_attrib_list_ptr);
     APIInterceptor::MemoryChunk             attrib_list_chunk(in_attrib_list_ptr,
-                                                              Interception::Hooks::WGL::Utils::get_n_context_attrib_list_ints(in_attrib_list_ptr),
+                                                              n_attrib_list_ints,
                                                               sizeof(int) );
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;

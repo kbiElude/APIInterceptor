@@ -146,13 +146,17 @@ uint32_t Replay::ReplayEngineDLL::GlReplayContext::map_argument(const size_t&   
         if (kind          == ObjectKind::FRAG_DATA_LOCATION &&
             in_n_argument >  0)
         {
+            constexpr char CLEAR_PREFIX[] = "glClear";
+
             const int clear_difference = ::strncmp(m_function_info_ptr->name_ptr,
-                                                   "glClear",
-                                                   ::strlen("glClear") );
+                                                   CLEAR_PREFIX,
+                                                   sizeof(CLEAR_PREFIX) - 1);
 
             if (clear_difference == 0)
             {
-                read_number(*get_in_argument_ptr(in_n_argument - 1),
+                const APIInterceptor::APIFunctionArgument* buffer_argument_ptr = get_in_argument_ptr(in_n_argument - 1);
+
+                read_number(*buffer_argument_ptr,
                             &buffer);
             }
         }
@@ -324,9 +328,11 @@ void Replay::ReplayEngineDLL::GlReplayContext::register_returned_name(const uint
                 /* glGenLists() hands out a range. */
                 uint64_t n_lists = 1;
 
-                if (get_in_argument_ptr(0) != nullptr)
+                const APIInterceptor::APIFunctionArgument* count_argument_ptr = get_in_argument_ptr(0);
+
+                if (count_argument_ptr != nullptr)
                 {
-                    read_number(*get_in_argument_ptr(0),
+                    read_number(*count_argument_ptr,
                                 &n_lists);
                 }
 

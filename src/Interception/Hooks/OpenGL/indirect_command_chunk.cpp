@@ -35,9 +35,11 @@ Interception::Hooks::OpenGL::IndirectCommandChunk Interception::Hooks::OpenGL::I
         n_bytes = static_cast<uint64_t>(in_n_commands - 1) * stride + in_command_n_bytes;
     }
 
+    const bool is_buffer_offset = (context.buffer_manager.get_bound_buffer(BufferBindingTarget::DRAW_INDIRECT_BUFFER) != 0);
+
     return IndirectCommandChunk(in_indirect_ptr,
                                 n_bytes,
-                                context.buffer_manager.get_bound_buffer(BufferBindingTarget::DRAW_INDIRECT_BUFFER) != 0);
+                                is_buffer_offset);
 }
 
 Interception::Hooks::OpenGL::IndirectCommandChunk Interception::Hooks::OpenGL::IndirectCommandChunk::create_for_draw_arrays(const void*     in_indirect_ptr,

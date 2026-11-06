@@ -118,6 +118,8 @@ void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIR
                                                                                                                                           DWORD                                in_n_indices,
                                                                                                                                           DWORD                                in_flags)
 {
+    const uint32_t vertex_n_bytes = Interception::Core::D3D7Utils::VertexFormat::get_n_vertex_bytes(in_vertex_format);
+
     (void) in_self;
     (void) in_primitive_type;
     (void) in_flags;
@@ -125,7 +127,7 @@ void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIR
     out_arguments_ptr[0] = Interception::Hooks::Common::ArgumentFactory::create_chunk(in_indices_ptr,
                                                                                       in_n_indices * static_cast<uint32_t>(sizeof(WORD) ));
     out_arguments_ptr[1] = Interception::Hooks::Common::ArgumentFactory::create_chunk(in_vertices_ptr,
-                                                                                      in_n_vertices * Interception::Core::D3D7Utils::VertexFormat::get_n_vertex_bytes(in_vertex_format) );
+                                                                                      in_n_vertices * vertex_n_bytes);
 }
 
 void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_DRAWINDEXEDPRIMITIVESTRIDED>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
@@ -179,12 +181,14 @@ void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIR
                                                                                                                                     DWORD                                in_n_vertices,
                                                                                                                                     DWORD                                in_flags)
 {
+    const uint32_t vertex_n_bytes = Interception::Core::D3D7Utils::VertexFormat::get_n_vertex_bytes(in_vertex_format);
+
     (void) in_self;
     (void) in_primitive_type;
     (void) in_flags;
 
     out_arguments_ptr[0] = Interception::Hooks::Common::ArgumentFactory::create_chunk(in_vertices_ptr,
-                                                                                      in_n_vertices * Interception::Core::D3D7Utils::VertexFormat::get_n_vertex_bytes(in_vertex_format) );
+                                                                                      in_n_vertices * vertex_n_bytes);
 }
 
 void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_DRAWPRIMITIVESTRIDED>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
@@ -211,12 +215,14 @@ void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIR
                                                                                                                                 IDirectDrawPalette**                 in_palette_ptr_ptr,
                                                                                                                                 IUnknown*                            in_outer_ptr)
 {
+    const uint32_t n_entries = Interception::Core::D3D7Utils::PaletteLayout::get_n_entries(in_flags);
+
     (void) in_self;
     (void) in_palette_ptr_ptr;
     (void) in_outer_ptr;
 
     out_arguments_ptr[0] = Interception::Hooks::Common::ArgumentFactory::create_chunk(in_entries_ptr,
-                                                                                      Interception::Core::D3D7Utils::PaletteLayout::get_n_entries(in_flags) * static_cast<uint32_t>(sizeof(PALETTEENTRY) ));
+                                                                                      n_entries * static_cast<uint32_t>(sizeof(PALETTEENTRY) ));
 }
 
 void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIRECTDRAWPALETTE_INITIALIZE>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
@@ -225,11 +231,13 @@ void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIR
                                                                                                                                    DWORD                                in_flags,
                                                                                                                                    const PALETTEENTRY*                  in_entries_ptr)
 {
+    const uint32_t n_entries = Interception::Core::D3D7Utils::PaletteLayout::get_n_entries(in_flags);
+
     (void) in_self;
     (void) in_direct_draw_ptr;
 
     out_arguments_ptr[0] = Interception::Hooks::Common::ArgumentFactory::create_chunk(in_entries_ptr,
-                                                                                      Interception::Core::D3D7Utils::PaletteLayout::get_n_entries(in_flags) * static_cast<uint32_t>(sizeof(PALETTEENTRY) ));
+                                                                                      n_entries * static_cast<uint32_t>(sizeof(PALETTEENTRY) ));
 }
 
 void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIRECTDRAWPALETTE_SETENTRIES>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,

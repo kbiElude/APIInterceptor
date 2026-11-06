@@ -70,8 +70,11 @@ bool Replay::ReplayEngineDLL::GlMappingReplayer::flush(const Capture::APIDumpLoa
 
             if (flush_func_ptr != nullptr)
             {
-                flush_func_ptr(m_context_ptr->map_name(ObjectKind::BUFFER,
-                                                       get_first_argument(in_call)),
+                const uint32_t first_argument = get_first_argument(in_call);
+                const uint32_t live_buffer    = m_context_ptr->map_name(ObjectKind::BUFFER,
+                                                                        first_argument);
+
+                flush_func_ptr(live_buffer,
                                static_cast<GLintptr>  (offset),
                                static_cast<GLsizeiptr>(length) );
             }
@@ -82,7 +85,9 @@ bool Replay::ReplayEngineDLL::GlMappingReplayer::flush(const Capture::APIDumpLoa
 
             if (flush_func_ptr != nullptr)
             {
-                flush_func_ptr(get_first_argument     (in_call),
+                const uint32_t first_argument = get_first_argument(in_call);
+
+                flush_func_ptr(first_argument,
                                static_cast<GLintptr>  (offset),
                                static_cast<GLsizeiptr>(length) );
             }
@@ -416,8 +421,11 @@ bool Replay::ReplayEngineDLL::GlMappingReplayer::unmap(const Capture::APIDumpLoa
 
         if (unmap_func_ptr != nullptr)
         {
-            unmap_func_ptr(m_context_ptr->map_name(ObjectKind::BUFFER,
-                                                   get_first_argument(in_call)));
+            const uint32_t first_argument = get_first_argument(in_call);
+            const uint32_t live_buffer    = m_context_ptr->map_name(ObjectKind::BUFFER,
+                                                                    first_argument);
+
+            unmap_func_ptr(live_buffer);
         }
     }
     else

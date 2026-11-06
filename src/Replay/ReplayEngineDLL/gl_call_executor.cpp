@@ -61,11 +61,13 @@ void Replay::ReplayEngineDLL::GlCallExecutor::add_function(const APIInterceptor:
                                                              const InvokeFuncPtr&               in_invoke_func_ptr,
                                                              const size_t&                      in_n_head_arguments)
 {
+    constexpr char PROGRAM_UNIFORM_PREFIX[] = "glProgramUniform";
+
     FunctionEntry entry;
 
     entry.info.has_explicit_program = (::strncmp(in_name_ptr,
-                                                 "glProgramUniform",
-                                                 ::strlen("glProgramUniform") ) == 0);
+                                                 PROGRAM_UNIFORM_PREFIX,
+                                                 sizeof(PROGRAM_UNIFORM_PREFIX) - 1) == 0);
     entry.info.ignored_param_mask   = in_ignored_param_mask;
     entry.info.name_ptr             = in_name_ptr;
     entry.info.param_kind_vec       = in_param_kind_vec;

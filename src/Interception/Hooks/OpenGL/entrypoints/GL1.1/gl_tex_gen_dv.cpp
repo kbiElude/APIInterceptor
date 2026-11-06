@@ -17,8 +17,9 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiTexGendv(GLenum          coord,
                                                          GLenum          pname,
                                                          const GLdouble* params)
 {
+    const uint32_t                          n_params = Interception::Hooks::OpenGL::Utils::get_n_tex_gen_params(pname);
     APIInterceptor::MemoryChunk             params_chunk(params,
-                                                         Interception::Hooks::OpenGL::Utils::get_n_tex_gen_params(pname),
+                                                         n_params,
                                                          sizeof(GLdouble));
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;

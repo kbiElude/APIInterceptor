@@ -143,7 +143,9 @@ void APIInterceptor::Logger::log(const LogLevel& in_log_level,
         {
             if (g_logger_ptr->m_currentframe_file_ptr == nullptr)
             {
-                g_logger_ptr->m_currentframe_file_ptr = ::fopen(get_frame_log_filename(m_n_current_frame).c_str(),
+                const std::string frame_log_filename = get_frame_log_filename(m_n_current_frame);
+
+                g_logger_ptr->m_currentframe_file_ptr = ::fopen(frame_log_filename.c_str(),
                                                                 "w");
             }
 

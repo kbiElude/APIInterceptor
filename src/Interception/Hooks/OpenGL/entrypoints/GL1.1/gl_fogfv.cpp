@@ -16,8 +16,9 @@
 void AI_APIENTRY Interception::Hooks::OpenGL::aiFogfv(GLenum         pname,
                                                       const GLfloat* params)
 {
+    const uint32_t                          n_params = Interception::Hooks::OpenGL::Utils::get_n_fog_params(pname);
     APIInterceptor::MemoryChunk             params_chunk(params,
-                                                         Interception::Hooks::OpenGL::Utils::get_n_fog_params(pname),
+                                                         n_params,
                                                          sizeof(GLfloat));
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;

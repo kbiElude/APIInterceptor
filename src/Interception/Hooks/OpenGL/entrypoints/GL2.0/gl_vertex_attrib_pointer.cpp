@@ -72,7 +72,8 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiVertexAttribPointer(GLuint      
 
     if (tracker.is_top_level_api_call() )
     {
-        auto& context = Interception::Hooks::OpenGL::get_context_state();
+        auto&          context      = Interception::Hooks::OpenGL::get_context_state();
+        const uint32_t bound_buffer = context.buffer_manager.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ARRAY_BUFFER);
 
         context.client_array_manager.set_pointer(Interception::Hooks::OpenGL::ClientArrayKind::GENERIC,
                                                index,
@@ -80,7 +81,7 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiVertexAttribPointer(GLuint      
                                                type,
                                                stride,
                                                pointer,
-                                               context.buffer_manager.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ARRAY_BUFFER),
+                                               bound_buffer,
                                                false,                   /* in_is_integer    */
                                                false,                   /* in_is_long       */
                                                normalized != GL_FALSE); /* in_is_normalized */

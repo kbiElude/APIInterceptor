@@ -91,7 +91,9 @@ const uint8_t* Replay::ReplayEngineDLL::D3D8ReplayContext::get_extra_data_ptr(co
         if (binding.function   == get_call().func &&
             binding.n_argument == in_n_argument)
         {
-            result_ptr = get_chunk_data_ptr(get_in_argument_ptr(get_n_head_arguments() + binding.n_extra_argument),
+            const APIInterceptor::APIFunctionArgument* extra_argument_ptr = get_in_argument_ptr(get_n_head_arguments() + binding.n_extra_argument);
+
+            result_ptr = get_chunk_data_ptr(extra_argument_ptr,
                                             out_n_bytes_ptr);
 
             break;

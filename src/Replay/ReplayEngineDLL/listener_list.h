@@ -59,9 +59,11 @@ namespace Replay
                 {
                     std::lock_guard<std::mutex> lock(m_mutex);
 
-                    m_listener_ptr_vec.erase(std::remove           (m_listener_ptr_vec.begin(),
+                    const auto removed_begin_iterator = std::remove(m_listener_ptr_vec.begin(),
                                                                     m_listener_ptr_vec.end  (),
-                                                                    in_listener_ptr),
+                                                                    in_listener_ptr);
+
+                    m_listener_ptr_vec.erase(removed_begin_iterator,
                                              m_listener_ptr_vec.end() );
                 }
             }

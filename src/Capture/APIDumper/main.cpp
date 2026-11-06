@@ -206,9 +206,14 @@ int main(int   in_argc,
             goto end;
         }
 
-        dll_dir                 = std::string(dll_dir_raw_i8vec260,
-                                              0,
-                                              std::string(dll_dir_raw_i8vec260).find_last_of('\\') );
+        {
+            const size_t n_last_separator_char = std::string(dll_dir_raw_i8vec260).find_last_of('\\');
+
+            dll_dir = std::string(dll_dir_raw_i8vec260,
+                                  0,
+                                  n_last_separator_char);
+        }
+
         working_dir             = working_dir_raw_i8vec260;
         apidumper_dll_file_name = dll_dir + "\\" + apidumper_dll_file_name;
 

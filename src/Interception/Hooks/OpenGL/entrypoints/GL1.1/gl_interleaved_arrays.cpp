@@ -60,12 +60,13 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiInterleavedArrays(GLenum        
 
     if (tracker.is_top_level_api_call() )
     {
-        auto& context = Interception::Hooks::OpenGL::get_context_state();
+        auto&          context      = Interception::Hooks::OpenGL::get_context_state();
+        const uint32_t bound_buffer = context.buffer_manager.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ARRAY_BUFFER);
 
         context.client_array_manager.set_interleaved_arrays(format,
                                                           stride,
                                                           pointer,
-                                                          context.buffer_manager.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ARRAY_BUFFER));
+                                                          bound_buffer);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLINTERLEAVEDARRRAYS,

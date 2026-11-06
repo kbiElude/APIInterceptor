@@ -103,8 +103,14 @@ bool Replay::ReplayPlayerSupport::PlayerLauncher::run_x86_player(const std::stri
 
     /* The 32-bit player is in the folder of this one. */
     x86_player_path = module_path_vec.data  ();
-    x86_player_path = x86_player_path.substr(0,
-                                             x86_player_path.find_last_of(L'\\') + 1) + get_wide_string(in_x86_player_file_name);
+
+    {
+        const size_t       n_directory_chars = x86_player_path.find_last_of(L'\\') + 1;
+        const std::wstring player_file_name  = get_wide_string(in_x86_player_file_name);
+
+        x86_player_path = x86_player_path.substr(0,
+                                                 n_directory_chars) + player_file_name;
+    }
 
     if (::GetFileAttributesW(x86_player_path.c_str() ) == INVALID_FILE_ATTRIBUTES)
     {

@@ -30,9 +30,11 @@ void Interception::Hooks::D3D8::IArgumentModifier::on_set_viewport(IDirect3DDevi
 
 void Interception::Hooks::D3D8::remove_argument_modifier(IArgumentModifier* in_modifier_ptr)
 {
-    g_argument_modifier_ptr_vec.erase(std::remove(g_argument_modifier_ptr_vec.begin(),
-                                                  g_argument_modifier_ptr_vec.end  (),
-                                                  in_modifier_ptr),
+    const auto removed_begin_iterator = std::remove(g_argument_modifier_ptr_vec.begin(),
+                                                    g_argument_modifier_ptr_vec.end  (),
+                                                    in_modifier_ptr);
+
+    g_argument_modifier_ptr_vec.erase(removed_begin_iterator,
                                       g_argument_modifier_ptr_vec.end() );
 }
 

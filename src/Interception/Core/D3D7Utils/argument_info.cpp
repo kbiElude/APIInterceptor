@@ -72,7 +72,9 @@ bool Interception::Core::D3D7Utils::get_argument_info(const APIInterceptor::APIF
         {APIInterceptor::APIFUNCTION_D3D7_IDIRECTDRAWSURFACE7_UPDATEOVERLAY,       Interception::Hooks::D3D7::ValueKind::OVERLAY_FLAGS,             4},
     };
 
-    const bool result = Interception::Core::Common::find_argument_info(get_signature_entry_ptr(in_function),
+    const Interception::Hooks::D3D7::SignatureEntry* signature_entry_ptr = get_signature_entry_ptr(in_function);
+
+    const bool result = Interception::Core::Common::find_argument_info(signature_entry_ptr,
                                                                        argument_override_array,
                                                                        sizeof(argument_override_array) / sizeof(argument_override_array[0]),
                                                                        in_function,

@@ -970,8 +970,10 @@ void Replay::ReplayEngineDLL::Win32CallExecutor::place_window(const HWND& in_win
 
         monitor_info.cbSize = sizeof(monitor_info);
 
-        ::GetMonitorInfoW(::MonitorFromPoint(last_center,
-                                             MONITOR_DEFAULTTONEAREST),
+        const HMONITOR nearest_monitor = ::MonitorFromPoint(last_center,
+                                                            MONITOR_DEFAULTTONEAREST);
+
+        ::GetMonitorInfoW(nearest_monitor,
                          &monitor_info);
 
         work_area = monitor_info.rcWork;

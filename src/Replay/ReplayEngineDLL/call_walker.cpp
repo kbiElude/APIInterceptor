@@ -189,11 +189,12 @@ bool Replay::ReplayEngineDLL::CallWalker::read_next_segment()
 bool Replay::ReplayEngineDLL::CallWalker::read_segment_starts(const char*                                                        in_filename_ptr,
                                                               std::vector<Capture::APIDumpLoader::WorkloadReader::SegmentStart>* out_start_vec_ptr)
 {
+    const std::string                     index_filename = Capture::APIDumpLoader::WorkloadIndex::get_default_filename(in_filename_ptr);
     Capture::APIDumpLoader::WorkloadIndex index;
     std::string                           error;
     bool                                  result = false;
 
-    if (Capture::APIDumpLoader::WorkloadIndex::load(Capture::APIDumpLoader::WorkloadIndex::get_default_filename(in_filename_ptr).c_str(),
+    if (Capture::APIDumpLoader::WorkloadIndex::load(index_filename.c_str(),
                                                    &index,
                                                    &error) == false)
     {

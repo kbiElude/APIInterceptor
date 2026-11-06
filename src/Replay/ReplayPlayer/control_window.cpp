@@ -72,8 +72,12 @@ Replay::ReplayPlayer::ControlWindow::~ControlWindow()
         ::DestroyWindow(m_hwnd);
     }
 
-    ::UnregisterClassW(WINDOW_CLASS_NAME,
-                       ::GetModuleHandleW(nullptr) );
+    {
+        const HMODULE module = ::GetModuleHandleW(nullptr);
+
+        ::UnregisterClassW(WINDOW_CLASS_NAME,
+                           module);
+    }
 }
 
 bool Replay::ReplayPlayer::ControlWindow::create(std::string* out_error_ptr)
@@ -271,8 +275,12 @@ void Replay::ReplayPlayer::ControlWindow::draw_controls()
                  ImGuiWindowFlags_NoSavedSettings |
                  ImGuiWindowFlags_NoTitleBar);
 
-    ImGui::Text("State: %s",
-                Replay::ReplayPlayerSupport::StateNames::get_state_name_ptr(status.state) );
+    {
+        const char* state_name_ptr = Replay::ReplayPlayerSupport::StateNames::get_state_name_ptr(status.state);
+
+        ImGui::Text("State: %s",
+                    state_name_ptr);
+    }
 
     extend_func();
 
@@ -365,12 +373,17 @@ void Replay::ReplayPlayer::ControlWindow::fit_to_content()
         outer_rect.bottom = m_content_height;
         outer_rect.right  = m_content_width;
 
-        ::AdjustWindowRectEx(&outer_rect,
-                             static_cast<DWORD>(::GetWindowLongW(m_hwnd,
-                                                                 GWL_STYLE) ),
-                             FALSE,
-                             static_cast<DWORD>(::GetWindowLongW(m_hwnd,
-                                                                 GWL_EXSTYLE) ));
+        {
+            const DWORD extended_style = static_cast<DWORD>(::GetWindowLongW(m_hwnd,
+                                                                             GWL_EXSTYLE) );
+            const DWORD style          = static_cast<DWORD>(::GetWindowLongW(m_hwnd,
+                                                                             GWL_STYLE) );
+
+            ::AdjustWindowRectEx(&outer_rect,
+                                 style,
+                                 FALSE,
+                                 extended_style);
+        }
 
         ::SetWindowPos(m_hwnd,
                        nullptr,
@@ -537,9 +550,14 @@ void Replay::ReplayPlayer::ControlWindow::place_below_replay_window()
 
         ::GetWindowRect(m_hwnd,
                        &control_rect);
-        ::GetMonitorInfoW(::MonitorFromRect(&replay_rect,
-                                            MONITOR_DEFAULTTONEAREST),
-                         &monitor_info);
+
+        {
+            const HMONITOR replay_monitor = ::MonitorFromRect(&replay_rect,
+                                                              MONITOR_DEFAULTTONEAREST);
+
+            ::GetMonitorInfoW(replay_monitor,
+                             &monitor_info);
+        }
 
         /* Under the window of the replay, in the middle; if that leaves the screen, it is moved back into it. */
         x = placement.x + (placement.width - (control_rect.right - control_rect.left) ) / N_PARTS_TO_CENTER;

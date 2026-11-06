@@ -17,8 +17,9 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiTexEnvfv(GLenum         target,
                                                          GLenum         pname,
                                                          const GLfloat* params)
 {
+    const uint32_t                          n_params = Interception::Hooks::OpenGL::Utils::get_n_tex_env_params(target, pname);
     APIInterceptor::MemoryChunk             params_chunk(params,
-                                                         Interception::Hooks::OpenGL::Utils::get_n_tex_env_params(target, pname),
+                                                         n_params,
                                                          sizeof(GLfloat));
     void*                                   post_callback_func_arg = nullptr;
     APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;

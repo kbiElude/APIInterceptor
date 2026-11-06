@@ -56,7 +56,8 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiEdgeFlagPointer(GLsizei       st
 
     if (tracker.is_top_level_api_call() )
     {
-        auto& context = Interception::Hooks::OpenGL::get_context_state();
+        auto&          context      = Interception::Hooks::OpenGL::get_context_state();
+        const uint32_t bound_buffer = context.buffer_manager.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ARRAY_BUFFER);
 
         context.client_array_manager.set_pointer(Interception::Hooks::OpenGL::ClientArrayKind::EDGE_FLAG,
                                                0,
@@ -64,7 +65,7 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiEdgeFlagPointer(GLsizei       st
                                                GL_UNSIGNED_BYTE,
                                                stride,
                                                pointer,
-                                               context.buffer_manager.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ARRAY_BUFFER),
+                                               bound_buffer,
                                                false,  /* in_is_integer    */
                                                false,  /* in_is_long       */
                                                false); /* in_is_normalized */

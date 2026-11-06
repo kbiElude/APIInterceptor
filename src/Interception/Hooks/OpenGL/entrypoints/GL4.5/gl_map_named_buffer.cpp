@@ -63,13 +63,14 @@ void* AI_APIENTRY Interception::Hooks::OpenGL::aiMapNamedBuffer(GLuint buffer,
     {
         auto& context = Interception::Hooks::OpenGL::get_context_state();
 
-        const int64_t length = static_cast<int64_t>(context.buffer_manager.get_size(buffer) );
+        const uint32_t flags  = Interception::Hooks::OpenGL::BufferMappingManager::get_flags_for_access(access);
+        const int64_t  length = static_cast<int64_t>(context.buffer_manager.get_size(buffer) );
 
         context.buffer_mapping_manager.on_buffer_mapped(buffer,
                                                         result,
                                                         0,
                                                         length,
-                                                        Interception::Hooks::OpenGL::BufferMappingManager::get_flags_for_access(access) );
+                                                        flags);
 
         if (context.buffer_mapping_manager.is_persistent(buffer) )
         {

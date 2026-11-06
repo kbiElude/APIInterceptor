@@ -20,10 +20,11 @@ int32_t Replay::ReplayEngineDLL::D3D8LockReplayer::get_dumped_int32(const D3D8Re
                                                                       const size_t&            in_n_argument,
                                                                       const size_t&            in_index)
 {
-    size_t         n_bytes  = 0;
-    const uint8_t* data_ptr = in_context.get_chunk_data_ptr(in_context.get_out_argument_ptr(in_n_argument),
-                                                            &n_bytes);
-    int32_t        result   = 0;
+    const APIInterceptor::APIFunctionArgument* argument_ptr = in_context.get_out_argument_ptr(in_n_argument);
+    size_t                                     n_bytes      = 0;
+    const uint8_t*                             data_ptr     = in_context.get_chunk_data_ptr(argument_ptr,
+                                                                                            &n_bytes);
+    int32_t                                    result       = 0;
 
     if (data_ptr != nullptr                          &&
         n_bytes  >= (in_index + 1) * sizeof(int32_t) )
@@ -117,11 +118,13 @@ bool Replay::ReplayEngineDLL::D3D8LockReplayer::lock(const Capture::APIDumpLoade
     }
 
     {
-        const LockKey key(object_ptr,
-                          get_u32_argument(*m_context_ptr,
-                                           spec_ptr->n_face_argument),
-                          get_u32_argument(*m_context_ptr,
-                                           spec_ptr->n_level_argument) );
+        const uint32_t face_value  = get_u32_argument(*m_context_ptr,
+                                                      spec_ptr->n_face_argument);
+        const uint32_t level_value = get_u32_argument(*m_context_ptr,
+                                                      spec_ptr->n_level_argument);
+        const LockKey  key(object_ptr,
+                           face_value,
+                           level_value);
 
         switch (spec_ptr->kind)
         {
@@ -192,9 +195,10 @@ bool Replay::ReplayEngineDLL::D3D8LockReplayer::lock_box(const Capture::APIDumpL
                                                                                      spec_ptr->n_flags_argument);
 
     {
-        size_t         n_bytes  = 0;
-        const uint8_t* data_ptr = m_context_ptr->get_chunk_data_ptr(m_context_ptr->get_in_argument_ptr(static_cast<size_t>(spec_ptr->n_region_argument) ),
-                                                                    &n_bytes);
+        const APIInterceptor::APIFunctionArgument* region_argument_ptr = m_context_ptr->get_in_argument_ptr(static_cast<size_t>(spec_ptr->n_region_argument) );
+        size_t                                     n_bytes             = 0;
+        const uint8_t*                             data_ptr            = m_context_ptr->get_chunk_data_ptr(region_argument_ptr,
+                                                                                                           &n_bytes);
 
         if (n_bytes >= sizeof(box) )
         {
@@ -460,11 +464,13 @@ bool Replay::ReplayEngineDLL::D3D8LockReplayer::unlock(const Capture::APIDumpLoa
     }
 
     {
-        const LockKey key(object_ptr,
-                          get_u32_argument(*m_context_ptr,
-                                            spec_ptr->n_face_argument),
-                          get_u32_argument(*m_context_ptr,
-                                            spec_ptr->n_level_argument));
+        const uint32_t face_value  = get_u32_argument(*m_context_ptr,
+                                                      spec_ptr->n_face_argument);
+        const uint32_t level_value = get_u32_argument(*m_context_ptr,
+                                                      spec_ptr->n_level_argument);
+        const LockKey  key(object_ptr,
+                           face_value,
+                           level_value);
 
         const uint8_t* data_ptr   = m_context_ptr->get_chunk_data_ptr(&in_call.arg_in_vec.back(), /* the data the dumper stored is the last argument */
                                                                       &n_bytes);

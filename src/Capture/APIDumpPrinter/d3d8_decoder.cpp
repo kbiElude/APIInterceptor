@@ -178,12 +178,14 @@ bool Capture::APIDumpPrinter::D3D8Decoder::format_struct(const Interception::Hoo
             if (read_func(&value,
                           sizeof(value) ))
             {
+                const size_t      driver_n_chars      = strnlen(value.Driver,
+                                                                sizeof(value.Driver) );
+                const size_t      description_n_chars = strnlen(value.Description,
+                                                                sizeof(value.Description) );
                 const std::string driver_name(value.Driver,
-                                              strnlen(value.Driver,
-                                                      sizeof(value.Driver) ));
+                                              driver_n_chars);
                 const std::string description(value.Description,
-                                              strnlen(value.Description,
-                                                      sizeof(value.Description) ));
+                                              description_n_chars);
 
                 stream << "{Driver=\"" << driver_name << "\""
                        << " Description=\"" << description << "\""
@@ -310,11 +312,14 @@ bool Capture::APIDumpPrinter::D3D8Decoder::format_struct(const Interception::Hoo
             if (in_chunk_u8_vec.size() == CREATION_PARAMETERS_N_BYTES_32 ||
                 in_chunk_u8_vec.size() == CREATION_PARAMETERS_N_BYTES_64)
             {
+                const uint32_t behavior_flags = read_u32_func(CREATION_PARAMETERS_HEAD_N_BYTES + pointer_size);
+                const uint32_t device_type    = read_u32_func(1 * sizeof(uint32_t));
+
                 stream << "{AdapterOrdinal=" << read_u32_func(0 * sizeof(uint32_t))
                        << " DeviceType=" << format_enum(Interception::Hooks::D3D8::ValueKind::DEVICE_TYPE,
-                                                        read_u32_func(1 * sizeof(uint32_t)) )
+                                                        device_type)
                        << " BehaviorFlags=" << format_flags(Interception::Hooks::D3D8::ValueKind::CREATE_FLAGS,
-                                                            read_u32_func(CREATION_PARAMETERS_HEAD_N_BYTES + pointer_size) ) << "}";
+                                                            behavior_flags) << "}";
 
                 result = true;
             }
@@ -587,21 +592,25 @@ bool Capture::APIDumpPrinter::D3D8Decoder::format_struct(const Interception::Hoo
             if (in_chunk_u8_vec.size() == PRESENT_PARAMETERS_N_BYTES_32 ||
                 in_chunk_u8_vec.size() == PRESENT_PARAMETERS_N_BYTES_64)
             {
-                const size_t tail_offset = PRESENT_PARAMETERS_HEAD_N_BYTES + pointer_size;
+                const size_t   tail_offset               = PRESENT_PARAMETERS_HEAD_N_BYTES + pointer_size;
+                const uint32_t auto_depth_stencil_format = read_u32_func(tail_offset + 2 * sizeof(uint32_t));
+                const uint32_t back_buffer_format        = read_u32_func(2 * sizeof(uint32_t));
+                const uint32_t multi_sample_type         = read_u32_func(4 * sizeof(uint32_t));
+                const uint32_t swap_effect               = read_u32_func(5 * sizeof(uint32_t));
 
                 stream << "{BackBufferWidth=" << read_u32_func(0 * sizeof(uint32_t))
                        << " BackBufferHeight=" << read_u32_func(1 * sizeof(uint32_t))
                        << " BackBufferFormat=" << format_enum(Interception::Hooks::D3D8::ValueKind::FORMAT,
-                                                              read_u32_func(2 * sizeof(uint32_t)) )
+                                                              back_buffer_format)
                        << " BackBufferCount=" << read_u32_func(3 * sizeof(uint32_t))
                        << " MultiSampleType=" << format_enum(Interception::Hooks::D3D8::ValueKind::MULTI_SAMPLE_TYPE,
-                                                             read_u32_func(4 * sizeof(uint32_t)) )
+                                                             multi_sample_type)
                        << " SwapEffect=" << format_enum(Interception::Hooks::D3D8::ValueKind::SWAP_EFFECT,
-                                                        read_u32_func(5 * sizeof(uint32_t)) )
+                                                        swap_effect)
                        << " Windowed=" << ValueFormatter::format_boolean(static_cast<int32_t>(read_u32_func(tail_offset + 0 * sizeof(uint32_t)) ))
                        << " EnableAutoDepthStencil=" << ValueFormatter::format_boolean(static_cast<int32_t>(read_u32_func(tail_offset + 1 * sizeof(uint32_t)) ))
                        << " AutoDepthStencilFormat=" << format_enum(Interception::Hooks::D3D8::ValueKind::FORMAT,
-                                                                    read_u32_func(tail_offset + 2 * sizeof(uint32_t)) )
+                                                                    auto_depth_stencil_format)
                        << " Flags=" << ValueFormatter::format_hex(read_u32_func(tail_offset + 3 * sizeof(uint32_t)) )
                        << " FullScreen_RefreshRateInHz=" << read_u32_func(tail_offset + 4 * sizeof(uint32_t))
                        << " FullScreen_PresentationInterval=" << ValueFormatter::format_hex(read_u32_func(tail_offset + 5 * sizeof(uint32_t)) ) << "}";
@@ -1108,9 +1117,11 @@ void Capture::APIDumpPrinter::D3D8Decoder::register_created_objects(const Captur
             method_info_ptr                   != nullptr)
         {
             /* Create* methods always return new objects; Get* ones return existing objects, which may be unknown to us. */
+            constexpr char CREATE_PREFIX[] = "Create";
+
             const bool is_create = (strncmp(method_info_ptr->method_name_ptr,
-                                            "Create",
-                                            strlen("Create") ) == 0);
+                                            CREATE_PREFIX,
+                                            sizeof(CREATE_PREFIX) - 1) == 0);
 
             for (uint32_t n_argument = 0;
                           n_argument < in_call.arg_out_vec.size();

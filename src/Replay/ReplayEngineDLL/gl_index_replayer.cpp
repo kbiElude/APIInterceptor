@@ -18,10 +18,11 @@ Replay::ReplayEngineDLL::GlIndexReplayer::GlIndexReplayer(GlReplayContext* in_co
 std::vector<uint32_t> Replay::ReplayEngineDLL::GlIndexReplayer::get_numbers(const GlReplayContext& in_context,
                                                                               const size_t&          in_n_argument)
 {
-    size_t                n_bytes  = 0;
-    const uint8_t*        data_ptr = in_context.get_chunk_data_ptr(in_context.get_in_argument_ptr(in_n_argument),
-                                                                   &n_bytes);
-    std::vector<uint32_t> result_vec(n_bytes / sizeof(uint32_t));
+    const APIInterceptor::APIFunctionArgument* argument_ptr = in_context.get_in_argument_ptr(in_n_argument);
+    size_t                                     n_bytes      = 0;
+    const uint8_t*                             data_ptr     = in_context.get_chunk_data_ptr(argument_ptr,
+                                                                                            &n_bytes);
+    std::vector<uint32_t>                      result_vec(n_bytes / sizeof(uint32_t));
 
     if (data_ptr != nullptr)
     {
@@ -166,11 +167,12 @@ bool Replay::ReplayEngineDLL::GlIndexReplayer::replay_draw_buffers(const Capture
 
     {
         /* Position n of the array is the n-th output of the fragment shader; the rest of the places hold nothing. */
-        const std::vector<uint32_t> live_vec = permute(get_numbers(*m_context_ptr,
-                                                                   n_first_argument + 1),
-                                                       ObjectKind::FRAG_DATA_LOCATION,
-                                                       0, /* in_scope */
-                                                       GL_NONE);
+        const std::vector<uint32_t> dumped_vec = get_numbers(*m_context_ptr,
+                                                             n_first_argument + 1);
+        const std::vector<uint32_t> live_vec   = permute(dumped_vec,
+                                                         ObjectKind::FRAG_DATA_LOCATION,
+                                                         0, /* in_scope */
+                                                         GL_NONE);
 
         if (in_is_named)
         {
@@ -181,8 +183,10 @@ bool Replay::ReplayEngineDLL::GlIndexReplayer::replay_draw_buffers(const Capture
 
             if (draw_func_ptr != nullptr)
             {
-                draw_func_ptr(m_context_ptr->map_name        (ObjectKind::FRAMEBUFFER,
-                                                              framebuffer),
+                const uint32_t live_framebuffer = m_context_ptr->map_name(ObjectKind::FRAMEBUFFER,
+                                                                          framebuffer);
+
+                draw_func_ptr(live_framebuffer,
                               static_cast<GLsizei>           (live_vec.size() ),
                               reinterpret_cast<const GLenum*>(live_vec.data() ));
             }

@@ -88,11 +88,13 @@ void Replay::ReplayPlayer::ConsoleObserver::on_frame_presented(const uint32_t& i
 void Replay::ReplayPlayer::ConsoleObserver::on_state_changed(const Replay::ReplayEngineDLL::PlaybackState& in_old_state,
                                                                      const Replay::ReplayEngineDLL::PlaybackState& in_new_state)
 {
+    const char* state_name_ptr = Replay::ReplayPlayerSupport::StateNames::get_state_name_ptr(in_new_state);
+
     (void) in_old_state;
 
     fprintf(stdout,
             "[*] %s\n",
-            Replay::ReplayPlayerSupport::StateNames::get_state_name_ptr(in_new_state) );
+            state_name_ptr);
 
     /* A pause, or the end, closes a stretch of frames; the time to the next one does not count. */
     if (in_new_state != Replay::ReplayEngineDLL::PlaybackState::PLAYING)
@@ -310,11 +312,12 @@ void Replay::ReplayPlayer::run_console(Replay::ReplayEngineDLL::IPlaybackControl
 
         if (command == "s")
         {
-            const auto status = in_controller_ptr->get_status();
+            const auto  status         = in_controller_ptr->get_status();
+            const char* state_name_ptr = Replay::ReplayPlayerSupport::StateNames::get_state_name_ptr(status.state);
 
             fprintf(stdout,
                     "[*] %s: %llu calls, %u frames\n",
-                    Replay::ReplayPlayerSupport::StateNames::get_state_name_ptr(status.state),
+                    state_name_ptr,
                     static_cast<unsigned long long>(status.n_calls_executed),
                     status.n_frames_presented);
         }

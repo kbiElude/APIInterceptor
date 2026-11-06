@@ -252,18 +252,22 @@ void Capture::APIDumpPrinter::print_argument(FILE*                              
 
         case APIInterceptor::ARGTYPE_I32_GLENUM:
         {
+            const char* enum_name_ptr = Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(static_cast<GLenum>(in_argument.get_i32_glenum() ));
+
             fprintf(in_file_handle,
                     "%s",
-                    Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(static_cast<GLenum>(in_argument.get_i32_glenum() )) );
+                    enum_name_ptr);
 
             break;
         }
 
         case APIInterceptor::ARGTYPE_U32_GLENUM:
         {
+            const char* enum_name_ptr = Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(in_argument.get_u32_glenum() );
+
             fprintf(in_file_handle,
                     "%s",
-                    Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(in_argument.get_u32_glenum() ) );
+                    enum_name_ptr);
 
             break;
         }
@@ -329,9 +333,13 @@ void Capture::APIDumpPrinter::print_call(FILE*                                  
         }
     };
 
-    fprintf(in_file_handle,
-            "%s(",
-            Capture::APIDumpNames::get_function_name(in_call.func) );
+    {
+        const char* function_name_ptr = Capture::APIDumpNames::get_function_name(in_call.func);
+
+        fprintf(in_file_handle,
+                "%s(",
+                function_name_ptr);
+    }
 
     for (size_t n_argument = 0; n_argument < in_call.arg_in_vec.size(); ++n_argument)
     {
