@@ -5,7 +5,7 @@
 #
 # Only what is named here is installed: no libraries, no debug information, and no program of an earlier build that is not a target any
 # more. A program that has both architectures has them side by side, the 64-bit one with the suffix _x64 and the 32-bit one with _x86
-# (the replay programs have _x86 in the name of the 32-bit target, see Replay.cmake), since each looks for its partners next to itself.
+# (the replay programs have _x86 in the name of the 32-bit target, see replay.cmake), since each looks for its partners next to itself.
 #
 #   build_final\tools\APIDumper\     the dumper, its DLL and the printer of a capture
 #   build_final\tools\Replay\        the replay player and the replay engine
@@ -15,7 +15,7 @@ if (NOT CMAKE_SOURCE_DIR STREQUAL APIInterceptor_SOURCE_DIR)
     return()
 endif()
 
-include(${APIInterceptor_SOURCE_DIR}/cmake/InstallHelpers.cmake)
+include(${APIInterceptor_SOURCE_DIR}/cmake/install_helpers.cmake)
 
 if (APIINTERCEPTOR_BUILD_TOOLS)
     install_with_suffix(APIDumper    "tools/APIDumper")

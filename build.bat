@@ -4,7 +4,7 @@ rem ============================================================
 rem  build.bat
 rem
 rem  Builds APIInterceptor for both x86 and x64, then installs both
-rem  into build_final\ (cmake\Install.cmake says what goes where).
+rem  into build_final\ (cmake\install.cmake says what goes where).
 rem
 rem  Usage:
 rem    build.bat [mode] [--debug] [--source-dir <dir>]
@@ -206,7 +206,7 @@ exit /b %errorlevel%
 rem --- :collect_binaries ----------------------------------------
 rem  Empties build_final\, then installs both build trees into it, so that the
 rem  directory can be zipped as it is. What goes where, and under which name, is
-rem  said by cmake\Install.cmake (the layout is described there): no libraries,
+rem  said by cmake\install.cmake (the layout is described there): no libraries,
 rem  no debug information, and nothing that is not a target any more.
 
 :collect_binaries
