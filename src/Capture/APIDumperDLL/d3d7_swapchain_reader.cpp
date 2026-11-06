@@ -32,7 +32,7 @@ bool Capture::APIDumperDLL::D3D7SwapchainReader::get_source_format(const Interce
         in_pixel_format.dwBBitMask    == MASK_BLUE_8_BITS)
     {
         *out_source_format_ptr = (in_pixel_format.dwRGBAlphaBitMask == MASK_ALPHA_A8R8G8B8) ? PixelConverter::SourceFormat::A8R8G8B8
-                                                                                           : PixelConverter::SourceFormat::X8R8G8B8;
+                                                                                            : PixelConverter::SourceFormat::X8R8G8B8;
     }
     else
     if (in_pixel_format.dwRGBBitCount == BIT_COUNT_16      &&
@@ -49,7 +49,7 @@ bool Capture::APIDumperDLL::D3D7SwapchainReader::get_source_format(const Interce
         in_pixel_format.dwBBitMask    == MASK_BLUE_5_BITS)
     {
         *out_source_format_ptr = (in_pixel_format.dwRGBAlphaBitMask == MASK_ALPHA_A1R5G5B5) ? PixelConverter::SourceFormat::A1R5G5B5
-                                                                                           : PixelConverter::SourceFormat::X1R5G5B5;
+                                                                                            : PixelConverter::SourceFormat::X1R5G5B5;
     }
     else
     {
@@ -88,7 +88,7 @@ end:
     if (back_buffer_ptr != nullptr)
     {
         const auto release_func = APIInterceptor::get_method_ptr<Interception::Hooks::D3D7::PFN_IDIRECTDRAWSURFACE7_RELEASE>(back_buffer_ptr,
-                                                                                                                              Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECTDRAWSURFACE7_RELEASE);
+                                                                                                                             Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECTDRAWSURFACE7_RELEASE);
 
         release_func(back_buffer_ptr);
     }
@@ -108,7 +108,7 @@ bool Capture::APIDumperDLL::D3D7SwapchainReader::read_surface(void*             
     bool                                      result        = false;
     PixelConverter::SourceFormat              source_format = PixelConverter::SourceFormat::A8R8G8B8;
 
-    const auto surface_ptr = static_cast<Interception::Hooks::D3D7::IDirectDrawSurface7*>(in_surface_ptr);
+    const auto surface_ptr = static_cast<Interception::Hooks::D3D7::IDirectDrawSurface7*>                             (in_surface_ptr);
     const auto lock_func   = APIInterceptor::get_method_ptr<Interception::Hooks::D3D7::PFN_IDIRECTDRAWSURFACE7_LOCK>  (in_surface_ptr,
                                                                                                                        Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECTDRAWSURFACE7_LOCK);
     const auto unlock_func = APIInterceptor::get_method_ptr<Interception::Hooks::D3D7::PFN_IDIRECTDRAWSURFACE7_UNLOCK>(in_surface_ptr,
