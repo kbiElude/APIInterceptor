@@ -106,7 +106,7 @@ int main(int   in_argc,
                 "it's UINT32_MAX. The dump is written as soon as that many frames have been presented; otherwise,\n"
                 "it is written when the app exits.\n"
                 "\n"
-                "The --dump-swapchain-on-present is optional; if specified, the color buffer (OpenGL, D3D8) is taken\n"
+                "The --dump-swapchain-on-present is optional; if specified, the color buffer (OpenGL, D3D7, D3D8) is taken\n"
                 "right before present and stored in the dump as RGBA8, bottom row first. Use --dump-n-frames to\n"
                 "limit the number of frames to be dumped.\n"
                 "\n"
