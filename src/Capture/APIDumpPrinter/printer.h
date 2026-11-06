@@ -7,7 +7,7 @@
 #ifndef APIDUMPPRINTER_PRINTER_H
 #define APIDUMPPRINTER_PRINTER_H
 
-#include "Capture/APIDumpLoader/APIDumpLoader.h"
+#include "Capture/APIDumpLoader/api_dump_loader.h"
 #include "types.h"
 #include <map>
 #include <set>

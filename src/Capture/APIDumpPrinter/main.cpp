@@ -11,9 +11,9 @@
 #include <set>
 #include <string>
 #include <vector>
-#include "Capture/APIDumpLoader/APIDumpLoader.h"
-#include "Capture/APIDumpLoader/WorkloadIndex.h"
-#include "Capture/APIDumpLoader/WorkloadReader.h"
+#include "Capture/APIDumpLoader/api_dump_loader.h"
+#include "Capture/APIDumpLoader/workload_index.h"
+#include "Capture/APIDumpLoader/workload_reader.h"
 #include "Capture/APIDumpLoader/api_info.h"
 #include "Capture/APIDumpNames/function_names.h"
 #include "d3d7_decoder.h"

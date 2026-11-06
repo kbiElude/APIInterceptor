@@ -3,7 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "player_launcher.h"
-#include "Capture/APIDumpLoader/WorkloadReader.h"
+#include "Capture/APIDumpLoader/workload_reader.h"
 #include <stdlib.h>
 #include <vector>
 #include <Windows.h>

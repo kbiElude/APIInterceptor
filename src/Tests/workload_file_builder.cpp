@@ -3,7 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include <gtest/gtest.h>
-#include "Capture/APIDumpLoader/APIDumpLoader.h"
+#include "Capture/APIDumpLoader/api_dump_loader.h"
 #include "Common/workload_format.h"
 #include "workload_file_builder.h"
 #include "zstd.h"

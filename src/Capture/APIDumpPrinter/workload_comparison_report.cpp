@@ -4,7 +4,7 @@
  *
  * --compare: what two captures have in common, and where their calls first differ (see WorkloadComparer).
  */
-#include "Capture/APIDumpLoader/WorkloadComparison.h"
+#include "Capture/APIDumpLoader/workload_comparison.h"
 #include "Capture/APIDumpNames/function_names.h"
 #include "printer.h"
 #include <algorithm>

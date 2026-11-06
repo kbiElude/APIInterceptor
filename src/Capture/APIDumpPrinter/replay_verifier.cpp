@@ -5,7 +5,7 @@
  * The checks of what the replay can do: --verify (a workload) and --unreplayed-functions (no workload). The decisions are the ones of the executors of
  * the replay engine (ICallExecutor::get_call_support), asked without a replay.
  */
-#include "Capture/APIDumpLoader/WorkloadReader.h"
+#include "Capture/APIDumpLoader/workload_reader.h"
 #include "Capture/APIDumpLoader/api_info.h"
 #include "Capture/APIDumpNames/function_names.h"
 #include "printer.h"

@@ -9,7 +9,7 @@
 #ifndef APIDUMPLOADER_OBJECT_NAMER_H
 #define APIDUMPLOADER_OBJECT_NAMER_H
 
-#include "Capture/APIDumpLoader/APIDumpLoader.h"
+#include "Capture/APIDumpLoader/api_dump_loader.h"
 #include <map>
 #include <stdint.h>
 #include <string>

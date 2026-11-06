@@ -5,8 +5,8 @@
  * A workload file is a header, followed by a sequence of segments (one per spill of the dumper's memory to disk). Data
  * chunk IDs count across segments. See Common/workload_format.h for the layout.
  */
-#include "Capture/APIDumpLoader/APIDumpLoader.h"
-#include "Capture/APIDumpLoader/WorkloadReader.h"
+#include "Capture/APIDumpLoader/api_dump_loader.h"
+#include "Capture/APIDumpLoader/workload_reader.h"
 
 Capture::APIDumpLoader::WorkloadUniquePtr Capture::APIDumpLoader::create_workload_from_file(const char* in_filename_ptr)
 {

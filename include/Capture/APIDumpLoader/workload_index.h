@@ -14,7 +14,7 @@
 #ifndef APIDUMPLOADER_WORKLOAD_INDEX_H
 #define APIDUMPLOADER_WORKLOAD_INDEX_H
 
-#include "Capture/APIDumpLoader/WorkloadReader.h"
+#include "Capture/APIDumpLoader/workload_reader.h"
 #include <stdint.h>
 #include <string>
 #include <vector>

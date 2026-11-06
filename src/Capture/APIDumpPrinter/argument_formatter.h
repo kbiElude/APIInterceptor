@@ -9,7 +9,7 @@
 #ifndef APIDUMPPRINTER_ARGUMENT_FORMATTER_H
 #define APIDUMPPRINTER_ARGUMENT_FORMATTER_H
 
-#include "Capture/APIDumpLoader/APIDumpLoader.h"
+#include "Capture/APIDumpLoader/api_dump_loader.h"
 #include <functional>
 #include <string>
 

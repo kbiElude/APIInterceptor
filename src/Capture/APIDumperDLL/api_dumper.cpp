@@ -10,7 +10,7 @@
 #include "GL/gl.h"
 #include "Interception/Hooks/Kernel32/callbacks.h"
 #include "Interception/Hooks/OpenGL/types.h"
-#include "APIDumper.h"
+#include "api_dumper.h"
 #include "d3d8_swapchain_reader.h"
 #include "zstd_file_writer.h"
 #include <algorithm>

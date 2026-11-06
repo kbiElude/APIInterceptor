@@ -2,8 +2,8 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
-#include "Capture/APIDumpLoader/WorkloadComparison.h"
-#include "Capture/APIDumpLoader/WorkloadReader.h"
+#include "Capture/APIDumpLoader/workload_comparison.h"
+#include "Capture/APIDumpLoader/workload_reader.h"
 #include "Capture/APIDumpLoader/api_info.h"
 
 namespace

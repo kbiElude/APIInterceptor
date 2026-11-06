@@ -5,8 +5,8 @@
 #ifndef REPLAYENGINEDLL_CALL_WALKER_H
 #define REPLAYENGINEDLL_CALL_WALKER_H
 
-#include "Capture/APIDumpLoader/APIDumpLoader.h"
-#include "Capture/APIDumpLoader/WorkloadReader.h"
+#include "Capture/APIDumpLoader/api_dump_loader.h"
+#include "Capture/APIDumpLoader/workload_reader.h"
 #include "i_chunk_source.h"
 #include <condition_variable>
 #include <mutex>

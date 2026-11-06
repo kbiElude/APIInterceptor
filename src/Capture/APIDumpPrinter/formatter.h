@@ -5,7 +5,7 @@
 #ifndef APIDUMPPRINTER_FORMATTER_H
 #define APIDUMPPRINTER_FORMATTER_H
 
-#include "Capture/APIDumpLoader/APIDumpLoader.h"
+#include "Capture/APIDumpLoader/api_dump_loader.h"
 #include "i_api_decoder.h"
 #include <stdio.h>
 #include <set>

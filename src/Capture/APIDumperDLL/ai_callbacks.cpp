@@ -3,7 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
  #include "Common/callbacks.h"
- #include "APIDumper.h"
+ #include "api_dumper.h"
 
 static APIDumperUniquePtr g_instance_ptr;
 

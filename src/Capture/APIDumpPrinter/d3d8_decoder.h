@@ -8,7 +8,7 @@
 #ifndef APIDUMPPRINTER_D3D8_DECODER_H
 #define APIDUMPPRINTER_D3D8_DECODER_H
 
-#include "Capture/APIDumpLoader/APIDumpLoader.h"
+#include "Capture/APIDumpLoader/api_dump_loader.h"
 #include "Capture/APIDumpLoader/object_namer.h"
 #include "i_api_decoder.h"
 #include "Interception/Hooks/D3D8/types.h"

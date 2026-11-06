@@ -5,7 +5,7 @@
  * Checks of the comparison of two workloads: what each holds, and where their calls first differ.
  */
 #include <gtest/gtest.h>
-#include "Capture/APIDumpLoader/WorkloadComparison.h"
+#include "Capture/APIDumpLoader/workload_comparison.h"
 #include "workload_file_builder.h"
 #include <stdio.h>
 

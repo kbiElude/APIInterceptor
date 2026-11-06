@@ -12,7 +12,7 @@
 #if !defined(APIDUMPLOADER_WORKLOAD_READER_H)
 #define APIDUMPLOADER_WORKLOAD_READER_H
 
-#include "Capture/APIDumpLoader/APIDumpLoader.h"
+#include "Capture/APIDumpLoader/api_dump_loader.h"
 #include "Capture/APIDumpLoader/api_info.h"
 #include "zstd.h"
 #include <memory>

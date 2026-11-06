@@ -5,8 +5,8 @@
  * Checks of reading workload files with threads: the segments must come out as they do without them.
  */
 #include <gtest/gtest.h>
-#include "Capture/APIDumpLoader/APIDumpLoader.h"
-#include "Capture/APIDumpLoader/WorkloadReader.h"
+#include "Capture/APIDumpLoader/api_dump_loader.h"
+#include "Capture/APIDumpLoader/workload_reader.h"
 #include "Common/workload_format.h"
 #include "workload_file_builder.h"
 #include <stdio.h>

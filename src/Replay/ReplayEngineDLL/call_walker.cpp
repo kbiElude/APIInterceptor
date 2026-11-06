@@ -3,7 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "call_walker.h"
-#include "Capture/APIDumpLoader/WorkloadIndex.h"
+#include "Capture/APIDumpLoader/workload_index.h"
 #include <algorithm>
 #include <thread>
 

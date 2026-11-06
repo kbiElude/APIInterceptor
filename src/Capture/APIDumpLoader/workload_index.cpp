@@ -2,7 +2,7 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
-#include "Capture/APIDumpLoader/WorkloadIndex.h"
+#include "Capture/APIDumpLoader/workload_index.h"
 #include "Capture/APIDumpLoader/api_info.h"
 #include <algorithm>
 #include <stdio.h>

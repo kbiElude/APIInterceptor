@@ -12,7 +12,7 @@
 #ifndef REPLAYENGINEDLL_REPLAY_COVERAGE_H
 #define REPLAYENGINEDLL_REPLAY_COVERAGE_H
 
-#include "Capture/APIDumpLoader/APIDumpLoader.h"
+#include "Capture/APIDumpLoader/api_dump_loader.h"
 #include "types.h"
 #include <functional>
 #include <map>

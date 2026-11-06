@@ -5,7 +5,7 @@
 #ifndef REPLAYENGINEDLL_I_CALL_INTERCEPTOR_H
 #define REPLAYENGINEDLL_I_CALL_INTERCEPTOR_H
 
-#include "Capture/APIDumpLoader/APIDumpLoader.h"
+#include "Capture/APIDumpLoader/api_dump_loader.h"
 
 namespace Replay
 {

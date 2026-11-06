@@ -7,7 +7,7 @@
 #ifndef APIDUMPPRINTER_I_API_DECODER_H
 #define APIDUMPPRINTER_I_API_DECODER_H
 
-#include "Capture/APIDumpLoader/APIDumpLoader.h"
+#include "Capture/APIDumpLoader/api_dump_loader.h"
 #include <stdio.h>
 
 namespace Capture

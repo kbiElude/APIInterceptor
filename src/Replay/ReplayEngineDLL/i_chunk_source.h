@@ -5,7 +5,7 @@
 #ifndef REPLAYENGINEDLL_I_CHUNK_SOURCE_H
 #define REPLAYENGINEDLL_I_CHUNK_SOURCE_H
 
-#include "Capture/APIDumpLoader/APIDumpLoader.h"
+#include "Capture/APIDumpLoader/api_dump_loader.h"
 #include <stdint.h>
 
 namespace Replay

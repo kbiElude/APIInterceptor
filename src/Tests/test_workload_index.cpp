@@ -6,7 +6,7 @@
  * have got on the way, and that an index is only used for the file it was made of.
  */
 #include <gtest/gtest.h>
-#include "Capture/APIDumpLoader/WorkloadIndex.h"
+#include "Capture/APIDumpLoader/workload_index.h"
 #include "workload_file_builder.h"
 #include <stdio.h>
 

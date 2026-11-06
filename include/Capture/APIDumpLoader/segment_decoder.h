@@ -12,7 +12,7 @@
 #if !defined(APIDUMPLOADER_SEGMENT_DECODER_H)
 #define APIDUMPLOADER_SEGMENT_DECODER_H
 
-#include "Capture/APIDumpLoader/APIDumpLoader.h"
+#include "Capture/APIDumpLoader/api_dump_loader.h"
 #include "zstd.h"
 #include <stddef.h>
 #include <stdint.h>

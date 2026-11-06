@@ -2,7 +2,7 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
-#include "Capture/APIDumpLoader/SegmentDecoder.h"
+#include "Capture/APIDumpLoader/segment_decoder.h"
 #include "Capture/APIDumpLoader/api_info.h"
 #include "Common/workload_format.h"
 #include <algorithm>

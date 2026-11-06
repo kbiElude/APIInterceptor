@@ -3,7 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "Capture/APIDumpLoader/api_info.h"
-#include "Capture/APIDumpLoader/APIDumpLoader.h"
+#include "Capture/APIDumpLoader/api_dump_loader.h"
 #include "Common/frame_boundary.h"
 #include "Common/macros.h"
 #include <string.h>
