@@ -9,6 +9,7 @@
 #include "call_walker.h"
 #include "executor_registry.h"
 #include "i_frame_executor.h"
+#include "i_frame_host.h"
 #include "listener_list.h"
 #include "object_remapper.h"
 #include "sequential_frame_executor.h"

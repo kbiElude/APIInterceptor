@@ -6,6 +6,7 @@
 #define REPLAYENGINEDLL_SEQUENTIAL_FRAME_EXECUTOR_H
 
 #include "i_frame_executor.h"
+#include "i_frame_host.h"
 
 namespace Replay
 {
