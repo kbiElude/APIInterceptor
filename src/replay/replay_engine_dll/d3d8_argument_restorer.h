@@ -14,6 +14,7 @@
 #include "common/vtable.h"
 #include "interception/core/D3D8Utils/types.h"
 #include "d3d8_replay_context.h"
+#include "passive_restorer.h"
 #include <string.h>
 #include <string>
 #include <type_traits>
@@ -112,18 +113,7 @@ namespace Replay
             };
 
             /* The restorers which have nothing to do after the call. */
-            class PassiveRestorer
-            {
-            public:
-                void finish(D3D8ReplayContext* in_context_ptr,
-                            const size_t&      in_n_argument,
-                            const bool&        in_is_success)
-                {
-                    (void) in_context_ptr;
-                    (void) in_n_argument;
-                    (void) in_is_success;
-                }
-            };
+            typedef ReplayEngineDLL::PassiveRestorer<D3D8ReplayContext> PassiveRestorer;
 
             template<typename T,
                      Interception::Core::D3D8Utils::ArgumentCategory category>
