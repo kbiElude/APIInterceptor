@@ -50,8 +50,8 @@ set(APIINTERCEPTOR_INCLUDE_DIRECTORIES "${APIInterceptor_BINARY_DIR}"
 
 include_directories(${APIINTERCEPTOR_INCLUDE_DIRECTORIES})
 
-file(GLOB CommonIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Common/*.h")
-file(GLOB CommonSources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Common/*.cpp")
+file(GLOB CommonIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/common/*.h")
+file(GLOB CommonSources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/common/*.cpp")
 
 include(cmake/interception.cmake)
 include(cmake/libraries.cmake)

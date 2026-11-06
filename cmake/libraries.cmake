@@ -15,10 +15,10 @@ if (APIINTERCEPTOR_BUILD_LIBS)
     target_include_directories(Zstd PUBLIC  "$<BUILD_INTERFACE:${APIInterceptor_SOURCE_DIR}/deps/zstd/lib>"
                                            "$<INSTALL_INTERFACE:include>")
 
-    file(GLOB APIDumpLoaderIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Capture/APIDumpLoader/*.h")
-    file(GLOB APIDumpLoaderSources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Capture/APIDumpLoader/*.cpp"
-                                                      "${APIInterceptor_SOURCE_DIR}/src/Common/fatal_error.cpp"
-                                                      "${APIInterceptor_SOURCE_DIR}/src/Common/types.cpp")
+    file(GLOB APIDumpLoaderIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/capture/api_dump_loader/*.h")
+    file(GLOB APIDumpLoaderSources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/capture/api_dump_loader/*.cpp"
+                                                      "${APIInterceptor_SOURCE_DIR}/src/common/fatal_error.cpp"
+                                                      "${APIInterceptor_SOURCE_DIR}/src/common/types.cpp")
 
     add_library(APIDumpLoader STATIC ${APIDumpLoaderIncludes} ${APIDumpLoaderSources})
 
@@ -26,9 +26,9 @@ if (APIINTERCEPTOR_BUILD_LIBS)
 
     # The names of the API functions, which the tools that say what a call is use: the Direct3D ones are in the descriptions of the interceptor.
     if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
-        file(GLOB APIDumpNamesIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Capture/APIDumpNames/*.h")
-        file(GLOB APIDumpNamesSources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Capture/APIDumpNames/*.cpp"
-                                                         "${APIInterceptor_SOURCE_DIR}/src/Capture/APIDumpNames/*.h")
+        file(GLOB APIDumpNamesIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/capture/api_dump_names/*.h")
+        file(GLOB APIDumpNamesSources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/capture/api_dump_names/*.cpp"
+                                                         "${APIInterceptor_SOURCE_DIR}/src/capture/api_dump_names/*.h")
 
         add_library(APIDumpNames STATIC ${APIDumpNamesIncludes} ${APIDumpNamesSources})
 
@@ -40,8 +40,8 @@ if (APIINTERCEPTOR_BUILD_LIBS)
 
     # The launcher needs Detours, which the interceptor builds.
     if (APIINTERCEPTOR_BUILD_INTERCEPTOR)
-        file(GLOB InjectionLauncherIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Capture/InjectionLauncher/*.h")
-        file(GLOB InjectionLauncherSources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/Capture/InjectionLauncher/*.cpp")
+        file(GLOB InjectionLauncherIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/capture/injection_launcher/*.h")
+        file(GLOB InjectionLauncherSources CONFIGURE_DEPENDS  "${APIInterceptor_SOURCE_DIR}/src/capture/injection_launcher/*.cpp")
 
         # Starting an application with a DLL in it: shared by the dumper and the programs which build on this project.
         add_library(InjectionLauncher STATIC ${InjectionLauncherIncludes} ${InjectionLauncherSources})

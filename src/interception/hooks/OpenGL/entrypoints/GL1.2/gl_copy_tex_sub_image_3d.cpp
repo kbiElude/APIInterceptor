@@ -1,0 +1,109 @@
+/* API Interceptor (c) 2024 Dominik Witczak
+ *
+ * This code is licensed under MIT license (see LICENSE.txt for details)
+ */
+#include "common/callbacks.h"
+#include "common/logger.h"
+#include "common/macros.h"
+#include "common/tracker.h"
+#include "interception/hooks/OpenGL/entrypoints/GL1.2/gl_copy_tex_sub_image_3d.h"
+#include "interception/hooks/OpenGL/globals.h"
+#include "interception/core/OpenGLUtils/utils_enum.h"
+#include "interception/hooks/WGL/globals.h"
+
+void AI_APIENTRY Interception::Hooks::OpenGL::aiCopyTexSubImage3D(GLenum  target,
+                                                                  GLint   level,
+                                                                  GLint   xoffset,
+                                                                  GLint   yoffset,
+                                                                  GLint   zoffset,
+                                                                  GLint   x,
+                                                                  GLint   y,
+                                                                  GLsizei width,
+                                                                  GLsizei height)
+{
+    void*                                   post_callback_func_arg = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
+    void*                                   pre_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
+    bool                                    should_pass_through    = true;
+    APIInterceptor::Tracker                 tracker;
+
+    if (tracker.is_top_level_api_call() )
+    {
+        AI_TRACE("glCopyTexSubImage3D(target=[%s] level=[%d] xoffset=[%d] yoffset=[%d] zoffset=[%d] x=[%d] y=[%d] width=[%d] height=[%d])",
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
+                 level,
+                 xoffset,
+                 yoffset,
+                 zoffset,
+                 x,
+                 y,
+                 static_cast<int32_t>(width),
+                 static_cast<int32_t>(height) );
+
+        if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCOPYTEXSUBIMAGE3D,
+                                                         &pre_callback_func_ptr,
+                                                         &pre_callback_func_arg) )
+        {
+            const APIInterceptor::APIFunctionArgument args[] =
+            {
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(target),
+                APIInterceptor::APIFunctionArgument::create_i32       (level),
+                APIInterceptor::APIFunctionArgument::create_i32       (xoffset),
+                APIInterceptor::APIFunctionArgument::create_i32       (yoffset),
+                APIInterceptor::APIFunctionArgument::create_i32       (zoffset),
+                APIInterceptor::APIFunctionArgument::create_i32       (x),
+                APIInterceptor::APIFunctionArgument::create_i32       (y),
+                APIInterceptor::APIFunctionArgument::create_i32       (width),
+                APIInterceptor::APIFunctionArgument::create_i32       (height),
+            };
+
+            pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLCOPYTEXSUBIMAGE3D,
+                                  sizeof(args) / sizeof(args[0]),
+                                  args,
+                                  pre_callback_func_arg,
+                                 &should_pass_through);
+        }
+    }
+
+    AI_ASSERT(should_pass_through);
+
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLCOPYTEXSUBIMAGE3DPROC>(Interception::Hooks::OpenGL::g_cached_gl_copy_tex_sub_image_3D)(target,
+                                                                                                                     level,
+                                                                                                                     xoffset,
+                                                                                                                     yoffset,
+                                                                                                                     zoffset,
+                                                                                                                     x,
+                                                                                                                     y,
+                                                                                                                     width,
+                                                                                                                     height);
+    }
+
+    if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCOPYTEXSUBIMAGE3D,
+                                                      &post_callback_func_ptr,
+                                                      &post_callback_func_arg) )
+    {
+        APIInterceptor::APIFunctionArgument result_arg;
+
+        const APIInterceptor::APIFunctionArgument args[] =
+        {
+            APIInterceptor::APIFunctionArgument::create_u32_glenum(target),
+            APIInterceptor::APIFunctionArgument::create_i32       (level),
+            APIInterceptor::APIFunctionArgument::create_i32       (xoffset),
+            APIInterceptor::APIFunctionArgument::create_i32       (yoffset),
+            APIInterceptor::APIFunctionArgument::create_i32       (zoffset),
+            APIInterceptor::APIFunctionArgument::create_i32       (x),
+            APIInterceptor::APIFunctionArgument::create_i32       (y),
+            APIInterceptor::APIFunctionArgument::create_i32       (width),
+            APIInterceptor::APIFunctionArgument::create_i32       (height),
+        };
+
+        post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLCOPYTEXSUBIMAGE3D,
+                               post_callback_func_arg,
+                               static_cast<uint32_t>(sizeof(args) / sizeof(args[0]) ),
+                               args,
+                              &result_arg);
+    }
+}

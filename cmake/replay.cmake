@@ -1,20 +1,20 @@
 # The replayer and the programs which play a workload.
 # The replayer needs the D3D8 description of the interceptor (D3D8Utils).
 if (APIINTERCEPTOR_BUILD_INTERCEPTOR AND APIINTERCEPTOR_BUILD_LIBS)
-    file(GLOB ReplayEngineDLLIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/Replay/ReplayEngineDLL/*.h")
-    file(GLOB ReplayEngineCoreSources CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL/*.cpp"
-                                                        "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL/*.h")
+    file(GLOB ReplayEngineDLLIncludes CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/include/replay/replay_engine_dll/*.h")
+    file(GLOB ReplayEngineCoreSources CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/src/replay/replay_engine_dll/*.cpp"
+                                                        "${APIInterceptor_SOURCE_DIR}/src/replay/replay_engine_dll/*.h")
 
     # The engine itself. A program which replays more than the plain sequence of calls links it and plugs its own executors
     # and frame executor in (see ReplayEngine); the DLL below is the engine as the player uses it.
-    list(REMOVE_ITEM ReplayEngineCoreSources "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL/entrypoints.cpp")
+    list(REMOVE_ITEM ReplayEngineCoreSources "${APIInterceptor_SOURCE_DIR}/src/replay/replay_engine_dll/entrypoints.cpp")
 
     add_library(ReplayEngineCore STATIC ${ReplayEngineDLLIncludes} ${ReplayEngineCoreSources})
 
-    target_include_directories(ReplayEngineCore PUBLIC "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL")
+    target_include_directories(ReplayEngineCore PUBLIC "${APIInterceptor_SOURCE_DIR}/src/replay/replay_engine_dll")
     target_link_libraries     (ReplayEngineCore PUBLIC APIDumpLoader D3D7Utils D3D8Utils gdi32 opengl32 user32 winmm)
 
-    add_library(ReplayEngineDLL SHARED ${ReplayEngineDLLIncludes} "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayEngineDLL/entrypoints.cpp")
+    add_library(ReplayEngineDLL SHARED ${ReplayEngineDLLIncludes} "${APIInterceptor_SOURCE_DIR}/src/replay/replay_engine_dll/entrypoints.cpp")
 
     target_compile_definitions(ReplayEngineDLL PRIVATE REPLAYENGINEDLL_BUILDING_DLL)
     target_link_libraries     (ReplayEngineDLL ReplayEngineCore)
@@ -33,16 +33,16 @@ if (APIINTERCEPTOR_BUILD_INTERCEPTOR AND APIINTERCEPTOR_BUILD_LIBS)
 
     # What the programs which play a workload have in common: the names of the states, the dialog which picks the file and the handover
     # of a workload with 32-bit only APIs from the 64-bit player to the 32-bit one.
-    file(GLOB ReplayPlayerSupportSources CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayPlayerSupport/*.cpp"
-                                                           "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayPlayerSupport/*.h")
+    file(GLOB ReplayPlayerSupportSources CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/src/replay/replay_player_support/*.cpp"
+                                                           "${APIInterceptor_SOURCE_DIR}/src/replay/replay_player_support/*.h")
 
     add_library(ReplayPlayerSupport STATIC ${ReplayPlayerSupportSources})
 
-    target_include_directories(ReplayPlayerSupport PUBLIC "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayPlayerSupport")
+    target_include_directories(ReplayPlayerSupport PUBLIC "${APIInterceptor_SOURCE_DIR}/src/replay/replay_player_support")
     target_link_libraries     (ReplayPlayerSupport PUBLIC APIDumpLoader comdlg32)
 
-    file(GLOB ReplayPlayerSources CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayPlayer/*.cpp"
-                                                     "${APIInterceptor_SOURCE_DIR}/src/Replay/ReplayPlayer/*.h")
+    file(GLOB ReplayPlayerSources CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/src/replay/replay_player/*.cpp"
+                                                     "${APIInterceptor_SOURCE_DIR}/src/replay/replay_player/*.h")
 
     add_executable(ReplayPlayer ${ReplayPlayerSources})
 

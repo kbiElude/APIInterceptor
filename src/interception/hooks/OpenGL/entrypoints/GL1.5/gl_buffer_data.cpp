@@ -1,0 +1,109 @@
+/* API Interceptor (c) 2024 Dominik Witczak
+ *
+ * This code is licensed under MIT license (see LICENSE.txt for details)
+ */
+#include "common/callbacks.h"
+#include "common/logger.h"
+#include "common/macros.h"
+#include "common/tracker.h"
+#include "interception/hooks/OpenGL/entrypoints/GL1.5/gl_buffer_data.h"
+#include "interception/hooks/OpenGL/globals.h"
+#include "interception/hooks/OpenGL/state_tracker.h"
+#include "interception/hooks/OpenGL/utils.h"
+#include "interception/core/OpenGLUtils/utils_enum.h"
+#include "interception/hooks/WGL/globals.h"
+
+void AI_APIENTRY Interception::Hooks::OpenGL::aiBufferData(GLenum      target,
+                                                           GLsizeiptr  size,
+                                                           const void* data,
+                                                           GLenum      usage)
+{
+    void*                                   post_callback_func_arg = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC post_callback_func_ptr = nullptr;
+    void*                                   pre_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
+    bool                                    should_pass_through    = true;
+    APIInterceptor::Tracker                 tracker;
+    uint32_t                                data_chunk_id          = 0;
+
+    if (tracker.is_top_level_api_call() )
+    {
+        AI_TRACE("glBufferData(target=[%s] size=[%d] data=[%p] usage=[%s])",
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
+                 static_cast<uint32_t>(size),
+                 data,
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(usage) );
+
+        /* data may be nullptr when the call is allocation-only (no initial upload). */
+        data_chunk_id = APIInterceptor::register_data_chunk(data,
+                                                            (data != nullptr) ? static_cast<uint32_t>(size) : 0u);
+
+        if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBUFFERDATA,
+                                                         &pre_callback_func_ptr,
+                                                         &pre_callback_func_arg) )
+        {
+            const APIInterceptor::APIFunctionArgument args[] =
+            {
+                APIInterceptor::APIFunctionArgument::create_u32_glenum   (target),
+                APIInterceptor::APIFunctionArgument::create_i64          (static_cast<int64_t>(size) ),
+                APIInterceptor::APIFunctionArgument::create_data_chunk_id(data_chunk_id),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum   (usage),
+            };
+
+            pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLBUFFERDATA,
+                                  sizeof(args) / sizeof(args[0]),
+                                  args,
+                                  pre_callback_func_arg,
+                                 &should_pass_through);
+        }
+    }
+
+    AI_ASSERT(should_pass_through);
+
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLBUFFERDATAPROC>(Interception::Hooks::OpenGL::g_cached_gl_buffer_data)(target,
+                                                                                                    size,
+                                                                                                    data,
+                                                                                                    usage);
+    }
+
+    if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBUFFERDATA,
+                                                      &post_callback_func_ptr,
+                                                      &post_callback_func_arg) )
+    {
+        APIInterceptor::APIFunctionArgument result_arg;
+
+        const APIInterceptor::APIFunctionArgument args[] =
+        {
+            APIInterceptor::APIFunctionArgument::create_u32_glenum   (target),
+            APIInterceptor::APIFunctionArgument::create_i64          (static_cast<int64_t>(size) ),
+            APIInterceptor::APIFunctionArgument::create_data_chunk_id(data_chunk_id),
+            APIInterceptor::APIFunctionArgument::create_u32_glenum   (usage),
+        };
+
+        post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLBUFFERDATA,
+                               post_callback_func_arg,
+                               static_cast<uint32_t>(sizeof(args) / sizeof(args[0]) ),
+                               args,
+                              &result_arg);
+    }
+
+    if (tracker.is_top_level_api_call() )
+    {
+        Interception::Hooks::OpenGL::BufferBindingTarget binding_target;
+
+        if (Interception::Hooks::OpenGL::Utils::get_buffer_binding_target_for_gl_enum(target,
+                                                                                     &binding_target) )
+        {
+            auto&        context         = Interception::Hooks::OpenGL::get_context_state();
+            const GLuint bound_buffer_id = context.buffer_manager.get_bound_buffer(binding_target);
+
+            if (bound_buffer_id != 0)
+            {
+                context.buffer_manager.set_size(bound_buffer_id,
+                                                static_cast<uint64_t>(size) );
+            }
+        }
+    }
+}

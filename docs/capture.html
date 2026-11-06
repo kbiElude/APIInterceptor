@@ -41,7 +41,7 @@
 <p><code>DataChunkStore</code> keeps the chunks. A chunk is registered when a call is made and given a number which is never used again. The store holds only the chunks from the oldest one that is neither taken nor released, so it does not grow while the program runs. A consumer takes a chunk once (<code>take_data_chunk</code>, or <code>take_data_chunks</code> for a run of them); taking moves the contents out.</p>
 
 <h3>Callbacks and the gate</h3>
-<p><code>CallbackRegistry</code> holds the pre and post callbacks of each function (registered at start-up, never changed after). <code>ApiCallGate</code> lets the dumper hold other threads back from entering intercepted calls while it cuts a segment of the workload. All three are process-wide objects that are never destroyed, since hooks can still run while the process shuts down; the free functions in <code>Common/callbacks.h</code> forward to them.</p>
+<p><code>CallbackRegistry</code> holds the pre and post callbacks of each function (registered at start-up, never changed after). <code>ApiCallGate</code> lets the dumper hold other threads back from entering intercepted calls while it cuts a segment of the workload. All three are process-wide objects that are never destroyed, since hooks can still run while the process shuts down; the free functions in <code>common/callbacks.h</code> forward to them.</p>
 
 <h3>Calls the interceptor makes itself</h3>
 <p>A program that builds on the interceptor (one that changes the calls, or plays them back) has to call the API too. Those calls go through <code>OwnCallScope</code>, which keeps the hooks from recording them as the program's.</p>

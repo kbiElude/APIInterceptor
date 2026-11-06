@@ -1,0 +1,95 @@
+/* API Interceptor (c) 2024 Dominik Witczak
+ *
+ * This code is licensed under MIT license (see LICENSE.txt for details)
+ */
+#include "common/callbacks.h"
+#include "common/logger.h"
+#include "common/macros.h"
+#include "common/tracker.h"
+#include "interception/hooks/OpenGL/entrypoints/GL4.3/gl_multi_draw_elements_indirect.h"
+#include "interception/hooks/OpenGL/globals.h"
+#include "interception/hooks/OpenGL/indirect_command_chunk.h"
+#include "interception/core/OpenGLUtils/utils_enum.h"
+#include "interception/hooks/WGL/globals.h"
+
+void AI_APIENTRY Interception::Hooks::OpenGL::aiMultiDrawElementsIndirect(GLenum      mode,
+                                                                          GLenum      type,
+                                                                          const void* indirect,
+                                                                          GLsizei     drawcount,
+                                                                          GLsizei     stride)
+{
+    Interception::Hooks::OpenGL::IndirectCommandChunk indirect_chunk;
+    void*                                             post_callback_func_arg = nullptr;
+    APIInterceptor::PFNPOSTCALLBACKFUNCPROC           post_callback_func_ptr = nullptr;
+    void*                                             pre_callback_func_arg  = nullptr;
+    APIInterceptor::PFNPRECALLBACKFUNCPROC            pre_callback_func_ptr  = nullptr;
+    bool                                              should_pass_through    = true;
+    APIInterceptor::Tracker                           tracker;
+
+    if (tracker.is_top_level_api_call() )
+    {
+        AI_TRACE("glMultiDrawElementsIndirect(mode=[%s] type=[%s] indirect=[%p] drawcount=[%d] stride=[%d])",
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(mode),
+                 Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(type),
+                 indirect,
+                 static_cast<int32_t>(drawcount),
+                 static_cast<int32_t>(stride));
+
+        indirect_chunk = Interception::Hooks::OpenGL::IndirectCommandChunk::create_for_draw_elements(indirect,
+                                                                                                     drawcount,
+                                                                                                     stride);
+
+        if (APIInterceptor::get_pre_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMULTIDRAWELEMENTSINDIRECT,
+                                                         &pre_callback_func_ptr,
+                                                         &pre_callback_func_arg) )
+        {
+            const APIInterceptor::APIFunctionArgument args[] =
+            {
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(mode),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(type),
+                indirect_chunk.get_arg(),
+                APIInterceptor::APIFunctionArgument::create_i32       (drawcount),
+                APIInterceptor::APIFunctionArgument::create_i32       (stride),
+            };
+
+            pre_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLMULTIDRAWELEMENTSINDIRECT,
+                                  sizeof(args) / sizeof(args[0]),
+                                  args,
+                                  pre_callback_func_arg,
+                                 &should_pass_through);
+        }
+    }
+
+    AI_ASSERT(should_pass_through);
+
+    if (should_pass_through)
+    {
+        reinterpret_cast<PFNGLMULTIDRAWELEMENTSINDIRECTPROC>(Interception::Hooks::OpenGL::g_cached_gl_multi_draw_elements_indirect)(mode,
+                                                                                                                                    type,
+                                                                                                                                    indirect,
+                                                                                                                                    drawcount,
+                                                                                                                                    stride);
+    }
+
+    if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMULTIDRAWELEMENTSINDIRECT,
+                                                      &post_callback_func_ptr,
+                                                      &post_callback_func_arg) )
+    {
+        APIInterceptor::APIFunctionArgument result_arg;
+
+        const APIInterceptor::APIFunctionArgument args[] =
+        {
+            APIInterceptor::APIFunctionArgument::create_u32_glenum(mode),
+            APIInterceptor::APIFunctionArgument::create_u32_glenum(type),
+            indirect_chunk.get_arg(),
+            APIInterceptor::APIFunctionArgument::create_i32       (drawcount),
+            APIInterceptor::APIFunctionArgument::create_i32       (stride),
+        };
+
+        post_callback_func_ptr(APIInterceptor::APIFUNCTION_GL_GLMULTIDRAWELEMENTSINDIRECT,
+                               post_callback_func_arg,
+                               static_cast<uint32_t>(sizeof(args) / sizeof(args[0]) ),
+                               args,
+                              &result_arg);
+    }
+}

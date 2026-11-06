@@ -1,0 +1,853 @@
+/* API Interceptor (c) 2025 Dominik Witczak
+ *
+ * This code is licensed under MIT license (see LICENSE.txt for details)
+ *
+ * Names of D3D8 enums and flags. Tables of values which the D3D8 types do not define use the D3D8 SDK values.
+ */
+#include "d3d8_names.h"
+#include "interception/hooks/D3D8/types.h"
+#include "shared_names.h"
+
+#define D3D8_FLAG_NAME(flag)          {static_cast<uint32_t>(Interception::Hooks::D3D8::flag), #flag}
+#define D3D8_NAMED_VALUE(name, value) {name, value}
+#define D3D8_VALUE_NAME(enumerator)   {#enumerator, static_cast<uint32_t>(Interception::Hooks::D3D8::enumerator)}
+
+#define D3D8_TABLE(array) array, static_cast<uint32_t>(sizeof(array) / sizeof(array[0]) )
+
+/* The tables which D3D7 has the same (see shared_names.h). */
+#define D3D8_SHARED_TABLE(table) get_shared_name_table(SharedNameTable::table).table_ptr, get_shared_name_table(SharedNameTable::table).n_entries
+
+bool Capture::APIDumpPrinter::get_flag_name_table(const Interception::Hooks::D3D8::ValueKind& in_kind,
+                                                   const FlagNameEntry**                       out_table_ptr_ptr,
+                                                   uint32_t*                                   out_n_entries_ptr)
+{
+    static const FlagNameEntry clear_flag_name_array[] =
+    {
+        D3D8_FLAG_NAME(D3DCLEAR_TARGET),
+        D3D8_FLAG_NAME(D3DCLEAR_ZBUFFER),
+        D3D8_FLAG_NAME(D3DCLEAR_STENCIL),
+    };
+
+    static const FlagNameEntry create_flag_name_array[] =
+    {
+        D3D8_FLAG_NAME(D3DCREATE_FPU_PRESERVE),
+        D3D8_FLAG_NAME(D3DCREATE_MULTITHREADED),
+        D3D8_FLAG_NAME(D3DCREATE_PUREDEVICE),
+        D3D8_FLAG_NAME(D3DCREATE_SOFTWARE_VERTEXPROCESSING),
+        D3D8_FLAG_NAME(D3DCREATE_HARDWARE_VERTEXPROCESSING),
+        D3D8_FLAG_NAME(D3DCREATE_MIXED_VERTEXPROCESSING),
+    };
+
+    static const FlagNameEntry lock_flag_name_array[] =
+    {
+        D3D8_FLAG_NAME(D3DLOCK_READONLY),
+        D3D8_FLAG_NAME(D3DLOCK_NOSYSLOCK),
+        D3D8_FLAG_NAME(D3DLOCK_NOOVERWRITE),
+        D3D8_FLAG_NAME(D3DLOCK_DISCARD),
+        D3D8_FLAG_NAME(D3DLOCK_NO_DIRTY_UPDATE),
+    };
+
+    static const FlagNameEntry usage_flag_name_array[] =
+    {
+        D3D8_FLAG_NAME(D3DUSAGE_RENDERTARGET),
+        D3D8_FLAG_NAME(D3DUSAGE_DEPTHSTENCIL),
+        D3D8_FLAG_NAME(D3DUSAGE_WRITEONLY),
+        D3D8_FLAG_NAME(D3DUSAGE_SOFTWAREPROCESSING),
+        D3D8_FLAG_NAME(D3DUSAGE_DONOTCLIP),
+        D3D8_FLAG_NAME(D3DUSAGE_POINTS),
+        D3D8_FLAG_NAME(D3DUSAGE_RTPATCHES),
+        D3D8_FLAG_NAME(D3DUSAGE_NPATCHES),
+        D3D8_FLAG_NAME(D3DUSAGE_DYNAMIC),
+    };
+
+    const auto set_table_func = [&](const FlagNameEntry* in_table_ptr,
+                                    const uint32_t&      in_n_entries)
+    {
+        *out_table_ptr_ptr = in_table_ptr;
+        *out_n_entries_ptr = in_n_entries;
+    };
+
+    bool result = true;
+
+    switch (in_kind)
+    {
+        case Interception::Hooks::D3D8::ValueKind::CLEAR_FLAGS:
+        {
+            set_table_func(D3D8_TABLE(clear_flag_name_array) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::ValueKind::CREATE_FLAGS:
+        {
+            set_table_func(D3D8_TABLE(create_flag_name_array) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::ValueKind::LOCK_FLAGS:
+        {
+            set_table_func(D3D8_TABLE(lock_flag_name_array) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::ValueKind::USAGE_FLAGS:
+        {
+            set_table_func(D3D8_TABLE(usage_flag_name_array) );
+
+            break;
+        }
+
+        default:
+        {
+            result = false;
+
+            break;
+        }
+    }
+
+    return result;
+}
+
+bool Capture::APIDumpPrinter::get_render_state_value_info(const uint32_t& in_render_state,
+                                                           StateValueInfo* out_info_ptr)
+{
+    static const ValueNameEntry blend_op_name_array[] =
+    {
+        D3D8_NAMED_VALUE("D3DBLENDOP_ADD",         1),
+        D3D8_NAMED_VALUE("D3DBLENDOP_SUBTRACT",    2),
+        D3D8_NAMED_VALUE("D3DBLENDOP_REVSUBTRACT", 3),
+        D3D8_NAMED_VALUE("D3DBLENDOP_MIN",         4),
+        D3D8_NAMED_VALUE("D3DBLENDOP_MAX",         5),
+    };
+
+    const auto set_info_func = [&](const StateValueFormat& in_format,
+                                   const ValueNameEntry*   in_table_ptr,
+                                   const uint32_t&         in_n_entries)
+    {
+        out_info_ptr->format    = in_format;
+        out_info_ptr->n_entries = in_n_entries;
+        out_info_ptr->table_ptr = in_table_ptr;
+    };
+
+    bool result = true;
+
+    switch (in_render_state)
+    {
+        case Interception::Hooks::D3D8::D3DRS_ZENABLE:
+        {
+            set_info_func(StateValueFormat::NAME,
+                          D3D8_SHARED_TABLE(Z_BUFFER_TYPE) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::D3DRS_FILLMODE:
+        {
+            set_info_func(StateValueFormat::NAME,
+                          D3D8_SHARED_TABLE(FILL_MODE) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::D3DRS_SHADEMODE:
+        {
+            set_info_func(StateValueFormat::NAME,
+                          D3D8_SHARED_TABLE(SHADE_MODE) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::D3DRS_SRCBLEND:
+        case Interception::Hooks::D3D8::D3DRS_DESTBLEND:
+        {
+            set_info_func(StateValueFormat::NAME,
+                          D3D8_SHARED_TABLE(BLEND) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::D3DRS_CULLMODE:
+        {
+            set_info_func(StateValueFormat::NAME,
+                          D3D8_SHARED_TABLE(CULL) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::D3DRS_ZFUNC:
+        case Interception::Hooks::D3D8::D3DRS_ALPHAFUNC:
+        case Interception::Hooks::D3D8::D3DRS_STENCILFUNC:
+        {
+            set_info_func(StateValueFormat::NAME,
+                          D3D8_SHARED_TABLE(CMP_FUNC) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::D3DRS_STENCILFAIL:
+        case Interception::Hooks::D3D8::D3DRS_STENCILZFAIL:
+        case Interception::Hooks::D3D8::D3DRS_STENCILPASS:
+        {
+            set_info_func(StateValueFormat::NAME,
+                          D3D8_SHARED_TABLE(STENCIL_OP) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::D3DRS_FOGTABLEMODE:
+        case Interception::Hooks::D3D8::D3DRS_FOGVERTEXMODE:
+        {
+            set_info_func(StateValueFormat::NAME,
+                          D3D8_SHARED_TABLE(FOG_MODE) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::D3DRS_DIFFUSEMATERIALSOURCE:
+        case Interception::Hooks::D3D8::D3DRS_SPECULARMATERIALSOURCE:
+        case Interception::Hooks::D3D8::D3DRS_AMBIENTMATERIALSOURCE:
+        case Interception::Hooks::D3D8::D3DRS_EMISSIVEMATERIALSOURCE:
+        {
+            set_info_func(StateValueFormat::NAME,
+                          D3D8_SHARED_TABLE(MATERIAL_COLOR_SOURCE) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::D3DRS_BLENDOP:
+        {
+            set_info_func(StateValueFormat::NAME,
+                          D3D8_TABLE(blend_op_name_array) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::D3DRS_ALPHABLENDENABLE:
+        case Interception::Hooks::D3D8::D3DRS_ALPHATESTENABLE:
+        case Interception::Hooks::D3D8::D3DRS_CLIPPING:
+        case Interception::Hooks::D3D8::D3DRS_COLORVERTEX:
+        case Interception::Hooks::D3D8::D3DRS_DITHERENABLE:
+        case Interception::Hooks::D3D8::D3DRS_EDGEANTIALIAS:
+        case Interception::Hooks::D3D8::D3DRS_FOGENABLE:
+        case Interception::Hooks::D3D8::D3DRS_INDEXEDVERTEXBLENDENABLE:
+        case Interception::Hooks::D3D8::D3DRS_LASTPIXEL:
+        case Interception::Hooks::D3D8::D3DRS_LIGHTING:
+        case Interception::Hooks::D3D8::D3DRS_LOCALVIEWER:
+        case Interception::Hooks::D3D8::D3DRS_MULTISAMPLEANTIALIAS:
+        case Interception::Hooks::D3D8::D3DRS_NORMALIZENORMALS:
+        case Interception::Hooks::D3D8::D3DRS_POINTSCALEENABLE:
+        case Interception::Hooks::D3D8::D3DRS_POINTSPRITEENABLE:
+        case Interception::Hooks::D3D8::D3DRS_RANGEFOGENABLE:
+        case Interception::Hooks::D3D8::D3DRS_SOFTWAREVERTEXPROCESSING:
+        case Interception::Hooks::D3D8::D3DRS_SPECULARENABLE:
+        case Interception::Hooks::D3D8::D3DRS_STENCILENABLE:
+        case Interception::Hooks::D3D8::D3DRS_ZVISIBLE:
+        case Interception::Hooks::D3D8::D3DRS_ZWRITEENABLE:
+        {
+            set_info_func(StateValueFormat::BOOLEAN,
+                          nullptr,
+                          0);
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::D3DRS_AMBIENT:
+        case Interception::Hooks::D3D8::D3DRS_FOGCOLOR:
+        case Interception::Hooks::D3D8::D3DRS_TEXTUREFACTOR:
+        {
+            set_info_func(StateValueFormat::COLOR,
+                          nullptr,
+                          0);
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::D3DRS_FOGDENSITY:
+        case Interception::Hooks::D3D8::D3DRS_FOGEND:
+        case Interception::Hooks::D3D8::D3DRS_FOGSTART:
+        case Interception::Hooks::D3D8::D3DRS_PATCHSEGMENTS:
+        case Interception::Hooks::D3D8::D3DRS_POINTSCALE_A:
+        case Interception::Hooks::D3D8::D3DRS_POINTSCALE_B:
+        case Interception::Hooks::D3D8::D3DRS_POINTSCALE_C:
+        case Interception::Hooks::D3D8::D3DRS_POINTSIZE:
+        case Interception::Hooks::D3D8::D3DRS_POINTSIZE_MAX:
+        case Interception::Hooks::D3D8::D3DRS_POINTSIZE_MIN:
+        case Interception::Hooks::D3D8::D3DRS_TWEENFACTOR:
+        {
+            set_info_func(StateValueFormat::FLOAT,
+                          nullptr,
+                          0);
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::D3DRS_CLIPPLANEENABLE:
+        case Interception::Hooks::D3D8::D3DRS_COLORWRITEENABLE:
+        case Interception::Hooks::D3D8::D3DRS_MULTISAMPLEMASK:
+        case Interception::Hooks::D3D8::D3DRS_STENCILMASK:
+        case Interception::Hooks::D3D8::D3DRS_STENCILWRITEMASK:
+        case Interception::Hooks::D3D8::D3DRS_WRAP0:
+        case Interception::Hooks::D3D8::D3DRS_WRAP1:
+        case Interception::Hooks::D3D8::D3DRS_WRAP2:
+        case Interception::Hooks::D3D8::D3DRS_WRAP3:
+        case Interception::Hooks::D3D8::D3DRS_WRAP4:
+        case Interception::Hooks::D3D8::D3DRS_WRAP5:
+        case Interception::Hooks::D3D8::D3DRS_WRAP6:
+        case Interception::Hooks::D3D8::D3DRS_WRAP7:
+        {
+            set_info_func(StateValueFormat::HEX,
+                          nullptr,
+                          0);
+
+            break;
+        }
+
+        default:
+        {
+            set_info_func(StateValueFormat::RAW,
+                          nullptr,
+                          0);
+
+            result = false;
+
+            break;
+        }
+    }
+
+    return result;
+}
+
+bool Capture::APIDumpPrinter::get_texture_stage_state_value_info(const uint32_t& in_texture_stage_state,
+                                                                  StateValueInfo* out_info_ptr)
+{
+    static const ValueNameEntry texture_filter_name_array[] =
+    {
+        D3D8_NAMED_VALUE("D3DTEXF_NONE",          0),
+        D3D8_NAMED_VALUE("D3DTEXF_POINT",         1),
+        D3D8_NAMED_VALUE("D3DTEXF_LINEAR",        2),
+        D3D8_NAMED_VALUE("D3DTEXF_ANISOTROPIC",   3),
+        D3D8_NAMED_VALUE("D3DTEXF_FLATCUBIC",     4),
+        D3D8_NAMED_VALUE("D3DTEXF_GAUSSIANCUBIC", 5),
+    };
+
+    const auto set_info_func = [&](const StateValueFormat& in_format,
+                                   const ValueNameEntry*   in_table_ptr,
+                                   const uint32_t&         in_n_entries)
+    {
+        out_info_ptr->format    = in_format;
+        out_info_ptr->n_entries = in_n_entries;
+        out_info_ptr->table_ptr = in_table_ptr;
+    };
+
+    bool result = true;
+
+    switch (in_texture_stage_state)
+    {
+        case Interception::Hooks::D3D8::D3DTSS_COLOROP:
+        case Interception::Hooks::D3D8::D3DTSS_ALPHAOP:
+        {
+            set_info_func(StateValueFormat::NAME,
+                          D3D8_SHARED_TABLE(TEXTURE_OP) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::D3DTSS_COLORARG0:
+        case Interception::Hooks::D3D8::D3DTSS_COLORARG1:
+        case Interception::Hooks::D3D8::D3DTSS_COLORARG2:
+        case Interception::Hooks::D3D8::D3DTSS_ALPHAARG0:
+        case Interception::Hooks::D3D8::D3DTSS_ALPHAARG1:
+        case Interception::Hooks::D3D8::D3DTSS_ALPHAARG2:
+        case Interception::Hooks::D3D8::D3DTSS_RESULTARG:
+        {
+            set_info_func(StateValueFormat::TEXTURE_ARGUMENT,
+                          D3D8_SHARED_TABLE(TEXTURE_ARGUMENT) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::D3DTSS_ADDRESSU:
+        case Interception::Hooks::D3D8::D3DTSS_ADDRESSV:
+        case Interception::Hooks::D3D8::D3DTSS_ADDRESSW:
+        {
+            set_info_func(StateValueFormat::NAME,
+                          D3D8_SHARED_TABLE(TEXTURE_ADDRESS) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::D3DTSS_MAGFILTER:
+        case Interception::Hooks::D3D8::D3DTSS_MINFILTER:
+        case Interception::Hooks::D3D8::D3DTSS_MIPFILTER:
+        {
+            set_info_func(StateValueFormat::NAME,
+                          D3D8_TABLE(texture_filter_name_array) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::D3DTSS_TEXCOORDINDEX:
+        {
+            set_info_func(StateValueFormat::TEX_COORD_INDEX,
+                          nullptr,
+                          0);
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::D3DTSS_TEXTURETRANSFORMFLAGS:
+        {
+            set_info_func(StateValueFormat::TEXTURE_TRANSFORM_FLAGS,
+                          nullptr,
+                          0);
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::D3DTSS_BORDERCOLOR:
+        {
+            set_info_func(StateValueFormat::COLOR,
+                          nullptr,
+                          0);
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::D3DTSS_BUMPENVLOFFSET:
+        case Interception::Hooks::D3D8::D3DTSS_BUMPENVLSCALE:
+        case Interception::Hooks::D3D8::D3DTSS_BUMPENVMAT00:
+        case Interception::Hooks::D3D8::D3DTSS_BUMPENVMAT01:
+        case Interception::Hooks::D3D8::D3DTSS_BUMPENVMAT10:
+        case Interception::Hooks::D3D8::D3DTSS_BUMPENVMAT11:
+        case Interception::Hooks::D3D8::D3DTSS_MIPMAPLODBIAS:
+        {
+            set_info_func(StateValueFormat::FLOAT,
+                          nullptr,
+                          0);
+
+            break;
+        }
+
+        default:
+        {
+            set_info_func(StateValueFormat::RAW,
+                          nullptr,
+                          0);
+
+            result = false;
+
+            break;
+        }
+    }
+
+    return result;
+}
+
+bool Capture::APIDumpPrinter::get_value_name_table(const Interception::Hooks::D3D8::ValueKind& in_kind,
+                                                    const ValueNameEntry**                      out_table_ptr_ptr,
+                                                    uint32_t*                                   out_n_entries_ptr)
+{
+    static const ValueNameEntry back_buffer_type_name_array[] =
+    {
+        D3D8_VALUE_NAME(D3DBACKBUFFER_TYPE_MONO),
+        D3D8_VALUE_NAME(D3DBACKBUFFER_TYPE_LEFT),
+        D3D8_VALUE_NAME(D3DBACKBUFFER_TYPE_RIGHT),
+    };
+
+    static const ValueNameEntry basis_type_name_array[] =
+    {
+        D3D8_VALUE_NAME(D3DBASIS_BEZIER),
+        D3D8_VALUE_NAME(D3DBASIS_BSPLINE),
+        D3D8_VALUE_NAME(D3DBASIS_INTERPOLATE),
+    };
+
+    static const ValueNameEntry cube_map_face_name_array[] =
+    {
+        D3D8_VALUE_NAME(D3DCUBEMAP_FACE_POSITIVE_X),
+        D3D8_VALUE_NAME(D3DCUBEMAP_FACE_NEGATIVE_X),
+        D3D8_VALUE_NAME(D3DCUBEMAP_FACE_POSITIVE_Y),
+        D3D8_VALUE_NAME(D3DCUBEMAP_FACE_NEGATIVE_Y),
+        D3D8_VALUE_NAME(D3DCUBEMAP_FACE_POSITIVE_Z),
+        D3D8_VALUE_NAME(D3DCUBEMAP_FACE_NEGATIVE_Z),
+    };
+
+    static const ValueNameEntry device_type_name_array[] =
+    {
+        D3D8_VALUE_NAME(D3DDEVTYPE_HAL),
+        D3D8_VALUE_NAME(D3DDEVTYPE_REF),
+        D3D8_VALUE_NAME(D3DDEVTYPE_SW),
+    };
+
+    static const ValueNameEntry format_name_array[] =
+    {
+        D3D8_VALUE_NAME(D3DFMT_UNKNOWN),
+        D3D8_VALUE_NAME(D3DFMT_R8G8B8),
+        D3D8_VALUE_NAME(D3DFMT_A8R8G8B8),
+        D3D8_VALUE_NAME(D3DFMT_X8R8G8B8),
+        D3D8_VALUE_NAME(D3DFMT_R5G6B5),
+        D3D8_VALUE_NAME(D3DFMT_X1R5G5B5),
+        D3D8_VALUE_NAME(D3DFMT_A1R5G5B5),
+        D3D8_VALUE_NAME(D3DFMT_A4R4G4B4),
+        D3D8_VALUE_NAME(D3DFMT_R3G3B2),
+        D3D8_VALUE_NAME(D3DFMT_A8),
+        D3D8_VALUE_NAME(D3DFMT_A8R3G3B2),
+        D3D8_VALUE_NAME(D3DFMT_X4R4G4B4),
+        D3D8_VALUE_NAME(D3DFMT_A2B10G10R10),
+        D3D8_VALUE_NAME(D3DFMT_G16R16),
+        D3D8_VALUE_NAME(D3DFMT_A8P8),
+        D3D8_VALUE_NAME(D3DFMT_P8),
+        D3D8_VALUE_NAME(D3DFMT_L8),
+        D3D8_VALUE_NAME(D3DFMT_A8L8),
+        D3D8_VALUE_NAME(D3DFMT_A4L4),
+        D3D8_VALUE_NAME(D3DFMT_V8U8),
+        D3D8_VALUE_NAME(D3DFMT_L6V5U5),
+        D3D8_VALUE_NAME(D3DFMT_X8L8V8U8),
+        D3D8_VALUE_NAME(D3DFMT_Q8W8V8U8),
+        D3D8_VALUE_NAME(D3DFMT_V16U16),
+        D3D8_VALUE_NAME(D3DFMT_W11V11U10),
+        D3D8_VALUE_NAME(D3DFMT_A2W10V10U10),
+        D3D8_VALUE_NAME(D3DFMT_UYVY),
+        D3D8_VALUE_NAME(D3DFMT_YUY2),
+        D3D8_VALUE_NAME(D3DFMT_DXT1),
+        D3D8_VALUE_NAME(D3DFMT_DXT2),
+        D3D8_VALUE_NAME(D3DFMT_DXT3),
+        D3D8_VALUE_NAME(D3DFMT_DXT4),
+        D3D8_VALUE_NAME(D3DFMT_DXT5),
+        D3D8_VALUE_NAME(D3DFMT_D16_LOCKABLE),
+        D3D8_VALUE_NAME(D3DFMT_D32),
+        D3D8_VALUE_NAME(D3DFMT_D15S1),
+        D3D8_VALUE_NAME(D3DFMT_D24S8),
+        D3D8_VALUE_NAME(D3DFMT_D16),
+        D3D8_VALUE_NAME(D3DFMT_D24X8),
+        D3D8_VALUE_NAME(D3DFMT_D24X4S4),
+        D3D8_VALUE_NAME(D3DFMT_VERTEXDATA),
+        D3D8_VALUE_NAME(D3DFMT_INDEX16),
+        D3D8_VALUE_NAME(D3DFMT_INDEX32),
+    };
+
+    static const ValueNameEntry light_type_name_array[] =
+    {
+        D3D8_VALUE_NAME(D3DLIGHT_POINT),
+        D3D8_VALUE_NAME(D3DLIGHT_SPOT),
+        D3D8_VALUE_NAME(D3DLIGHT_DIRECTIONAL),
+    };
+
+    static const ValueNameEntry multisample_type_name_array[] =
+    {
+        D3D8_VALUE_NAME(D3DMULTISAMPLE_NONE),
+        D3D8_VALUE_NAME(D3DMULTISAMPLE_2_SAMPLES),
+        D3D8_VALUE_NAME(D3DMULTISAMPLE_3_SAMPLES),
+        D3D8_VALUE_NAME(D3DMULTISAMPLE_4_SAMPLES),
+        D3D8_VALUE_NAME(D3DMULTISAMPLE_5_SAMPLES),
+        D3D8_VALUE_NAME(D3DMULTISAMPLE_6_SAMPLES),
+        D3D8_VALUE_NAME(D3DMULTISAMPLE_7_SAMPLES),
+        D3D8_VALUE_NAME(D3DMULTISAMPLE_8_SAMPLES),
+        D3D8_VALUE_NAME(D3DMULTISAMPLE_9_SAMPLES),
+        D3D8_VALUE_NAME(D3DMULTISAMPLE_10_SAMPLES),
+        D3D8_VALUE_NAME(D3DMULTISAMPLE_11_SAMPLES),
+        D3D8_VALUE_NAME(D3DMULTISAMPLE_12_SAMPLES),
+        D3D8_VALUE_NAME(D3DMULTISAMPLE_13_SAMPLES),
+        D3D8_VALUE_NAME(D3DMULTISAMPLE_14_SAMPLES),
+        D3D8_VALUE_NAME(D3DMULTISAMPLE_15_SAMPLES),
+        D3D8_VALUE_NAME(D3DMULTISAMPLE_16_SAMPLES),
+    };
+
+    static const ValueNameEntry order_type_name_array[] =
+    {
+        D3D8_VALUE_NAME(D3DORDER_LINEAR),
+        D3D8_VALUE_NAME(D3DORDER_QUADRATIC),
+        D3D8_VALUE_NAME(D3DORDER_CUBIC),
+        D3D8_VALUE_NAME(D3DORDER_QUINTIC),
+    };
+
+    static const ValueNameEntry pool_name_array[] =
+    {
+        D3D8_VALUE_NAME(D3DPOOL_DEFAULT),
+        D3D8_VALUE_NAME(D3DPOOL_MANAGED),
+        D3D8_VALUE_NAME(D3DPOOL_SYSTEMMEM),
+        D3D8_VALUE_NAME(D3DPOOL_SCRATCH),
+    };
+
+    static const ValueNameEntry render_state_type_name_array[] =
+    {
+        D3D8_VALUE_NAME(D3DRS_ZENABLE),
+        D3D8_VALUE_NAME(D3DRS_FILLMODE),
+        D3D8_VALUE_NAME(D3DRS_SHADEMODE),
+        D3D8_VALUE_NAME(D3DRS_LINEPATTERN),
+        D3D8_VALUE_NAME(D3DRS_ZWRITEENABLE),
+        D3D8_VALUE_NAME(D3DRS_ALPHATESTENABLE),
+        D3D8_VALUE_NAME(D3DRS_LASTPIXEL),
+        D3D8_VALUE_NAME(D3DRS_SRCBLEND),
+        D3D8_VALUE_NAME(D3DRS_DESTBLEND),
+        D3D8_VALUE_NAME(D3DRS_CULLMODE),
+        D3D8_VALUE_NAME(D3DRS_ZFUNC),
+        D3D8_VALUE_NAME(D3DRS_ALPHAREF),
+        D3D8_VALUE_NAME(D3DRS_ALPHAFUNC),
+        D3D8_VALUE_NAME(D3DRS_DITHERENABLE),
+        D3D8_VALUE_NAME(D3DRS_ALPHABLENDENABLE),
+        D3D8_VALUE_NAME(D3DRS_FOGENABLE),
+        D3D8_VALUE_NAME(D3DRS_SPECULARENABLE),
+        D3D8_VALUE_NAME(D3DRS_ZVISIBLE),
+        D3D8_VALUE_NAME(D3DRS_FOGCOLOR),
+        D3D8_VALUE_NAME(D3DRS_FOGTABLEMODE),
+        D3D8_VALUE_NAME(D3DRS_FOGSTART),
+        D3D8_VALUE_NAME(D3DRS_FOGEND),
+        D3D8_VALUE_NAME(D3DRS_FOGDENSITY),
+        D3D8_VALUE_NAME(D3DRS_EDGEANTIALIAS),
+        D3D8_VALUE_NAME(D3DRS_ZBIAS),
+        D3D8_VALUE_NAME(D3DRS_RANGEFOGENABLE),
+        D3D8_VALUE_NAME(D3DRS_STENCILENABLE),
+        D3D8_VALUE_NAME(D3DRS_STENCILFAIL),
+        D3D8_VALUE_NAME(D3DRS_STENCILZFAIL),
+        D3D8_VALUE_NAME(D3DRS_STENCILPASS),
+        D3D8_VALUE_NAME(D3DRS_STENCILFUNC),
+        D3D8_VALUE_NAME(D3DRS_STENCILREF),
+        D3D8_VALUE_NAME(D3DRS_STENCILMASK),
+        D3D8_VALUE_NAME(D3DRS_STENCILWRITEMASK),
+        D3D8_VALUE_NAME(D3DRS_TEXTUREFACTOR),
+        D3D8_VALUE_NAME(D3DRS_WRAP0),
+        D3D8_VALUE_NAME(D3DRS_WRAP1),
+        D3D8_VALUE_NAME(D3DRS_WRAP2),
+        D3D8_VALUE_NAME(D3DRS_WRAP3),
+        D3D8_VALUE_NAME(D3DRS_WRAP4),
+        D3D8_VALUE_NAME(D3DRS_WRAP5),
+        D3D8_VALUE_NAME(D3DRS_WRAP6),
+        D3D8_VALUE_NAME(D3DRS_WRAP7),
+        D3D8_VALUE_NAME(D3DRS_CLIPPING),
+        D3D8_VALUE_NAME(D3DRS_LIGHTING),
+        D3D8_VALUE_NAME(D3DRS_AMBIENT),
+        D3D8_VALUE_NAME(D3DRS_FOGVERTEXMODE),
+        D3D8_VALUE_NAME(D3DRS_COLORVERTEX),
+        D3D8_VALUE_NAME(D3DRS_LOCALVIEWER),
+        D3D8_VALUE_NAME(D3DRS_NORMALIZENORMALS),
+        D3D8_VALUE_NAME(D3DRS_DIFFUSEMATERIALSOURCE),
+        D3D8_VALUE_NAME(D3DRS_SPECULARMATERIALSOURCE),
+        D3D8_VALUE_NAME(D3DRS_AMBIENTMATERIALSOURCE),
+        D3D8_VALUE_NAME(D3DRS_EMISSIVEMATERIALSOURCE),
+        D3D8_VALUE_NAME(D3DRS_VERTEXBLEND),
+        D3D8_VALUE_NAME(D3DRS_CLIPPLANEENABLE),
+        D3D8_VALUE_NAME(D3DRS_SOFTWAREVERTEXPROCESSING),
+        D3D8_VALUE_NAME(D3DRS_POINTSIZE),
+        D3D8_VALUE_NAME(D3DRS_POINTSIZE_MIN),
+        D3D8_VALUE_NAME(D3DRS_POINTSPRITEENABLE),
+        D3D8_VALUE_NAME(D3DRS_POINTSCALEENABLE),
+        D3D8_VALUE_NAME(D3DRS_POINTSCALE_A),
+        D3D8_VALUE_NAME(D3DRS_POINTSCALE_B),
+        D3D8_VALUE_NAME(D3DRS_POINTSCALE_C),
+        D3D8_VALUE_NAME(D3DRS_MULTISAMPLEANTIALIAS),
+        D3D8_VALUE_NAME(D3DRS_MULTISAMPLEMASK),
+        D3D8_VALUE_NAME(D3DRS_PATCHEDGESTYLE),
+        D3D8_VALUE_NAME(D3DRS_PATCHSEGMENTS),
+        D3D8_VALUE_NAME(D3DRS_DEBUGMONITORTOKEN),
+        D3D8_VALUE_NAME(D3DRS_POINTSIZE_MAX),
+        D3D8_VALUE_NAME(D3DRS_INDEXEDVERTEXBLENDENABLE),
+        D3D8_VALUE_NAME(D3DRS_COLORWRITEENABLE),
+        D3D8_VALUE_NAME(D3DRS_TWEENFACTOR),
+        D3D8_VALUE_NAME(D3DRS_BLENDOP),
+        D3D8_VALUE_NAME(D3DRS_POSITIONORDER),
+        D3D8_VALUE_NAME(D3DRS_NORMALORDER),
+    };
+
+    static const ValueNameEntry resource_type_name_array[] =
+    {
+        D3D8_VALUE_NAME(D3DRTYPE_SURFACE),
+        D3D8_VALUE_NAME(D3DRTYPE_VOLUME),
+        D3D8_VALUE_NAME(D3DRTYPE_TEXTURE),
+        D3D8_VALUE_NAME(D3DRTYPE_VOLUMETEXTURE),
+        D3D8_VALUE_NAME(D3DRTYPE_CUBETEXTURE),
+        D3D8_VALUE_NAME(D3DRTYPE_VERTEXBUFFER),
+        D3D8_VALUE_NAME(D3DRTYPE_INDEXBUFFER),
+    };
+
+    static const ValueNameEntry swap_effect_name_array[] =
+    {
+        D3D8_VALUE_NAME(D3DSWAPEFFECT_DISCARD),
+        D3D8_VALUE_NAME(D3DSWAPEFFECT_FLIP),
+        D3D8_VALUE_NAME(D3DSWAPEFFECT_COPY),
+        D3D8_VALUE_NAME(D3DSWAPEFFECT_COPY_VSYNC),
+    };
+
+    static const ValueNameEntry texture_stage_state_type_name_array[] =
+    {
+        D3D8_VALUE_NAME(D3DTSS_COLOROP),
+        D3D8_VALUE_NAME(D3DTSS_COLORARG1),
+        D3D8_VALUE_NAME(D3DTSS_COLORARG2),
+        D3D8_VALUE_NAME(D3DTSS_ALPHAOP),
+        D3D8_VALUE_NAME(D3DTSS_ALPHAARG1),
+        D3D8_VALUE_NAME(D3DTSS_ALPHAARG2),
+        D3D8_VALUE_NAME(D3DTSS_BUMPENVMAT00),
+        D3D8_VALUE_NAME(D3DTSS_BUMPENVMAT01),
+        D3D8_VALUE_NAME(D3DTSS_BUMPENVMAT10),
+        D3D8_VALUE_NAME(D3DTSS_BUMPENVMAT11),
+        D3D8_VALUE_NAME(D3DTSS_TEXCOORDINDEX),
+        D3D8_VALUE_NAME(D3DTSS_ADDRESSU),
+        D3D8_VALUE_NAME(D3DTSS_ADDRESSV),
+        D3D8_VALUE_NAME(D3DTSS_BORDERCOLOR),
+        D3D8_VALUE_NAME(D3DTSS_MAGFILTER),
+        D3D8_VALUE_NAME(D3DTSS_MINFILTER),
+        D3D8_VALUE_NAME(D3DTSS_MIPFILTER),
+        D3D8_VALUE_NAME(D3DTSS_MIPMAPLODBIAS),
+        D3D8_VALUE_NAME(D3DTSS_MAXMIPLEVEL),
+        D3D8_VALUE_NAME(D3DTSS_MAXANISOTROPY),
+        D3D8_VALUE_NAME(D3DTSS_BUMPENVLSCALE),
+        D3D8_VALUE_NAME(D3DTSS_BUMPENVLOFFSET),
+        D3D8_VALUE_NAME(D3DTSS_TEXTURETRANSFORMFLAGS),
+        D3D8_VALUE_NAME(D3DTSS_ADDRESSW),
+        D3D8_VALUE_NAME(D3DTSS_COLORARG0),
+        D3D8_VALUE_NAME(D3DTSS_ALPHAARG0),
+        D3D8_VALUE_NAME(D3DTSS_RESULTARG),
+    };
+
+    static const ValueNameEntry transform_state_type_name_array[] =
+    {
+        D3D8_VALUE_NAME(D3DTS_VIEW),
+        D3D8_VALUE_NAME(D3DTS_PROJECTION),
+        D3D8_VALUE_NAME(D3DTS_TEXTURE0),
+        D3D8_VALUE_NAME(D3DTS_TEXTURE1),
+        D3D8_VALUE_NAME(D3DTS_TEXTURE2),
+        D3D8_VALUE_NAME(D3DTS_TEXTURE3),
+        D3D8_VALUE_NAME(D3DTS_TEXTURE4),
+        D3D8_VALUE_NAME(D3DTS_TEXTURE5),
+        D3D8_VALUE_NAME(D3DTS_TEXTURE6),
+        D3D8_VALUE_NAME(D3DTS_TEXTURE7),
+        D3D8_VALUE_NAME(D3DTS_WORLD),
+        D3D8_VALUE_NAME(D3DTS_WORLD1),
+        D3D8_VALUE_NAME(D3DTS_WORLD2),
+        D3D8_VALUE_NAME(D3DTS_WORLD3),
+    };
+
+    const auto set_table_func = [&](const ValueNameEntry* in_table_ptr,
+                                    const uint32_t&       in_n_entries)
+    {
+        *out_table_ptr_ptr = in_table_ptr;
+        *out_n_entries_ptr = in_n_entries;
+    };
+
+    bool result = true;
+
+    switch (in_kind)
+    {
+        case Interception::Hooks::D3D8::ValueKind::BACK_BUFFER_TYPE:
+        {
+            set_table_func(D3D8_TABLE(back_buffer_type_name_array) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::ValueKind::BASIS_TYPE:
+        {
+            set_table_func(D3D8_TABLE(basis_type_name_array) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::ValueKind::CUBE_MAP_FACE:
+        {
+            set_table_func(D3D8_TABLE(cube_map_face_name_array) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::ValueKind::DEVICE_TYPE:
+        {
+            set_table_func(D3D8_TABLE(device_type_name_array) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::ValueKind::FORMAT:
+        {
+            set_table_func(D3D8_TABLE(format_name_array) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::ValueKind::LIGHT_TYPE:
+        {
+            set_table_func(D3D8_TABLE(light_type_name_array) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::ValueKind::MULTI_SAMPLE_TYPE:
+        {
+            set_table_func(D3D8_TABLE(multisample_type_name_array) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::ValueKind::ORDER_TYPE:
+        {
+            set_table_func(D3D8_TABLE(order_type_name_array) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::ValueKind::POOL:
+        {
+            set_table_func(D3D8_TABLE(pool_name_array) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::ValueKind::PRIMITIVE_TYPE:
+        {
+            set_table_func(D3D8_SHARED_TABLE(PRIMITIVE_TYPE) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::ValueKind::RENDER_STATE_TYPE:
+        {
+            set_table_func(D3D8_TABLE(render_state_type_name_array) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::ValueKind::RESOURCE_TYPE:
+        {
+            set_table_func(D3D8_TABLE(resource_type_name_array) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::ValueKind::STATE_BLOCK_TYPE:
+        {
+            set_table_func(D3D8_SHARED_TABLE(STATE_BLOCK_TYPE) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::ValueKind::SWAP_EFFECT:
+        {
+            set_table_func(D3D8_TABLE(swap_effect_name_array) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::ValueKind::TEXTURE_STAGE_STATE_TYPE:
+        {
+            set_table_func(D3D8_TABLE(texture_stage_state_type_name_array) );
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::ValueKind::TRANSFORM_STATE_TYPE:
+        {
+            set_table_func(D3D8_TABLE(transform_state_type_name_array) );
+
+            break;
+        }
+
+        default:
+        {
+            result = false;
+
+            break;
+        }
+    }
+
+    return result;
+}
