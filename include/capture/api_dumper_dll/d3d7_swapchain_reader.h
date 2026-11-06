@@ -38,7 +38,7 @@ namespace Capture
         private:
             /* Maps the masks of the pixels of a surface to a format the converter reads. False for any other. */
             static bool get_source_format(const Interception::Hooks::D3D7::DDPIXELFORMAT& in_pixel_format,
-                                          PixelConverter::SourceFormat*                   out_source_format_ptr);
+                                          PixelSourceFormat*                              out_source_format_ptr);
         };
     }
 }

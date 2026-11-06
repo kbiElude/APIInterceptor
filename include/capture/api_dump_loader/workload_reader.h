@@ -14,6 +14,7 @@
 
 #include "capture/api_dump_loader/api_dump_loader.h"
 #include "capture/api_dump_loader/api_info.h"
+#include "capture/api_dump_loader/types.h"
 #include "zstd.h"
 #include <memory>
 #include <stdio.h>
@@ -87,8 +88,8 @@ namespace Capture
             /* Returns nullptr if the file cannot be opened, or is not a workload this version can read. In that case,
              * *out_error_ptr (if not null) says why.
              */
-            static WorkloadReaderUniquePtr create(const char*  in_filename_ptr,
-                                                  std::string* out_error_ptr = nullptr);
+            static WorkloadReaderUniquePtr create(const char*    in_filename_ptr,
+                                                  std::string*   out_error_ptr = nullptr);
             static WorkloadReaderUniquePtr create(const char*    in_filename_ptr,
                                                   const Options& in_options,
                                                   std::string*   out_error_ptr = nullptr);
@@ -125,14 +126,6 @@ namespace Capture
                 std::unique_ptr<Workload> workload_ptr;
             };
 
-            /* What the next frame of the file came to. */
-            enum class Fetch
-            {
-                CLEAN_END,
-                DAMAGED_END, /* a frame which cannot be told to be one: nothing more can be read */
-                SEGMENT
-            };
-
             WorkloadReader();
 
             /* Makes a segment of the bytes of a frame. A frame which is cut is decompressed as far as it goes. */
@@ -143,7 +136,7 @@ namespace Capture
                                      DecodedSegment*             out_segment_ptr);
 
             /* The next segment of the file, in order. */
-            Fetch fetch_next_segment(DecodedSegment* out_segment_ptr);
+            FrameFetch fetch_next_segment(DecodedSegment* out_segment_ptr);
 
             ZSTD_DCtx*                     m_decompressor_ptr;    /* for the caller's own reading, without threads */
             FILE*                          m_file_handle;

@@ -6,6 +6,7 @@
 #define REPLAYENGINEDLL_D3D8_LOCK_REPLAYER_H
 
 #include "d3d8_replay_context.h"
+#include "types.h"
 #include <Windows.h>
 #include <map>
 #include <string>
@@ -37,13 +38,6 @@ namespace Replay
             static bool is_unlock_function(const APIInterceptor::APIFunction& in_function);
 
         private:
-            enum class LockKind
-            {
-                BOX,
-                BUFFER,
-                RECT
-            };
-
             /* What the replay's own lock gave out, and how the dumped one laid the data out. */
             struct LockRecord
             {

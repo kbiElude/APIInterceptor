@@ -25,6 +25,13 @@ namespace Replay
             FIRST_TIME_ONLY /* once, in the first execution: what creates objects                     */
         };
 
+        enum class LockKind
+        {
+            BOX,
+            BUFFER,
+            RECT
+        };
+
         /* What a handle or an ID of the dumped process stands for. An object is told apart by the kind and the value it had
          * in the dump (see ObjectRemapper). NONE stands for a value which is not one of those.
          */

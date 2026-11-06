@@ -22,6 +22,14 @@ namespace Capture
 
             UNKNOWN
         };
+
+        /* What the next frame of the file came to. */
+        enum class FrameFetch
+        {
+            CLEAN_END,
+            DAMAGED_END, /* a frame which cannot be told to be one: nothing more can be read */
+            SEGMENT
+        };
     }
 }
 

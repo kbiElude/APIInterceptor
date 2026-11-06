@@ -6,12 +6,12 @@
 #include "pixel_converter.h"
 #include <string.h>
 
-void Capture::APIDumperDLL::PixelConverter::convert_to_rgba8_bottom_first(const SourceFormat&   in_format,
-                                                                          const void*           in_pixels_ptr,
-                                                                          const uint32_t&       in_pitch_n_bytes,
-                                                                          const uint32_t&       in_width,
-                                                                          const uint32_t&       in_height,
-                                                                          std::vector<uint8_t>* out_rgba_u8_vec_ptr)
+void Capture::APIDumperDLL::PixelConverter::convert_to_rgba8_bottom_first(const PixelSourceFormat& in_format,
+                                                                          const void*              in_pixels_ptr,
+                                                                          const uint32_t&          in_pitch_n_bytes,
+                                                                          const uint32_t&          in_width,
+                                                                          const uint32_t&          in_height,
+                                                                          std::vector<uint8_t>*    out_rgba_u8_vec_ptr)
 {
     constexpr uint32_t A1R5G5B5_ALPHA_SHIFT = 15;
     constexpr uint32_t CHANNEL_MAX          = 255;
@@ -60,22 +60,22 @@ void Capture::APIDumperDLL::PixelConverter::convert_to_rgba8_bottom_first(const 
 
             switch (in_format)
             {
-                case SourceFormat::A8R8G8B8:
-                case SourceFormat::X8R8G8B8:
+                case PixelSourceFormat::A8R8G8B8:
+                case PixelSourceFormat::X8R8G8B8:
                 {
                     const uint8_t* pixel_ptr = source_ptr + x * sizeof(uint32_t);
 
                     blue  = pixel_ptr[ARGB8_BLUE_OFFSET];
                     green = pixel_ptr[ARGB8_GREEN_OFFSET];
                     red   = pixel_ptr[ARGB8_RED_OFFSET];
-                    alpha = (in_format == SourceFormat::A8R8G8B8) ? pixel_ptr[ARGB8_ALPHA_OFFSET]
+                    alpha = (in_format == PixelSourceFormat::A8R8G8B8) ? pixel_ptr[ARGB8_ALPHA_OFFSET]
                                                                   : CHANNEL_MAX;
 
                     break;
                 }
 
-                case SourceFormat::A1R5G5B5:
-                case SourceFormat::X1R5G5B5:
+                case PixelSourceFormat::A1R5G5B5:
+                case PixelSourceFormat::X1R5G5B5:
                 {
                     uint16_t pixel = 0;
 
@@ -86,13 +86,13 @@ void Capture::APIDumperDLL::PixelConverter::convert_to_rgba8_bottom_first(const 
                     blue  = ((pixel >> X1R5G5B5_BLUE_SHIFT)  & FIVE_BIT_MAX) * CHANNEL_MAX / FIVE_BIT_MAX;
                     green = ((pixel >> X1R5G5B5_GREEN_SHIFT) & FIVE_BIT_MAX) * CHANNEL_MAX / FIVE_BIT_MAX;
                     red   = ((pixel >> X1R5G5B5_RED_SHIFT)   & FIVE_BIT_MAX) * CHANNEL_MAX / FIVE_BIT_MAX;
-                    alpha = (in_format == SourceFormat::A1R5G5B5) ? (((pixel >> A1R5G5B5_ALPHA_SHIFT) & 1) * CHANNEL_MAX)
+                    alpha = (in_format == PixelSourceFormat::A1R5G5B5) ? (((pixel >> A1R5G5B5_ALPHA_SHIFT) & 1) * CHANNEL_MAX)
                                                                   : CHANNEL_MAX;
 
                     break;
                 }
 
-                case SourceFormat::R5G6B5:
+                case PixelSourceFormat::R5G6B5:
                 {
                     uint16_t pixel = 0;
 

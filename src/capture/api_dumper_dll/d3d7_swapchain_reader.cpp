@@ -8,7 +8,7 @@
 #include "d3d7_swapchain_reader.h"
 
 bool Capture::APIDumperDLL::D3D7SwapchainReader::get_source_format(const Interception::Hooks::D3D7::DDPIXELFORMAT& in_pixel_format,
-                                                                   PixelConverter::SourceFormat*                   out_source_format_ptr)
+                                                                   PixelSourceFormat*                              out_source_format_ptr)
 {
     constexpr uint32_t BIT_COUNT_16        = 16;
     constexpr uint32_t BIT_COUNT_32        = 32;
@@ -31,8 +31,8 @@ bool Capture::APIDumperDLL::D3D7SwapchainReader::get_source_format(const Interce
         in_pixel_format.dwGBitMask    == MASK_GREEN_X8R8G8B8 &&
         in_pixel_format.dwBBitMask    == MASK_BLUE_8_BITS)
     {
-        *out_source_format_ptr = (in_pixel_format.dwRGBAlphaBitMask == MASK_ALPHA_A8R8G8B8) ? PixelConverter::SourceFormat::A8R8G8B8
-                                                                                            : PixelConverter::SourceFormat::X8R8G8B8;
+        *out_source_format_ptr = (in_pixel_format.dwRGBAlphaBitMask == MASK_ALPHA_A8R8G8B8) ? PixelSourceFormat::A8R8G8B8
+                                                                                            : PixelSourceFormat::X8R8G8B8;
     }
     else
     if (in_pixel_format.dwRGBBitCount == BIT_COUNT_16      &&
@@ -40,7 +40,7 @@ bool Capture::APIDumperDLL::D3D7SwapchainReader::get_source_format(const Interce
         in_pixel_format.dwGBitMask    == MASK_GREEN_R5G6B5 &&
         in_pixel_format.dwBBitMask    == MASK_BLUE_5_BITS)
     {
-        *out_source_format_ptr = PixelConverter::SourceFormat::R5G6B5;
+        *out_source_format_ptr = PixelSourceFormat::R5G6B5;
     }
     else
     if (in_pixel_format.dwRGBBitCount == BIT_COUNT_16        &&
@@ -48,8 +48,8 @@ bool Capture::APIDumperDLL::D3D7SwapchainReader::get_source_format(const Interce
         in_pixel_format.dwGBitMask    == MASK_GREEN_X1R5G5B5 &&
         in_pixel_format.dwBBitMask    == MASK_BLUE_5_BITS)
     {
-        *out_source_format_ptr = (in_pixel_format.dwRGBAlphaBitMask == MASK_ALPHA_A1R5G5B5) ? PixelConverter::SourceFormat::A1R5G5B5
-                                                                                            : PixelConverter::SourceFormat::X1R5G5B5;
+        *out_source_format_ptr = (in_pixel_format.dwRGBAlphaBitMask == MASK_ALPHA_A1R5G5B5) ? PixelSourceFormat::A1R5G5B5
+                                                                                            : PixelSourceFormat::X1R5G5B5;
     }
     else
     {
@@ -106,7 +106,7 @@ bool Capture::APIDumperDLL::D3D7SwapchainReader::read_surface(void*             
     Interception::Hooks::D3D7::DDSURFACEDESC2 description   = {};
     bool                                      is_locked     = false;
     bool                                      result        = false;
-    PixelConverter::SourceFormat              source_format = PixelConverter::SourceFormat::A8R8G8B8;
+    PixelSourceFormat                         source_format = PixelSourceFormat::A8R8G8B8;
 
     const auto surface_ptr = static_cast<Interception::Hooks::D3D7::IDirectDrawSurface7*>                             (in_surface_ptr);
     const auto lock_func   = APIInterceptor::get_method_ptr<Interception::Hooks::D3D7::PFN_IDIRECTDRAWSURFACE7_LOCK>  (in_surface_ptr,

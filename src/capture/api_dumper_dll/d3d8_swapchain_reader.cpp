@@ -15,7 +15,7 @@ bool Capture::APIDumperDLL::D3D8SwapchainReader::read(void*                    i
     Interception::Hooks::D3D8::D3DLOCKED_RECT     locked_rect     = {};
     bool                                          is_locked       = false;
     bool                                          result          = false;
-    PixelConverter::SourceFormat                  source_format   = PixelConverter::SourceFormat::A8R8G8B8;
+    PixelSourceFormat                             source_format   = PixelSourceFormat::A8R8G8B8;
     Interception::Hooks::D3D8::IDirect3DSurface8* system_ptr      = nullptr;
 
     void** const device_vtable = *reinterpret_cast<void***>(in_device_ptr);
@@ -59,35 +59,35 @@ bool Capture::APIDumperDLL::D3D8SwapchainReader::read(void*                    i
     {
         case Interception::Hooks::D3D8::D3DFMT_A8R8G8B8:
         {
-            source_format = PixelConverter::SourceFormat::A8R8G8B8;
+            source_format = PixelSourceFormat::A8R8G8B8;
 
             break;
         }
 
         case Interception::Hooks::D3D8::D3DFMT_X8R8G8B8:
         {
-            source_format = PixelConverter::SourceFormat::X8R8G8B8;
+            source_format = PixelSourceFormat::X8R8G8B8;
 
             break;
         }
 
         case Interception::Hooks::D3D8::D3DFMT_A1R5G5B5:
         {
-            source_format = PixelConverter::SourceFormat::A1R5G5B5;
+            source_format = PixelSourceFormat::A1R5G5B5;
 
             break;
         }
 
         case Interception::Hooks::D3D8::D3DFMT_X1R5G5B5:
         {
-            source_format = PixelConverter::SourceFormat::X1R5G5B5;
+            source_format = PixelSourceFormat::X1R5G5B5;
 
             break;
         }
 
         case Interception::Hooks::D3D8::D3DFMT_R5G6B5:
         {
-            source_format = PixelConverter::SourceFormat::R5G6B5;
+            source_format = PixelSourceFormat::R5G6B5;
 
             break;
         }

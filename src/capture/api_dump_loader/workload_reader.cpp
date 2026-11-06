@@ -28,7 +28,7 @@ struct Capture::APIDumpLoader::WorkloadReader::FrameSource
         FRAME
     };
 
-    FrameSource(FILE*          in_file_handle,
+    FrameSource(FILE*           in_file_handle,
                 const uint64_t& in_first_frame_offset)
         :buffer_u8_vec    (INITIAL_BUFFER_N_BYTES),
          end              (0),
@@ -203,10 +203,10 @@ struct Capture::APIDumpLoader::WorkloadReader::Pipeline
     }
 
     /* The next segment in the order of the file: waits for it. */
-    Fetch take_next(DecodedSegment* out_segment_ptr)
+    FrameFetch take_next(DecodedSegment* out_segment_ptr)
     {
         std::unique_lock<std::mutex> lock(mutex);
-        Fetch                        result = Fetch::CLEAN_END;
+        FrameFetch                        result = FrameFetch::CLEAN_END;
 
         result_ready_condition.wait(lock,
                                     [&]()
@@ -228,14 +228,14 @@ struct Capture::APIDumpLoader::WorkloadReader::Pipeline
             next_sequence++;
             n_in_flight--;
 
-            result = Fetch::SEGMENT;
+            result = FrameFetch::SEGMENT;
 
             slot_free_condition.notify_one();
         }
         else
         if (is_damaged)
         {
-            result = Fetch::DAMAGED_END;
+            result = FrameFetch::DAMAGED_END;
         }
 
         return result;
@@ -366,24 +366,24 @@ struct Capture::APIDumpLoader::WorkloadReader::Pipeline
     }
 
 
-    std::condition_variable    job_available_condition;
-    FrameSource*               frame_source_ptr;
-    bool                       ignores_checksums; /* the decompressors do not check the checksum of a frame */
-    bool                       is_damaged;        /* the producer found bytes which are not a frame        */
-    bool                       is_producer_done;
-    bool                       is_stopping;
-    std::deque<Job>            job_deque;
-    std::mutex                 mutex;             /* guards all of the below, and the flags above          */
-    uint64_t                   n_frames_produced;
-    uint32_t                   n_in_flight;       /* jobs queued, being decoded, or decoded and not taken  */
-    uint32_t                   n_segments_in_flight;
-    uint64_t                   next_sequence;     /* of the segment which the caller is to get next        */
-    Options                    options;
-    std::thread                producer_thread;
-    std::condition_variable    result_ready_condition;
+    std::condition_variable            job_available_condition;
+    FrameSource*                       frame_source_ptr;
+    bool                               ignores_checksums; /* the decompressors do not check the checksum of a frame */
+    bool                               is_damaged;        /* the producer found bytes which are not a frame        */
+    bool                               is_producer_done;
+    bool                               is_stopping;
+    std::deque<Job>                    job_deque;
+    std::mutex                         mutex;             /* guards all of the below, and the flags above          */
+    uint64_t                           n_frames_produced;
+    uint32_t                           n_in_flight;       /* jobs queued, being decoded, or decoded and not taken  */
+    uint32_t                           n_segments_in_flight;
+    uint64_t                           next_sequence;     /* of the segment which the caller is to get next        */
+    Options                            options;
+    std::thread                        producer_thread;
+    std::condition_variable            result_ready_condition;
     std::map<uint64_t, DecodedSegment> result_map;
-    std::condition_variable    slot_free_condition;
-    std::vector<std::thread>   worker_thread_vec;
+    std::condition_variable            slot_free_condition;
+    std::vector<std::thread>           worker_thread_vec;
 };
 
 Capture::APIDumpLoader::WorkloadReader::WorkloadReader()
@@ -573,7 +573,7 @@ void Capture::APIDumpLoader::WorkloadReader::decode_frame(ZSTD_DCtx*            
     FrameStream            stream(in_decompressor_ptr,
                                   in_frame_byte_vec.data(),
                                   in_frame_byte_vec.size() );
-    bool                   is_short = false;
+    bool                    is_short = false;
     SegmentDecoder::Options options;
 
     options.skip_data_chunks_above_n_bytes = in_options.skip_data_chunks_above_n_bytes;
@@ -615,10 +615,10 @@ void Capture::APIDumpLoader::WorkloadReader::decode_frame(ZSTD_DCtx*            
     }
 }
 
-Capture::APIDumpLoader::WorkloadReader::Fetch Capture::APIDumpLoader::WorkloadReader::fetch_next_segment(DecodedSegment* out_segment_ptr)
+Capture::APIDumpLoader::FrameFetch Capture::APIDumpLoader::WorkloadReader::fetch_next_segment(DecodedSegment* out_segment_ptr)
 {
     std::vector<uint8_t> frame_byte_vec;
-    Fetch                result = Fetch::CLEAN_END;
+    FrameFetch           result = FrameFetch::CLEAN_END;
 
     if (m_pipeline_ptr != nullptr)
     {
@@ -641,28 +641,28 @@ Capture::APIDumpLoader::WorkloadReader::Fetch Capture::APIDumpLoader::WorkloadRe
             out_segment_ptr->file_offset_n_bytes = m_frame_source_ptr->last_frame_offset;
             out_segment_ptr->n_compressed_bytes  = frame_byte_vec.size();
 
-            result = Fetch::SEGMENT;
+            result = FrameFetch::SEGMENT;
 
             break;
         }
 
         case FrameSource::Result::DAMAGED:
         {
-            result = Fetch::DAMAGED_END;
+            result = FrameFetch::DAMAGED_END;
 
             break;
         }
 
         case FrameSource::Result::END:
         {
-            result = Fetch::CLEAN_END;
+            result = FrameFetch::CLEAN_END;
 
             break;
         }
 
         default:
         {
-            result = Fetch::DAMAGED_END;
+            result = FrameFetch::DAMAGED_END;
 
             break;
         }
@@ -694,14 +694,14 @@ bool Capture::APIDumpLoader::WorkloadReader::read_next_segment(Workload* out_wor
 
     switch (fetch_next_segment(&segment) )
     {
-        case Fetch::CLEAN_END:
+        case FrameFetch::CLEAN_END:
         {
             m_is_finished = true;
 
             break;
         }
 
-        case Fetch::DAMAGED_END:
+        case FrameFetch::DAMAGED_END:
         {
             m_is_finished  = true;
             m_is_truncated = true;
@@ -709,7 +709,7 @@ bool Capture::APIDumpLoader::WorkloadReader::read_next_segment(Workload* out_wor
             break;
         }
 
-        case Fetch::SEGMENT:
+        case FrameFetch::SEGMENT:
         {
             if (segment.has_segment == false)
             {

@@ -94,6 +94,29 @@ namespace Capture
             TEXTURE_TRANSFORM_FLAGS
         };
 
+        /* The tables of the values of the states, which are the ones of the states themselves (see shared_names.h too). */
+        enum class StateValueTable
+        {
+            NONE,
+            BLEND,
+            CMP_FUNC,
+            CULL,
+            FILL_MODE,
+            FOG_MODE,
+            MATERIAL_COLOR_SOURCE,
+            SHADE_MODE,
+            STENCIL_OP,
+            TEXTURE_ADDRESS,
+            TEXTURE_ARGUMENT,
+            TEXTURE_BLEND,
+            TEXTURE_FILTER_MAG,
+            TEXTURE_FILTER_MAG_LEGACY,
+            TEXTURE_FILTER_MIN,
+            TEXTURE_FILTER_MIP,
+            TEXTURE_OP,
+            Z_BUFFER_TYPE
+        };
+
         struct ValueNameEntry
         {
             const char* name_ptr;
