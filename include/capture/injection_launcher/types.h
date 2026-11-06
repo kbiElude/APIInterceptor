@@ -13,8 +13,8 @@ namespace Capture
     {
         enum class TargetArchitecture
         {
-            X86,
             X64,
+            X86,
 
             UNKNOWN
         };

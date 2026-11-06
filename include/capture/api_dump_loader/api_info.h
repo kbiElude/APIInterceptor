@@ -19,12 +19,12 @@ namespace Capture
 
         enum class APIGroup
         {
+            D3D7,
+            D3D8,
             GDI32,
             GL,
-            WGL,
             USER32,
-            D3D8,
-            D3D7,
+            WGL,
 
             UNKNOWN
         };

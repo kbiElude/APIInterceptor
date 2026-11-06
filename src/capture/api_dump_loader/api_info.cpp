@@ -119,12 +119,12 @@ const std::vector<Capture::APIDumpLoader::APIGroup>& Capture::APIDumpLoader::get
 {
     static const std::vector<APIGroup> result_vec =
     {
+        APIGroup::D3D7,
+        APIGroup::D3D8,
         APIGroup::GDI32,
         APIGroup::GL,
-        APIGroup::WGL,
         APIGroup::USER32,
-        APIGroup::D3D8,
-        APIGroup::D3D7
+        APIGroup::WGL
     };
 
     return result_vec;
