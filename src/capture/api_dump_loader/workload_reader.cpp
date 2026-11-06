@@ -3,6 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #define ZSTD_STATIC_LINKING_ONLY /* ZSTD_d_forceIgnoreChecksum */
+#include "capture/api_dump_loader/frame_stream.h"
 #include "capture/api_dump_loader/segment_decoder.h"
 #include "capture/api_dump_loader/workload_reader.h"
 #include "common/workload_format.h"
