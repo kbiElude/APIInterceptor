@@ -4,41 +4,18 @@
  */
 #include "Interception/Hooks/D3D8/types.h"
 #include "d3d8_swapchain_reader.h"
-#include <string.h>
+#include "pixel_converter.h"
 
 bool Capture::APIDumperDLL::D3D8SwapchainReader::read(void*                    in_device_ptr,
                                                       std::array<uint32_t, 2>* out_extents_u32vec2_ptr,
                                                       std::vector<uint8_t>*    out_rgba_u8_vec_ptr)
 {
-    constexpr uint32_t A1R5G5B5_ALPHA_SHIFT = 15;
-    constexpr uint32_t CHANNEL_MAX          = 255;
-
-    constexpr uint32_t FIVE_BIT_MAX         = (1u << 5) - 1;
-    constexpr uint32_t SIX_BIT_MAX          = (1u << 6) - 1;
-
-    constexpr uint32_t X1R5G5B5_BLUE_SHIFT  = 0;
-    constexpr uint32_t X1R5G5B5_GREEN_SHIFT = 5;
-    constexpr uint32_t X1R5G5B5_RED_SHIFT   = 10;
-
-    constexpr uint32_t R5G6B5_BLUE_SHIFT    = 0;
-    constexpr uint32_t R5G6B5_GREEN_SHIFT   = 5;
-    constexpr uint32_t R5G6B5_RED_SHIFT     = 11;
-
-    /* A8R8G8B8 and X8R8G8B8 are stored as B, G, R, A; the output is R, G, B, A. All are 32-bit pixels. */
-    constexpr uint32_t ARGB8_BLUE_OFFSET    = 0;
-    constexpr uint32_t ARGB8_GREEN_OFFSET   = 1;
-    constexpr uint32_t ARGB8_RED_OFFSET     = 2;
-    constexpr uint32_t ARGB8_ALPHA_OFFSET   = 3;
-    constexpr uint32_t RGBA8_RED_OFFSET     = 0;
-    constexpr uint32_t RGBA8_GREEN_OFFSET   = 1;
-    constexpr uint32_t RGBA8_BLUE_OFFSET    = 2;
-    constexpr uint32_t RGBA8_ALPHA_OFFSET   = 3;
-
     Interception::Hooks::D3D8::IDirect3DSurface8* back_buffer_ptr = nullptr;
     Interception::Hooks::D3D8::D3DSURFACE_DESC    description     = {};
     Interception::Hooks::D3D8::D3DLOCKED_RECT     locked_rect     = {};
     bool                                          is_locked       = false;
     bool                                          result          = false;
+    PixelConverter::SourceFormat                  source_format   = PixelConverter::SourceFormat::A8R8G8B8;
     Interception::Hooks::D3D8::IDirect3DSurface8* system_ptr      = nullptr;
 
     void** const device_vtable = *reinterpret_cast<void***>(in_device_ptr);
@@ -78,6 +55,50 @@ bool Capture::APIDumperDLL::D3D8SwapchainReader::read(void*                    i
         }
     }
 
+    switch (description.Format)
+    {
+        case Interception::Hooks::D3D8::D3DFMT_A8R8G8B8:
+        {
+            source_format = PixelConverter::SourceFormat::A8R8G8B8;
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::D3DFMT_X8R8G8B8:
+        {
+            source_format = PixelConverter::SourceFormat::X8R8G8B8;
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::D3DFMT_A1R5G5B5:
+        {
+            source_format = PixelConverter::SourceFormat::A1R5G5B5;
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::D3DFMT_X1R5G5B5:
+        {
+            source_format = PixelConverter::SourceFormat::X1R5G5B5;
+
+            break;
+        }
+
+        case Interception::Hooks::D3D8::D3DFMT_R5G6B5:
+        {
+            source_format = PixelConverter::SourceFormat::R5G6B5;
+
+            break;
+        }
+
+        default:
+        {
+            /* A format the converter cannot read. */
+            goto end;
+        }
+    }
+
     /* The back buffer may not be lockable; a system memory copy of it always is. */
     if (FAILED(create_image_func(static_cast<Interception::Hooks::D3D8::IDirect3DDevice8*>(in_device_ptr),
                                  description.Width,
@@ -111,88 +132,12 @@ bool Capture::APIDumperDLL::D3D8SwapchainReader::read(void*                    i
 
         is_locked = true;
 
-        out_rgba_u8_vec_ptr->resize(static_cast<size_t>(description.Width) * description.Height * sizeof(uint32_t));
-
-        for (uint32_t y = 0;
-                      y < description.Height;
-                    ++y)
-        {
-            /* Rows are stored bottom first. */
-            uint8_t*       destination_ptr = out_rgba_u8_vec_ptr->data  ()                                                                  +
-                                             static_cast<size_t>        (description.Height - 1 - y) * description.Width * sizeof(uint32_t);
-            const uint8_t* source_ptr      = static_cast<const uint8_t*>(locked_rect.pBits)                                                 +
-                                             static_cast<size_t>        (y)                          * locked_rect.Pitch;
-
-            for (uint32_t x = 0;
-                          x < description.Width;
-                        ++x)
-            {
-                uint32_t red   = 0;
-                uint32_t green = 0;
-                uint32_t blue  = 0;
-                uint32_t alpha = CHANNEL_MAX;
-
-                switch (description.Format)
-                {
-                    case Interception::Hooks::D3D8::D3DFMT_A8R8G8B8:
-                    case Interception::Hooks::D3D8::D3DFMT_X8R8G8B8:
-                    {
-                        const uint8_t* pixel_ptr = source_ptr + x * sizeof(uint32_t);
-
-                        blue  = pixel_ptr[ARGB8_BLUE_OFFSET];
-                        green = pixel_ptr[ARGB8_GREEN_OFFSET];
-                        red   = pixel_ptr[ARGB8_RED_OFFSET];
-                        alpha = (description.Format == Interception::Hooks::D3D8::D3DFMT_A8R8G8B8) ? pixel_ptr[ARGB8_ALPHA_OFFSET]
-                                                                                                   : CHANNEL_MAX;
-
-                        break;
-                    }
-
-                    case Interception::Hooks::D3D8::D3DFMT_A1R5G5B5:
-                    case Interception::Hooks::D3D8::D3DFMT_X1R5G5B5:
-                    {
-                        uint16_t pixel = 0;
-
-                        memcpy(&pixel,
-                               source_ptr + x * sizeof(pixel),
-                               sizeof(pixel) );
-
-                        blue  = ((pixel >> X1R5G5B5_BLUE_SHIFT)  & FIVE_BIT_MAX) * CHANNEL_MAX / FIVE_BIT_MAX;
-                        green = ((pixel >> X1R5G5B5_GREEN_SHIFT) & FIVE_BIT_MAX) * CHANNEL_MAX / FIVE_BIT_MAX;
-                        red   = ((pixel >> X1R5G5B5_RED_SHIFT)   & FIVE_BIT_MAX) * CHANNEL_MAX / FIVE_BIT_MAX;
-                        alpha = (description.Format == Interception::Hooks::D3D8::D3DFMT_A1R5G5B5) ? (((pixel >> A1R5G5B5_ALPHA_SHIFT) & 1) * CHANNEL_MAX)
-                                                                                                   : CHANNEL_MAX;
-
-                        break;
-                    }
-
-                    case Interception::Hooks::D3D8::D3DFMT_R5G6B5:
-                    {
-                        uint16_t pixel = 0;
-
-                        memcpy(&pixel,
-                               source_ptr + x * sizeof(pixel),
-                               sizeof(pixel) );
-
-                        blue  = ((pixel >> R5G6B5_BLUE_SHIFT)  & FIVE_BIT_MAX) * CHANNEL_MAX / FIVE_BIT_MAX;
-                        green = ((pixel >> R5G6B5_GREEN_SHIFT) & SIX_BIT_MAX)  * CHANNEL_MAX / SIX_BIT_MAX;
-                        red   = ((pixel >> R5G6B5_RED_SHIFT)   & FIVE_BIT_MAX) * CHANNEL_MAX / FIVE_BIT_MAX;
-
-                        break;
-                    }
-
-                    default:
-                    {
-                        goto end;
-                    }
-                }
-
-                destination_ptr[x * sizeof(uint32_t) + RGBA8_RED_OFFSET]   = static_cast<uint8_t>(red);
-                destination_ptr[x * sizeof(uint32_t) + RGBA8_GREEN_OFFSET] = static_cast<uint8_t>(green);
-                destination_ptr[x * sizeof(uint32_t) + RGBA8_BLUE_OFFSET]  = static_cast<uint8_t>(blue);
-                destination_ptr[x * sizeof(uint32_t) + RGBA8_ALPHA_OFFSET] = static_cast<uint8_t>(alpha);
-            }
-        }
+        PixelConverter::convert_to_rgba8_bottom_first(source_format,
+                                                      locked_rect.pBits,
+                                                      static_cast<uint32_t>(locked_rect.Pitch),
+                                                      description.Width,
+                                                      description.Height,
+                                                      out_rgba_u8_vec_ptr);
     }
 
     (*out_extents_u32vec2_ptr)[0] = description.Width;
