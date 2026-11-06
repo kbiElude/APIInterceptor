@@ -39,15 +39,15 @@ private:
 
     struct DumpedAPICall
     {
-        APIInterceptor::APIFunction         api_func          = APIInterceptor::APIFunction::APIFUNCTION_UNKNOWN;
+        APIInterceptor::APIFunction         api_func                                                = APIInterceptor::APIFunction::APIFUNCTION_UNKNOWN;
         APIInterceptor::APIFunctionArgument arguments_in [APIInterceptor::MAX_N_FUNCTION_ARGUMENTS] {};
         APIInterceptor::APIFunctionArgument arguments_out[APIInterceptor::MAX_N_FUNCTION_ARGUMENTS] {};
-        bool                                is_completed      = false; /* post-callback seen            */
-        uint32_t                            n_arguments_in    = 0;
-        uint32_t                            n_arguments_out   = 0;
-        APIInterceptor::APIFunctionArgument returned_value    {};
-        uint32_t                            thread_id         = 0;
-        uint64_t                            timestamp_qpc     = 0;     /* when the call was intercepted */
+        bool                                is_completed                                            = false; /* post-callback seen            */
+        uint32_t                            n_arguments_in                                          = 0;
+        uint32_t                            n_arguments_out                                         = 0;
+        APIInterceptor::APIFunctionArgument returned_value                                          {};
+        uint32_t                            thread_id                                               = 0;
+        uint64_t                            timestamp_qpc                                           = 0;     /* when the call was intercepted */
     };
 
     struct DumpedSurface

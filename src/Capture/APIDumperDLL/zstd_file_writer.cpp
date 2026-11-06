@@ -52,7 +52,7 @@ bool Capture::APIDumperDLL::ZstdFileWriter::compress(const void*              in
             }
         }
     }
-    while (input.pos < input.size ||
+    while (input.pos          <  input.size ||
            (in_directive      == ZSTD_e_end &&
             n_bytes_remaining != 0) );
 

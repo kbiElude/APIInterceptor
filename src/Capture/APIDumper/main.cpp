@@ -143,10 +143,10 @@ int main(int   in_argc,
 
     /* Now look for the dumper dll .. The DLL must match the target's architecture, not ours. */
     {
-        char                                          dll_dir_raw_i8vec260    [MAX_PATH] = {};
-        std::string                                   target_architecture_error;
+        char                                           dll_dir_raw_i8vec260    [MAX_PATH] = {};
+        std::string                                    target_architecture_error;
         Capture::InjectionLauncher::TargetArchitecture target_architecture                = Capture::InjectionLauncher::TargetArchitecture::UNKNOWN;
-        char                                          working_dir_raw_i8vec260[MAX_PATH] = {};
+        char                                           working_dir_raw_i8vec260[MAX_PATH] = {};
 
         if (Capture::InjectionLauncher::Launcher::get_target_architecture(filename_ptr,
                                                                          &target_architecture,
@@ -166,9 +166,9 @@ int main(int   in_argc,
         if (target_architecture != launcher_architecture)
         {
             const char* target_architecture_string   = (target_architecture   == Capture::InjectionLauncher::TargetArchitecture::X86) ? "x86"
-                                                                                                                                     : "x64";
+                                                                                                                                      : "x64";
             const char* launcher_architecture_string = (launcher_architecture == Capture::InjectionLauncher::TargetArchitecture::X86) ? "x86"
-                                                                                                                                     : "x64";
+                                                                                                                                      : "x64";
 
             fprintf(stderr,
                     "[!] [%s] is an %s executable but this is the %s APIDumper. Use APIDumper_%s.exe instead.\n",
@@ -181,7 +181,7 @@ int main(int   in_argc,
         }
 
         apidumper_dll_file_name = (target_architecture == Capture::InjectionLauncher::TargetArchitecture::X86) ? "APIDumperDLL_x86.dll"
-                                                                                                              : "APIDumperDLL_x64.dll";
+                                                                                                               : "APIDumperDLL_x64.dll";
 
         if (::GetCurrentDirectory(sizeof(working_dir_raw_i8vec260),
                                   working_dir_raw_i8vec260) == 0)
@@ -223,7 +223,7 @@ int main(int   in_argc,
                     "[!] [%s] is an %s executable but [%s] was not found.\n",
                     filename_ptr,
                     (target_architecture == Capture::InjectionLauncher::TargetArchitecture::X86) ? "x86"
-                                                                                                : "x64",
+                                                                                                 : "x64",
                     apidumper_dll_file_name.c_str() );
 
             goto end;
@@ -281,9 +281,9 @@ int main(int   in_argc,
 
     // Launch the process with APIDumper attached.
     {
+        std::string                               launch_error;
+        PROCESS_INFORMATION                       process_info;
         Capture::InjectionLauncher::LaunchRequest request;
-        PROCESS_INFORMATION                      process_info;
-        std::string                              launch_error;
 
         request.dll_path          = apidumper_dll_file_name;
         request.executable_path   = filename_ptr;

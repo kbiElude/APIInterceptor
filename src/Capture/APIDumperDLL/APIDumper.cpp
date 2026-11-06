@@ -28,7 +28,7 @@ APIDumper::APIDumper()
 
 APIDumper::~APIDumper()
 {
-    write_workload();
+    write_workload ();
     wait_for_writer();
 }
 
@@ -253,9 +253,9 @@ void APIDumper::on_post_callback(APIInterceptor::APIFunction                in_a
                     AI_FAIL_UNSUPPORTED(in_n_arguments_out);
                 }
 
-                deque_iterator->is_completed   = true;
-                deque_iterator->n_arguments_out     = in_n_arguments_out;
-                deque_iterator->returned_value = *in_returned_value_ptr;
+                deque_iterator->is_completed    =  true;
+                deque_iterator->n_arguments_out =  in_n_arguments_out;
+                deque_iterator->returned_value  = *in_returned_value_ptr;
 
                 for (uint32_t n_arg = 0;
                               n_arg < in_n_arguments_out;
@@ -300,8 +300,8 @@ void APIDumper::on_pre_callback(APIInterceptor::APIFunction                in_ap
         AI_FAIL_UNSUPPORTED(in_n_arguments_in);
     }
 
-    if (in_api_func                          == APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_PRESENT &&
-        this_ptr->m_recorded.n_frames_dumped <  this_ptr->m_settings.n_frames_to_dump                     &&
+    if (in_api_func                                    == APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_PRESENT &&
+        this_ptr->m_recorded.n_frames_dumped           <  this_ptr->m_settings.n_frames_to_dump                     &&
         this_ptr->m_settings.dump_swapchain_on_present)
     {
         DumpedSurface new_surface;
@@ -541,7 +541,7 @@ void APIDumper::write_segment(SegmentJobUniquePtr in_job_ptr)
     {
         const uint32_t       n_api_calls       = static_cast<uint32_t>(in_job_ptr->api_call_deque.size() );
         const uint32_t       n_data_chunks     = static_cast<uint32_t>(in_job_ptr->data_chunk_vec.size() );
-        const uint32_t       n_dumped_surfaces = static_cast<uint32_t>(in_job_ptr->surface_vec.size() );
+        const uint32_t       n_dumped_surfaces = static_cast<uint32_t>(in_job_ptr->surface_vec.size   () );
         std::vector<uint8_t> helper_u8_vec;
 
         /* Items are written out as they are put together, so that a big segment need not exist in memory twice. */
