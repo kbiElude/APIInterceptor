@@ -108,11 +108,14 @@ int Capture::APIDumpPrinter::verify_replay(const Options& in_options)
     int                                             result        = EXIT_FAILURE;
     Capture::APIDumpLoader::Workload                segment;
     Replay::ReplayEngineDLL::ReplayEngine           engine;
-    Replay::ReplayEngineDLL::ReplayCoverage         coverage([&engine](const APIInterceptor::APIFunction& in_function)
-                                                             {
-                                                                 return get_support(engine,
-                                                                                    in_function);
-                                                             });
+
+    const auto get_support_func = [&engine](const APIInterceptor::APIFunction& in_function)
+    {
+        return get_support(engine,
+                           in_function);
+    };
+
+    Replay::ReplayEngineDLL::ReplayCoverage         coverage(get_support_func);
 
     reader_options.n_threads = n_threads;
 

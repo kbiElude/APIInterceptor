@@ -208,14 +208,16 @@ struct Capture::APIDumpLoader::WorkloadReader::Pipeline
         std::unique_lock<std::mutex> lock(mutex);
         FrameFetch                        result = FrameFetch::CLEAN_END;
 
+        const auto is_result_ready_func = [&]()
+        {
+            return (result_map.find(next_sequence) != result_map.end() ||
+                    is_stopping                                         ||
+                    (is_producer_done                                   &&
+                     next_sequence >= n_frames_produced) );
+        };
+
         result_ready_condition.wait(lock,
-                                    [&]()
-                                    {
-                                        return (result_map.find(next_sequence) != result_map.end() ||
-                                                is_stopping                                         ||
-                                                (is_producer_done                                   &&
-                                                 next_sequence >= n_frames_produced) );
-                                    });
+                                    is_result_ready_func);
 
         const auto result_iterator = result_map.find(next_sequence);
 
@@ -252,12 +254,14 @@ struct Capture::APIDumpLoader::WorkloadReader::Pipeline
             {
                 std::unique_lock<std::mutex> lock(mutex);
 
+                const auto is_slot_free_func = [&]()
+                {
+                    return (n_in_flight < n_segments_in_flight ||
+                            is_stopping);
+                };
+
                 slot_free_condition.wait(lock,
-                                         [&]()
-                                         {
-                                             return (n_in_flight < n_segments_in_flight ||
-                                                     is_stopping);
-                                         });
+                                         is_slot_free_func);
 
                 if (is_stopping)
                 {
@@ -319,13 +323,15 @@ struct Capture::APIDumpLoader::WorkloadReader::Pipeline
             {
                 std::unique_lock<std::mutex> lock(mutex);
 
+                const auto is_job_available_func = [&]()
+                {
+                    return (job_deque.empty() == false ||
+                            is_stopping                ||
+                            is_producer_done);
+                };
+
                 job_available_condition.wait(lock,
-                                             [&]()
-                                             {
-                                                 return (job_deque.empty() == false ||
-                                                         is_stopping                ||
-                                                         is_producer_done);
-                                             });
+                                             is_job_available_func);
 
                 if (is_stopping                         ||
                     job_deque.empty() )
@@ -581,14 +587,16 @@ void Capture::APIDumpLoader::WorkloadReader::decode_frame(ZSTD_DCtx*            
     /* The segments the reader has no start of are read in full. */
     if (in_options.chunk_wanted_func)
     {
+        const auto is_segment_before_offset_func = [](const SegmentStart& in_start,
+                                                      const uint64_t&     in_offset_n_bytes)
+        {
+            return (in_start.file_offset_n_bytes < in_offset_n_bytes);
+        };
+
         const auto start_iterator = std::lower_bound(in_options.segment_start_vec.begin(),
                                                      in_options.segment_start_vec.end(),
                                                      in_file_offset_n_bytes,
-                                                     [](const SegmentStart& in_start,
-                                                        const uint64_t&     in_offset_n_bytes)
-                                                     {
-                                                         return (in_start.file_offset_n_bytes < in_offset_n_bytes);
-                                                     });
+                                                     is_segment_before_offset_func);
 
         if (start_iterator                      != in_options.segment_start_vec.end() &&
             start_iterator->file_offset_n_bytes == in_file_offset_n_bytes)

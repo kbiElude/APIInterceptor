@@ -69,12 +69,14 @@ void Replay::ReplayEngineDLL::CallWalker::prefetch_main()
         {
             std::unique_lock<std::mutex> lock(m_prefetch.mutex);
 
+            const auto can_prefetch_func = [this]()
+            {
+                return (m_prefetch.is_ready == false ||
+                        m_prefetch.is_stop_requested);
+            };
+
             m_prefetch.cv.wait(lock,
-                               [this]()
-                               {
-                                   return (m_prefetch.is_ready == false ||
-                                           m_prefetch.is_stop_requested);
-                               });
+                               can_prefetch_func);
 
             if (m_prefetch.is_stop_requested)
             {
@@ -163,12 +165,14 @@ bool Replay::ReplayEngineDLL::CallWalker::read_next_segment()
     {
         std::unique_lock<std::mutex> lock(m_prefetch.mutex);
 
+        const auto is_prefetch_done_func = [this]()
+        {
+            return (m_prefetch.is_ready ||
+                    m_prefetch.is_finished);
+        };
+
         m_prefetch.cv.wait(lock,
-                           [this]()
-                           {
-                               return (m_prefetch.is_ready ||
-                                       m_prefetch.is_finished);
-                           });
+                           is_prefetch_done_func);
 
         if (m_prefetch.is_ready)
         {

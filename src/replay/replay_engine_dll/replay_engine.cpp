@@ -24,15 +24,19 @@ Replay::ReplayEngineDLL::ReplayEngine::ReplayEngine()
     }
 
     {
+        const auto notify_window_closed_func = [this]()
+        {
+            notify_window_closed();
+        };
+
+        const auto notify_window_placed_func = [this](const WindowPlacement& in_placement)
+        {
+            notify_window_placed(in_placement);
+        };
+
         const auto win32_executor_ptr = std::make_shared<Win32CallExecutor>(&m_remapper,
-                                                                            [this]()
-                                                                            {
-                                                                                notify_window_closed();
-                                                                            },
-                                                                            [this](const WindowPlacement& in_placement)
-                                                                            {
-                                                                                notify_window_placed(in_placement);
-                                                                            });
+                                                                            notify_window_closed_func,
+                                                                            notify_window_placed_func);
 
         m_executors.add(Capture::APIDumpLoader::APIGroup::GDI32,
                         win32_executor_ptr);
@@ -306,18 +310,22 @@ end:
 
 void Replay::ReplayEngineDLL::ReplayEngine::notify_error(const std::string& in_message)
 {
-    m_observers.for_each([&](IReplayObserver* in_observer_ptr)
-                         {
-                             in_observer_ptr->on_error(in_message);
-                         });
+    const auto notify_error_func = [&](IReplayObserver* in_observer_ptr)
+    {
+        in_observer_ptr->on_error(in_message);
+    };
+
+    m_observers.for_each(notify_error_func);
 }
 
 void Replay::ReplayEngineDLL::ReplayEngine::notify_frame_presented(const uint32_t& in_n_frame)
 {
-    m_observers.for_each([&](IReplayObserver* in_observer_ptr)
-                         {
-                             in_observer_ptr->on_frame_presented(in_n_frame);
-                         });
+    const auto notify_frame_presented_func = [&](IReplayObserver* in_observer_ptr)
+    {
+        in_observer_ptr->on_frame_presented(in_n_frame);
+    };
+
+    m_observers.for_each(notify_frame_presented_func);
 }
 
 void Replay::ReplayEngineDLL::ReplayEngine::notify_idle()
@@ -330,18 +338,22 @@ void Replay::ReplayEngineDLL::ReplayEngine::notify_idle()
 
 void Replay::ReplayEngineDLL::ReplayEngine::notify_window_closed()
 {
-    m_observers.for_each([](IReplayObserver* in_observer_ptr)
-                         {
-                             in_observer_ptr->on_window_closed();
-                         });
+    const auto notify_window_closed_func = [](IReplayObserver* in_observer_ptr)
+    {
+        in_observer_ptr->on_window_closed();
+    };
+
+    m_observers.for_each(notify_window_closed_func);
 }
 
 void Replay::ReplayEngineDLL::ReplayEngine::notify_window_placed(const WindowPlacement& in_placement)
 {
-    m_observers.for_each([&](IReplayObserver* in_observer_ptr)
-                         {
-                             in_observer_ptr->on_window_placed(in_placement);
-                         });
+    const auto notify_window_placed_func = [&](IReplayObserver* in_observer_ptr)
+    {
+        in_observer_ptr->on_window_placed(in_placement);
+    };
+
+    m_observers.for_each(notify_window_placed_func);
 }
 
 void Replay::ReplayEngineDLL::ReplayEngine::pause()
@@ -536,11 +548,13 @@ void Replay::ReplayEngineDLL::ReplayEngine::set_state(const PlaybackState& in_st
 
     if (old_state != in_state)
     {
-        m_observers.for_each([&](IReplayObserver* in_observer_ptr)
-                             {
-                                 in_observer_ptr->on_state_changed(old_state,
-                                                                   in_state);
-                             });
+        const auto notify_state_changed_func = [&](IReplayObserver* in_observer_ptr)
+        {
+            in_observer_ptr->on_state_changed(old_state,
+                                              in_state);
+        };
+
+        m_observers.for_each(notify_state_changed_func);
     }
 }
 

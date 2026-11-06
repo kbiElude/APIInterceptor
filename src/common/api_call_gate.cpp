@@ -34,8 +34,11 @@ void APIInterceptor::ApiCallGate::enter()
             std::unique_lock<std::mutex> lock(m_mutex);
 
             m_cv.notify_all();
-            m_cv.wait      (lock,
-                            [this]() { return m_is_closed.load() == false; });
+
+            const auto is_open_func = [this]() { return m_is_closed.load() == false; };
+
+            m_cv.wait(lock,
+                      is_open_func);
         }
     }
 }
@@ -134,9 +137,11 @@ bool APIInterceptor::ApiCallGate::try_quiesce(const uint32_t& in_timeout_ms)
     {
         std::unique_lock<std::mutex> lock(m_mutex);
 
+        const auto are_other_threads_out_func = [&]() { return m_n_threads_inside.load() <= n_own_threads; };
+
         result = m_cv.wait_for(lock,
                                std::chrono::milliseconds(in_timeout_ms),
-                               [&]() { return m_n_threads_inside.load() <= n_own_threads; });
+                               are_other_threads_out_func);
     }
 
     if (result == false)

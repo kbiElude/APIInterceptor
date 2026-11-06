@@ -237,14 +237,16 @@ void APIDumper::on_post_callback(APIInterceptor::APIFunction                in_a
              */
             const auto this_thread_id = static_cast<uint32_t>(::GetCurrentThreadId() );
 
+            const auto is_pending_call_func = [&](const DumpedAPICall& in_api_call)
+            {
+               return (in_api_call.api_func     == in_api_func)    &&
+                      (in_api_call.thread_id    == this_thread_id) &&
+                      (in_api_call.is_completed == false);
+            };
+
             auto deque_iterator = std::find_if(this_ptr->m_recorded.api_call_deque.rbegin(),
                                                this_ptr->m_recorded.api_call_deque.rend  (),
-                                               [&](const DumpedAPICall& in_api_call)
-                                               {
-                                                  return (in_api_call.api_func     == in_api_func)    &&
-                                                         (in_api_call.thread_id    == this_thread_id) &&
-                                                         (in_api_call.is_completed == false);
-                                               });
+                                               is_pending_call_func);
 
             if (deque_iterator != this_ptr->m_recorded.api_call_deque.rend() )
             {

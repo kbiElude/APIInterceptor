@@ -866,12 +866,14 @@ bool Capture::APIDumpPrinter::D3D8Decoder::print_argument(FILE*                 
         case Interception::Hooks::D3D8::ValueKind::TEXTURE_STAGE_STATE_TYPE:
         case Interception::Hooks::D3D8::ValueKind::TRANSFORM_STATE_TYPE:
         {
+            const auto format_enum_func = [&info](const uint32_t& in_value)
+            {
+                return format_enum(info.kind,
+                                   in_value);
+            };
+
             result = ArgumentFormatter::format_u32(in_argument,
-                                                   [&info](const uint32_t& in_value)
-                                                   {
-                                                       return format_enum(info.kind,
-                                                                          in_value);
-                                                   },
+                                                   format_enum_func,
                                                   &text);
 
             break;
@@ -882,12 +884,14 @@ bool Capture::APIDumpPrinter::D3D8Decoder::print_argument(FILE*                 
         case Interception::Hooks::D3D8::ValueKind::LOCK_FLAGS:
         case Interception::Hooks::D3D8::ValueKind::USAGE_FLAGS:
         {
+            const auto format_flags_func = [&info](const uint32_t& in_value)
+            {
+                return format_flags(info.kind,
+                                    in_value);
+            };
+
             result = ArgumentFormatter::format_u32(in_argument,
-                                                   [&info](const uint32_t& in_value)
-                                                   {
-                                                       return format_flags(info.kind,
-                                                                           in_value);
-                                                   },
+                                                   format_flags_func,
                                                   &text);
 
             break;
@@ -922,12 +926,14 @@ bool Capture::APIDumpPrinter::D3D8Decoder::print_argument(FILE*                 
 
         case Interception::Hooks::D3D8::ValueKind::OBJECT:
         {
+            const auto get_object_name_func = [this, &info](const void* in_pointer)
+            {
+                return get_object_name(in_pointer,
+                                       info.object_type_name_ptr);
+            };
+
             result = ArgumentFormatter::format_pointer(in_argument,
-                                                       [this, &info](const void* in_pointer)
-                                                       {
-                                                           return get_object_name(in_pointer,
-                                                                                  info.object_type_name_ptr);
-                                                       },
+                                                       get_object_name_func,
                                                       &text);
 
             break;
@@ -935,13 +941,15 @@ bool Capture::APIDumpPrinter::D3D8Decoder::print_argument(FILE*                 
 
         case Interception::Hooks::D3D8::ValueKind::OBJECT_OUT:
         {
+            const auto get_object_name_func = [this, &info](const void* in_pointer)
+            {
+                return get_object_name(in_pointer,
+                                       info.object_type_name_ptr);
+            };
+
             result = ArgumentFormatter::format_pointer_out(in_argument,
                                                            in_is_out,
-                                                           [this, &info](const void* in_pointer)
-                                                           {
-                                                               return get_object_name(in_pointer,
-                                                                                      info.object_type_name_ptr);
-                                                           },
+                                                           get_object_name_func,
                                                           &text);
 
             break;
@@ -950,28 +958,30 @@ bool Capture::APIDumpPrinter::D3D8Decoder::print_argument(FILE*                 
         case Interception::Hooks::D3D8::ValueKind::RENDER_STATE_VALUE:
         case Interception::Hooks::D3D8::ValueKind::TEXTURE_STAGE_STATE_VALUE:
         {
+            const auto format_state_value_func = [this, &info](const uint32_t& in_state,
+                                                               const uint32_t& in_value)
+            {
+                StateValueInfo value_info = {};
+
+                if (info.kind == Interception::Hooks::D3D8::ValueKind::RENDER_STATE_VALUE)
+                {
+                    get_render_state_value_info(in_state,
+                                               &value_info);
+                }
+                else
+                {
+                    get_texture_stage_state_value_info(in_state,
+                                                      &value_info);
+                }
+
+                return ValueFormatter::format_state_value(value_info,
+                                                          in_value);
+            };
+
             result = ArgumentFormatter::format_u32_after_state(in_call,
                                                                in_n_argument,
                                                                in_argument,
-                                                               [this, &info](const uint32_t& in_state,
-                                                                             const uint32_t& in_value)
-                                                               {
-                                                                   StateValueInfo value_info = {};
-
-                                                                   if (info.kind == Interception::Hooks::D3D8::ValueKind::RENDER_STATE_VALUE)
-                                                                   {
-                                                                       get_render_state_value_info(in_state,
-                                                                                                  &value_info);
-                                                                   }
-                                                                   else
-                                                                   {
-                                                                       get_texture_stage_state_value_info(in_state,
-                                                                                                         &value_info);
-                                                                   }
-
-                                                                   return ValueFormatter::format_state_value(value_info,
-                                                                                                             in_value);
-                                                               },
+                                                               format_state_value_func,
                                                               &text);
 
             break;
@@ -984,16 +994,18 @@ bool Capture::APIDumpPrinter::D3D8Decoder::print_argument(FILE*                 
 
         default:
         {
+            const auto format_struct_func = [&info](const Capture::APIDumpLoader::DataChunk& in_chunk,
+                                                    std::string*                             out_text_ptr)
+            {
+                return format_struct(info.kind,
+                                     in_chunk,
+                                     out_text_ptr);
+            };
+
             /* Structures and GUIDs, stored as data chunks. */
             result = ArgumentFormatter::format_chunk(in_workload,
                                                      in_argument,
-                                                     [&info](const Capture::APIDumpLoader::DataChunk& in_chunk,
-                                                             std::string*                             out_text_ptr)
-                                                     {
-                                                         return format_struct(info.kind,
-                                                                              in_chunk,
-                                                                              out_text_ptr);
-                                                     },
+                                                     format_struct_func,
                                                     &text);
 
             break;

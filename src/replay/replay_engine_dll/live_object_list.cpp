@@ -44,13 +44,15 @@ std::vector<void*> Replay::ReplayEngineDLL::LiveObjectList::get_newest_first_vec
                                order_pair.first});
     }
 
+    const auto is_address_greater_func = [](const std::pair<uint64_t, void*>& in_a,
+                                            const std::pair<uint64_t, void*>& in_b)
+    {
+        return (in_a.first > in_b.first);
+    };
+
     std::sort(ordered_vec.begin(),
               ordered_vec.end  (),
-              [](const std::pair<uint64_t, void*>& in_a,
-                 const std::pair<uint64_t, void*>& in_b)
-              {
-                  return (in_a.first > in_b.first);
-              });
+              is_address_greater_func);
 
     for (const auto& ordered_pair : ordered_vec)
     {
