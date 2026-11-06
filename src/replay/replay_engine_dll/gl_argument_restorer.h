@@ -18,6 +18,7 @@
 #include <type_traits>
 #include <Windows.h>
 #include "Khronos/GL/glcorearb.h"
+#include "types.h"
 
 namespace Replay
 {
@@ -25,16 +26,6 @@ namespace Replay
     {
         namespace GlRestore
         {
-            enum class ArgumentCategory
-            {
-                FUNCTION,
-                NUMBER,
-                POINTER,
-                STRING,
-                STRING_ARRAY,
-                SYNC
-            };
-
             template<typename T>
             struct ArgumentCategoryOf
             {

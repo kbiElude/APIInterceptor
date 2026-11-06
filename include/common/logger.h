@@ -6,21 +6,12 @@
 #define AI_LOGGER_H
 
 #include "apitracer_config.h"
+#include "common/types.h"
 #include <mutex>
 #include <sstream>
 
 namespace APIInterceptor
 {
-    enum class LogLevel
-    {
-        API_DUMP,
-        ERR,
-        INFO,
-        WARNING,
-
-        UNKNOWN
-    };
-
     class Logger
     {
     public:

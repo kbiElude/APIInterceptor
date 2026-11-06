@@ -14,6 +14,33 @@ namespace Capture
 {
     namespace APIDumpPrinter
     {
+        /* The sets of flags of D3D7: those that arguments hold, and those in the fields of the structures. */
+        enum class D3D7FlagTable
+        {
+            BLT,
+            BLT_FAST,
+            CLEAR,
+            COLOR_KEY,
+            COOPERATIVE_LEVEL,
+            DEVICE_CAPS,
+            DIRECT_DRAW_CAPS,
+            DIRECT_DRAW_CAPS2,
+            DRAW,
+            ENUM_DISPLAY_MODES,
+            ENUM_SURFACES,
+            FLIP,
+            LOCK,
+            OVERLAY,
+            PALETTE,
+            PIXEL_FORMAT,
+            SET_DISPLAY_MODE,
+            SURFACE_CAPS,
+            SURFACE_CAPS2,
+            SURFACE_DESC,
+            VERTEX_OPERATION,
+            WAIT_FOR_VERTICAL_BLANK
+        };
+
         struct FlagNameEntry
         {
             uint32_t    mask;
@@ -33,6 +60,24 @@ namespace Capture
             bool                                       show_statistics            = false;
             bool                                       verifies_replay            = false;
             const char*                                workload_filename_ptr      = nullptr;
+        };
+
+        enum class SharedNameTable
+        {
+            BLEND,
+            CMP_FUNC,
+            CULL,
+            FILL_MODE,
+            FOG_MODE,
+            MATERIAL_COLOR_SOURCE,
+            PRIMITIVE_TYPE,
+            SHADE_MODE,
+            STATE_BLOCK_TYPE,
+            STENCIL_OP,
+            TEXTURE_ADDRESS,
+            TEXTURE_ARGUMENT,
+            TEXTURE_OP,
+            Z_BUFFER_TYPE
         };
 
         /* How the value of a render state or of a texture stage state is printed. */

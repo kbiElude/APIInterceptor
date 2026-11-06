@@ -1174,6 +1174,16 @@ namespace APIInterceptor
             pfn_interceptor_func_ptr      = in_pfn_interceptor_func_ptr;
         }
     };
+
+    enum class LogLevel
+    {
+        API_DUMP,
+        ERR,
+        INFO,
+        WARNING,
+
+        UNKNOWN
+    };
 }
 
 #endif /* COMMON_TYPES_H */

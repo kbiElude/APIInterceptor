@@ -9,38 +9,12 @@
 
 #include "interception/hooks/D3D7/types.h"
 #include "types.h"
+#include "types.h"
 
 namespace Capture
 {
     namespace APIDumpPrinter
     {
-        /* The sets of flags of D3D7: those that arguments hold, and those in the fields of the structures. */
-        enum class D3D7FlagTable
-        {
-            BLT,
-            BLT_FAST,
-            CLEAR,
-            COLOR_KEY,
-            COOPERATIVE_LEVEL,
-            DEVICE_CAPS,
-            DIRECT_DRAW_CAPS,
-            DIRECT_DRAW_CAPS2,
-            DRAW,
-            ENUM_DISPLAY_MODES,
-            ENUM_SURFACES,
-            FLIP,
-            LOCK,
-            OVERLAY,
-            PALETTE,
-            PIXEL_FORMAT,
-            SET_DISPLAY_MODE,
-            SURFACE_CAPS,
-            SURFACE_CAPS2,
-            SURFACE_DESC,
-            VERTEX_OPERATION,
-            WAIT_FOR_VERTICAL_BLANK
-        };
-
         class D3D7Names
         {
         public:

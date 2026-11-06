@@ -53,6 +53,17 @@ namespace Interception
                 typedef typename std::remove_cv<typename std::remove_pointer<T>::type>::type type;
             };
 
+            /* The values of D3DPRIMITIVETYPE, which are the same in Direct3D 7 and 8. */
+            enum class PrimitiveType : uint32_t
+            {
+                POINT_LIST     = 1,
+                LINE_LIST      = 2,
+                LINE_STRIP     = 3,
+                TRIANGLE_LIST  = 4,
+                TRIANGLE_STRIP = 5,
+                TRIANGLE_FAN   = 6
+            };
+
             /* Enums are 32-bit in the APIs which use COM. */
             template<typename T, bool is_enum = std::is_enum<T>::value>
             struct ScalarConversion

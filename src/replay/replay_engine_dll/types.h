@@ -60,6 +60,19 @@ namespace Replay
             UNIFORM_LOCATION,
             VERTEX_ARRAY
         };
+
+        namespace GlRestore
+        {
+            enum class ArgumentCategory
+            {
+                FUNCTION,
+                NUMBER,
+                POINTER,
+                STRING,
+                STRING_ARRAY,
+                SYNC
+            };
+        }
     }
 }
 

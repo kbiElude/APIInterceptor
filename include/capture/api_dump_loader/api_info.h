@@ -8,6 +8,7 @@
 #ifndef APIDUMPLOADER_API_INFO_H
 #define APIDUMPLOADER_API_INFO_H
 
+#include "capture/api_dump_loader/types.h"
 #include "common/types.h"
 #include <vector>
 
@@ -16,18 +17,6 @@ namespace Capture
     namespace APIDumpLoader
     {
         struct DumpedAPICall;
-
-        enum class APIGroup
-        {
-            D3D7,
-            D3D8,
-            GDI32,
-            GL,
-            USER32,
-            WGL,
-
-            UNKNOWN
-        };
 
         APIGroup    get_api_group     (const APIInterceptor::APIFunction& in_function);
         const char* get_api_group_name(const APIGroup&                    in_group);

@@ -8,29 +8,12 @@
 #define APIDUMPPRINTER_SHARED_NAMES_H
 
 #include "types.h"
+#include "types.h"
 
 namespace Capture
 {
     namespace APIDumpPrinter
     {
-        enum class SharedNameTable
-        {
-            BLEND,
-            CMP_FUNC,
-            CULL,
-            FILL_MODE,
-            FOG_MODE,
-            MATERIAL_COLOR_SOURCE,
-            PRIMITIVE_TYPE,
-            SHADE_MODE,
-            STATE_BLOCK_TYPE,
-            STENCIL_OP,
-            TEXTURE_ADDRESS,
-            TEXTURE_ARGUMENT,
-            TEXTURE_OP,
-            Z_BUFFER_TYPE
-        };
-
         struct NameTable
         {
             const ValueNameEntry* table_ptr;
