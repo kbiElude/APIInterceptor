@@ -5,8 +5,8 @@
  * Tests for ListenerList: listeners are called in order, a removed one is not called, and removing waits for a call in progress.
  */
 #include <gtest/gtest.h>
+#include "counting_listener.h"
 #include "listener_list.h"
-#include "replay_test_doubles.h"
 #include <atomic>
 #include <chrono>
 #include <future>

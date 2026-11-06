@@ -4,18 +4,23 @@ if (APIINTERCEPTOR_BUILD_TESTS)
 
     file(GLOB APIInterceptorTestsSources CONFIGURE_DEPENDS "${APIInterceptor_SOURCE_DIR}/src/tests/*.cpp")
 
-    list(FILTER APIInterceptorTestsSources EXCLUDE REGEX ".*/(fixtures|replay_test_doubles).cpp$")
+    list(FILTER APIInterceptorTestsSources EXCLUDE REGEX ".*/(fixtures|map_chunk_source|pausing_interceptor|stub_call_executor).cpp$")
 
     # Where the data files of the tests are, and the names the tests use: shared with a project which builds on this one.
-    add_library(APIInterceptorTestSupport STATIC "${APIInterceptor_SOURCE_DIR}/src/tests/fixtures.cpp"
+    add_library(APIInterceptorTestSupport STATIC "${APIInterceptor_SOURCE_DIR}/src/tests/counting_listener.h"
+                                                 "${APIInterceptor_SOURCE_DIR}/src/tests/fixtures.cpp"
                                                  "${APIInterceptor_SOURCE_DIR}/src/tests/fixtures.h"
-                                                 "${APIInterceptor_SOURCE_DIR}/src/tests/replay_test_doubles.cpp"
-                                                 "${APIInterceptor_SOURCE_DIR}/src/tests/replay_test_doubles.h")
+                                                 "${APIInterceptor_SOURCE_DIR}/src/tests/map_chunk_source.cpp"
+                                                 "${APIInterceptor_SOURCE_DIR}/src/tests/map_chunk_source.h"
+                                                 "${APIInterceptor_SOURCE_DIR}/src/tests/pausing_interceptor.cpp"
+                                                 "${APIInterceptor_SOURCE_DIR}/src/tests/pausing_interceptor.h"
+                                                 "${APIInterceptor_SOURCE_DIR}/src/tests/stub_call_executor.cpp"
+                                                 "${APIInterceptor_SOURCE_DIR}/src/tests/stub_call_executor.h")
 
     target_link_libraries(APIInterceptorTestSupport PUBLIC ReplayEngineCore)
 
     target_compile_definitions(APIInterceptorTestSupport PUBLIC APIINTERCEPTOR_TESTS_DATA_DIR="${APIInterceptor_SOURCE_DIR}/src/tests/data")
-    target_include_directories(APIInterceptorTestSupport PUBLIC "${APIInterceptor_SOURCE_DIR}/src/Tests")
+    target_include_directories(APIInterceptorTestSupport PUBLIC "${APIInterceptor_SOURCE_DIR}/src/tests")
 
     # Sources under test which are not part of a library.
     add_executable(APIInterceptorTests ${APIInterceptorTestsSources}

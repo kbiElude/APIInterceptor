@@ -7,7 +7,7 @@
  */
 #include <gtest/gtest.h>
 #include "executor_registry.h"
-#include "replay_test_doubles.h"
+#include "stub_call_executor.h"
 
 TEST(ExecutorRegistryTest, AnApiWithNoExecutorGetsOneWhichDoesNothing)
 {
