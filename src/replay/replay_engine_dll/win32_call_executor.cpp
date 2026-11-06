@@ -157,6 +157,8 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::create_window_ex(const Capture:
 
     if (is_reused == false)
     {
+        const HMODULE module_handle = ::GetModuleHandleW(nullptr);
+
         creation_height = signature.height;
         creation_style  = signature.style;
         creation_width  = signature.width;
@@ -176,7 +178,7 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::create_window_ex(const Capture:
                                         creation_height,
                                         live_parent,
                                         nullptr, /* menus are not replayed */
-                                        ::GetModuleHandleW(nullptr),
+                                        module_handle,
                                         nullptr);
 
         if (live_window == nullptr)

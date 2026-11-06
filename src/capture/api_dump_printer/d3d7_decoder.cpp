@@ -1344,10 +1344,12 @@ void Capture::APIDumpPrinter::D3D7Decoder::register_created_objects(const Captur
             if (info.kind                               == Interception::Hooks::D3D7::ValueKind::OBJECT_OUT &&
                 in_call.arg_out_vec.at(n_argument).type == APIInterceptor::ARGTYPE_VOID_PTR)
             {
+                const char* type_name_ptr = get_created_object_type_name_ptr(in_call,
+                                                                             info,
+                                                                             in_workload);
+
                 m_object_namer.register_object(in_call.arg_out_vec.at(n_argument).get_ptr_as_u64(),
-                                               get_created_object_type_name_ptr(in_call,
-                                                                                info,
-                                                                                in_workload),
+                                               type_name_ptr,
                                                is_new);
             }
         }
