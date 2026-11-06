@@ -36,7 +36,7 @@ namespace Interception
 
 #include "interception/hooks/OpenGL/types_typedefs.h"
 #include "interception/hooks/OpenGL/types_structs.h"
-#include "interception/hooks/OpenGL/types_interfaces.h"
+#include "interception/hooks/OpenGL/i_context.h"
 
 namespace Interception
 {

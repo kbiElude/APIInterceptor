@@ -10,7 +10,7 @@
 #include "interception/hooks/OpenGL/client_array_manager.h"
 #include "interception/hooks/OpenGL/pixel_store_manager.h"
 #include "interception/hooks/OpenGL/texture_manager.h"
-#include "interception/hooks/OpenGL/types_interfaces.h"
+#include "interception/hooks/OpenGL/i_context.h"
 
 namespace Interception
 {

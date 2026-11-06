@@ -2,8 +2,8 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
-#ifndef AI_TYPES_INTERFACES_H
-#define AI_TYPES_INTERFACES_H
+#ifndef AI_I_CONTEXT_H
+#define AI_I_CONTEXT_H
 
 namespace Interception
 {
@@ -26,4 +26,4 @@ namespace Interception
     }
 }
 
-#endif /* AI_TYPES_INTERFACES_H */
+#endif /* AI_I_CONTEXT_H */
