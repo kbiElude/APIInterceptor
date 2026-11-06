@@ -148,6 +148,7 @@ private:
      * read. Every reader is of one API; this is the only place which tells which is which. False if there is nothing to store.
      */
     static bool read_frame_surface(const APIInterceptor::APIFunction&         in_api_func,
+                                   const uint32_t&                            in_n_arguments_in,
                                    const APIInterceptor::APIFunctionArgument* in_arguments_in_ptr,
                                    DumpedSurface*                             out_surface_ptr);
 

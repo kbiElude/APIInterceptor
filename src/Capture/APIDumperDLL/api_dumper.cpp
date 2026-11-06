@@ -9,6 +9,7 @@
 #include "Common/workload_format.h"
 #include "Interception/Hooks/Kernel32/callbacks.h"
 #include "api_dumper.h"
+#include "d3d7_swapchain_reader.h"
 #include "d3d8_swapchain_reader.h"
 #include "opengl_swapchain_reader.h"
 #include "zstd_file_writer.h"
@@ -305,6 +306,7 @@ void APIDumper::on_pre_callback(APIInterceptor::APIFunction                in_ap
         DumpedSurface new_surface;
 
         if (read_frame_surface(in_api_func,
+                               in_n_arguments_in,
                                in_arguments_in_ptr,
                               &new_surface) )
         {
@@ -412,6 +414,7 @@ end:
 }
 
 bool APIDumper::read_frame_surface(const APIInterceptor::APIFunction&         in_api_func,
+                                   const uint32_t&                            in_n_arguments_in,
                                    const APIInterceptor::APIFunctionArgument* in_arguments_in_ptr,
                                    DumpedSurface*                             out_surface_ptr)
 {
@@ -421,11 +424,63 @@ bool APIDumper::read_frame_surface(const APIInterceptor::APIFunction&         in
     std::vector<uint8_t>* rgba_ptr = rgba_u8_vec_ptr.get();
     bool                  result   = false;
 
-    /* The frame is read before the call which presents it. Every API says it in the first argument, which is what is read from. */
+    /* The frame is read before the call which presents it. */
     switch (in_api_func)
     {
+        case APIInterceptor::APIFUNCTION_D3D7_IDIRECTDRAWSURFACE7_BLT:
+        case APIInterceptor::APIFUNCTION_D3D7_IDIRECTDRAWSURFACE7_BLTFAST:
+        {
+            /* The surface which is blitted from, in the arguments of the method (the surface which is blitted to is the first). */
+            constexpr uint32_t BLT_SOURCE_ARGUMENT     = 2;
+            constexpr uint32_t BLT_FAST_SOURCE_ARGUMENT = 3;
+
+            const bool     is_presenting   = APIInterceptor::is_frame_boundary(in_api_func,
+                                                                               in_n_arguments_in,
+                                                                               in_arguments_in_ptr);
+            const uint32_t source_argument = (in_api_func == APIInterceptor::APIFUNCTION_D3D7_IDIRECTDRAWSURFACE7_BLT) ? BLT_SOURCE_ARGUMENT
+                                                                                                                       : BLT_FAST_SOURCE_ARGUMENT;
+
+            /* Only a blit to the primary surface ends a frame. */
+            if (is_presenting)
+            {
+                void* const source_ptr = const_cast<void*>(in_arguments_in_ptr[source_argument].get_ptr() );
+
+                if (source_ptr != nullptr)
+                {
+                    result = Capture::APIDumperDLL::D3D7SwapchainReader::read_surface(source_ptr,
+                                                                                     &out_surface_ptr->extents_u32vec2,
+                                                                                      rgba_ptr);
+                }
+            }
+
+            break;
+        }
+
+        case APIInterceptor::APIFUNCTION_D3D7_IDIRECTDRAWSURFACE7_FLIP:
+        {
+            /* The surface which is flipped is the first argument, and the one that is flipped to is the second, or else the back buffer. */
+            void* const primary_ptr = const_cast<void*>(in_arguments_in_ptr[0].get_ptr() );
+            void* const target_ptr  = const_cast<void*>(in_arguments_in_ptr[1].get_ptr() );
+
+            if (target_ptr != nullptr)
+            {
+                result = Capture::APIDumperDLL::D3D7SwapchainReader::read_surface(target_ptr,
+                                                                                 &out_surface_ptr->extents_u32vec2,
+                                                                                  rgba_ptr);
+            }
+            else
+            {
+                result = Capture::APIDumperDLL::D3D7SwapchainReader::read_back_buffer(primary_ptr,
+                                                                                     &out_surface_ptr->extents_u32vec2,
+                                                                                      rgba_ptr);
+            }
+
+            break;
+        }
+
         case APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_PRESENT:
         {
+            /* The device is the first argument of the call. */
             void* const device_ptr = const_cast<void*>(in_arguments_in_ptr[0].get_ptr() );
 
             result = Capture::APIDumperDLL::D3D8SwapchainReader::read(device_ptr,
@@ -437,6 +492,7 @@ bool APIDumper::read_frame_surface(const APIInterceptor::APIFunction&         in
 
         case APIInterceptor::APIFUNCTION_GDI32_SWAPBUFFERS:
         {
+            /* The device context is the first argument of the call. */
             void* const device_context_ptr = const_cast<void*>(in_arguments_in_ptr[0].get_ptr() );
 
             result = Capture::APIDumperDLL::OpenGLSwapchainReader::read(device_context_ptr,
