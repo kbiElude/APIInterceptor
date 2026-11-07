@@ -3,6 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "gl_replay_context.h"
+#include <array>
 #include <limits.h>
 #include <string.h>
 
@@ -10,6 +11,7 @@ Replay::ReplayEngineDLL::GlReplayContext::GlReplayContext(ObjectRemapper* in_rem
     :CallContext        (in_remapper_ptr),
      m_current_program  (0),
      m_function_info_ptr(nullptr),
+     m_is_pixel_pack_buffer_bound(false),
      m_is_skipped       (false),
      m_live_return      (0)
 {
@@ -92,6 +94,169 @@ uint64_t Replay::ReplayEngineDLL::GlReplayContext::get_index_program() const
 uint64_t Replay::ReplayEngineDLL::GlReplayContext::get_live_return() const
 {
     return m_live_return;
+}
+
+uint64_t Replay::ReplayEngineDLL::GlReplayContext::get_pixel_n_components(const uint32_t& in_format)
+{
+    constexpr uint64_t MOST_COMPONENTS = 4;
+
+    uint64_t result = MOST_COMPONENTS;
+
+    switch (in_format)
+    {
+        case 0x1900: /* GL_COLOR_INDEX     */
+        case 0x1901: /* GL_STENCIL_INDEX   */
+        case 0x1902: /* GL_DEPTH_COMPONENT */
+        case 0x1903: /* GL_RED             */
+        case 0x1904: /* GL_GREEN           */
+        case 0x1905: /* GL_BLUE            */
+        case 0x1906: /* GL_ALPHA           */
+        case 0x1909: /* GL_LUMINANCE       */
+        {
+            result = 1;
+
+            break;
+        }
+
+        case 0x190A: /* GL_LUMINANCE_ALPHA */
+        {
+            result = 2;
+
+            break;
+        }
+
+        case 0x1907: /* GL_RGB */
+        case 0x80E0: /* GL_BGR */
+        {
+            result = 3;
+
+            break;
+        }
+
+        default:
+        {
+            break;
+        }
+    }
+
+    return result;
+}
+
+uint64_t Replay::ReplayEngineDLL::GlReplayContext::get_pixel_type_n_bytes(const uint32_t& in_type)
+{
+    constexpr uint64_t MOST_BYTES = 4;
+
+    uint64_t result = MOST_BYTES;
+
+    switch (in_type)
+    {
+        case 0x1400: /* GL_BYTE          */
+        case 0x1401: /* GL_UNSIGNED_BYTE */
+        {
+            result = 1;
+
+            break;
+        }
+
+        case 0x1402: /* GL_SHORT          */
+        case 0x1403: /* GL_UNSIGNED_SHORT */
+        case 0x140B: /* GL_HALF_FLOAT     */
+        {
+            result = 2;
+
+            break;
+        }
+
+        default:
+        {
+            break;
+        }
+    }
+
+    return result;
+}
+
+size_t Replay::ReplayEngineDLL::GlReplayContext::get_unrecorded_output_n_bytes(const size_t& in_n_argument) const
+{
+    /* The glGet*v() write the values of one query: at most a matrix of doubles (16 of them); this is more than twice that. */
+    constexpr size_t   QUERY_N_BYTES            = 256;
+    constexpr size_t   READ_PIXELS_ARGUMENT     = 6;
+    constexpr size_t   READ_PIXELS_MAX_N_BYTES  = 256 * 1024 * 1024;
+    constexpr uint64_t ROW_ALIGNMENT_N_BYTES    = 8; /* the most that GL_PACK_ALIGNMENT can be */
+
+    const auto& call   = get_call();
+    size_t      result = 0;
+
+    switch (call.func)
+    {
+        case APIInterceptor::APIFUNCTION_GL_GLGETBOOLEANV:
+        case APIInterceptor::APIFUNCTION_GL_GLGETDOUBLEV:
+        case APIInterceptor::APIFUNCTION_GL_GLGETFLOATV:
+        case APIInterceptor::APIFUNCTION_GL_GLGETINTEGER64V:
+        case APIInterceptor::APIFUNCTION_GL_GLGETINTEGERV:
+        {
+            if (in_n_argument == 1)
+            {
+                result = QUERY_N_BYTES;
+            }
+
+            break;
+        }
+
+        case APIInterceptor::APIFUNCTION_GL_GLREADPIXELS:
+        {
+            /* glReadPixels(x, y, width, height, format, type, pixels): the rows are padded to the alignment, at most. */
+            std::array<int64_t, 6> argument_array = {};
+            bool                   are_read       = (in_n_argument                == READ_PIXELS_ARGUMENT &&
+                                                     m_is_pixel_pack_buffer_bound == false);
+
+            for (size_t n_value = 0;
+                        are_read &&
+                        n_value < argument_array.size();
+                      ++n_value)
+            {
+                const auto argument_ptr = get_in_argument_ptr(n_value);
+
+                are_read = (argument_ptr != nullptr);
+
+                if (are_read)
+                {
+                    are_read = read_number(*argument_ptr,
+                                           &argument_array.at(n_value) );
+                }
+            }
+
+            const uint64_t n_components = (are_read) ? get_pixel_n_components(static_cast<uint32_t>(argument_array.at(4) ) )
+                                                     : 0;
+            const uint64_t n_type_bytes = (are_read) ? get_pixel_type_n_bytes(static_cast<uint32_t>(argument_array.at(5) ) )
+                                                     : 0;
+
+            if (are_read      &&
+                n_components  != 0 &&
+                n_type_bytes  != 0 &&
+                argument_array.at(2) > 0 &&
+                argument_array.at(3) > 0)
+            {
+                const uint64_t row_n_bytes   = static_cast<uint64_t>(argument_array.at(2) ) * n_components * n_type_bytes;
+                const uint64_t padded_n_bytes = (row_n_bytes + ROW_ALIGNMENT_N_BYTES - 1) / ROW_ALIGNMENT_N_BYTES * ROW_ALIGNMENT_N_BYTES;
+                const uint64_t total_n_bytes = padded_n_bytes * static_cast<uint64_t>(argument_array.at(3) ) + ROW_ALIGNMENT_N_BYTES;
+
+                if (total_n_bytes <= READ_PIXELS_MAX_N_BYTES)
+                {
+                    result = static_cast<size_t>(total_n_bytes);
+                }
+            }
+
+            break;
+        }
+
+        default:
+        {
+            break;
+        }
+    }
+
+    return result;
 }
 
 Replay::ReplayEngineDLL::ObjectKind Replay::ReplayEngineDLL::GlReplayContext::get_param_kind(const size_t& in_n_argument) const
@@ -365,6 +530,11 @@ void Replay::ReplayEngineDLL::GlReplayContext::register_uniform_location(const u
     m_uniform_location_map[(in_dumped_program << PROGRAM_SHIFT) | static_cast<uint32_t>(in_dumped_location)] = in_live_location;
 }
 
+bool Replay::ReplayEngineDLL::GlReplayContext::is_pixel_pack_buffer_bound() const
+{
+    return m_is_pixel_pack_buffer_bound;
+}
+
 void Replay::ReplayEngineDLL::GlReplayContext::request_skip()
 {
     m_is_skipped = true;
@@ -378,4 +548,9 @@ void Replay::ReplayEngineDLL::GlReplayContext::set_current_program(const uint64_
 void Replay::ReplayEngineDLL::GlReplayContext::set_live_return(const uint64_t& in_value)
 {
     m_live_return = in_value;
+}
+
+void Replay::ReplayEngineDLL::GlReplayContext::set_pixel_pack_buffer_bound(const bool& in_is_bound)
+{
+    m_is_pixel_pack_buffer_bound = in_is_bound;
 }

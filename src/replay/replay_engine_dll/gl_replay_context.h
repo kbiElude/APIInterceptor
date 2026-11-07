@@ -59,6 +59,17 @@ namespace Replay
             bool       is_param_ignored(const size_t& in_n_argument) const;
             bool       is_skipped      ()                            const;
 
+            /* True if a buffer is bound to the target that glReadPixels and the other reads of pixels write to: the pointer of such a call is then an offset in
+             * the buffer, and not the address of memory of the program.
+             */
+            bool is_pixel_pack_buffer_bound() const;
+
+            /* How many bytes the driver writes to a pointer of the call which the dump holds no data of (the dumper does not know how much a call writes
+             * to a place of the program, which is not a name of an object): the calls that write a known number of bytes, to memory of the dumped process.
+             * 0 for any other pointer, which the replay cannot give memory to.
+             */
+            size_t get_unrecorded_output_n_bytes(const size_t& in_n_argument) const;
+
             /* Maps what the dump holds to what the replay has: a name, or a location, or an index. Values which the replay
              * has not seen are passed on as they are.
              */
@@ -99,6 +110,7 @@ namespace Replay
             void request_skip             ();
             void set_current_program      (const uint64_t& in_dumped_program);
             void set_live_return          (const uint64_t& in_value);
+            void set_pixel_pack_buffer_bound(const bool&     in_is_bound);
 
         private:
             /* The kind of the index, the dumped program, the scope and the dumped index. */
@@ -107,12 +119,19 @@ namespace Replay
             /* The program an index of this call belongs to: the one the call names (its first parameter), or the current one. */
             uint64_t get_index_program() const;
 
+            /* The number of components of a pixel of the format, and the bytes of one of them (or of the whole pixel, for a packed type): a number that is
+             * never less than the true one, for a format or a type that is not known.
+             */
+            static uint64_t get_pixel_n_components(const uint32_t& in_format);
+            static uint64_t get_pixel_type_n_bytes(const uint32_t& in_type);
+
             uint64_t get_uniform_program() const;
 
             std::map<uint32_t, uint32_t>          m_attrib_location_map;
             uint64_t                              m_current_program;
             const GlFunctionInfo*                 m_function_info_ptr;
             std::map<IndexKey, uint32_t>          m_index_map;
+            bool                                  m_is_pixel_pack_buffer_bound;
             bool                                  m_is_skipped;
             uint64_t                              m_live_return;
             std::deque<std::vector<uint8_t> >     m_scratch_deque;

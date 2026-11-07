@@ -265,11 +265,15 @@ namespace Replay
                     /* A pointer value below this is an offset in a buffer; the one above is an address of the dumped process. */
                     constexpr uint64_t MAX_BUFFER_OFFSET = 0x10000000;
 
-                    size_t     n_bytes          = 0;
-                    const auto out_argument_ptr = in_context_ptr->get_out_argument_ptr(in_n_argument);
-                    const auto pointer_value    = in_argument.get_ptr_as_u64          ();
-                    const auto out_data_ptr     = in_context_ptr->get_chunk_data_ptr  (out_argument_ptr,
-                                                                                       &n_bytes);
+                    /* A place that the call writes to is a pointer to what is not const. */
+                    constexpr bool is_output = (std::is_const<typename std::remove_pointer<T>::type>::value == false);
+
+                    size_t     n_bytes            = 0;
+                    const auto out_argument_ptr   = in_context_ptr->get_out_argument_ptr           (in_n_argument);
+                    const auto pointer_value      = in_argument.get_ptr_as_u64                     ();
+                    const auto out_data_ptr       = in_context_ptr->get_chunk_data_ptr             (out_argument_ptr,
+                                                                                                     &n_bytes);
+                    const auto n_unrecorded_bytes = in_context_ptr->get_unrecorded_output_n_bytes  (in_n_argument);
 
                     if (out_data_ptr != nullptr)
                     {
@@ -284,13 +288,21 @@ namespace Replay
                         m_value = nullptr;
                     }
                     else
+                    if (is_output &&
+                        n_unrecorded_bytes != 0)
+                    {
+                        /* Memory of the dumped process that the call writes to, and the dump holds nothing of: the driver writes to memory of the replay. */
+                        m_scratch_ptr = in_context_ptr->allocate_scratch(n_unrecorded_bytes);
+                        m_value       = reinterpret_cast<T>             (m_scratch_ptr->data() );
+                    }
+                    else
                     if (pointer_value < MAX_BUFFER_OFFSET)
                     {
                         m_value = reinterpret_cast<T>(static_cast<uintptr_t>(pointer_value) );
                     }
                     else
                     {
-                        /* Memory the replay does not have: the call cannot be replayed. */
+                        /* Memory the replay does not have, and the call writes an amount that is not known: it cannot be replayed. */
                         in_context_ptr->request_skip();
                     }
                 }

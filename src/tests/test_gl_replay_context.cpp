@@ -6,6 +6,7 @@
  */
 #include "call_walker.h"
 #include <gtest/gtest.h>
+#include "gl_argument_restorer.h"
 #include "gl_replay_context.h"
 
 namespace
@@ -111,4 +112,183 @@ TEST(GlReplayContext, ARangeOfDisplayListsIsMappedOneByOne)
     EXPECT_EQ(fixture.context.map_name(Replay::ReplayEngineDLL::ObjectKind::DISPLAY_LIST,
                                                12),
                       102u);
+}
+
+namespace
+{
+    /* The call as the dump holds it, started in the context. */
+    void begin_call(ContextFixture*                                         inout_fixture_ptr,
+                    const APIInterceptor::APIFunction&                      in_function,
+                    const std::vector<APIInterceptor::APIFunctionArgument>& in_argument_vec)
+    {
+        inout_fixture_ptr->call.arg_in_vec = in_argument_vec;
+        inout_fixture_ptr->call.func       = in_function;
+
+        inout_fixture_ptr->context.begin_call(&inout_fixture_ptr->call,
+                                              &inout_fixture_ptr->walker,
+                                              in_argument_vec.size(),
+                                              &inout_fixture_ptr->info);
+    }
+
+    /* A pointer of the dumped process, which is a place on its stack. */
+    APIInterceptor::APIFunctionArgument make_stack_pointer()
+    {
+        return APIInterceptor::APIFunctionArgument::create_fp32_ptr(reinterpret_cast<const float*>(static_cast<uintptr_t>(0x19fd6c) ) );
+    }
+
+    /* glReadPixels(0, 0, width, height, format, type, pointer). */
+    std::vector<APIInterceptor::APIFunctionArgument> make_read_pixels_arguments(const int32_t&  in_width,
+                                                                                const int32_t&  in_height,
+                                                                                const uint32_t& in_format,
+                                                                                const uint32_t& in_type)
+    {
+        return {APIInterceptor::APIFunctionArgument::create_i32       (0),
+                APIInterceptor::APIFunctionArgument::create_i32       (0),
+                APIInterceptor::APIFunctionArgument::create_i32       (in_width),
+                APIInterceptor::APIFunctionArgument::create_i32       (in_height),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(in_format),
+                APIInterceptor::APIFunctionArgument::create_u32_glenum(in_type),
+                make_stack_pointer()};
+    }
+}
+
+TEST(GlReplayContext, AQueryOfGlWritesAKnownNumberOfBytesToTheMemoryOfTheProgram)
+{
+    ContextFixture fixture;
+
+    begin_call(&fixture,
+               APIInterceptor::APIFUNCTION_GL_GLGETFLOATV,
+               {APIInterceptor::APIFunctionArgument::create_u32_glenum(0xBA6),
+                make_stack_pointer()});
+
+    EXPECT_GE(fixture.context.get_unrecorded_output_n_bytes(1),
+              16 * sizeof(double) );
+    EXPECT_EQ(fixture.context.get_unrecorded_output_n_bytes(0),
+              0u);
+}
+
+TEST(GlReplayContext, ThePixelsOfAReadAreAsManyAsItsSizeSays)
+{
+    ContextFixture fixture;
+
+    /* Three bytes, in a row which may be padded. */
+    begin_call(&fixture,
+               APIInterceptor::APIFUNCTION_GL_GLREADPIXELS,
+               make_read_pixels_arguments(1,
+                                          1,
+                                          0x1907,
+                                          0x1401) );
+
+    EXPECT_GE(fixture.context.get_unrecorded_output_n_bytes(6),
+              3u);
+    EXPECT_LT(fixture.context.get_unrecorded_output_n_bytes(6),
+              64u);
+}
+
+TEST(GlReplayContext, TheRowsOfAReadAreCountedWhole)
+{
+    ContextFixture fixture;
+
+    begin_call(&fixture,
+               APIInterceptor::APIFUNCTION_GL_GLREADPIXELS,
+               make_read_pixels_arguments(640,
+                                          480,
+                                          0x1908,
+                                          0x1401) );
+
+    EXPECT_GE(fixture.context.get_unrecorded_output_n_bytes(6),
+              640u * 480u * 4u);
+}
+
+TEST(GlReplayContext, AReadThatIsTooLargeIsNotGivenMemory)
+{
+    ContextFixture fixture;
+
+    begin_call(&fixture,
+               APIInterceptor::APIFUNCTION_GL_GLREADPIXELS,
+               make_read_pixels_arguments(100000,
+                                          100000,
+                                          0x1908,
+                                          0x1401) );
+
+    EXPECT_EQ(fixture.context.get_unrecorded_output_n_bytes(6),
+              0u);
+}
+
+TEST(GlReplayContext, WithABufferBoundToThePixelsOfAReadThePointerIsAnOffset)
+{
+    ContextFixture fixture;
+
+    fixture.context.set_pixel_pack_buffer_bound(true);
+
+    begin_call(&fixture,
+               APIInterceptor::APIFUNCTION_GL_GLREADPIXELS,
+               make_read_pixels_arguments(1,
+                                          1,
+                                          0x1907,
+                                          0x1401) );
+
+    EXPECT_EQ(fixture.context.get_unrecorded_output_n_bytes(6),
+              0u);
+}
+
+TEST(GlReplayContext, AFunctionOfNoKnownOutputIsGivenNoMemory)
+{
+    ContextFixture fixture;
+
+    begin_call(&fixture,
+               APIInterceptor::APIFUNCTION_GL_GLACCUM,
+               {APIInterceptor::APIFunctionArgument::create_u32_glenum(0x100),
+                make_stack_pointer()});
+
+    EXPECT_EQ(fixture.context.get_unrecorded_output_n_bytes(1),
+              0u);
+}
+
+TEST(GlArgumentRestorer, APlaceThatACallWritesToIsMemoryOfTheReplay)
+{
+    typedef Replay::ReplayEngineDLL::GlRestore::ArgumentRestorer<GLfloat*,
+                                                                 Replay::ReplayEngineDLL::GlRestore::ArgumentCategory::POINTER> OutputRestorer;
+
+    ContextFixture fixture;
+    OutputRestorer restorer;
+    std::string    error;
+
+    begin_call(&fixture,
+               APIInterceptor::APIFUNCTION_GL_GLGETFLOATV,
+               {APIInterceptor::APIFunctionArgument::create_u32_glenum(0xBA6),
+                make_stack_pointer()});
+
+    ASSERT_TRUE(restorer.prepare(&fixture.context,
+                                 1,
+                                 &error) ) << error;
+
+    /* Not the address of the dumped process, which the replay cannot write to. */
+    EXPECT_NE(restorer.get(),
+              nullptr);
+    EXPECT_NE(restorer.get(),
+              reinterpret_cast<GLfloat*>(static_cast<uintptr_t>(0x19fd6c) ) );
+    EXPECT_FALSE(fixture.context.is_skipped() );
+}
+
+TEST(GlArgumentRestorer, APlaceThatIsOnlyReadFromIsNotMadeUp)
+{
+    typedef Replay::ReplayEngineDLL::GlRestore::ArgumentRestorer<const GLfloat*,
+                                                                 Replay::ReplayEngineDLL::GlRestore::ArgumentCategory::POINTER> InputRestorer;
+
+    ContextFixture fixture;
+    InputRestorer  restorer;
+    std::string    error;
+
+    begin_call(&fixture,
+               APIInterceptor::APIFUNCTION_GL_GLGETFLOATV,
+               {APIInterceptor::APIFunctionArgument::create_u32_glenum(0xBA6),
+                APIInterceptor::APIFunctionArgument::create_fp32_ptr(reinterpret_cast<const float*>(static_cast<uintptr_t>(0x20000000) ) )});
+
+    ASSERT_TRUE(restorer.prepare(&fixture.context,
+                                 1,
+                                 &error) ) << error;
+
+    /* An address above the offsets of a buffer, with nothing in the dump: the call cannot be replayed. */
+    EXPECT_TRUE(fixture.context.is_skipped() );
 }

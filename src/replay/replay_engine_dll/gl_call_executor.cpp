@@ -5,6 +5,7 @@
 #include "gl_call_executor.h"
 #include "gl_function_types.h"
 #include "gl_replay_invoker.h"
+#include <array>
 #include <string.h>
 
 /* Turns the parenthesized list of the table's entry into the list of an initializer. */
@@ -85,6 +86,32 @@ void Replay::ReplayEngineDLL::GlCallExecutor::after_call(const Capture::APIDumpL
 
     switch (in_call.func)
     {
+        case APIInterceptor::APIFUNCTION_GL_GLBINDBUFFER:
+        {
+            /* A buffer bound to GL_PIXEL_PACK_BUFFER makes the pointers of the reads of pixels offsets. */
+            constexpr uint32_t PIXEL_PACK_BUFFER = 0x88EB;
+
+            std::array<uint32_t, 2> bind_array = {};
+            bool                    are_read   = (in_call.arg_in_vec.size() >= bind_array.size() );
+
+            for (size_t n_value = 0;
+                        are_read &&
+                        n_value < bind_array.size();
+                      ++n_value)
+            {
+                are_read = read_number(in_call.arg_in_vec.at(n_value),
+                                       &bind_array.at(n_value) );
+            }
+
+            if (are_read &&
+                bind_array.at(0) == PIXEL_PACK_BUFFER)
+            {
+                m_context.set_pixel_pack_buffer_bound(bind_array.at(1) != 0);
+            }
+
+            break;
+        }
+
         case APIInterceptor::APIFUNCTION_GL_GLGETATTRIBLOCATION:
         {
             /* The index that the app uses is the one the dump holds; the driver may hand out another. */
