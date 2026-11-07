@@ -2,6 +2,7 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
+#include "common/argument_reader.h"
 #include "win32_call_executor.h"
 #include <algorithm>
 #include <string.h>
@@ -734,12 +735,26 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::on_make_current(const Capture::
         goto end;
     }
 
-    if (::wglMakeCurrent(live_hdc,
-                         live_rc) == FALSE)
     {
-        *out_error_ptr = "wglMakeCurrent failed.";
+        uint32_t recorded_result = 1; /* a call with no recorded result is expected to have worked */
 
-        goto end;
+        const BOOL is_made_current = ::wglMakeCurrent(live_hdc,
+                                                      live_rc);
+
+        if (in_call.returned_value_ptr != nullptr)
+        {
+            APIInterceptor::read_number(*in_call.returned_value_ptr,
+                                       &recorded_result);
+        }
+
+        /* A call which failed for the program is not a failure of the replay (an unbind when nothing was current, which a program does not look at). */
+        if (is_made_current == FALSE &&
+            recorded_result != 0)
+        {
+            *out_error_ptr = "wglMakeCurrent failed.";
+
+            goto end;
+        }
     }
 
     result = true;
