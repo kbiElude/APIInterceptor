@@ -334,11 +334,13 @@ void Replay::ReplayPlayer::ControlWindow::draw_controls()
     /* The message does not make the window wider than the buttons do. */
     if (status.state == Replay::ReplayEngineDLL::PlaybackState::FAILED)
     {
+        const ImVec4 error_color(1.0f,
+                                 0.4f,
+                                 0.4f,
+                                 1.0f);
+
         ImGui::PushTextWrapPos(max_right);
-        ImGui::TextColored(ImVec4(1.0f,
-                                  0.4f,
-                                  0.4f,
-                                  1.0f),
+        ImGui::TextColored(error_color,
                            "%s",
                            status.error_message.c_str() );
         ImGui::PopTextWrapPos();
@@ -446,8 +448,11 @@ LRESULT Replay::ReplayPlayer::ControlWindow::handle_message(const HWND&   in_win
 
         case WM_SYSCOMMAND:
         {
+            /* The low four bits of the command belong to Windows. */
+            constexpr WPARAM COMMAND_MASK = 0xfff0;
+
             /* The menu of the Alt key would take the keyboard from the window. */
-            if ((in_wparam & 0xfff0) == SC_KEYMENU)
+            if ((in_wparam & COMMAND_MASK) == SC_KEYMENU)
             {
                 goto end;
             }

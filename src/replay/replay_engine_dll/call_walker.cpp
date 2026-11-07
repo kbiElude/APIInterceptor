@@ -253,13 +253,14 @@ bool Replay::ReplayEngineDLL::CallWalker::start_reader(const char*     in_filena
      * with two gigabytes to put them in (the segments being read, this walker's own two, and the one that is being freed), so it has a few. What
      * more threads would do for segments that are read in full (the work is of the memory) is not worth the risk of running out.
      */
+    constexpr uint32_t MIN_N_CORES               = 2; /* what is assumed if the system tells less (it may tell 0) */
     constexpr uint32_t N_READER_THREADS_32_BIT   = 3;
     constexpr uint32_t N_READER_THREADS_64_BIT   = 6;
     constexpr uint32_t N_READER_THREADS_FILTERED = 6; /* when chunks are left out: see below */
 
     const uint32_t                                  n_threads_wanted = (sizeof(void*) == sizeof(uint32_t) ) ? N_READER_THREADS_32_BIT
                                                                                                             : N_READER_THREADS_64_BIT;
-    const uint32_t                                  n_cores          = std::max<uint32_t>(2,
+    const uint32_t                                  n_cores          = std::max<uint32_t>(MIN_N_CORES,
                                                                                           std::thread::hardware_concurrency() );
     std::string                                     error;
     Capture::APIDumpLoader::WorkloadReader::Options reader_options;

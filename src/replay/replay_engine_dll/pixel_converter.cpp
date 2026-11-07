@@ -104,6 +104,7 @@ uint32_t Replay::ReplayEngineDLL::PixelConverter::get_bytes_per_pixel(const uint
 
 const std::vector<Replay::ReplayEngineDLL::PixelConverter::PixelLayout>& Replay::ReplayEngineDLL::PixelConverter::get_layout_vec()
 {
+    /* The columns are the fields of PixelLayout: blue, format, green, bytes of a pixel, red; a channel is its number of bits and its shift. */
     static const std::vector<PixelLayout> result_vec =
     {
         {{8, 0}, Interception::Hooks::D3D8::D3DFMT_A8R8G8B8, {8, 8}, 4, {8, 16}},

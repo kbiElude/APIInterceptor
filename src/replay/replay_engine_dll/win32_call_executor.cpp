@@ -73,14 +73,16 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::create_window_ex(const Capture:
                                                                     const bool&                                  in_is_wide,
                                                                     std::string*                                 out_error_ptr)
 {
-    constexpr size_t N_ARGUMENTS         = 12;
-    constexpr size_t N_ARGUMENT_EX_STYLE = 0;
-    constexpr size_t N_ARGUMENT_HEIGHT   = 7;
-    constexpr size_t N_ARGUMENT_PARENT   = 8;
-    constexpr size_t N_ARGUMENT_STYLE    = 3;
-    constexpr size_t N_ARGUMENT_WIDTH    = 6;
-    constexpr size_t N_ARGUMENT_X        = 4;
-    constexpr size_t N_ARGUMENT_Y        = 5;
+    constexpr size_t N_ARGUMENTS              = 12;
+    constexpr size_t N_ARGUMENT_CLASS_NAME    = 1;
+    constexpr size_t N_ARGUMENT_EX_STYLE      = 0;
+    constexpr size_t N_ARGUMENT_HEIGHT        = 7;
+    constexpr size_t N_ARGUMENT_PARENT        = 8;
+    constexpr size_t N_ARGUMENT_STYLE         = 3;
+    constexpr size_t N_ARGUMENT_WIDTH         = 6;
+    constexpr size_t N_ARGUMENT_WINDOW_NAME   = 2;
+    constexpr size_t N_ARGUMENT_X             = 4;
+    constexpr size_t N_ARGUMENT_Y             = 5;
 
     std::wstring    class_name      = DEFAULT_WINDOW_CLASS_NAME;
     int             creation_height = 0;
@@ -101,9 +103,9 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::create_window_ex(const Capture:
     }
 
     /* A class is told by a name, or by an atom, which means nothing to another process. */
-    if (in_call.arg_in_vec.at(1).type == APIInterceptor::ARGTYPE_DATA_CHUNK_ID)
+    if (in_call.arg_in_vec.at(N_ARGUMENT_CLASS_NAME).type == APIInterceptor::ARGTYPE_DATA_CHUNK_ID)
     {
-        const auto chunk_ptr = in_chunk_source.get_data_chunk_ptr(in_call.arg_in_vec.at(1).get_data_chunk_id() );
+        const auto chunk_ptr = in_chunk_source.get_data_chunk_ptr(in_call.arg_in_vec.at(N_ARGUMENT_CLASS_NAME).get_data_chunk_id() );
 
         if (chunk_ptr          != nullptr &&
             chunk_ptr->empty() == false)
@@ -114,7 +116,7 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::create_window_ex(const Capture:
     }
 
     {
-        const auto chunk_ptr = in_chunk_source.get_data_chunk_ptr(in_call.arg_in_vec.at(2).get_data_chunk_id() );
+        const auto chunk_ptr = in_chunk_source.get_data_chunk_ptr(in_call.arg_in_vec.at(N_ARGUMENT_WINDOW_NAME).get_data_chunk_id() );
 
         if (chunk_ptr          != nullptr &&
             chunk_ptr->empty() == false)
@@ -389,6 +391,10 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::on_copy_context(const Capture::
                                                                    const IChunkSource&                          in_chunk_source,
                                                                    std::string*                                 out_error_ptr)
 {
+    constexpr size_t N_ARGUMENT_DESTINATION = 1;
+    constexpr size_t N_ARGUMENT_MASK        = 2;
+    constexpr size_t N_ARGUMENT_SOURCE      = 0;
+
     HGLRC destination = nullptr;
     bool  result      = false;
     HGLRC source      = nullptr;
@@ -396,7 +402,7 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::on_copy_context(const Capture::
     (void) in_chunk_source;
 
     if (get_live_handle(ObjectKind::HGLRC,
-                        in_call.arg_in_vec.at(0),
+                        in_call.arg_in_vec.at(N_ARGUMENT_SOURCE),
                         reinterpret_cast<void**>(&source),
                         out_error_ptr) == false)
     {
@@ -404,7 +410,7 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::on_copy_context(const Capture::
     }
 
     if (get_live_handle(ObjectKind::HGLRC,
-                        in_call.arg_in_vec.at(1),
+                        in_call.arg_in_vec.at(N_ARGUMENT_DESTINATION),
                         reinterpret_cast<void**>(&destination),
                         out_error_ptr) == false)
     {
@@ -413,7 +419,7 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::on_copy_context(const Capture::
 
     ::wglCopyContext(source,
                      destination,
-                     in_call.arg_in_vec.at(2).get_u32() );
+                     in_call.arg_in_vec.at(N_ARGUMENT_MASK).get_u32() );
 
     result = true;
 
@@ -467,6 +473,10 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::on_create_context_attribs_arb(c
                                                                                  const IChunkSource&                          in_chunk_source,
                                                                                  std::string*                                 out_error_ptr)
 {
+    constexpr size_t N_ARGUMENT_ATTRIB_LIST = 2;
+    constexpr size_t N_ARGUMENT_HDC         = 0;
+    constexpr size_t N_ARGUMENT_SHARE       = 1;
+
     const int*                        attrib_list_ptr = nullptr;
     PFNWGLCREATECONTEXTATTRIBSARBPROC create_func_ptr = nullptr;
     HDC                               live_hdc        = nullptr;
@@ -475,7 +485,7 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::on_create_context_attribs_arb(c
     bool                              result          = false;
 
     if (get_live_handle(ObjectKind::HDC,
-                        in_call.arg_in_vec.at(0),
+                        in_call.arg_in_vec.at(N_ARGUMENT_HDC),
                         reinterpret_cast<void**>(&live_hdc),
                         out_error_ptr) == false)
     {
@@ -483,7 +493,7 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::on_create_context_attribs_arb(c
     }
 
     if (get_live_handle(ObjectKind::HGLRC,
-                        in_call.arg_in_vec.at(1),
+                        in_call.arg_in_vec.at(N_ARGUMENT_SHARE),
                         reinterpret_cast<void**>(&live_share),
                         out_error_ptr) == false)
     {
@@ -491,7 +501,7 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::on_create_context_attribs_arb(c
     }
 
     {
-        const auto chunk_ptr = in_chunk_source.get_data_chunk_ptr(in_call.arg_in_vec.at(2).get_data_chunk_id() );
+        const auto chunk_ptr = in_chunk_source.get_data_chunk_ptr(in_call.arg_in_vec.at(N_ARGUMENT_ATTRIB_LIST).get_data_chunk_id() );
 
         if (chunk_ptr          != nullptr &&
             chunk_ptr->empty() == false)
@@ -783,13 +793,16 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::on_set_pixel_format(const Captu
                                                                        const IChunkSource&                          in_chunk_source,
                                                                        std::string*                                 out_error_ptr)
 {
+    constexpr size_t N_ARGUMENT_DESCRIPTOR = 2;
+    constexpr size_t N_ARGUMENT_HDC        = 0;
+
     int                   live_format = 0;
     HDC                   live_hdc    = nullptr;
     PIXELFORMATDESCRIPTOR pixel_format_descriptor;
     bool                  result = false;
 
     if (get_live_handle(ObjectKind::HDC,
-                        in_call.arg_in_vec.at(0),
+                        in_call.arg_in_vec.at(N_ARGUMENT_HDC),
                         reinterpret_cast<void**>(&live_hdc),
                         out_error_ptr) == false)
     {
@@ -797,7 +810,7 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::on_set_pixel_format(const Captu
     }
 
     {
-        const auto chunk_ptr = in_chunk_source.get_data_chunk_ptr(in_call.arg_in_vec.at(2).get_data_chunk_id() );
+        const auto chunk_ptr = in_chunk_source.get_data_chunk_ptr(in_call.arg_in_vec.at(N_ARGUMENT_DESCRIPTOR).get_data_chunk_id() );
 
         if (chunk_ptr         == nullptr                         ||
             chunk_ptr->size() <  sizeof(pixel_format_descriptor) )

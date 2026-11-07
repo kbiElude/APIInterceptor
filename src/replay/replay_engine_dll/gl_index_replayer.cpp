@@ -154,11 +154,13 @@ bool Replay::ReplayEngineDLL::GlIndexReplayer::replay_draw_buffers(const Capture
     typedef void (APIENTRY* PFNDRAWBUFFERSPROC)     (GLsizei, const GLenum*);
     typedef void (APIENTRY* PFNNAMEDDRAWBUFFERSPROC)(GLuint, GLsizei, const GLenum*);
 
+    constexpr size_t N_BUFFER_ARGUMENTS = 2; /* the number of the buffers, and their array */
+
     const size_t n_first_argument = (in_is_named) ? 1 : 0;
     uint32_t     framebuffer      = 0;
     bool         result           = false;
 
-    if (in_call.arg_in_vec.size() < n_first_argument + 2)
+    if (in_call.arg_in_vec.size() < n_first_argument + N_BUFFER_ARGUMENTS)
     {
         *out_error_ptr = "A call that sets the draw buffers has too few arguments.";
 
@@ -214,10 +216,13 @@ bool Replay::ReplayEngineDLL::GlIndexReplayer::replay_uniform_subroutines(const 
 {
     typedef void (APIENTRY* PFNSUBROUTINESPROC)(GLenum, GLsizei, const GLuint*);
 
+    constexpr size_t INDICES_ARGUMENT = 2; /* the array of the indices of the subroutines */
+    constexpr size_t N_ARGUMENTS      = 3; /* the shader type, the number of the indices, and the array */
+
     bool     result      = false;
     uint32_t shader_type = 0;
 
-    if (in_call.arg_in_vec.size() < 3)
+    if (in_call.arg_in_vec.size() < N_ARGUMENTS)
     {
         *out_error_ptr = "A call that sets the subroutines has too few arguments.";
 
@@ -229,7 +234,7 @@ bool Replay::ReplayEngineDLL::GlIndexReplayer::replay_uniform_subroutines(const 
 
     {
         std::vector<uint32_t> dumped_vec = get_numbers(*m_context_ptr,
-                                                       2);
+                                                       INDICES_ARGUMENT);
 
         /* The numbers of the subroutines are the replay's own. */
         for (auto& dumped_index : dumped_vec)

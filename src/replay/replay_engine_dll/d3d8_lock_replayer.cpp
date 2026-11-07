@@ -8,6 +8,10 @@
 #include "interception/core/D3D8Utils/surface_layout.h"
 #include <string.h>
 
+/* The places in a LockKey (the object, the cube map face, the level) of what the object does not tell. */
+static constexpr size_t FACE_KEY_ELEMENT  = 1;
+static constexpr size_t LEVEL_KEY_ELEMENT = 2;
+
 const int Replay::ReplayEngineDLL::D3D8LockReplayer::ARGUMENT_ABSENT = -1;
 
 Replay::ReplayEngineDLL::D3D8LockReplayer::D3D8LockReplayer(D3D8ReplayContext* in_context_ptr)
@@ -39,6 +43,7 @@ int32_t Replay::ReplayEngineDLL::D3D8LockReplayer::get_dumped_int32(const D3D8Re
 
 const Replay::ReplayEngineDLL::D3D8LockReplayer::LockSpec* Replay::ReplayEngineDLL::D3D8LockReplayer::get_lock_spec_ptr(const APIInterceptor::APIFunction& in_function)
 {
+    /* The columns are the fields of LockSpec, in the order of its declaration: slots of the vtable and numbers of arguments. */
     static const LockSpec LOCK_SPEC_ARRAY[] =
     {
         {13, APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DINDEXBUFFER8_LOCK,        false, LockKind::BUFFER, ARGUMENT_ABSENT, 4,               ARGUMENT_ABSENT, 3,               1,               ARGUMENT_ABSENT, 2,               11},
@@ -185,7 +190,7 @@ bool Replay::ReplayEngineDLL::D3D8LockReplayer::lock_box(const Capture::APIDumpL
     const Interception::Hooks::D3D8::D3DBOX*  box_ptr    = nullptr;
     Interception::Hooks::D3D8::D3DVOLUME_DESC desc       = {};
     HRESULT                                   hresult    = E_FAIL;
-    const uint32_t                            level      = std::get<2>(in_key);
+    const uint32_t                            level      = std::get<LEVEL_KEY_ELEMENT>(in_key);
     Interception::Hooks::D3D8::D3DLOCKED_BOX  locked     = {};
     LockRecord                                record     = {};
     bool                                      result     = false;
@@ -337,9 +342,9 @@ bool Replay::ReplayEngineDLL::D3D8LockReplayer::lock_rect(const Capture::APIDump
     typedef HRESULT (__stdcall* PFNSURFACELOCKPROC)(void*, Interception::Hooks::D3D8::D3DLOCKED_RECT*, const RECT*, DWORD);
 
     Interception::Hooks::D3D8::D3DSURFACE_DESC desc       = {};
-    const uint32_t                             face       = std::get<1>(in_key);
+    const uint32_t                             face       = std::get<FACE_KEY_ELEMENT>(in_key);
     HRESULT                                    hresult    = E_FAIL;
-    const uint32_t                             level      = std::get<2>(in_key);
+    const uint32_t                             level      = std::get<LEVEL_KEY_ELEMENT>(in_key);
     Interception::Hooks::D3D8::D3DLOCKED_RECT  locked     = {};
     LockRecord                                 record     = {};
     RECT                                       rect       = {};
@@ -474,9 +479,9 @@ bool Replay::ReplayEngineDLL::D3D8LockReplayer::unlock(const Capture::APIDumpLoa
 
         const uint8_t* data_ptr   = m_context_ptr->get_chunk_data_ptr(&in_call.arg_in_vec.back(), /* the data the dumper stored is the last argument */
                                                                       &n_bytes);
-        const uint32_t face       = std::get<1>                      (key);
-        const auto     iterator   = m_lock_record_map.find           (key);
-        const uint32_t level      = std::get<2>                      (key);
+        const uint32_t face       = std::get<FACE_KEY_ELEMENT> (key);
+        const auto     iterator   = m_lock_record_map.find     (key);
+        const uint32_t level      = std::get<LEVEL_KEY_ELEMENT>(key);
         void** const   vtable_ptr = APIInterceptor::get_vtable_ptr(object_ptr);
 
         if (iterator != m_lock_record_map.end() )

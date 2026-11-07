@@ -59,6 +59,7 @@ void* Replay::ReplayEngineDLL::D3D8ReplayContext::get_device_ptr() const
 const uint8_t* Replay::ReplayEngineDLL::D3D8ReplayContext::get_extra_data_ptr(const size_t& in_n_argument,
                                                                                 size_t*       out_n_bytes_ptr) const
 {
+    /* The columns are the fields of ExtraBinding: the function, the number of its argument, and the number of the extra argument with its data. */
     static const ExtraBinding EXTRA_BINDING_ARRAY[] =
     {
         {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_CLEAR,                   2, 0},
@@ -107,6 +108,7 @@ const Replay::ReplayEngineDLL::D3D8ReplayContext::HandleBinding* Replay::ReplayE
                                                                                                                                         const size_t&                      in_n_argument,
                                                                                                                                         const bool&                        in_is_output)
 {
+    /* The columns are the fields of HandleBinding: the function, whether the argument is an output, the kind of the object, the number of the argument. */
     static const HandleBinding HANDLE_BINDING_ARRAY[] =
     {
         {APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_APPLYSTATEBLOCK,    false, ObjectKind::D3D8_STATE_BLOCK,   1},

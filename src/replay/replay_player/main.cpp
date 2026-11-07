@@ -53,11 +53,13 @@ Replay::ReplayPlayer::ConsoleObserver::ConsoleObserver()
     :m_last_frame_ms(0.0),
      m_ms_per_tick  (0.0)
 {
+    constexpr double N_MILLISECONDS_PER_SECOND = 1000.0;
+
     LARGE_INTEGER frequency;
 
     ::QueryPerformanceFrequency(&frequency);
 
-    m_ms_per_tick = 1000.0 / static_cast<double>(frequency.QuadPart);
+    m_ms_per_tick = N_MILLISECONDS_PER_SECOND / static_cast<double>(frequency.QuadPart);
 }
 
 void Replay::ReplayPlayer::ConsoleObserver::on_error(const std::string& in_message)
@@ -180,15 +182,19 @@ int Replay::ReplayPlayer::run(int   in_argc,
         goto end;
     }
 
-    if (workload_path.empty() &&
-        Replay::ReplayPlayerSupport::WorkloadPicker::pick(&workload_path) == false)
+    if (workload_path.empty() )
     {
-        fprintf(stdout,
-                "[*] No workload has been selected.\n");
+        const bool is_workload_picked = Replay::ReplayPlayerSupport::WorkloadPicker::pick(&workload_path);
 
-        result = EXIT_SUCCESS;
+        if (is_workload_picked == false)
+        {
+            fprintf(stdout,
+                    "[*] No workload has been selected.\n");
 
-        goto end;
+            result = EXIT_SUCCESS;
+
+            goto end;
+        }
     }
 
     /* Direct3D 7 and 8 can only be replayed by the 32-bit player. */

@@ -14,6 +14,7 @@
 #include <string.h>
 
 /* The values of the headers of DirectX 7 which only the replay needs. */
+static constexpr DWORD  BITS_PER_BYTE                = 8;
 static constexpr DWORD  DDLOCK_EVENT_FLAG            = 0x00000002;
 static constexpr DWORD  DDLOCK_READONLY_FLAG         = 0x00000010;
 static constexpr DWORD  DDLOCK_WAIT_FLAG             = 0x00000001;
@@ -111,8 +112,12 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::add_attached_surface(std::string
 
     if (get_live_object(SURFACE_ARGUMENT,
                        &surface_ptr,
-                        out_error_ptr) == false ||
-        get_live_object(ATTACHED_ARGUMENT,
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_live_object(ATTACHED_ARGUMENT,
                        &attached_ptr,
                         out_error_ptr) == false)
     {
@@ -197,12 +202,20 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::blt(std::string* out_error_ptr)
 
     if (get_live_object(0,
                        &surface_ptr,
-                        out_error_ptr) == false ||
-        get_live_object(SOURCE_ARGUMENT,
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_live_object(SOURCE_ARGUMENT,
                        &source_ptr,
-                        out_error_ptr) == false ||
-        get_u32        (FLAGS_ARGUMENT,
-                       &flags)         == false)
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(FLAGS_ARGUMENT,
+               &flags) == false)
     {
         goto end;
     }
@@ -247,16 +260,32 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::blt_fast(std::string* out_error_
 
     if (get_live_object(0,
                        &surface_ptr,
-                        out_error_ptr) == false ||
-        get_live_object(SOURCE_ARGUMENT,
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_live_object(SOURCE_ARGUMENT,
                        &source_ptr,
-                        out_error_ptr) == false ||
-        get_u32        (FLAGS_ARGUMENT,
-                       &flags)         == false ||
-        get_u32        (X_ARGUMENT,
-                       &x)             == false ||
-        get_u32        (Y_ARGUMENT,
-                       &y)             == false)
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(FLAGS_ARGUMENT,
+               &flags) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(X_ARGUMENT,
+               &x) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(Y_ARGUMENT,
+               &y) == false)
     {
         goto end;
     }
@@ -315,17 +344,37 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::clear(std::string* out_error_ptr
 
     if (get_live_object(0,
                        &device_ptr,
-                        out_error_ptr)       == false ||
-        get_u32        (COLOR_ARGUMENT,
-                       &color)               == false ||
-        get_u32        (FLAGS_ARGUMENT,
-                       &flags)               == false ||
-        get_u32        (N_RECTS_ARGUMENT,
-                       &n_rects)             == false ||
-        get_u32        (STENCIL_ARGUMENT,
-                       &stencil)             == false ||
-        read_number    (*depth_argument_ptr,
-                        &depth)              == false)
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(COLOR_ARGUMENT,
+               &color) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(FLAGS_ARGUMENT,
+               &flags) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(N_RECTS_ARGUMENT,
+               &n_rects) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(STENCIL_ARGUMENT,
+               &stencil) == false)
+    {
+        goto end;
+    }
+
+    if (read_number(*depth_argument_ptr,
+                   &depth) == false)
     {
         goto end;
     }
@@ -365,8 +414,12 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::create_device(std::string* out_e
 
     if (get_live_object(0,
                        &direct3d_ptr,
-                        out_error_ptr) == false ||
-        get_live_object(SURFACE_ARGUMENT,
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_live_object(SURFACE_ARGUMENT,
                        &surface_ptr,
                         out_error_ptr) == false)
     {
@@ -558,9 +611,13 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::create_vertex_buffer(std::string
 
     if (get_live_object(0,
                        &direct3d_ptr,
-                        out_error_ptr) == false ||
-        get_u32(FLAGS_ARGUMENT,
-               &flags)                 == false)
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(FLAGS_ARGUMENT,
+               &flags) == false)
     {
         goto end;
     }
@@ -617,17 +674,37 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_indexed_primitive(std::stri
 
     if (get_live_object(0,
                        &device_ptr,
-                        out_error_ptr)       == false ||
-        get_u32        (FLAGS_ARGUMENT,
-                       &flags)               == false ||
-        get_u32        (FVF_ARGUMENT,
-                       &fvf)                 == false ||
-        get_u32        (N_INDICES_ARGUMENT,
-                       &n_indices)           == false ||
-        get_u32        (N_VERTICES_ARGUMENT,
-                       &n_vertices)          == false ||
-        get_u32        (TYPE_ARGUMENT,
-                       &type)                == false)
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(FLAGS_ARGUMENT,
+               &flags) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(FVF_ARGUMENT,
+               &fvf) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(N_INDICES_ARGUMENT,
+               &n_indices) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(N_VERTICES_ARGUMENT,
+               &n_vertices) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(TYPE_ARGUMENT,
+               &type) == false)
     {
         goto end;
     }
@@ -675,17 +752,37 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_indexed_primitive_strided(s
 
     if (get_live_object(0,
                        &device_ptr,
-                        out_error_ptr)       == false ||
-        get_u32        (FLAGS_ARGUMENT,
-                       &flags)               == false ||
-        get_u32        (FVF_ARGUMENT,
-                       &fvf)                 == false ||
-        get_u32        (N_INDICES_ARGUMENT,
-                       &n_indices)           == false ||
-        get_u32        (N_VERTICES_ARGUMENT,
-                       &n_vertices)          == false ||
-        get_u32        (TYPE_ARGUMENT,
-                       &type)                == false)
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(FLAGS_ARGUMENT,
+               &flags) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(FVF_ARGUMENT,
+               &fvf) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(N_INDICES_ARGUMENT,
+               &n_indices) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(N_VERTICES_ARGUMENT,
+               &n_vertices) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(TYPE_ARGUMENT,
+               &type) == false)
     {
         goto end;
     }
@@ -740,20 +837,44 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_indexed_primitive_vb(std::s
 
     if (get_live_object(0,
                        &device_ptr,
-                        out_error_ptr)         == false ||
-        get_live_object(VERTEX_BUFFER_ARGUMENT,
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_live_object(VERTEX_BUFFER_ARGUMENT,
                        &vertex_buffer_ptr,
-                        out_error_ptr)         == false ||
-        get_u32        (FLAGS_ARGUMENT,
-                       &flags)                 == false ||
-        get_u32        (N_INDICES_ARGUMENT,
-                       &n_indices)             == false ||
-        get_u32        (N_VERTICES_ARGUMENT,
-                       &n_vertices)            == false ||
-        get_u32        (START_VERTEX_ARGUMENT,
-                       &start_vertex)          == false ||
-        get_u32        (TYPE_ARGUMENT,
-                       &type)                  == false)
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(FLAGS_ARGUMENT,
+               &flags) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(N_INDICES_ARGUMENT,
+               &n_indices) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(N_VERTICES_ARGUMENT,
+               &n_vertices) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(START_VERTEX_ARGUMENT,
+               &start_vertex) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(TYPE_ARGUMENT,
+               &type) == false)
     {
         goto end;
     }
@@ -795,15 +916,31 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_primitive(std::string* out_
 
     if (get_live_object(0,
                        &device_ptr,
-                        out_error_ptr)       == false ||
-        get_u32        (FLAGS_ARGUMENT,
-                       &flags)               == false ||
-        get_u32        (FVF_ARGUMENT,
-                       &fvf)                 == false ||
-        get_u32        (N_VERTICES_ARGUMENT,
-                       &n_vertices)          == false ||
-        get_u32        (TYPE_ARGUMENT,
-                       &type)                == false)
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(FLAGS_ARGUMENT,
+               &flags) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(FVF_ARGUMENT,
+               &fvf) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(N_VERTICES_ARGUMENT,
+               &n_vertices) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(TYPE_ARGUMENT,
+               &type) == false)
     {
         goto end;
     }
@@ -845,15 +982,31 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_primitive_strided(std::stri
 
     if (get_live_object(0,
                        &device_ptr,
-                        out_error_ptr)       == false ||
-        get_u32        (FLAGS_ARGUMENT,
-                       &flags)               == false ||
-        get_u32        (FVF_ARGUMENT,
-                       &fvf)                 == false ||
-        get_u32        (N_VERTICES_ARGUMENT,
-                       &n_vertices)          == false ||
-        get_u32        (TYPE_ARGUMENT,
-                       &type)                == false)
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(FLAGS_ARGUMENT,
+               &flags) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(FVF_ARGUMENT,
+               &fvf) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(N_VERTICES_ARGUMENT,
+               &n_vertices) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(TYPE_ARGUMENT,
+               &type) == false)
     {
         goto end;
     }
@@ -899,18 +1052,38 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_primitive_vb(std::string* o
 
     if (get_live_object(0,
                        &device_ptr,
-                        out_error_ptr)         == false ||
-        get_live_object(VERTEX_BUFFER_ARGUMENT,
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_live_object(VERTEX_BUFFER_ARGUMENT,
                        &vertex_buffer_ptr,
-                        out_error_ptr)         == false ||
-        get_u32        (FLAGS_ARGUMENT,
-                       &flags)                 == false ||
-        get_u32        (N_VERTICES_ARGUMENT,
-                       &n_vertices)            == false ||
-        get_u32        (START_VERTEX_ARGUMENT,
-                       &start_vertex)          == false ||
-        get_u32        (TYPE_ARGUMENT,
-                       &type)                  == false)
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(FLAGS_ARGUMENT,
+               &flags) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(N_VERTICES_ARGUMENT,
+               &n_vertices) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(START_VERTEX_ARGUMENT,
+               &start_vertex) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(TYPE_ARGUMENT,
+               &type) == false)
     {
         goto end;
     }
@@ -1121,9 +1294,14 @@ Replay::ReplayEngineDLL::CallSupport Replay::ReplayEngineDLL::D3D7CallExecutor::
      */
     {
         const auto* method_info_ptr = Interception::Core::D3D7Utils::get_method_info_ptr(in_function);
+        bool        is_skipped      = (method_info_ptr == nullptr);
 
-        if (method_info_ptr                                     == nullptr ||
-            is_ignored_method(method_info_ptr->method_name_ptr) )
+        if (is_skipped == false)
+        {
+            is_skipped = is_ignored_method(method_info_ptr->method_name_ptr);
+        }
+
+        if (is_skipped)
         {
             result = CallSupport::SKIPPED;
         }
@@ -1373,11 +1551,19 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::light_enable(std::string* out_er
 
     if (get_live_object(0,
                        &device_ptr,
-                        out_error_ptr)  == false ||
-        get_u32        (ENABLE_ARGUMENT,
-                       &enable)         == false ||
-        get_u32        (INDEX_ARGUMENT,
-                       &index)          == false)
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(ENABLE_ARGUMENT,
+               &enable) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(INDEX_ARGUMENT,
+               &index) == false)
     {
         goto end;
     }
@@ -1409,15 +1595,27 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::load(std::string* out_error_ptr)
 
     if (get_live_object(0,
                        &device_ptr,
-                        out_error_ptr) == false ||
-        get_live_object(DESTINATION_ARGUMENT,
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_live_object(DESTINATION_ARGUMENT,
                        &destination_ptr,
-                        out_error_ptr) == false ||
-        get_live_object(SOURCE_ARGUMENT,
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_live_object(SOURCE_ARGUMENT,
                        &source_ptr,
-                        out_error_ptr) == false ||
-        get_u32        (FLAGS_ARGUMENT,
-                       &flags)         == false)
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(FLAGS_ARGUMENT,
+               &flags) == false)
     {
         goto end;
     }
@@ -1460,9 +1658,13 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::lock(std::string* out_error_ptr)
 
     if (get_live_object(0,
                        &surface_ptr,
-                        out_error_ptr) == false ||
-        get_u32        (FLAGS_ARGUMENT,
-                       &flags)         == false)
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(FLAGS_ARGUMENT,
+               &flags) == false)
     {
         goto end;
     }
@@ -1485,12 +1687,16 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::lock(std::string* out_error_ptr)
                                                                                                             &n_bytes);
         Interception::Core::D3D7Utils::SurfaceDescription dumped_description;
 
-        if (data_ptr                                                                     != nullptr &&
-            Interception::Core::D3D7Utils::parse_surface_description(data_ptr,
-                                                                     n_bytes,
-                                                                    &dumped_description) )
+        if (data_ptr != nullptr)
         {
-            locked.dumped_pitch = static_cast<uint32_t>(dumped_description.pitch);
+            const bool is_description_parsed = Interception::Core::D3D7Utils::parse_surface_description(data_ptr,
+                                                                                                        n_bytes,
+                                                                                                       &dumped_description);
+
+            if (is_description_parsed)
+            {
+                locked.dumped_pitch = static_cast<uint32_t>(dumped_description.pitch);
+            }
         }
     }
 
@@ -1582,28 +1788,32 @@ void Replay::ReplayEngineDLL::D3D7CallExecutor::present_to_window()
 
     if (m_back_buffer_ptr != nullptr &&
         m_primary_ptr     != nullptr &&
-        m_window          != nullptr &&
-        ::GetClientRect(m_window,
-                       &client_rect) )
+        m_window          != nullptr)
     {
-        ::ClientToScreen(m_window,
-                        &origin);
+        const bool has_client_rect = (::GetClientRect(m_window,
+                                                     &client_rect) != FALSE);
 
-        RECT destination_rect = {origin.x,
-                                 origin.y,
-                                 origin.x + client_rect.right,
-                                 origin.y + client_rect.bottom};
-
-        if (destination_rect.right  > destination_rect.left &&
-            destination_rect.bottom > destination_rect.top)
+        if (has_client_rect)
         {
-            call_method<HRESULT>(m_primary_ptr,
-                                 Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECTDRAWSURFACE7_BLT,
-                                 &destination_rect,
-                                 m_back_buffer_ptr,
-                                 static_cast<RECT*>(nullptr),
-                                 static_cast<DWORD>(DDLOCK_WAIT_FLAG),
-                                 static_cast<uint8_t*>(nullptr) );
+            ::ClientToScreen(m_window,
+                            &origin);
+
+            RECT destination_rect = {origin.x,
+                                     origin.y,
+                                     origin.x + client_rect.right,
+                                     origin.y + client_rect.bottom};
+
+            if (destination_rect.right  > destination_rect.left &&
+                destination_rect.bottom > destination_rect.top)
+            {
+                call_method<HRESULT>(m_primary_ptr,
+                                     Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECTDRAWSURFACE7_BLT,
+                                     &destination_rect,
+                                     m_back_buffer_ptr,
+                                     static_cast<RECT*>(nullptr),
+                                     static_cast<DWORD>(DDLOCK_WAIT_FLAG),
+                                     static_cast<uint8_t*>(nullptr) );
+            }
         }
     }
 }
@@ -1681,23 +1891,23 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::read_back_buffer(std::vector<uin
 
     /* The format of the pixels, as the converter names them. */
     {
-        constexpr uint32_t BITS_PER_BYTE = 8;
+        constexpr uint32_t BIT_COUNT_16      = 16;
+        constexpr uint32_t BIT_COUNT_32      = 32;
+        constexpr uint32_t MASK_GREEN_R5G6B5 = 0x07E0; /* 6 bits of green: tells R5G6B5 from X1R5G5B5 */
 
         const auto& pixel_format = description.ddpfPixelFormat;
 
-        if (pixel_format.dwRGBBitCount == 32 * 1)
+        if (pixel_format.dwRGBBitCount == BIT_COUNT_32)
         {
             format = (pixel_format.dwRGBAlphaBitMask != 0) ? Interception::Hooks::D3D8::D3DFMT_A8R8G8B8
                                                            : Interception::Hooks::D3D8::D3DFMT_X8R8G8B8;
         }
         else
-        if (pixel_format.dwRGBBitCount == 16)
+        if (pixel_format.dwRGBBitCount == BIT_COUNT_16)
         {
-            format = (pixel_format.dwGBitMask == 0x07E0) ? Interception::Hooks::D3D8::D3DFMT_R5G6B5
-                                                         : Interception::Hooks::D3D8::D3DFMT_X1R5G5B5;
+            format = (pixel_format.dwGBitMask == MASK_GREEN_R5G6B5) ? Interception::Hooks::D3D8::D3DFMT_R5G6B5
+                                                                    : Interception::Hooks::D3D8::D3DFMT_X1R5G5B5;
         }
-
-        (void) BITS_PER_BYTE;
     }
 
     if (PixelConverter::get_bytes_per_pixel(format) == 0)
@@ -2054,9 +2264,13 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::set_cooperative_level(std::strin
 
     if (get_live_object(0,
                        &direct_draw_ptr,
-                        out_error_ptr) == false ||
-        get_u32(FLAGS_ARGUMENT,
-               &flags)                 == false)
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(FLAGS_ARGUMENT,
+               &flags) == false)
     {
         goto end;
     }
@@ -2128,9 +2342,13 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::set_light(std::string* out_error
 
     if (get_live_object(0,
                        &device_ptr,
-                        out_error_ptr) == false ||
-        get_u32(INDEX_ARGUMENT,
-               &index)                 == false)
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(INDEX_ARGUMENT,
+               &index) == false)
     {
         goto end;
     }
@@ -2185,11 +2403,19 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::set_render_state(std::string* ou
 
     if (get_live_object(0,
                        &device_ptr,
-                        out_error_ptr) == false ||
-        get_u32(STATE_ARGUMENT,
-               &state)                 == false ||
-        get_u32(VALUE_ARGUMENT,
-               &value)                 == false)
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(STATE_ARGUMENT,
+               &state) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(VALUE_ARGUMENT,
+               &value) == false)
     {
         goto end;
     }
@@ -2221,15 +2447,27 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::set_render_target(std::string* o
 
     if (get_live_object(0,
                        &device_ptr,
-                        out_error_ptr) == false ||
-        get_live_object(SURFACE_ARGUMENT,
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_live_object(SURFACE_ARGUMENT,
                        &surface_ptr,
-                        out_error_ptr) == false ||
-        get_left_object(SURFACE_ARGUMENT,
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_left_object(SURFACE_ARGUMENT,
                        &left_surface_ptr,
-                        out_error_ptr) == false ||
-        get_u32(FLAGS_ARGUMENT,
-               &flags)                 == false)
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(FLAGS_ARGUMENT,
+               &flags) == false)
     {
         goto end;
     }
@@ -2266,15 +2504,27 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::set_texture(std::string* out_err
 
     if (get_live_object(0,
                        &device_ptr,
-                        out_error_ptr) == false ||
-        get_live_object(TEXTURE_ARGUMENT,
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_live_object(TEXTURE_ARGUMENT,
                        &texture_ptr,
-                        out_error_ptr) == false ||
-        get_left_object(TEXTURE_ARGUMENT,
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_left_object(TEXTURE_ARGUMENT,
                        &left_texture_ptr,
-                        out_error_ptr) == false ||
-        get_u32(STAGE_ARGUMENT,
-               &stage)                 == false)
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(STAGE_ARGUMENT,
+               &stage) == false)
     {
         goto end;
     }
@@ -2307,13 +2557,25 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::set_texture_stage_state(std::str
 
     if (get_live_object(0,
                        &device_ptr,
-                        out_error_ptr) == false ||
-        get_u32(STAGE_ARGUMENT,
-               &stage)                 == false ||
-        get_u32(STATE_ARGUMENT,
-               &state)                 == false ||
-        get_u32(VALUE_ARGUMENT,
-               &value)                 == false)
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(STAGE_ARGUMENT,
+               &stage) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(STATE_ARGUMENT,
+               &state) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(VALUE_ARGUMENT,
+               &value) == false)
     {
         goto end;
     }
@@ -2345,9 +2607,13 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::set_transform(std::string* out_e
 
     if (get_live_object(0,
                        &device_ptr,
-                        out_error_ptr) == false ||
-        get_u32(STATE_ARGUMENT,
-               &state)                 == false)
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(STATE_ARGUMENT,
+               &state) == false)
     {
         goto end;
     }
@@ -2448,7 +2714,7 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::unlock(std::string* out_error_pt
                                                                    : locked.description.dwHeight;
             const uint32_t       width         = (locked.has_rect) ? static_cast<uint32_t>(locked.rect.right - locked.rect.left)
                                                                    : locked.description.dwWidth;
-            const uint32_t       n_row_bytes   = width * (pixel_format.dwRGBBitCount / 8);
+            const uint32_t       n_row_bytes   = width * (pixel_format.dwRGBBitCount / BITS_PER_BYTE);
             const uint32_t       live_pitch    = static_cast<uint32_t>(locked.description.lPitch);
             if (data_ptr != nullptr)
             {
@@ -2515,9 +2781,13 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::vertex_buffer_lock(std::string* 
 
     if (get_live_object(0,
                        &vertex_buffer_ptr,
-                        out_error_ptr) == false ||
-        get_u32(FLAGS_ARGUMENT,
-               &flags)                 == false)
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (get_u32(FLAGS_ARGUMENT,
+               &flags) == false)
     {
         goto end;
     }
@@ -2595,7 +2865,7 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::write_back_buffer(const std::vec
     }
 
     {
-        const uint32_t n_row_bytes = description.dwWidth * (description.ddpfPixelFormat.dwRGBBitCount / 8);
+        const uint32_t n_row_bytes = description.dwWidth * (description.ddpfPixelFormat.dwRGBBitCount / BITS_PER_BYTE);
 
         result = (n_row_bytes != 0 &&
                   in_pixel_u8_vec.size() == static_cast<size_t>(n_row_bytes) * description.dwHeight);

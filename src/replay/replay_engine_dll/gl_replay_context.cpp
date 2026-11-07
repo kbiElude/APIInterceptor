@@ -251,6 +251,7 @@ uint32_t Replay::ReplayEngineDLL::GlReplayContext::map_name(const ObjectKind& in
 int32_t Replay::ReplayEngineDLL::GlReplayContext::map_uniform_location(const int32_t& in_dumped_location) const
 {
     constexpr uint32_t PROGRAM_SHIFT = 32;
+    constexpr uint64_t LOCATION_MASK = (1ull << PROGRAM_SHIFT) - 1; /* the key has the program in its high half and the location in the low one */
 
     const uint64_t program = get_uniform_program();
     const uint64_t key     = (program << PROGRAM_SHIFT) | static_cast<uint32_t>(in_dumped_location);
@@ -267,7 +268,7 @@ int32_t Replay::ReplayEngineDLL::GlReplayContext::map_uniform_location(const int
 
             if ((iterator->first >> PROGRAM_SHIFT) == program)
             {
-                result = iterator->second + (in_dumped_location - static_cast<int32_t>(iterator->first & 0xffffffffu) );
+                result = iterator->second + (in_dumped_location - static_cast<int32_t>(iterator->first & LOCATION_MASK) );
             }
         }
     }
