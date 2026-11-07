@@ -256,8 +256,10 @@ bool Capture::APIDumpLoader::WorkloadIndex::is_of(const char* in_workload_filena
 {
     Identity identity;
 
-    return (get_identity(in_workload_filename_ptr,
-                        &identity)                 &&
+    const bool has_identity = get_identity(in_workload_filename_ptr,
+                                          &identity);
+
+    return (has_identity                                   &&
             identity.head_hash   == m_identity.head_hash   &&
             identity.middle_hash == m_identity.middle_hash &&
             identity.n_bytes     == m_identity.n_bytes     &&
@@ -273,11 +275,12 @@ bool Capture::APIDumpLoader::WorkloadIndex::load(const char*    in_index_filenam
                                                  WorkloadIndex* out_index_ptr,
                                                  std::string*   out_error_ptr)
 {
-    FILE* const     file_handle = ::fopen(in_index_filename_ptr,
-                                          "rb");
-    IndexFileHeader header      = {};
+    FILE* const     file_handle     = ::fopen(in_index_filename_ptr,
+                                              "rb");
+    IndexFileHeader header          = {};
     WorkloadIndex   index;
-    bool            result      = false;
+    bool            is_header_valid = false;
+    bool            result          = false;
 
     if (file_handle == nullptr)
     {
@@ -286,14 +289,24 @@ bool Capture::APIDumpLoader::WorkloadIndex::load(const char*    in_index_filenam
         goto end;
     }
 
-    if (::fread(&header,
-                sizeof(header),
-                1,
-                file_handle) != 1                                       ||
-        ::memcmp(header.magic_i8vec8,
-                 INDEX_MAGIC,
-                 sizeof(header.magic_i8vec8) ) != 0                     ||
-        header.version != INDEX_VERSION)
+    {
+        const size_t n_headers_read = ::fread(&header,
+                                              sizeof(header),
+                                              1,
+                                              file_handle);
+
+        if (n_headers_read == 1)
+        {
+            const int magic_difference = ::memcmp(header.magic_i8vec8,
+                                                  INDEX_MAGIC,
+                                                  sizeof(header.magic_i8vec8) );
+
+            is_header_valid = (magic_difference == 0 &&
+                               header.version   == INDEX_VERSION);
+        }
+    }
+
+    if (is_header_valid == false)
     {
         *out_error_ptr = "This is not an index of this version.";
 
@@ -359,10 +372,18 @@ bool Capture::APIDumpLoader::WorkloadIndex::load_or_build(const char*     in_wor
 
     *out_was_built_ptr = false;
 
-    if (load(index_filename.c_str(),
-             out_index_ptr,
-            &ignored_error)                                   &&
-        out_index_ptr->is_of(in_workload_filename_ptr) )
+    const bool is_loaded = load(index_filename.c_str(),
+                                out_index_ptr,
+                               &ignored_error);
+
+    bool is_of_workload = false;
+
+    if (is_loaded)
+    {
+        is_of_workload = out_index_ptr->is_of(in_workload_filename_ptr);
+    }
+
+    if (is_of_workload)
     {
         result = true;
 
@@ -449,15 +470,23 @@ bool Capture::APIDumpLoader::WorkloadIndex::save(const char*  in_index_filename_
         file_entry.n_data_chunks       = entry.n_data_chunks;
         file_entry.n_frames_ended      = entry.n_frames_ended;
 
-        result = (result &&
-                  ::fwrite(&file_entry,
-                           sizeof(file_entry),
-                           1,
-                           file_handle) == 1);
+        if (result)
+        {
+            const size_t n_entries_written = ::fwrite(&file_entry,
+                                                      sizeof(file_entry),
+                                                      1,
+                                                      file_handle);
+
+            result = (n_entries_written == 1);
+        }
     }
 
-    result = (::fclose(file_handle) == 0 &&
-              result);
+    {
+        const int close_result = ::fclose(file_handle);
+
+        result = (close_result == 0 &&
+                  result);
+    }
 
     if (result == false)
     {

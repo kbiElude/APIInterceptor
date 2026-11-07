@@ -16,11 +16,15 @@ void Capture::APIDumpPrinter::D3D8Decoder::forget_released_objects(const Capture
 {
     const auto* method_info_ptr = Interception::Core::D3D8Utils::get_method_info_ptr(in_call.func);
 
-    if (method_info_ptr != nullptr &&
-        ::strcmp(method_info_ptr->method_name_ptr,
-                 "Release") == 0)
+    if (method_info_ptr != nullptr)
     {
-        m_object_namer.forget_after_release(in_call);
+        const int name_difference = ::strcmp(method_info_ptr->method_name_ptr,
+                                             "Release");
+
+        if (name_difference == 0)
+        {
+            m_object_namer.forget_after_release(in_call);
+        }
     }
 }
 
@@ -1123,10 +1127,18 @@ void Capture::APIDumpPrinter::D3D8Decoder::register_created_objects(const Captur
     {
         const auto* method_info_ptr = Interception::Core::D3D8Utils::get_method_info_ptr(in_call.func);
 
-        if (in_call.returned_value_ptr        != nullptr                     &&
-            in_call.returned_value_ptr->type  == APIInterceptor::ARGTYPE_I32 &&
-            in_call.returned_value_ptr->get_i32() >= 0                       &&
-            method_info_ptr                   != nullptr)
+        bool is_call_succeeded = false;
+
+        if (in_call.returned_value_ptr       != nullptr                     &&
+            in_call.returned_value_ptr->type == APIInterceptor::ARGTYPE_I32)
+        {
+            const int32_t returned_value = in_call.returned_value_ptr->get_i32();
+
+            is_call_succeeded = (returned_value >= 0);
+        }
+
+        if (is_call_succeeded   &&
+            method_info_ptr != nullptr)
         {
             /* Create* methods always return new objects; Get* ones return existing objects, which may be unknown to us. */
             constexpr char CREATE_PREFIX[] = "Create";

@@ -7,12 +7,18 @@
 
 void Capture::APIDumpLoader::ObjectNamer::forget_after_release(const DumpedAPICall& in_call)
 {
-    if (in_call.arg_in_vec.empty()                    == false                       &&
-        in_call.returned_value_ptr                     != nullptr                     &&
-        in_call.returned_value_ptr->type               == APIInterceptor::ARGTYPE_U32 &&
-        in_call.returned_value_ptr->get_u32()          == 0)
+    if (in_call.arg_in_vec.empty()       == false                       &&
+        in_call.returned_value_ptr       != nullptr                     &&
+        in_call.returned_value_ptr->type == APIInterceptor::ARGTYPE_U32)
     {
-        forget_object(in_call.arg_in_vec.at(0).get_ptr_as_u64() );
+        const uint32_t returned_value = in_call.returned_value_ptr->get_u32();
+
+        if (returned_value == 0)
+        {
+            const uint64_t released_address = in_call.arg_in_vec.at(0).get_ptr_as_u64();
+
+            forget_object(released_address);
+        }
     }
 }
 
@@ -58,13 +64,18 @@ void Capture::APIDumpLoader::ObjectNamer::register_object(const uint64_t& in_add
                                                           const char*     in_type_name_ptr,
                                                           const bool&     in_is_new)
 {
-    if (in_address                   != 0                &&
-        (in_is_new                                       ||
-         m_name_map.find(in_address) == m_name_map.end() ))
+    if (in_address != 0)
     {
-        const std::string type_name(in_type_name_ptr);
-        const auto        n_object = ++m_n_named_objects_map[type_name];
+        const auto name_iterator = m_name_map.find(in_address);
+        const bool is_named      = (name_iterator != m_name_map.end() );
 
-        m_name_map[in_address] = type_name + "#" + std::to_string(n_object);
+        if (in_is_new         ||
+            is_named == false)
+        {
+            const std::string type_name(in_type_name_ptr);
+            const auto        n_object = ++m_n_named_objects_map[type_name];
+
+            m_name_map[in_address] = type_name + "#" + std::to_string(n_object);
+        }
     }
 }

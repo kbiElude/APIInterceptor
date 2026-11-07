@@ -61,10 +61,13 @@ namespace Interception
                     const MethodInfo* methods_ptr = Traits::get_method_info_array_ptr(&n_methods);
                     const MethodInfo* result_ptr  = nullptr;
 
-                    if (in_function >= Traits::get_first_function() &&
-                        in_function <= Traits::get_last_function ())
+                    const auto first_function = Traits::get_first_function();
+                    const auto last_function  = Traits::get_last_function();
+
+                    if (in_function >= first_function &&
+                        in_function <= last_function)
                     {
-                        result_ptr = methods_ptr + (in_function - Traits::get_first_function() );
+                        result_ptr = methods_ptr + (in_function - first_function);
 
                         assert(result_ptr->function == in_function);
                     }

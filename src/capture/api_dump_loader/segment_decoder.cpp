@@ -39,10 +39,11 @@ std::vector<bool> Capture::APIDumpLoader::SegmentDecoder::find_unwanted_chunks(c
             {
                 if (arg.type == APIInterceptor::ARGTYPE_DATA_CHUNK_ID)
                 {
-                    const uint32_t n_chunk = arg.get_data_chunk_id() - in_options.first_data_chunk_id;
+                    const uint32_t chunk_id = arg.get_data_chunk_id();
+                    const uint32_t n_chunk  = chunk_id - in_options.first_data_chunk_id;
 
-                    if (arg.get_data_chunk_id() >= in_options.first_data_chunk_id &&
-                        n_chunk                 <  in_n_chunks)
+                    if (chunk_id >= in_options.first_data_chunk_id &&
+                        n_chunk  <  in_n_chunks)
                     {
                         if (is_wanted)
                         {

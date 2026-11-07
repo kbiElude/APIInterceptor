@@ -17,11 +17,15 @@ void Capture::APIDumpPrinter::D3D7Decoder::forget_released_objects(const Capture
 {
     const Interception::Hooks::D3D7::MethodInfo* method_info_ptr = Interception::Core::D3D7Utils::get_method_info_ptr(in_call.func);
 
-    if (method_info_ptr != nullptr &&
-        ::strcmp(method_info_ptr->method_name_ptr,
-                 "Release") == 0)
+    if (method_info_ptr != nullptr)
     {
-        m_object_namer.forget_after_release(in_call);
+        const int name_difference = ::strcmp(method_info_ptr->method_name_ptr,
+                                             "Release");
+
+        if (name_difference == 0)
+        {
+            m_object_namer.forget_after_release(in_call);
+        }
     }
 }
 
@@ -813,8 +817,16 @@ bool Capture::APIDumpPrinter::D3D7Decoder::format_struct(const Interception::Hoo
             /* The number of the arrays, their sizes, and the arrays (see the hook). */
             const size_t head_n_bytes = sizeof(uint32_t) * (1 + N_STRIDED_ARRAYS);
 
-            if (in_chunk_u8_vec.size() >= head_n_bytes &&
-                read_u32_func(0)       == N_STRIDED_ARRAYS)
+            bool is_head_valid = false;
+
+            if (in_chunk_u8_vec.size() >= head_n_bytes)
+            {
+                const uint32_t n_arrays = read_u32_func(0);
+
+                is_head_valid = (n_arrays == N_STRIDED_ARRAYS);
+            }
+
+            if (is_head_valid)
             {
                 size_t n_array_bytes = 0;
                 bool   is_first      = true;
@@ -1315,9 +1327,17 @@ void Capture::APIDumpPrinter::D3D7Decoder::register_created_objects(const Captur
 {
     const Interception::Hooks::D3D7::MethodInfo* method_info_ptr = Interception::Core::D3D7Utils::get_method_info_ptr(in_call.func);
 
-    if (in_call.returned_value_ptr        != nullptr                     &&
-        in_call.returned_value_ptr->type  == APIInterceptor::ARGTYPE_I32 &&
-        in_call.returned_value_ptr->get_i32() >= 0)
+    bool is_call_succeeded = false;
+
+    if (in_call.returned_value_ptr       != nullptr                     &&
+        in_call.returned_value_ptr->type == APIInterceptor::ARGTYPE_I32)
+    {
+        const int32_t returned_value = in_call.returned_value_ptr->get_i32();
+
+        is_call_succeeded = (returned_value >= 0);
+    }
+
+    if (is_call_succeeded)
     {
         /* The exports, Create* methods and DuplicateSurface always return new objects; Get* ones return existing objects, which may be
          * unknown to us, and so does QueryInterface.

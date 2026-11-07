@@ -32,8 +32,12 @@ namespace APIInterceptor
         if (in_function == APIFUNCTION_D3D7_IDIRECTDRAWSURFACE7_BLT     ||
             in_function == APIFUNCTION_D3D7_IDIRECTDRAWSURFACE7_BLTFAST)
         {
-            result = (in_n_arguments > D3D7_BLT_PRESENTS_ARGUMENT)                 &&
-                     (in_arguments_ptr[D3D7_BLT_PRESENTS_ARGUMENT].get_u32() != 0);
+            if (in_n_arguments > D3D7_BLT_PRESENTS_ARGUMENT)
+            {
+                const uint32_t presents = in_arguments_ptr[D3D7_BLT_PRESENTS_ARGUMENT].get_u32();
+
+                result = (presents != 0);
+            }
         }
 
         return result;

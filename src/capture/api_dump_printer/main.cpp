@@ -399,8 +399,10 @@ int Capture::APIDumpPrinter::run(int   in_argc,
                         index_filename.c_str() );
             }
 
-            if (index.find_segment_of_frame(options.first_frame,
-                                           &n_segment) &&
+            const bool has_segment = index.find_segment_of_frame(options.first_frame,
+                                                                &n_segment);
+
+            if (has_segment   &&
                 n_segment != 0)
             {
                 n_prefix_segments                             = n_segment;
@@ -504,10 +506,12 @@ int Capture::APIDumpPrinter::run(int   in_argc,
         for (const auto& current_api_call : *segment.dumped_api_call_vec_ptr)
         {
             const auto api_group         = Capture::APIDumpLoader::get_api_group(current_api_call.func);
-            const bool is_in_frame_range = (n_frame                                      >= options.first_frame                 &&
-                                            n_frame                                      <= options.last_frame);
-            const bool is_api_allowed    = options.allowed_api_group_set.empty()                                                ||
-                                           options.allowed_api_group_set.find(api_group) != options.allowed_api_group_set.end();
+            const auto allowed_iterator  = options.allowed_api_group_set.find(api_group);
+            const bool is_in_frame_range = (n_frame >= options.first_frame &&
+                                            n_frame <= options.last_frame);
+            const bool is_api_listed     = (allowed_iterator != options.allowed_api_group_set.end() );
+            const bool is_api_allowed    = (options.allowed_api_group_set.empty() ||
+                                            is_api_listed);
 
             /* Objects are named in the order they are created, whether or not their creation is printed. */
             const auto   decoder_iterator = decoder_ptr_map.find(api_group);

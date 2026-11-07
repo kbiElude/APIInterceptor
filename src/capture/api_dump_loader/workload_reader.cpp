@@ -210,9 +210,12 @@ struct Capture::APIDumpLoader::WorkloadReader::Pipeline
 
         const auto is_result_ready_func = [&]()
         {
-            return (result_map.find(next_sequence) != result_map.end() ||
-                    is_stopping                                         ||
-                    (is_producer_done                                   &&
+            const auto ready_iterator = result_map.find(next_sequence);
+            const bool is_next_ready  = (ready_iterator != result_map.end() );
+
+            return (is_next_ready ||
+                    is_stopping   ||
+                    (is_producer_done                 &&
                      next_sequence >= n_frames_produced) );
         };
 
@@ -530,10 +533,18 @@ Capture::APIDumpLoader::WorkloadReaderUniquePtr Capture::APIDumpLoader::Workload
 
     if (in_options.start_offset_n_bytes != 0)
     {
-        if (in_options.start_offset_n_bytes < sizeof(header) ||
-            ::_fseeki64(result_ptr->m_file_handle,
-                        static_cast<__int64>(in_options.start_offset_n_bytes),
-                        SEEK_SET) != 0)
+        bool is_start_valid = false;
+
+        if (in_options.start_offset_n_bytes >= sizeof(header) )
+        {
+            const int seek_result = ::_fseeki64(result_ptr->m_file_handle,
+                                                static_cast<__int64>(in_options.start_offset_n_bytes),
+                                                SEEK_SET);
+
+            is_start_valid = (seek_result == 0);
+        }
+
+        if (is_start_valid == false)
         {
             error = "The file cannot be read from the place that was asked for.";
 

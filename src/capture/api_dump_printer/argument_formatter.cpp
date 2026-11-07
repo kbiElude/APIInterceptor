@@ -108,10 +108,16 @@ bool Capture::APIDumpPrinter::ArgumentFormatter::format_pointer_out(const APIInt
                                                                     std::string*                               out_text_ptr)
 {
     /* Before the call, the argument is the address of the returned pointer. */
-    return (in_is_out                                    &&
-            format_pointer(in_argument,
-                           in_format_func,
-                           out_text_ptr) );
+    bool result = false;
+
+    if (in_is_out)
+    {
+        result = format_pointer(in_argument,
+                                in_format_func,
+                                out_text_ptr);
+    }
+
+    return result;
 }
 
 bool Capture::APIDumpPrinter::ArgumentFormatter::format_u32(const APIInterceptor::APIFunctionArgument& in_argument,
