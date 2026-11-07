@@ -6,16 +6,16 @@
 
 Replay::ReplayEngineDLL::CallContext::CallContext(ObjectRemapper* in_remapper_ptr)
     :m_call_ptr        (nullptr),
+     m_chunk_source_ptr(nullptr),
      m_n_head_arguments(0),
-     m_remapper_ptr    (in_remapper_ptr),
-     m_chunk_source_ptr      (nullptr)
+     m_remapper_ptr    (in_remapper_ptr)
 {
     /* Stub */
 }
 
 void Replay::ReplayEngineDLL::CallContext::begin_call(const Capture::APIDumpLoader::DumpedAPICall* in_call_ptr,
-                                                        const IChunkSource*                          in_chunk_source_ptr,
-                                                        const size_t&                                in_n_head_arguments)
+                                                      const IChunkSource*                          in_chunk_source_ptr,
+                                                      const size_t&                                in_n_head_arguments)
 {
     m_call_ptr         = in_call_ptr;
     m_n_head_arguments = in_n_head_arguments;
@@ -28,7 +28,7 @@ const Capture::APIDumpLoader::DumpedAPICall& Replay::ReplayEngineDLL::CallContex
 }
 
 const uint8_t* Replay::ReplayEngineDLL::CallContext::get_chunk_data_ptr(const APIInterceptor::APIFunctionArgument* in_argument_ptr,
-                                                                          size_t*                                    out_n_bytes_ptr) const
+                                                                        size_t*                                    out_n_bytes_ptr) const
 {
     const uint8_t* result_ptr = nullptr;
 
