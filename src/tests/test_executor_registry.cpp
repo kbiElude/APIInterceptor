@@ -32,7 +32,8 @@ TEST(ExecutorRegistryTest, AnExecutorWhichServesSeveralApisIsListedOnce)
     registry.add(Capture::APIDumpLoader::APIGroup::USER32,
                  shared_ptr);
 
-    const std::vector<Replay::ReplayEngineDLL::ICallExecutor*> expected_vec = {shared_ptr.get(), single_ptr.get()};
+    /* In the order of the APIs: Direct3D 8 comes before GDI32. */
+    const std::vector<Replay::ReplayEngineDLL::ICallExecutor*> expected_vec = {single_ptr.get(), shared_ptr.get()};
 
     EXPECT_EQ(registry.get_executor_ptr_vec(),
               expected_vec);

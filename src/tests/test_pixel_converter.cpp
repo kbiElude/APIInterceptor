@@ -6,7 +6,7 @@
  */
 #include <gtest/gtest.h>
 #include "interception/hooks/D3D8/types.h"
-#include "pixel_converter.h"
+#include "replay/replay_engine_dll/pixel_converter.h"
 #include <string.h>
 
 TEST(PixelConverter, A32BitFormatKeepsItsColorsAndIsOpaque)
