@@ -27,7 +27,7 @@ namespace APIInterceptor
             APIInterceptor::resume_api_call_nesting(m_depth);
         }
 
-        TopLevelScope(const TopLevelScope&)            = delete;
+        TopLevelScope           (const TopLevelScope&) = delete;
         TopLevelScope& operator=(const TopLevelScope&) = delete;
 
     private:

@@ -52,8 +52,8 @@ bool Interception::Core::D3D7Utils::parse_surface_description(const uint8_t*    
         read_func(OFFSET_PITCH,        &description.pitch,             sizeof(int32_t) );
         read_func(OFFSET_BACK_BUFFERS, &description.back_buffer_count, sizeof(uint32_t) );
         read_func(OFFSET_MIP_MAPS,     &description.mip_map_count,     sizeof(uint32_t) );
-        read_func(OFFSET_ALPHA_DEPTH,  &description.alpha_bit_depth,    sizeof(uint32_t) );
-        read_func(OFFSET_RESERVED,     &description.reserved,           sizeof(uint32_t) );
+        read_func(OFFSET_ALPHA_DEPTH,  &description.alpha_bit_depth,   sizeof(uint32_t) );
+        read_func(OFFSET_RESERVED,     &description.reserved,          sizeof(uint32_t) );
 
         if (is_32_bit)
         {
@@ -70,11 +70,14 @@ bool Interception::Core::D3D7Utils::parse_surface_description(const uint8_t*    
 
         read_func(offset, description.color_key_array, sizeof(description.color_key_array) );
         offset += sizeof(description.color_key_array);
-        read_func(offset, &description.pixel_format,   sizeof(description.pixel_format) );
+
+        read_func(offset, &description.pixel_format, sizeof(description.pixel_format) );
         offset += sizeof(description.pixel_format);
-        read_func(offset, &description.caps,           sizeof(description.caps) );
+
+        read_func(offset, &description.caps, sizeof(description.caps) );
         offset += sizeof(description.caps);
-        read_func(offset, &description.texture_stage,  sizeof(uint32_t) );
+
+        read_func(offset, &description.texture_stage, sizeof(uint32_t) );
 
         *out_description_ptr = description;
         result               = true;

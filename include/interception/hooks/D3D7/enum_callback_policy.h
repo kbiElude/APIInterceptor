@@ -62,11 +62,11 @@ namespace Interception
                     return reinterpret_cast<void*>(&invoke);
                 }
 
-                static int __stdcall invoke(GUID*        in_guid_ptr,
-                                            Character*   in_description_ptr,
-                                            Character*   in_name_ptr,
-                                            void*        in_context_ptr,
-                                            HMONITOR     in_monitor)
+                static int __stdcall invoke(GUID*      in_guid_ptr,
+                                            Character* in_description_ptr,
+                                            Character* in_name_ptr,
+                                            void*      in_context_ptr,
+                                            HMONITOR   in_monitor)
                 {
                     const EnumCallbackState* state_ptr = static_cast<const EnumCallbackState*>(in_context_ptr);
 
@@ -87,7 +87,7 @@ namespace Interception
                 template<typename... Arguments>
                 static void on_call_starting(Arguments&... io_arguments)
                 {
-                    auto  arguments = std::tie(io_arguments...);
+                    auto  arguments     = std::tie                (io_arguments...);
                     void*& callback_ptr = std::get<callback_index>(arguments);
                     void*& context_ptr  = std::get<context_index> (arguments);
 
@@ -103,7 +103,7 @@ namespace Interception
                 static void on_call_finished(const bool&,
                                              Arguments&... io_arguments)
                 {
-                    auto  arguments = std::tie(io_arguments...);
+                    auto   arguments    = std::tie                (io_arguments...);
                     void*& callback_ptr = std::get<callback_index>(arguments);
                     void*& context_ptr  = std::get<context_index> (arguments);
 
@@ -119,11 +119,11 @@ namespace Interception
                 }
             };
 
-            typedef ContextLastTrampoline<int,  GUID*, char*,    char*>    DirectDrawEnumerateATrampoline;
-            typedef ContextLastTrampoline<int,  GUID*, wchar_t*, wchar_t*> DirectDrawEnumerateWTrampoline;
-            typedef ContextLastTrampoline<long, char*, char*,    D3DDEVICEDESC7*> DevicesTrampoline;
-            typedef ContextLastTrampoline<long, DDPIXELFORMAT*>            PixelFormatsTrampoline;
-            typedef ContextLastTrampoline<long, DDSURFACEDESC2*>           SurfaceDescriptionsTrampoline;
+            typedef ContextLastTrampoline<int,  GUID*, char*,    char*>                DirectDrawEnumerateATrampoline;
+            typedef ContextLastTrampoline<int,  GUID*, wchar_t*, wchar_t*>             DirectDrawEnumerateWTrampoline;
+            typedef ContextLastTrampoline<long, char*, char*,    D3DDEVICEDESC7*>      DevicesTrampoline;
+            typedef ContextLastTrampoline<long, DDPIXELFORMAT*>                        PixelFormatsTrampoline;
+            typedef ContextLastTrampoline<long, DDSURFACEDESC2*>                       SurfaceDescriptionsTrampoline;
             typedef ContextLastTrampoline<long, IDirectDrawSurface7*, DDSURFACEDESC2*> SurfacesTrampoline;
 
             #define D3D7_ENUM_POLICY(function_tag, trampoline, context_index, callback_index) \
@@ -133,17 +133,18 @@ namespace Interception
                     /* Stub */ \
                 };
 
-            D3D7_ENUM_POLICY(DIRECTDRAWENUMERATEA,                    DirectDrawEnumerateATrampoline,  1, 0)
-            D3D7_ENUM_POLICY(DIRECTDRAWENUMERATEEXA,                  EnumerateExTrampoline<char>,     1, 0)
-            D3D7_ENUM_POLICY(DIRECTDRAWENUMERATEEXW,                  EnumerateExTrampoline<wchar_t>,  1, 0)
-            D3D7_ENUM_POLICY(DIRECTDRAWENUMERATEW,                    DirectDrawEnumerateWTrampoline,  1, 0)
-            D3D7_ENUM_POLICY(IDIRECT3D7_ENUMDEVICES,                  DevicesTrampoline,               2, 1)
-            D3D7_ENUM_POLICY(IDIRECT3D7_ENUMZBUFFERFORMATS,           PixelFormatsTrampoline,          3, 2)
-            D3D7_ENUM_POLICY(IDIRECT3DDEVICE7_ENUMTEXTUREFORMATS,     PixelFormatsTrampoline,          2, 1)
-            D3D7_ENUM_POLICY(IDIRECTDRAW7_ENUMDISPLAYMODES,           SurfaceDescriptionsTrampoline,   3, 4)
-            D3D7_ENUM_POLICY(IDIRECTDRAW7_ENUMSURFACES,               SurfacesTrampoline,              3, 4)
-            D3D7_ENUM_POLICY(IDIRECTDRAWSURFACE7_ENUMATTACHEDSURFACES, SurfacesTrampoline,             1, 2)
-            D3D7_ENUM_POLICY(IDIRECTDRAWSURFACE7_ENUMOVERLAYZORDERS,  SurfacesTrampoline,              2, 3)
+            D3D7_ENUM_POLICY(DIRECTDRAWENUMERATEA,                     DirectDrawEnumerateATrampoline,  1, 0)
+            D3D7_ENUM_POLICY(DIRECTDRAWENUMERATEEXA,                   EnumerateExTrampoline<char>,     1, 0)
+            D3D7_ENUM_POLICY(DIRECTDRAWENUMERATEEXW,                   EnumerateExTrampoline<wchar_t>,  1, 0)
+            D3D7_ENUM_POLICY(DIRECTDRAWENUMERATEW,                     DirectDrawEnumerateWTrampoline,  1, 0)
+            D3D7_ENUM_POLICY(IDIRECT3D7_ENUMDEVICES,                   DevicesTrampoline,               2, 1)
+            D3D7_ENUM_POLICY(IDIRECT3D7_ENUMZBUFFERFORMATS,            PixelFormatsTrampoline,          3, 2)
+            D3D7_ENUM_POLICY(IDIRECT3DDEVICE7_ENUMTEXTUREFORMATS,      PixelFormatsTrampoline,          2, 1)
+            D3D7_ENUM_POLICY(IDIRECTDRAW7_ENUMDISPLAYMODES,            SurfaceDescriptionsTrampoline,   3, 4)
+            D3D7_ENUM_POLICY(IDIRECTDRAW7_ENUMSURFACES,                SurfacesTrampoline,              3, 4)
+            D3D7_ENUM_POLICY(IDIRECTDRAWSURFACE7_ENUMATTACHEDSURFACES, SurfacesTrampoline,              1, 2)
+            D3D7_ENUM_POLICY(IDIRECTDRAWSURFACE7_ENUMOVERLAYZORDERS,   SurfacesTrampoline,              2, 3)
+
             #undef D3D7_ENUM_POLICY
         }
     }

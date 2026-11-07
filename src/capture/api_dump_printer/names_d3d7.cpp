@@ -9,7 +9,7 @@
 #define D3D7_FLAG(name, value)  {static_cast<uint32_t>(value), #name}
 #define D3D7_TABLE(array)       array, static_cast<uint32_t>(sizeof(array) / sizeof(array[0]) )
 
-bool Capture::APIDumpPrinter::D3D7Names::get_flag_name_table(const D3D7FlagTable& in_table,
+bool Capture::APIDumpPrinter::D3D7Names::get_flag_name_table(const D3D7FlagTable&  in_table,
                                                              const FlagNameEntry** out_table_ptr_ptr,
                                                              uint32_t*             out_n_entries_ptr)
 {

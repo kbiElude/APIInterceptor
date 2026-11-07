@@ -21,7 +21,7 @@ namespace APIInterceptor
 
     /* A method by its position in a virtual table that is at hand, with the type of the method (see the PFN_ types of the hooks). */
     template<typename FunctionPointer>
-    inline FunctionPointer get_method_ptr(void** in_vtable_ptr,
+    inline FunctionPointer get_method_ptr(void**          in_vtable_ptr,
                                           const uint32_t& in_vtable_index)
     {
         return reinterpret_cast<FunctionPointer>(in_vtable_ptr[in_vtable_index]);

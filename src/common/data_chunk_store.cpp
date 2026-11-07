@@ -13,7 +13,7 @@ APIInterceptor::DataChunkStore::ChunkUniquePtr* APIInterceptor::DataChunkStore::
     {
         const size_t index = in_data_chunk_id - m_chunks.first_id;
 
-        if (index < m_chunks.chunk_deque.size()          &&
+        if (index                          <  m_chunks.chunk_deque.size() &&
             m_chunks.chunk_deque.at(index) != nullptr)
         {
             result_ptr = &m_chunks.chunk_deque.at(index);
@@ -36,7 +36,7 @@ bool APIInterceptor::DataChunkStore::get(const DataChunkID& in_data_chunk_id,
 
         if (slot_ptr != nullptr)
         {
-            *out_data_ptr_ptr = (*slot_ptr)->data ();
+            *out_data_ptr_ptr = (*slot_ptr)->data    ();
             *out_n_bytes_ptr  = static_cast<uint32_t>((*slot_ptr)->size() );
 
             result = true;
@@ -155,8 +155,8 @@ void APIInterceptor::DataChunkStore::take_range(const DataChunkID&              
 
 void APIInterceptor::DataChunkStore::trim()
 {
-    while (m_chunks.chunk_deque.empty() == false &&
-           m_chunks.chunk_deque.front()   == nullptr)
+    while (m_chunks.chunk_deque.empty() == false   &&
+           m_chunks.chunk_deque.front() == nullptr)
     {
         m_chunks.chunk_deque.pop_front();
 

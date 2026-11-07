@@ -21,9 +21,9 @@ namespace APIInterceptor
      * is told by them: a blit does if it is made to the primary surface. IDirect3DSwapChain8::Present is not a boundary, as it
      * presents additional swap chains.
      */
-    inline bool is_frame_boundary(const APIFunction&               in_function,
-                                  const uint32_t&                  in_n_arguments,
-                                  const APIFunctionArgument*       in_arguments_ptr)
+    inline bool is_frame_boundary(const APIFunction&         in_function,
+                                  const uint32_t&            in_n_arguments,
+                                  const APIFunctionArgument* in_arguments_ptr)
     {
         bool result = (in_function == APIFUNCTION_GDI32_SWAPBUFFERS             ||
                        in_function == APIFUNCTION_D3D7_IDIRECTDRAWSURFACE7_FLIP ||
@@ -32,7 +32,7 @@ namespace APIInterceptor
         if (in_function == APIFUNCTION_D3D7_IDIRECTDRAWSURFACE7_BLT     ||
             in_function == APIFUNCTION_D3D7_IDIRECTDRAWSURFACE7_BLTFAST)
         {
-            result = (in_n_arguments > D3D7_BLT_PRESENTS_ARGUMENT) &&
+            result = (in_n_arguments > D3D7_BLT_PRESENTS_ARGUMENT)                 &&
                      (in_arguments_ptr[D3D7_BLT_PRESENTS_ARGUMENT].get_u32() != 0);
         }
 

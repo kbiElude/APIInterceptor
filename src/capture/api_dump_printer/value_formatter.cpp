@@ -148,7 +148,7 @@ std::string Capture::APIDumpPrinter::ValueFormatter::format_fvf(const uint32_t& 
 
     std::string result;
 
-    if (in_style.has_shader_handles                       &&
+    if (in_style.has_shader_handles          &&
         (in_value & SHADER_HANDLE_BIT) != 0)
     {
         result = "shader " + std::to_string(in_value);
@@ -180,10 +180,10 @@ std::string Capture::APIDumpPrinter::ValueFormatter::format_fvf(const uint32_t& 
             }
         }
 
-        result += ((in_value & FVF_NORMAL)       != 0) ? " | D3DFVF_NORMAL"                                                  : "";
-        result += ((in_value & FVF_RESERVED_BIT) != 0) ? std::string(" | D3DFVF_") + in_style.reserved_bit_name_ptr          : "";
-        result += ((in_value & FVF_DIFFUSE)      != 0) ? " | D3DFVF_DIFFUSE"                                                 : "";
-        result += ((in_value & FVF_SPECULAR)     != 0) ? " | D3DFVF_SPECULAR"                                                : "";
+        result += ((in_value & FVF_NORMAL)       != 0) ? " | D3DFVF_NORMAL"                                         : "";
+        result += ((in_value & FVF_RESERVED_BIT) != 0) ? std::string(" | D3DFVF_") + in_style.reserved_bit_name_ptr : "";
+        result += ((in_value & FVF_DIFFUSE)      != 0) ? " | D3DFVF_DIFFUSE"                                        : "";
+        result += ((in_value & FVF_SPECULAR)     != 0) ? " | D3DFVF_SPECULAR"                                       : "";
         result += " | D3DFVF_TEX" + std::to_string(n_tex_coord_sets);
 
         /* Coordinates are 2 floats, unless the format says otherwise. */
@@ -345,9 +345,10 @@ std::string Capture::APIDumpPrinter::ValueFormatter::format_state_value(const St
         {
             const uint32_t n_coordinates = in_value & TTFF_COUNT_MASK;
 
-            result  = (n_coordinates == 0) ? "D3DTTFF_DISABLE"
-                                           : "D3DTTFF_COUNT" + std::to_string(n_coordinates);
-            result += ((in_value & TTFF_PROJECTED) != 0) ? " | D3DTTFF_PROJECTED" : "";
+            result  = (n_coordinates               == 0) ? "D3DTTFF_DISABLE"
+                                                         : "D3DTTFF_COUNT" + std::to_string(n_coordinates);
+            result += ((in_value & TTFF_PROJECTED) != 0) ? " | D3DTTFF_PROJECTED" 
+                                                         : "";
 
             break;
         }

@@ -35,10 +35,10 @@ void APIInterceptor::FatalError::unsupported_value(const char*     in_filename_p
                in_filename_ptr,
                in_line);
 
-    ::fprintf (stderr,
-               "%s\n",
-               message_i8vec1024);
-    ::fflush  (stderr);
+    ::fprintf           (stderr,
+                         "%s\n",
+                         message_i8vec1024);
+    ::fflush            (stderr);
     ::OutputDebugStringA(message_i8vec1024);
 
     /* A program that has no console (an application with a DLL injected into it) has nowhere else to say it. */

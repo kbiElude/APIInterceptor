@@ -115,7 +115,7 @@ int Capture::APIDumpPrinter::verify_replay(const Options& in_options)
                            in_function);
     };
 
-    Replay::ReplayEngineDLL::ReplayCoverage         coverage(get_support_func);
+    Replay::ReplayEngineDLL::ReplayCoverage coverage(get_support_func);
 
     reader_options.n_threads = n_threads;
 

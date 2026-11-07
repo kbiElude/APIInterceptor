@@ -28,12 +28,12 @@ void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_DIRE
 }
 
 void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIRECTDRAWSURFACE7_BLT>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
-                                                                                                                            IDirectDrawSurface7*                 in_self,
-                                                                                                                            const RECT*                          in_destination_rect_ptr,
-                                                                                                                            IDirectDrawSurface7*                 in_source_ptr,
-                                                                                                                            const RECT*                          in_source_rect_ptr,
-                                                                                                                            DWORD                                in_flags,
-                                                                                                                            const DDBLTFX*                       in_effects_ptr)
+                                                                                                                             IDirectDrawSurface7*                 in_self,
+                                                                                                                             const RECT*                          in_destination_rect_ptr,
+                                                                                                                             IDirectDrawSurface7*                 in_source_ptr,
+                                                                                                                             const RECT*                          in_source_rect_ptr,
+                                                                                                                             DWORD                                in_flags,
+                                                                                                                             const DDBLTFX*                       in_effects_ptr)
 {
     (void) in_destination_rect_ptr;
     (void) in_source_ptr;
@@ -46,12 +46,12 @@ void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIR
 }
 
 void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIRECTDRAWSURFACE7_BLTFAST>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
-                                                                                                                                IDirectDrawSurface7*                 in_self,
-                                                                                                                                DWORD                                in_x,
-                                                                                                                                DWORD                                in_y,
-                                                                                                                                IDirectDrawSurface7*                 in_source_ptr,
-                                                                                                                                const RECT*                          in_source_rect_ptr,
-                                                                                                                                DWORD                                in_transfer_flags)
+                                                                                                                                 IDirectDrawSurface7*                 in_self,
+                                                                                                                                 DWORD                                in_x,
+                                                                                                                                 DWORD                                in_y,
+                                                                                                                                 IDirectDrawSurface7*                 in_source_ptr,
+                                                                                                                                 const RECT*                          in_source_rect_ptr,
+                                                                                                                                 DWORD                                in_transfer_flags)
 {
     (void) in_x;
     (void) in_y;
@@ -109,14 +109,14 @@ void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIR
 }
 
 void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_DRAWINDEXEDPRIMITIVE>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
-                                                                                                                                          IDirect3DDevice7*                    in_self,
-                                                                                                                                          D3DPRIMITIVETYPE                     in_primitive_type,
-                                                                                                                                          DWORD                                in_vertex_format,
-                                                                                                                                          void*                                in_vertices_ptr,
-                                                                                                                                          DWORD                                in_n_vertices,
-                                                                                                                                          WORD*                                in_indices_ptr,
-                                                                                                                                          DWORD                                in_n_indices,
-                                                                                                                                          DWORD                                in_flags)
+                                                                                                                                           IDirect3DDevice7*                    in_self,
+                                                                                                                                           D3DPRIMITIVETYPE                     in_primitive_type,
+                                                                                                                                           DWORD                                in_vertex_format,
+                                                                                                                                           void*                                in_vertices_ptr,
+                                                                                                                                           DWORD                                in_n_vertices,
+                                                                                                                                           WORD*                                in_indices_ptr,
+                                                                                                                                           DWORD                                in_n_indices,
+                                                                                                                                           DWORD                                in_flags)
 {
     const uint32_t vertex_n_bytes = Interception::Core::D3D7Utils::VertexFormat::get_n_vertex_bytes(in_vertex_format);
 
@@ -131,14 +131,14 @@ void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIR
 }
 
 void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_DRAWINDEXEDPRIMITIVESTRIDED>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
-                                                                                                                                                   IDirect3DDevice7*                    in_self,
-                                                                                                                                                   D3DPRIMITIVETYPE                     in_primitive_type,
-                                                                                                                                                   DWORD                                in_vertex_format,
-                                                                                                                                                   const D3DDRAWPRIMITIVESTRIDEDDATA*   in_vertex_array_ptr,
-                                                                                                                                                   DWORD                                in_n_vertices,
-                                                                                                                                                   WORD*                                in_indices_ptr,
-                                                                                                                                                   DWORD                                in_n_indices,
-                                                                                                                                                   DWORD                                in_flags)
+                                                                                                                                                  IDirect3DDevice7*                    in_self,
+                                                                                                                                                  D3DPRIMITIVETYPE                     in_primitive_type,
+                                                                                                                                                  DWORD                                in_vertex_format,
+                                                                                                                                                  const D3DDRAWPRIMITIVESTRIDEDDATA*   in_vertex_array_ptr,
+                                                                                                                                                  DWORD                                in_n_vertices,
+                                                                                                                                                  WORD*                                in_indices_ptr,
+                                                                                                                                                  DWORD                                in_n_indices,
+                                                                                                                                                  DWORD                                in_flags)
 {
     (void) in_self;
     (void) in_primitive_type;
@@ -153,14 +153,14 @@ void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIR
 }
 
 void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_DRAWINDEXEDPRIMITIVEVB>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
-                                                                                                                                            IDirect3DDevice7*                    in_self,
-                                                                                                                                            D3DPRIMITIVETYPE                     in_primitive_type,
-                                                                                                                                            IDirect3DVertexBuffer7*              in_vertex_buffer_ptr,
-                                                                                                                                            DWORD                                in_start_vertex,
-                                                                                                                                            DWORD                                in_n_vertices,
-                                                                                                                                            WORD*                                in_indices_ptr,
-                                                                                                                                            DWORD                                in_n_indices,
-                                                                                                                                            DWORD                                in_flags)
+                                                                                                                                             IDirect3DDevice7*                    in_self,
+                                                                                                                                             D3DPRIMITIVETYPE                     in_primitive_type,
+                                                                                                                                             IDirect3DVertexBuffer7*              in_vertex_buffer_ptr,
+                                                                                                                                             DWORD                                in_start_vertex,
+                                                                                                                                             DWORD                                in_n_vertices,
+                                                                                                                                             WORD*                                in_indices_ptr,
+                                                                                                                                             DWORD                                in_n_indices,
+                                                                                                                                             DWORD                                in_flags)
 {
     (void) in_self;
     (void) in_primitive_type;
@@ -276,7 +276,7 @@ void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIR
 }
 
 void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DVERTEXBUFFER7_UNLOCK>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
-                                                                                                                                  IDirect3DVertexBuffer7*              in_self)
+                                                                                                                                   IDirect3DVertexBuffer7*              in_self)
 {
     out_arguments_ptr[0] = HookPolicyHelper::create_locked_data_argument(in_self,
                                                                          0); /* in_level */
@@ -292,11 +292,11 @@ void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIR
 }
 
 void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIRECTDRAWSURFACE7_LOCK>::on_call_finished(const bool&          in_is_success,
-                                                                                                                       IDirectDrawSurface7* in_self,
-                                                                                                                       const RECT*          in_rect_ptr,
-                                                                                                                       DDSURFACEDESC2*      in_description_ptr,
-                                                                                                                       DWORD                in_flags,
-                                                                                                                       HANDLE               in_event)
+                                                                                                                        IDirectDrawSurface7* in_self,
+                                                                                                                        const RECT*          in_rect_ptr,
+                                                                                                                        DDSURFACEDESC2*      in_description_ptr,
+                                                                                                                        DWORD                in_flags,
+                                                                                                                        HANDLE               in_event)
 {
     (void) in_event;
 
@@ -321,8 +321,8 @@ void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIR
 }
 
 void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIRECTDRAWSURFACE7_UNLOCK>::on_call_finished(const bool&          in_is_success,
-                                                                                                                           IDirectDrawSurface7* in_self,
-                                                                                                                           const RECT*          in_rect_ptr)
+                                                                                                                          IDirectDrawSurface7* in_self,
+                                                                                                                          const RECT*          in_rect_ptr)
 {
     (void) in_is_success;
     (void) in_rect_ptr;

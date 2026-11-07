@@ -8,21 +8,21 @@
 const uint32_t Interception::Core::D3D7Utils::VertexFormat::FLAG_DIFFUSE                     = 0x00000040;
 const uint32_t Interception::Core::D3D7Utils::VertexFormat::FLAG_NORMAL                      = 0x00000010;
 const uint32_t Interception::Core::D3D7Utils::VertexFormat::FLAG_RESERVED1                   = 0x00000020;
-const uint32_t Interception::Core::D3D7Utils::VertexFormat::FLAG_SPECULAR                   = 0x00000080;
-const uint32_t Interception::Core::D3D7Utils::VertexFormat::MAX_N_TEXTURE_STAGES            = 8;
-const uint32_t Interception::Core::D3D7Utils::VertexFormat::N_BYTES_COLOR                   = sizeof(uint32_t);
-const uint32_t Interception::Core::D3D7Utils::VertexFormat::N_BYTES_FLOAT                   = sizeof(float);
-const uint32_t Interception::Core::D3D7Utils::VertexFormat::N_FLOATS_NORMAL                 = 3;
-const uint32_t Interception::Core::D3D7Utils::VertexFormat::N_FLOATS_POSITION               = 3;
-const uint32_t Interception::Core::D3D7Utils::VertexFormat::N_FLOATS_POSITION_RHW           = 4;
-const uint32_t Interception::Core::D3D7Utils::VertexFormat::POSITION_MASK                   = 0x0000000e;
-const uint32_t Interception::Core::D3D7Utils::VertexFormat::POSITION_RHW                    = 0x00000004;
-const uint32_t Interception::Core::D3D7Utils::VertexFormat::POSITION_XYZ                    = 0x00000002;
+const uint32_t Interception::Core::D3D7Utils::VertexFormat::FLAG_SPECULAR                    = 0x00000080;
+const uint32_t Interception::Core::D3D7Utils::VertexFormat::MAX_N_TEXTURE_STAGES             = 8;
+const uint32_t Interception::Core::D3D7Utils::VertexFormat::N_BYTES_COLOR                    = sizeof(uint32_t);
+const uint32_t Interception::Core::D3D7Utils::VertexFormat::N_BYTES_FLOAT                    = sizeof(float);
+const uint32_t Interception::Core::D3D7Utils::VertexFormat::N_FLOATS_NORMAL                  = 3;
+const uint32_t Interception::Core::D3D7Utils::VertexFormat::N_FLOATS_POSITION                = 3;
+const uint32_t Interception::Core::D3D7Utils::VertexFormat::N_FLOATS_POSITION_RHW            = 4;
+const uint32_t Interception::Core::D3D7Utils::VertexFormat::POSITION_MASK                    = 0x0000000e;
+const uint32_t Interception::Core::D3D7Utils::VertexFormat::POSITION_RHW                     = 0x00000004;
+const uint32_t Interception::Core::D3D7Utils::VertexFormat::POSITION_XYZ                     = 0x00000002;
 const uint32_t Interception::Core::D3D7Utils::VertexFormat::TEXTURE_COORDINATE_SIZE_BASE_BIT = 16; /* the size of the coordinates of stage 0; each stage has 2 more bits */
-const uint32_t Interception::Core::D3D7Utils::VertexFormat::TEXTURE_COORDINATE_SIZE_BITS    = 2;
-const uint32_t Interception::Core::D3D7Utils::VertexFormat::TEXTURE_COORDINATE_SIZE_MASK    = 0x00000003;
-const uint32_t Interception::Core::D3D7Utils::VertexFormat::TEXTURE_COUNT_MASK              = 0x00000f00;
-const uint32_t Interception::Core::D3D7Utils::VertexFormat::TEXTURE_COUNT_SHIFT             = 8;
+const uint32_t Interception::Core::D3D7Utils::VertexFormat::TEXTURE_COORDINATE_SIZE_BITS     = 2;
+const uint32_t Interception::Core::D3D7Utils::VertexFormat::TEXTURE_COORDINATE_SIZE_MASK     = 0x00000003;
+const uint32_t Interception::Core::D3D7Utils::VertexFormat::TEXTURE_COUNT_MASK               = 0x00000f00;
+const uint32_t Interception::Core::D3D7Utils::VertexFormat::TEXTURE_COUNT_SHIFT              = 8;
 
 uint32_t Interception::Core::D3D7Utils::VertexFormat::get_n_position_bytes(const uint32_t& in_vertex_format)
 {
@@ -51,7 +51,7 @@ uint32_t Interception::Core::D3D7Utils::VertexFormat::get_n_position_bytes(const
 }
 
 uint32_t Interception::Core::D3D7Utils::VertexFormat::get_n_texture_coordinate_bytes(const uint32_t& in_vertex_format,
-                                                                                const uint32_t& in_n_stage)
+                                                                                     const uint32_t& in_n_stage)
 {
     constexpr uint32_t N_FLOATS_1D = 1;
     constexpr uint32_t N_FLOATS_2D = 2;

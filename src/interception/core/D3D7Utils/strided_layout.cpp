@@ -5,10 +5,10 @@
 #include "interception/core/D3D7Utils/strided_layout.h"
 #include <string.h>
 
-bool Interception::Core::D3D7Utils::StridedLayout::rebuild(const uint8_t*                                         in_structure_ptr,
-                                                           const size_t&                                          in_n_structure_bytes,
-                                                           const uint8_t*                                         in_arrays_ptr,
-                                                           const size_t&                                          in_n_arrays_bytes,
+bool Interception::Core::D3D7Utils::StridedLayout::rebuild(const uint8_t*                                          in_structure_ptr,
+                                                           const size_t&                                           in_n_structure_bytes,
+                                                           const uint8_t*                                          in_arrays_ptr,
+                                                           const size_t&                                           in_n_arrays_bytes,
                                                            Interception::Hooks::D3D7::D3DDRAWPRIMITIVESTRIDEDDATA* out_strided_ptr)
 {
     constexpr size_t N_HEAD_BYTES = sizeof(uint32_t) * (1 + N_ARRAYS); /* the number of the arrays, and the size of each */
@@ -21,9 +21,9 @@ bool Interception::Core::D3D7Utils::StridedLayout::rebuild(const uint8_t*       
     Interception::Hooks::D3D7::D3DDRAWPRIMITIVESTRIDEDDATA rebuilt                          = {};
     bool                                                   result                           = false;
 
-    if (in_structure_ptr     == nullptr             ||
-        in_arrays_ptr        == nullptr             ||
-        in_n_structure_bytes != sizeof(dumped)      ||
+    if (in_structure_ptr     == nullptr        ||
+        in_arrays_ptr        == nullptr        ||
+        in_n_structure_bytes != sizeof(dumped) ||
         in_n_arrays_bytes    <  N_HEAD_BYTES)
     {
         goto end;

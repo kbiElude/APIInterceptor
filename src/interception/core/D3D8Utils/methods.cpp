@@ -111,7 +111,7 @@ const Interception::Hooks::D3D8::MethodInfo* Interception::Core::D3D8Utils::get_
                 #interface_name "::" #method_name,                                                                         \
                 APIInterceptor::APIFUNCTION_D3D8_##INTERFACE_TAG##_##METHOD_TAG,                                           \
                 #interface_name,                                                                                           \
-                Interception::Hooks::D3D8::Interface::INTERFACE_TAG,                                                                                  \
+                Interception::Hooks::D3D8::Interface::INTERFACE_TAG,                                                       \
                 #method_name,                                                                                              \
                 vtable_index                                                                                               \
             },

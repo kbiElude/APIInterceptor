@@ -17,18 +17,18 @@ namespace APIInterceptor
     class MemoryChunk
     {
     public:
-        MemoryChunk(const void*    in_data_ptr,
+        MemoryChunk(const void*   in_data_ptr,
                    const int64_t& in_n_elements,
                    const size_t&  in_element_n_bytes);
 
         DataChunkID get_id();
 
     private:
-        const void*                 m_data_ptr;
-        size_t                      m_element_n_bytes;
-        DataChunkID m_id;
-        bool                        m_is_registered;
-        int64_t                     m_n_elements;
+        const void*  m_data_ptr;
+        size_t       m_element_n_bytes;
+        DataChunkID  m_id;
+        bool         m_is_registered;
+        int64_t      m_n_elements;
     };
 }
 

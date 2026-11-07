@@ -446,8 +446,8 @@ bool Capture::APIDumpPrinter::get_texture_stage_state_value_info(const uint32_t&
 }
 
 bool Capture::APIDumpPrinter::get_value_name_table(const Interception::Hooks::D3D8::ValueKind& in_kind,
-                                                    const ValueNameEntry**                      out_table_ptr_ptr,
-                                                    uint32_t*                                   out_n_entries_ptr)
+                                                   const ValueNameEntry**                      out_table_ptr_ptr,
+                                                   uint32_t*                                   out_n_entries_ptr)
 {
     static const ValueNameEntry back_buffer_type_name_array[] =
     {

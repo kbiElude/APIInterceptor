@@ -35,7 +35,7 @@ namespace APIInterceptor
         FILE*             m_warning_file_ptr;
         std::stringstream m_log_data_sstream;
         std::mutex        m_mutex;
-        uint32_t m_n_current_frame;
+        uint32_t          m_n_current_frame;
     };
 
     extern Logger* g_logger_ptr;

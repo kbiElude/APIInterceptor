@@ -21,19 +21,19 @@ namespace Interception
              */
             struct SurfaceDescription
             {
-                uint32_t                                       alpha_bit_depth    = 0;
-                uint32_t                                       back_buffer_count  = 0;
-                Interception::Hooks::D3D7::DDSCAPS2            caps               = {};
-                Interception::Hooks::D3D7::DDCOLORKEY          color_key_array[4] = {}; /* destination overlay, destination blit, source overlay, source blit */
-                uint32_t                                       flags              = 0;
-                uint32_t                                       height             = 0;
-                uint32_t                                       mip_map_count      = 0;
-                int32_t                                        pitch              = 0;
-                Interception::Hooks::D3D7::DDPIXELFORMAT       pixel_format       = {};
-                uint32_t                                       reserved           = 0;
-                uint32_t                                       texture_stage      = 0;
-                uint64_t                                       surface_address    = 0;
-                uint32_t                                       width              = 0;
+                uint32_t                                 alpha_bit_depth    = 0;
+                uint32_t                                 back_buffer_count  = 0;
+                Interception::Hooks::D3D7::DDSCAPS2      caps               = {};
+                Interception::Hooks::D3D7::DDCOLORKEY    color_key_array[4] = {}; /* destination overlay, destination blit, source overlay, source blit */
+                uint32_t                                 flags              = 0;
+                uint32_t                                 height             = 0;
+                uint32_t                                 mip_map_count      = 0;
+                int32_t                                  pitch              = 0;
+                Interception::Hooks::D3D7::DDPIXELFORMAT pixel_format       = {};
+                uint32_t                                 reserved           = 0;
+                uint32_t                                 texture_stage      = 0;
+                uint64_t                                 surface_address    = 0;
+                uint32_t                                 width              = 0;
             };
 
             /* Returns false (and leaves the output alone) if the bytes are not a structure of the kind. */

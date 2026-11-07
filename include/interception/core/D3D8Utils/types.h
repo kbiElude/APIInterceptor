@@ -40,26 +40,26 @@ namespace Interception
             struct PresentParameters
             {
                 Interception::Hooks::D3D8::D3DFORMAT           auto_depth_stencil_format         = Interception::Hooks::D3D8::D3DFMT_UNKNOWN;
-                uint32_t            back_buffer_count                 = 0;
+                uint32_t                                       back_buffer_count                 = 0;
                 Interception::Hooks::D3D8::D3DFORMAT           back_buffer_format                = Interception::Hooks::D3D8::D3DFMT_UNKNOWN;
-                uint32_t            back_buffer_height                = 0;
-                uint32_t            back_buffer_width                 = 0;
-                bool                enable_auto_depth_stencil         = false;
-                uint32_t            flags                             = 0;
-                uint32_t            full_screen_presentation_interval = 0;
-                uint32_t            full_screen_refresh_rate_in_hz    = 0;
+                uint32_t                                       back_buffer_height                = 0;
+                uint32_t                                       back_buffer_width                 = 0;
+                bool                                           enable_auto_depth_stencil         = false;
+                uint32_t                                       flags                             = 0;
+                uint32_t                                       full_screen_presentation_interval = 0;
+                uint32_t                                       full_screen_refresh_rate_in_hz    = 0;
                 Interception::Hooks::D3D8::D3DMULTISAMPLE_TYPE multi_sample_type                 = Interception::Hooks::D3D8::D3DMULTISAMPLE_NONE;
                 Interception::Hooks::D3D8::D3DSWAPEFFECT       swap_effect                       = Interception::Hooks::D3D8::D3DSWAPEFFECT_DISCARD;
-                bool                windowed                          = false;
+                bool                                           windowed                          = false;
             };
 
             /* D3D8 interfaces. Interface::UNKNOWN means the interface has no entry in the method table. */
             template<typename T>
             struct InterfaceTraits
             {
-                static const bool       is_object       = false;
-                static const Interception::Hooks::D3D8::Interface  interface_value = Interception::Hooks::D3D8::Interface::UNKNOWN;
-                static const ObjectType object_type     = ObjectType::NONE;
+                static const bool                                 is_object       = false;
+                static const Interception::Hooks::D3D8::Interface interface_value = Interception::Hooks::D3D8::Interface::UNKNOWN;
+                static const ObjectType                           object_type     = ObjectType::NONE;
             };
 
             /* The pointed-to type of a pointer argument, without cv-qualifiers. */
@@ -77,8 +77,8 @@ namespace Interception
             template<typename T>
             struct StructTraits
             {
-                static const bool      is_captured     = false;
-                static const bool      is_input_output = false;
+                static const bool                                 is_captured     = false;
+                static const bool                                 is_input_output = false;
                 static const Interception::Hooks::D3D8::ValueKind kind            = Interception::Hooks::D3D8::ValueKind::PLAIN;
             };
 
@@ -92,9 +92,9 @@ namespace Interception
             #define D3D8_INTERFACE_TRAITS(type, interface_name, object_type_name) \
                 template<> struct InterfaceTraits<type> \
                 { \
-                    static const bool       is_object       = true; \
+                    static const bool                                  is_object       = true; \
                     static const Interception::Hooks::D3D8::Interface  interface_value = Interception::Hooks::D3D8::Interface::interface_name; \
-                    static const ObjectType object_type     = ObjectType::object_type_name; \
+                    static const ObjectType                            object_type     = ObjectType::object_type_name; \
                 };
 
             D3D8_INTERFACE_TRAITS(Interception::Hooks::D3D8::IDirect3D8,              IDIRECT3D8,              DIRECT3D8)

@@ -43,16 +43,17 @@ namespace Interception
                     /* Stub */ \
                 };
 
-            D3D7_QUERY_INTERFACE_POLICY(IDIRECT3D7,             IDirect3D7)
-            D3D7_QUERY_INTERFACE_POLICY(IDIRECT3DDEVICE7,       IDirect3DDevice7)
-            D3D7_QUERY_INTERFACE_POLICY(IDIRECT3DVERTEXBUFFER7, IDirect3DVertexBuffer7)
-            D3D7_QUERY_INTERFACE_POLICY(IDIRECTDRAW,            IDirectDraw)
-            D3D7_QUERY_INTERFACE_POLICY(IDIRECTDRAW7,           IDirectDraw7)
-            D3D7_QUERY_INTERFACE_POLICY(IDIRECTDRAWCLIPPER,     IDirectDrawClipper)
+            D3D7_QUERY_INTERFACE_POLICY(IDIRECT3D7,              IDirect3D7)
+            D3D7_QUERY_INTERFACE_POLICY(IDIRECT3DDEVICE7,        IDirect3DDevice7)
+            D3D7_QUERY_INTERFACE_POLICY(IDIRECT3DVERTEXBUFFER7,  IDirect3DVertexBuffer7)
+            D3D7_QUERY_INTERFACE_POLICY(IDIRECTDRAW,             IDirectDraw)
+            D3D7_QUERY_INTERFACE_POLICY(IDIRECTDRAW7,            IDirectDraw7)
+            D3D7_QUERY_INTERFACE_POLICY(IDIRECTDRAWCLIPPER,      IDirectDrawClipper)
             D3D7_QUERY_INTERFACE_POLICY(IDIRECTDRAWCOLORCONTROL, IDirectDrawColorControl)
             D3D7_QUERY_INTERFACE_POLICY(IDIRECTDRAWGAMMACONTROL, IDirectDrawGammaControl)
-            D3D7_QUERY_INTERFACE_POLICY(IDIRECTDRAWPALETTE,     IDirectDrawPalette)
-            D3D7_QUERY_INTERFACE_POLICY(IDIRECTDRAWSURFACE7,    IDirectDrawSurface7)
+            D3D7_QUERY_INTERFACE_POLICY(IDIRECTDRAWPALETTE,      IDirectDrawPalette)
+            D3D7_QUERY_INTERFACE_POLICY(IDIRECTDRAWSURFACE7,     IDirectDrawSurface7)
+
             #undef D3D7_QUERY_INTERFACE_POLICY
 
             /* The object that DirectDrawCreateEx makes is of the interface that was asked for. */

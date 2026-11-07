@@ -171,11 +171,10 @@ void Interception::Hooks::D3D8::HookPolicyHelper::on_box_locked(const void*     
     /* The last slice is not padded up to the slice pitch. */
     lock_record.data_ptr = static_cast<const uint8_t*>(in_locked_box_ptr->pBits);
     lock_record.flags    = in_flags;
-    lock_record.n_bytes  = (depth != 0) ? (depth - 1) * static_cast<uint32_t>(in_locked_box_ptr->SlicePitch) +
-                                          get_surface_region_n_bytes(in_description.Format,
-                                                                     width,
-                                                                     height,
-                                                                     static_cast<uint32_t>(in_locked_box_ptr->RowPitch) )
+    lock_record.n_bytes  = (depth != 0) ? (depth - 1) * static_cast<uint32_t>(in_locked_box_ptr->SlicePitch) + get_surface_region_n_bytes(in_description.Format,
+                                                                                                                                          width,
+                                                                                                                                          height,
+                                                                                                                                          static_cast<uint32_t>(in_locked_box_ptr->RowPitch) )
                                         : 0;
 
     Interception::Hooks::Common::LockTracker::get_ptr()->on_locked(in_object_ptr,

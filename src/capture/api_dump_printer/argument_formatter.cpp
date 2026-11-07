@@ -52,7 +52,7 @@ bool Capture::APIDumpPrinter::ArgumentFormatter::format_chunk(const Capture::API
     }
 
     chunk_ptr = Capture::APIDumpLoader::get_data_chunk_ptr(in_workload,
-                                                            in_argument.get_data_chunk_id() );
+                                                           in_argument.get_data_chunk_id() );
 
     if (chunk_ptr == nullptr)
     {
@@ -128,12 +128,12 @@ bool Capture::APIDumpPrinter::ArgumentFormatter::format_u32(const APIInterceptor
     return result;
 }
 
-bool Capture::APIDumpPrinter::ArgumentFormatter::format_u32_after_state(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                                        const uint32_t&                              in_n_argument,
-                                                                        const APIInterceptor::APIFunctionArgument&   in_argument,
+bool Capture::APIDumpPrinter::ArgumentFormatter::format_u32_after_state(const Capture::APIDumpLoader::DumpedAPICall&                in_call,
+                                                                        const uint32_t&                                             in_n_argument,
+                                                                        const APIInterceptor::APIFunctionArgument&                  in_argument,
                                                                         const std::function<std::string(const uint32_t& in_state,
                                                                                                         const uint32_t& in_value)>& in_format_func,
-                                                                        std::string*                                 out_text_ptr)
+                                                                        std::string*                                                out_text_ptr)
 {
     const bool result = (in_argument.type == APIInterceptor::ARGTYPE_U32 &&
                          in_n_argument    != 0);

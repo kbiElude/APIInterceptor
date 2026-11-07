@@ -280,11 +280,11 @@ void Capture::APIDumpPrinter::print_argument(FILE*                              
 }
 
 void Capture::APIDumpPrinter::print_call(FILE*                                        in_file_handle,
-                                          const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                          const Capture::APIDumpLoader::Workload&      in_workload,
-                                          uint32_t                                     in_n_hexdump_bytes,
-                                          std::set<APIInterceptor::DataChunkID>*       inout_referenced_chunk_set_ptr,
-                                          const IAPIDecoder*                           in_decoder_ptr)
+                                         const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                         const Capture::APIDumpLoader::Workload&      in_workload,
+                                         uint32_t                                     in_n_hexdump_bytes,
+                                         std::set<APIInterceptor::DataChunkID>*       inout_referenced_chunk_set_ptr,
+                                         const IAPIDecoder*                           in_decoder_ptr)
 {
     std::vector<APIInterceptor::DataChunkID> call_chunk_id_vec;
     const bool                               is_decoded_call = (in_decoder_ptr != nullptr);
@@ -454,8 +454,8 @@ void Capture::APIDumpPrinter::print_call(FILE*                                  
 }
 
 void Capture::APIDumpPrinter::print_hexdump(FILE*                       in_file_handle,
-                                             const std::vector<uint8_t>& in_chunk_u8_vec,
-                                             uint32_t                    in_n_bytes_max)
+                                            const std::vector<uint8_t>& in_chunk_u8_vec,
+                                            uint32_t                    in_n_bytes_max)
 {
     const uint32_t n_bytes_to_print = std::min<uint32_t>(in_n_bytes_max,
                                                          static_cast<uint32_t>(in_chunk_u8_vec.size() ));
@@ -509,8 +509,8 @@ void Capture::APIDumpPrinter::print_hexdump(FILE*                       in_file_
 }
 
 void Capture::APIDumpPrinter::print_ptr(FILE*       in_file_handle,
-                                         const char* in_type_prefix_ptr,
-                                         const void* in_ptr)
+                                        const char* in_type_prefix_ptr,
+                                        const void* in_ptr)
 {
     if (in_ptr == nullptr)
     {

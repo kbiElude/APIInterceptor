@@ -47,13 +47,13 @@ int Capture::APIDumpPrinter::compare_workloads(const Options& in_options)
 {
     constexpr size_t N_FUNCTIONS_LISTED = 40;
 
-    const uint32_t                                n_threads = (sizeof(void*) == sizeof(uint64_t) ) ? N_READER_THREADS_64_BIT
-                                                                                                   : N_READER_THREADS_32_BIT;
-    Capture::APIDumpLoader::WorkloadComparison    comparison;
-    std::string                                   error;
-    std::vector<APIInterceptor::APIFunction>      function_vec;
-    std::set<APIInterceptor::APIFunction>         function_set;
-    int                                           result    = EXIT_FAILURE;
+    Capture::APIDumpLoader::WorkloadComparison comparison;
+    std::string                                error;
+    std::vector<APIInterceptor::APIFunction>   function_vec;
+    std::set<APIInterceptor::APIFunction>      function_set;
+    const uint32_t                             n_threads = (sizeof(void*) == sizeof(uint64_t) ) ? N_READER_THREADS_64_BIT
+                                                                                                : N_READER_THREADS_32_BIT;
+    int                                        result    = EXIT_FAILURE;
 
     if (Capture::APIDumpLoader::WorkloadComparer::compare(in_options.workload_filename_ptr,
                                                           in_options.compare_filename_ptr,
