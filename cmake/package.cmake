@@ -2,14 +2,14 @@
 #
 #   cmake --install build_x64 --config Release --component Development --prefix <dir>
 #
-# and then, in the project, find_package(APIInterceptor) and link APIInterceptor::APIDumpLoader, ::D3D8Utils, ::InjectionLauncher (and
+# and then, in the project, find_package(APIInterceptor) and link APIInterceptor::APIDumpLoader, ::D3D7Utils, ::D3D8Utils, ::InjectionLauncher (and
 # what they need: ::Detours, ::Zstd). The package is a component of its own, so that the release which build.bat collects has none of it.
 # The interceptor itself (the hooks, which are compiled into the DLL that hooks) is for a project to build with this one as a subproject.
 if (NOT CMAKE_SOURCE_DIR STREQUAL APIInterceptor_SOURCE_DIR OR NOT APIINTERCEPTOR_BUILD_LIBS OR NOT APIINTERCEPTOR_BUILD_INTERCEPTOR)
     return()
 endif()
 
-install(TARGETS     APIDumpLoader D3D8Utils Detours InjectionLauncher Zstd
+install(TARGETS     APIDumpLoader D3D7Utils D3D8Utils Detours InjectionLauncher Zstd
         EXPORT      APIInterceptorTargets
         ARCHIVE     DESTINATION lib
         COMPONENT   Development

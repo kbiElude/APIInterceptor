@@ -61,7 +61,7 @@ build.bat --debug            :: Debug instead of Release</code></pre>
 <h2 id="package">Installed package</h2>
 <p>The static libraries can also be installed and found by <code>find_package(APIInterceptor)</code>:</p>
 <pre>cmake --install &lt;build dir&gt; --config Release --component Development --prefix &lt;prefix&gt;</pre>
-<p>The package exports <code>APIInterceptor::APIDumpLoader</code>, <code>APIInterceptor::D3D8Utils</code>, <code>APIInterceptor::InjectionLauncher</code> (and the Detours and Zstd libraries they use), with their headers. The hooks themselves (the <code>APIInterceptor</code> object library) are built through <code>add_subdirectory</code>, since a DLL that is injected has to contain them.</p>
+<p>The package exports <code>APIInterceptor::APIDumpLoader</code>, <code>APIInterceptor::D3D7Utils</code>, <code>APIInterceptor::D3D8Utils</code>, <code>APIInterceptor::InjectionLauncher</code> (and the Detours and Zstd libraries they use), with their headers. The hooks themselves (the <code>APIInterceptor</code> object library) are built through <code>add_subdirectory</code>, since a DLL that is injected has to contain them.</p>
 
 <h2 id="conventions">Code conventions</h2>
 <ul>
