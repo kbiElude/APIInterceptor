@@ -25,19 +25,6 @@ static constexpr DWORD DDSCL_NORMAL_FLAG           = 0x00000008;
 static constexpr DWORD DDSD_FLAGS_FOR_SIZED_SURFACE = Interception::Core::D3D7Utils::DDSD_CAPS | Interception::Core::D3D7Utils::DDSD_HEIGHT | Interception::Core::D3D7Utils::DDSD_WIDTH;
 static constexpr size_t IID_N_BYTES                = sizeof(GUID);
 
-template<typename ReturnType, typename... Arguments>
-ReturnType Replay::ReplayEngineDLL::D3D7CallExecutor::call_method(void*           in_object_ptr,
-                                                                  const uint32_t& in_vtable_index,
-                                                                  Arguments...    in_arguments)
-{
-    typedef ReturnType (__stdcall* MethodPtr)(void*, Arguments...);
-
-    void** const vtable_ptr = APIInterceptor::get_vtable_ptr(in_object_ptr);
-
-    return APIInterceptor::get_method_ptr<MethodPtr>(vtable_ptr, in_vtable_index)(in_object_ptr,
-                                                                                  in_arguments...);
-}
-
 Replay::ReplayEngineDLL::D3D7CallExecutor::D3D7CallExecutor(ObjectRemapper* in_remapper_ptr)
     :m_add_ref_function_set    (),
      m_back_buffer_ptr         (nullptr),
@@ -111,11 +98,6 @@ Replay::ReplayEngineDLL::D3D7CallExecutor::D3D7CallExecutor(ObjectRemapper* in_r
     m_handler_map[APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DVERTEXBUFFER7_UNLOCK]                = &D3D7CallExecutor::vertex_buffer_unlock;
 }
 
-Replay::ReplayEngineDLL::D3D7CallExecutor::~D3D7CallExecutor()
-{
-    reset();
-}
-
 bool Replay::ReplayEngineDLL::D3D7CallExecutor::add_attached_surface(std::string* out_error_ptr)
 {
     constexpr size_t ATTACHED_ARGUMENT = 1;
@@ -146,6 +128,11 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::add_attached_surface(std::string
 
 end:
     return result;
+}
+
+Replay::ReplayEngineDLL::D3D7CallExecutor::~D3D7CallExecutor()
+{
+    reset();
 }
 
 bool Replay::ReplayEngineDLL::D3D7CallExecutor::add_ref(std::string* out_error_ptr)
@@ -291,6 +278,19 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::blt_fast(std::string* out_error_
 
 end:
     return result;
+}
+
+template<typename ReturnType, typename... Arguments>
+ReturnType Replay::ReplayEngineDLL::D3D7CallExecutor::call_method(void*           in_object_ptr,
+                                                                  const uint32_t& in_vtable_index,
+                                                                  Arguments...    in_arguments)
+{
+    typedef ReturnType (__stdcall* MethodPtr)(void*, Arguments...);
+
+    void** const vtable_ptr = APIInterceptor::get_vtable_ptr(in_object_ptr);
+
+    return APIInterceptor::get_method_ptr<MethodPtr>(vtable_ptr, in_vtable_index)(in_object_ptr,
+                                                                                  in_arguments...);
 }
 
 bool Replay::ReplayEngineDLL::D3D7CallExecutor::clear(std::string* out_error_ptr)

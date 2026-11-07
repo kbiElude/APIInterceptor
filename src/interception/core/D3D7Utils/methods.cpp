@@ -148,11 +148,6 @@ const char* Interception::Core::D3D7Utils::get_interface_name_ptr(const Intercep
     return result_ptr;
 }
 
-const Interception::Hooks::D3D7::MethodInfo* Interception::Core::D3D7Utils::get_method_info_ptr(const APIInterceptor::APIFunction& in_function)
-{
-    return Table::get_method_info_ptr(in_function);
-}
-
 const Interception::Hooks::D3D7::MethodInfo* Interception::Core::D3D7Utils::get_method_info_array_ptr(uint32_t* out_n_methods_ptr)
 {
     /* Same order as the APIFUNCTION_D3D7_* enum: position = function - APIFUNCTION_D3D7_METHODS_FIRST. */
@@ -176,6 +171,11 @@ const Interception::Hooks::D3D7::MethodInfo* Interception::Core::D3D7Utils::get_
     *out_n_methods_ptr = static_cast<uint32_t>(sizeof(method_info_array) / sizeof(method_info_array[0]) );
 
     return method_info_array;
+}
+
+const Interception::Hooks::D3D7::MethodInfo* Interception::Core::D3D7Utils::get_method_info_ptr(const APIInterceptor::APIFunction& in_function)
+{
+    return Table::get_method_info_ptr(in_function);
 }
 
 uint32_t Interception::Core::D3D7Utils::get_n_methods(const Interception::Hooks::D3D7::Interface& in_interface)

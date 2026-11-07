@@ -13,6 +13,18 @@
 #include <sstream>
 #include <string.h>
 
+void Capture::APIDumpPrinter::D3D7Decoder::forget_released_objects(const Capture::APIDumpLoader::DumpedAPICall& in_call)
+{
+    const Interception::Hooks::D3D7::MethodInfo* method_info_ptr = Interception::Core::D3D7Utils::get_method_info_ptr(in_call.func);
+
+    if (method_info_ptr != nullptr &&
+        ::strcmp(method_info_ptr->method_name_ptr,
+                 "Release") == 0)
+    {
+        m_object_namer.forget_after_release(in_call);
+    }
+}
+
 std::string Capture::APIDumpPrinter::D3D7Decoder::format_color_value(const Interception::Hooks::D3D7::D3DCOLORVALUE& in_value)
 {
     std::ostringstream stream;
@@ -1296,18 +1308,6 @@ bool Capture::APIDumpPrinter::D3D7Decoder::print_returned_value(FILE*           
 
 end:
     return result;
-}
-
-void Capture::APIDumpPrinter::D3D7Decoder::forget_released_objects(const Capture::APIDumpLoader::DumpedAPICall& in_call)
-{
-    const Interception::Hooks::D3D7::MethodInfo* method_info_ptr = Interception::Core::D3D7Utils::get_method_info_ptr(in_call.func);
-
-    if (method_info_ptr != nullptr &&
-        ::strcmp(method_info_ptr->method_name_ptr,
-                 "Release") == 0)
-    {
-        m_object_namer.forget_after_release(in_call);
-    }
 }
 
 void Capture::APIDumpPrinter::D3D7Decoder::register_created_objects(const Capture::APIDumpLoader::DumpedAPICall& in_call,

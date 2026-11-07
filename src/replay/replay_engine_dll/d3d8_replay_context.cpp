@@ -226,24 +226,6 @@ void Replay::ReplayEngineDLL::D3D8ReplayContext::register_object(const uint64_t&
     }
 }
 
-void Replay::ReplayEngineDLL::D3D8ReplayContext::set_device_from_argument(const size_t& in_n_argument)
-{
-    uint64_t   live_value       = 0;
-    const auto out_argument_ptr = get_out_argument_ptr(in_n_argument);
-
-    if (out_argument_ptr != nullptr)
-    {
-        const bool is_live = get_remapper_ptr()->get(ObjectKind::D3D8_OBJECT,
-                                                     out_argument_ptr->get_ptr_as_u64(),
-                                                    &live_value);
-
-        if (is_live)
-        {
-            m_device_ptr = reinterpret_cast<void*>(live_value);
-        }
-    }
-}
-
 void Replay::ReplayEngineDLL::D3D8ReplayContext::release_all_objects()
 {
     constexpr size_t MAX_N_RELEASES_PER_OBJECT = 4096; /* sanity limit */
@@ -268,4 +250,22 @@ void Replay::ReplayEngineDLL::D3D8ReplayContext::release_all_objects()
     m_device_ptr = nullptr;
 
     m_live_objects.clear();
+}
+
+void Replay::ReplayEngineDLL::D3D8ReplayContext::set_device_from_argument(const size_t& in_n_argument)
+{
+    uint64_t   live_value       = 0;
+    const auto out_argument_ptr = get_out_argument_ptr(in_n_argument);
+
+    if (out_argument_ptr != nullptr)
+    {
+        const bool is_live = get_remapper_ptr()->get(ObjectKind::D3D8_OBJECT,
+                                                     out_argument_ptr->get_ptr_as_u64(),
+                                                    &live_value);
+
+        if (is_live)
+        {
+            m_device_ptr = reinterpret_cast<void*>(live_value);
+        }
+    }
 }

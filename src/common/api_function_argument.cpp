@@ -65,20 +65,6 @@ const double* APIInterceptor::APIFunctionArgument::get_fp64_ptr() const
     return reinterpret_cast<const double*>(get_ptr_internal() );
 }
 
-const char& APIInterceptor::APIFunctionArgument::get_i8() const
-{
-    assert(type == APIFunctionArgumentType::ARGTYPE_I8);
-
-    return value.value_i8;
-}
-
-const char* APIInterceptor::APIFunctionArgument::get_i8_ptr() const
-{
-    assert(type == APIFunctionArgumentType::ARGTYPE_I8_PTR);
-
-    return reinterpret_cast<const char*>(get_ptr_internal() );
-}
-
 const short& APIInterceptor::APIFunctionArgument::get_i16() const
 {
     assert(type == APIFunctionArgumentType::ARGTYPE_I16);
@@ -107,6 +93,7 @@ const int& APIInterceptor::APIFunctionArgument::get_i32_glenum() const
     return value.value_i32;
 
 }
+
 const int* APIInterceptor::APIFunctionArgument::get_i32_ptr() const
 {
     assert(type == APIFunctionArgumentType::ARGTYPE_I32_PTR);
@@ -119,6 +106,19 @@ const int64_t& APIInterceptor::APIFunctionArgument::get_i64() const
     assert(type == APIFunctionArgumentType::ARGTYPE_I64);
 
     return value.value_i64;
+}
+const char& APIInterceptor::APIFunctionArgument::get_i8() const
+{
+    assert(type == APIFunctionArgumentType::ARGTYPE_I8);
+
+    return value.value_i8;
+}
+
+const char* APIInterceptor::APIFunctionArgument::get_i8_ptr() const
+{
+    assert(type == APIFunctionArgumentType::ARGTYPE_I8_PTR);
+
+    return reinterpret_cast<const char*>(get_ptr_internal() );
 }
 
 uint32_t APIInterceptor::APIFunctionArgument::get_n_arg_value_bytes() const
@@ -172,62 +172,6 @@ uint32_t APIInterceptor::APIFunctionArgument::get_n_arg_value_bytes() const
     return result;
 }
 
-const unsigned char& APIInterceptor::APIFunctionArgument::get_u8() const
-{
-    assert(type == APIFunctionArgumentType::ARGTYPE_U8);
-
-    return value.value_u8;
-}
-
-const unsigned char* APIInterceptor::APIFunctionArgument::get_u8_ptr() const
-{
-    assert(type == APIFunctionArgumentType::ARGTYPE_U8_PTR);
-
-    return reinterpret_cast<const unsigned char*>(get_ptr_internal() );
-}
-
-const unsigned short& APIInterceptor::APIFunctionArgument::get_u16() const
-{
-    assert(type == APIFunctionArgumentType::ARGTYPE_U16);
-
-    return value.value_u16;
-}
-
-const unsigned short* APIInterceptor::APIFunctionArgument::get_u16_ptr() const
-{
-    assert(type == APIFunctionArgumentType::ARGTYPE_U16_PTR);
-
-    return reinterpret_cast<const unsigned short*>(get_ptr_internal() );
-}
-
-const unsigned int& APIInterceptor::APIFunctionArgument::get_u32() const
-{
-    assert(type == APIFunctionArgumentType::ARGTYPE_U32);
-
-    return value.value_u32;
-}
-
-const unsigned int& APIInterceptor::APIFunctionArgument::get_u32_glenum() const
-{
-    assert(type == APIFunctionArgumentType::ARGTYPE_U32_GLENUM);
-
-    return value.value_u32;
-}
-
-const unsigned int* APIInterceptor::APIFunctionArgument::get_u32_ptr() const
-{
-    assert(type == APIFunctionArgumentType::ARGTYPE_U32_PTR);
-
-    return reinterpret_cast<const unsigned int*>(get_ptr_internal() );
-}
-
-const uint64_t& APIInterceptor::APIFunctionArgument::get_u64() const
-{
-    assert(type == APIFunctionArgumentType::ARGTYPE_U64);
-
-    return value.value_u64;
-}
-
 const void* APIInterceptor::APIFunctionArgument::get_ptr() const
 {
     assert(type == APIFunctionArgumentType::ARGTYPE_VOID_PTR);
@@ -276,9 +220,60 @@ const void* APIInterceptor::APIFunctionArgument::get_ptr_internal() const
     #endif
 }
 
-void APIInterceptor::APIFunctionArgument::set_ptr_internal(const void* in_ptr)
+const unsigned short& APIInterceptor::APIFunctionArgument::get_u16() const
 {
-    value.value_ptr_as_u64 = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(in_ptr) );
+    assert(type == APIFunctionArgumentType::ARGTYPE_U16);
+
+    return value.value_u16;
+}
+
+const unsigned short* APIInterceptor::APIFunctionArgument::get_u16_ptr() const
+{
+    assert(type == APIFunctionArgumentType::ARGTYPE_U16_PTR);
+
+    return reinterpret_cast<const unsigned short*>(get_ptr_internal() );
+}
+
+const unsigned int& APIInterceptor::APIFunctionArgument::get_u32() const
+{
+    assert(type == APIFunctionArgumentType::ARGTYPE_U32);
+
+    return value.value_u32;
+}
+
+const unsigned int& APIInterceptor::APIFunctionArgument::get_u32_glenum() const
+{
+    assert(type == APIFunctionArgumentType::ARGTYPE_U32_GLENUM);
+
+    return value.value_u32;
+}
+
+const unsigned int* APIInterceptor::APIFunctionArgument::get_u32_ptr() const
+{
+    assert(type == APIFunctionArgumentType::ARGTYPE_U32_PTR);
+
+    return reinterpret_cast<const unsigned int*>(get_ptr_internal() );
+}
+
+const uint64_t& APIInterceptor::APIFunctionArgument::get_u64() const
+{
+    assert(type == APIFunctionArgumentType::ARGTYPE_U64);
+
+    return value.value_u64;
+}
+
+const unsigned char& APIInterceptor::APIFunctionArgument::get_u8() const
+{
+    assert(type == APIFunctionArgumentType::ARGTYPE_U8);
+
+    return value.value_u8;
+}
+
+const unsigned char* APIInterceptor::APIFunctionArgument::get_u8_ptr() const
+{
+    assert(type == APIFunctionArgumentType::ARGTYPE_U8_PTR);
+
+    return reinterpret_cast<const unsigned char*>(get_ptr_internal() );
 }
 
 void APIInterceptor::APIFunctionArgument::serialize_to_u8_vec(std::vector<uint8_t>* inout_u8_vec_ptr) const
@@ -300,4 +295,8 @@ void APIInterceptor::APIFunctionArgument::serialize_to_u8_vec(std::vector<uint8_
               &value,
                n_arg_value_bytes);
     }
+}
+void APIInterceptor::APIFunctionArgument::set_ptr_internal(const void* in_ptr)
+{
+    value.value_ptr_as_u64 = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(in_ptr) );
 }

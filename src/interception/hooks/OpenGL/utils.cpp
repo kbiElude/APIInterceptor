@@ -11,49 +11,6 @@
  * that are absent from glcorearb.h but valid as pixel transfer formats. */
 #include "gl/gl.h"
 
-bool Interception::Hooks::OpenGL::Utils::get_texture_binding_target_for_gl_enum(const GLenum&         in_target,
-                                                                                TextureBindingTarget* out_result_ptr)
-{
-    bool result = true;
-
-    switch (in_target)
-    {
-        case GL_TEXTURE_1D:         *out_result_ptr = TextureBindingTarget::TEXTURE_1D;         break;
-        case GL_TEXTURE_1D_ARRAY:   *out_result_ptr = TextureBindingTarget::TEXTURE_1D_ARRAY;   break;
-        case GL_TEXTURE_2D:         *out_result_ptr = TextureBindingTarget::TEXTURE_2D;         break;
-        case GL_TEXTURE_2D_ARRAY:   *out_result_ptr = TextureBindingTarget::TEXTURE_2D_ARRAY;   break;
-        case GL_TEXTURE_3D:         *out_result_ptr = TextureBindingTarget::TEXTURE_3D;         break;
-        case GL_TEXTURE_BUFFER:     *out_result_ptr = TextureBindingTarget::TEXTURE_BUFFER;     break;
-
-        case GL_TEXTURE_CUBE_MAP:
-        case GL_TEXTURE_CUBE_MAP_POSITIVE_X:
-        case GL_TEXTURE_CUBE_MAP_NEGATIVE_X:
-        case GL_TEXTURE_CUBE_MAP_POSITIVE_Y:
-        case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y:
-        case GL_TEXTURE_CUBE_MAP_POSITIVE_Z:
-        case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z:
-        {
-            *out_result_ptr = TextureBindingTarget::TEXTURE_CUBE_MAP;
-
-            break;
-        }
-
-        case GL_TEXTURE_RECTANGLE:
-        {
-            *out_result_ptr = TextureBindingTarget::TEXTURE_RECTANGLE;
-
-            break;
-        }
-
-        default:
-        {
-            AI_FAIL_UNSUPPORTED(in_target);
-        }
-    }
-
-    return result;
-}
-
 bool Interception::Hooks::OpenGL::Utils::get_buffer_binding_target_for_gl_enum(const GLenum&        in_target,
                                                                                BufferBindingTarget* out_result_ptr)
 {
@@ -83,37 +40,6 @@ bool Interception::Hooks::OpenGL::Utils::get_buffer_binding_target_for_gl_enum(c
     }
 
     return result;
-}
-
-bool Interception::Hooks::OpenGL::Utils::is_packed_pixel_type(const GLenum& in_type)
-{
-    switch (in_type)
-    {
-        case GL_UNSIGNED_BYTE_3_3_2:
-        case GL_UNSIGNED_BYTE_2_3_3_REV:
-        case GL_UNSIGNED_SHORT_5_6_5:
-        case GL_UNSIGNED_SHORT_5_6_5_REV:
-        case GL_UNSIGNED_SHORT_4_4_4_4:
-        case GL_UNSIGNED_SHORT_4_4_4_4_REV:
-        case GL_UNSIGNED_SHORT_5_5_5_1:
-        case GL_UNSIGNED_SHORT_1_5_5_5_REV:
-        case GL_UNSIGNED_INT_8_8_8_8:
-        case GL_UNSIGNED_INT_8_8_8_8_REV:
-        case GL_UNSIGNED_INT_10_10_10_2:
-        case GL_UNSIGNED_INT_2_10_10_10_REV:
-        case GL_UNSIGNED_INT_24_8:
-        case GL_UNSIGNED_INT_5_9_9_9_REV:
-        case GL_UNSIGNED_INT_10F_11F_11F_REV:
-        case GL_FLOAT_32_UNSIGNED_INT_24_8_REV:
-        {
-            return true;
-        }
-
-        default:
-        {
-            return false;
-        }
-    }
 }
 
 uint32_t Interception::Hooks::OpenGL::Utils::get_n_bytes_for_type(const GLenum& in_type)
@@ -211,4 +137,78 @@ uint32_t Interception::Hooks::OpenGL::Utils::get_n_texel_bytes(const GLenum& in_
     }
 
     return result;
+}
+
+bool Interception::Hooks::OpenGL::Utils::get_texture_binding_target_for_gl_enum(const GLenum&         in_target,
+                                                                                TextureBindingTarget* out_result_ptr)
+{
+    bool result = true;
+
+    switch (in_target)
+    {
+        case GL_TEXTURE_1D:         *out_result_ptr = TextureBindingTarget::TEXTURE_1D;         break;
+        case GL_TEXTURE_1D_ARRAY:   *out_result_ptr = TextureBindingTarget::TEXTURE_1D_ARRAY;   break;
+        case GL_TEXTURE_2D:         *out_result_ptr = TextureBindingTarget::TEXTURE_2D;         break;
+        case GL_TEXTURE_2D_ARRAY:   *out_result_ptr = TextureBindingTarget::TEXTURE_2D_ARRAY;   break;
+        case GL_TEXTURE_3D:         *out_result_ptr = TextureBindingTarget::TEXTURE_3D;         break;
+        case GL_TEXTURE_BUFFER:     *out_result_ptr = TextureBindingTarget::TEXTURE_BUFFER;     break;
+
+        case GL_TEXTURE_CUBE_MAP:
+        case GL_TEXTURE_CUBE_MAP_POSITIVE_X:
+        case GL_TEXTURE_CUBE_MAP_NEGATIVE_X:
+        case GL_TEXTURE_CUBE_MAP_POSITIVE_Y:
+        case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y:
+        case GL_TEXTURE_CUBE_MAP_POSITIVE_Z:
+        case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z:
+        {
+            *out_result_ptr = TextureBindingTarget::TEXTURE_CUBE_MAP;
+
+            break;
+        }
+
+        case GL_TEXTURE_RECTANGLE:
+        {
+            *out_result_ptr = TextureBindingTarget::TEXTURE_RECTANGLE;
+
+            break;
+        }
+
+        default:
+        {
+            AI_FAIL_UNSUPPORTED(in_target);
+        }
+    }
+
+    return result;
+}
+
+bool Interception::Hooks::OpenGL::Utils::is_packed_pixel_type(const GLenum& in_type)
+{
+    switch (in_type)
+    {
+        case GL_UNSIGNED_BYTE_3_3_2:
+        case GL_UNSIGNED_BYTE_2_3_3_REV:
+        case GL_UNSIGNED_SHORT_5_6_5:
+        case GL_UNSIGNED_SHORT_5_6_5_REV:
+        case GL_UNSIGNED_SHORT_4_4_4_4:
+        case GL_UNSIGNED_SHORT_4_4_4_4_REV:
+        case GL_UNSIGNED_SHORT_5_5_5_1:
+        case GL_UNSIGNED_SHORT_1_5_5_5_REV:
+        case GL_UNSIGNED_INT_8_8_8_8:
+        case GL_UNSIGNED_INT_8_8_8_8_REV:
+        case GL_UNSIGNED_INT_10_10_10_2:
+        case GL_UNSIGNED_INT_2_10_10_10_REV:
+        case GL_UNSIGNED_INT_24_8:
+        case GL_UNSIGNED_INT_5_9_9_9_REV:
+        case GL_UNSIGNED_INT_10F_11F_11F_REV:
+        case GL_FLOAT_32_UNSIGNED_INT_24_8_REV:
+        {
+            return true;
+        }
+
+        default:
+        {
+            return false;
+        }
+    }
 }

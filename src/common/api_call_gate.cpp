@@ -121,6 +121,20 @@ void APIInterceptor::ApiCallGate::resume()
     m_cv.notify_all();
 }
 
+void APIInterceptor::ApiCallGate::resume_nesting(const uint32_t& in_depth)
+{
+    m_n_api_calls_intercepted = in_depth;
+}
+
+uint32_t APIInterceptor::ApiCallGate::suspend_nesting()
+{
+    const uint32_t result = m_n_api_calls_intercepted;
+
+    m_n_api_calls_intercepted = 0;
+
+    return result;
+}
+
 bool APIInterceptor::ApiCallGate::try_quiesce(const uint32_t& in_timeout_ms)
 {
     bool       expected_is_closed = false;
@@ -150,19 +164,5 @@ bool APIInterceptor::ApiCallGate::try_quiesce(const uint32_t& in_timeout_ms)
     }
 
 end:
-    return result;
-}
-
-void APIInterceptor::ApiCallGate::resume_nesting(const uint32_t& in_depth)
-{
-    m_n_api_calls_intercepted = in_depth;
-}
-
-uint32_t APIInterceptor::ApiCallGate::suspend_nesting()
-{
-    const uint32_t result = m_n_api_calls_intercepted;
-
-    m_n_api_calls_intercepted = 0;
-
     return result;
 }

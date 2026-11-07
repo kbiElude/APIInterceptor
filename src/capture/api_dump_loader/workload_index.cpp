@@ -167,11 +167,6 @@ end:
     return result;
 }
 
-std::string Capture::APIDumpLoader::WorkloadIndex::get_default_filename(const std::string& in_workload_filename)
-{
-    return in_workload_filename + ".index";
-}
-
 bool Capture::APIDumpLoader::WorkloadIndex::find_segment_of_frame(const uint64_t& in_frame_index,
                                                                   size_t*         out_n_segment_ptr) const
 {
@@ -197,6 +192,11 @@ bool Capture::APIDumpLoader::WorkloadIndex::find_segment_of_frame(const uint64_t
     }
 
     return result;
+}
+
+std::string Capture::APIDumpLoader::WorkloadIndex::get_default_filename(const std::string& in_workload_filename)
+{
+    return in_workload_filename + ".index";
 }
 
 bool Capture::APIDumpLoader::WorkloadIndex::get_identity(const char* in_workload_filename_ptr,
