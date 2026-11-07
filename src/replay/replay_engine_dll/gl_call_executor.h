@@ -6,6 +6,7 @@
 #define REPLAYENGINEDLL_GL_CALL_EXECUTOR_H
 
 #include "gl_client_array_replayer.h"
+#include "gl_frame_reader.h"
 #include "gl_index_replayer.h"
 #include "gl_mapping_replayer.h"
 #include "gl_replay_context.h"
@@ -31,10 +32,12 @@ namespace Replay
 
             bool        execute           (const Capture::APIDumpLoader::DumpedAPICall& in_call,
                                            const IChunkSource&                          in_chunk_source,
-                                           std::string*                                 out_error_ptr)       override;
-            CallSupport get_call_support  (const APIInterceptor::APIFunction&           in_function)   const override;
-            void        on_frame_presented()                                                                 override;
-            void        reset             ()                                                                 override;
+                                           std::string*                                 out_error_ptr) override;
+            CallSupport get_call_support  (const APIInterceptor::APIFunction&           in_function) const override;
+            bool        read_back_buffer  (std::vector<uint8_t>*                        out_pixel_u8_vec_ptr,
+                                           FrameImage*                                  out_image_ptr) override;
+            void        on_frame_presented()                                                         override;
+            void        reset             ()                                                         override;
 
         private:
             typedef bool (*InvokeFuncPtr)(GlReplayContext* in_context_ptr,
@@ -69,6 +72,7 @@ namespace Replay
             GlReplayContext                                      m_context;
             GlIndexReplayer                                      m_index_replayer;
             std::map<APIInterceptor::APIFunction, FunctionEntry> m_entry_map;
+            GlFrameReader                                        m_frame_reader;
             GlMappingReplayer                                    m_mapping_replayer;
             HMODULE                                              m_opengl32_module;
             std::map<std::string, void*>                         m_proc_ptr_map;

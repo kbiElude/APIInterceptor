@@ -18,6 +18,10 @@ Replay::ReplayEngineDLL::GlCallExecutor::GlCallExecutor(ObjectRemapper* in_remap
                                  return get_proc_ptr(in_name_ptr);
                              }),
      m_context              (in_remapper_ptr),
+     m_frame_reader         ([this](const char* in_name_ptr)
+                             {
+                                 return get_proc_ptr(in_name_ptr);
+                             }),
      m_index_replayer       (&m_context,
                              [this](const char* in_name_ptr)
                              {
@@ -416,6 +420,13 @@ void Replay::ReplayEngineDLL::GlCallExecutor::register_returned_index(const Capt
                                      static_cast<uint32_t>(live_return) );
         }
     }
+}
+
+bool Replay::ReplayEngineDLL::GlCallExecutor::read_back_buffer(std::vector<uint8_t>* out_pixel_u8_vec_ptr,
+                                                               FrameImage*           out_image_ptr)
+{
+    return m_frame_reader.read(out_pixel_u8_vec_ptr,
+                               out_image_ptr);
 }
 
 void Replay::ReplayEngineDLL::GlCallExecutor::reset()
