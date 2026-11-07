@@ -7,11 +7,11 @@
 #include <string.h>
 
 bool Replay::ReplayEngineDLL::PixelConverter::convert_to_bgra8(const uint32_t&       in_format,
-                                                                 const uint32_t&       in_width,
-                                                                 const uint32_t&       in_height,
-                                                                 const uint32_t&       in_pitch,
-                                                                 const uint8_t*        in_pixel_ptr,
-                                                                 std::vector<uint8_t>* out_pixel_u8_vec_ptr)
+                                                               const uint32_t&       in_width,
+                                                               const uint32_t&       in_height,
+                                                               const uint32_t&       in_pitch,
+                                                               const uint8_t*        in_pixel_ptr,
+                                                               std::vector<uint8_t>* out_pixel_u8_vec_ptr)
 {
     constexpr uint32_t N_BYTES_PER_OUTPUT_PIXEL = sizeof(uint32_t);
     constexpr uint32_t OPAQUE_ALPHA_MASK        = 0xff000000;
@@ -31,8 +31,8 @@ bool Replay::ReplayEngineDLL::PixelConverter::convert_to_bgra8(const uint32_t&  
                   n_row < in_height;
                 ++n_row)
     {
-        const uint8_t*       in_row_ptr  = in_pixel_ptr + static_cast<size_t>(n_row) * in_pitch;
-        uint8_t*             out_row_ptr = out_pixel_u8_vec_ptr->data() + static_cast<size_t>(n_row) * in_width * N_BYTES_PER_OUTPUT_PIXEL;
+        const uint8_t* in_row_ptr  = in_pixel_ptr                 + static_cast<size_t>(n_row) * in_pitch;
+        uint8_t*       out_row_ptr = out_pixel_u8_vec_ptr->data() + static_cast<size_t>(n_row) * in_width * N_BYTES_PER_OUTPUT_PIXEL;
 
         if (layout_ptr->n_bytes == N_BYTES_PER_OUTPUT_PIXEL)
         {

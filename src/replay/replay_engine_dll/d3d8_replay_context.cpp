@@ -57,7 +57,7 @@ void* Replay::ReplayEngineDLL::D3D8ReplayContext::get_device_ptr() const
 }
 
 const uint8_t* Replay::ReplayEngineDLL::D3D8ReplayContext::get_extra_data_ptr(const size_t& in_n_argument,
-                                                                                size_t*       out_n_bytes_ptr) const
+                                                                              size_t*       out_n_bytes_ptr) const
 {
     /* The columns are the fields of ExtraBinding: the function, the number of its argument, and the number of the extra argument with its data. */
     static const ExtraBinding EXTRA_BINDING_ARRAY[] =
@@ -87,9 +87,11 @@ const uint8_t* Replay::ReplayEngineDLL::D3D8ReplayContext::get_extra_data_ptr(co
 
     *out_n_bytes_ptr = 0;
 
+    const APIInterceptor::APIFunction call_function = get_call().func;
+
     for (const auto& binding : EXTRA_BINDING_ARRAY)
     {
-        if (binding.function   == get_call().func &&
+        if (binding.function   == call_function &&
             binding.n_argument == in_n_argument)
         {
             const APIInterceptor::APIFunctionArgument* extra_argument_ptr = get_in_argument_ptr(get_n_head_arguments() + binding.n_extra_argument);
@@ -105,8 +107,8 @@ const uint8_t* Replay::ReplayEngineDLL::D3D8ReplayContext::get_extra_data_ptr(co
 }
 
 const Replay::ReplayEngineDLL::D3D8ReplayContext::HandleBinding* Replay::ReplayEngineDLL::D3D8ReplayContext::get_handle_binding_ptr(const APIInterceptor::APIFunction& in_function,
-                                                                                                                                        const size_t&                      in_n_argument,
-                                                                                                                                        const bool&                        in_is_output)
+                                                                                                                                    const size_t&                      in_n_argument,
+                                                                                                                                    const bool&                        in_is_output)
 {
     /* The columns are the fields of HandleBinding: the function, whether the argument is an output, the kind of the object, the number of the argument. */
     static const HandleBinding HANDLE_BINDING_ARRAY[] =
@@ -142,8 +144,8 @@ const Replay::ReplayEngineDLL::D3D8ReplayContext::HandleBinding* Replay::ReplayE
 }
 
 bool Replay::ReplayEngineDLL::D3D8ReplayContext::get_live_handle(const ObjectKind&                          in_kind,
-                                                                   const APIInterceptor::APIFunctionArgument& in_argument,
-                                                                   uint64_t*                                  out_live_value_ptr) const
+                                                                 const APIInterceptor::APIFunctionArgument& in_argument,
+                                                                 uint64_t*                                  out_live_value_ptr) const
 {
     return get_remapper_ptr()->get(in_kind,
                                    in_argument.get_ptr_as_u64(),
@@ -151,8 +153,8 @@ bool Replay::ReplayEngineDLL::D3D8ReplayContext::get_live_handle(const ObjectKin
 }
 
 bool Replay::ReplayEngineDLL::D3D8ReplayContext::get_live_object(const APIInterceptor::APIFunctionArgument& in_argument,
-                                                                   void**                                     out_live_object_ptr,
-                                                                   std::string*                               out_error_ptr) const
+                                                                 void**                                     out_live_object_ptr,
+                                                                 std::string*                               out_error_ptr) const
 {
     uint64_t live_value = 0;
     bool     result     = get_live_handle(ObjectKind::D3D8_OBJECT,
@@ -177,7 +179,7 @@ bool Replay::ReplayEngineDLL::D3D8ReplayContext::is_creation_expected() const
 }
 
 uint32_t Replay::ReplayEngineDLL::D3D8ReplayContext::map_handle_argument(const size_t&   in_n_argument,
-                                                                           const uint32_t& in_dumped_value) const
+                                                                         const uint32_t& in_dumped_value) const
 {
     const auto binding_ptr = get_handle_binding_ptr(get_call().func,
                                                     in_n_argument,
@@ -199,12 +201,12 @@ uint32_t Replay::ReplayEngineDLL::D3D8ReplayContext::map_handle_argument(const s
 }
 
 void Replay::ReplayEngineDLL::D3D8ReplayContext::register_handle(const size_t&   in_n_argument,
-                                                                   const uint32_t& in_live_value)
+                                                                 const uint32_t& in_live_value)
 {
     const auto binding_ptr = get_handle_binding_ptr(get_call().func,
                                                     in_n_argument,
                                                     true); /* in_is_output */
-    const auto out_ptr     = get_out_argument_ptr(in_n_argument);
+    const auto out_ptr     = get_out_argument_ptr  (in_n_argument);
 
     if (binding_ptr != nullptr &&
         out_ptr     != nullptr)
@@ -216,7 +218,7 @@ void Replay::ReplayEngineDLL::D3D8ReplayContext::register_handle(const size_t&  
 }
 
 void Replay::ReplayEngineDLL::D3D8ReplayContext::register_object(const uint64_t& in_dumped_value,
-                                                                   void*           in_live_object_ptr)
+                                                                 void*           in_live_object_ptr)
 {
     if (in_dumped_value != 0)
     {
@@ -237,12 +239,13 @@ void Replay::ReplayEngineDLL::D3D8ReplayContext::release_all_objects()
     /* The device is the first one to be created, so it is the last one to go. */
     for (void* const object_ptr : m_live_objects.get_newest_first_vec() )
     {
-        void** const   vtable_ptr       = APIInterceptor::get_vtable_ptr(object_ptr);
-        const auto     release_func_ptr = APIInterceptor::get_method_ptr<PFNRELEASEPROC>(vtable_ptr, Interception::Hooks::D3D8::VTABLE_INDEX_IDIRECT3DDEVICE8_RELEASE);
+        void** const   vtable_ptr       = APIInterceptor::get_vtable_ptr                (object_ptr);
+        const auto     release_func_ptr = APIInterceptor::get_method_ptr<PFNRELEASEPROC>(vtable_ptr,
+                                                                                         Interception::Hooks::D3D8::VTABLE_INDEX_IDIRECT3DDEVICE8_RELEASE);
 
         size_t n_release = 0;
 
-        while (n_release < MAX_N_RELEASES_PER_OBJECT &&
+        while (n_release                    < MAX_N_RELEASES_PER_OBJECT &&
                release_func_ptr(object_ptr) > 0)
         {
             ++n_release;

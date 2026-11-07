@@ -42,9 +42,9 @@ bool Replay::ReplayEngineDLL::GlIndexReplayer::is_index_function(const APIInterc
 }
 
 std::vector<uint32_t> Replay::ReplayEngineDLL::GlIndexReplayer::permute(const std::vector<uint32_t>& in_dumped_vec,
-                                                                          const ObjectKind&            in_kind,
-                                                                          const uint32_t&              in_scope,
-                                                                          const uint32_t&              in_empty_value) const
+                                                                        const ObjectKind&            in_kind,
+                                                                        const uint32_t&              in_scope,
+                                                                        const uint32_t&              in_empty_value) const
 {
     std::vector<bool> is_taken(in_dumped_vec.size(),
                                false);
@@ -104,7 +104,7 @@ std::vector<uint32_t> Replay::ReplayEngineDLL::GlIndexReplayer::permute(const st
 }
 
 bool Replay::ReplayEngineDLL::GlIndexReplayer::replay(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                        std::string*                                 out_error_ptr)
+                                                      std::string*                                 out_error_ptr)
 {
     bool result = false;
 
@@ -148,8 +148,8 @@ bool Replay::ReplayEngineDLL::GlIndexReplayer::replay(const Capture::APIDumpLoad
 }
 
 bool Replay::ReplayEngineDLL::GlIndexReplayer::replay_draw_buffers(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                                     const bool&                                  in_is_named,
-                                                                     std::string*                                 out_error_ptr)
+                                                                   const bool&                                  in_is_named,
+                                                                   std::string*                                 out_error_ptr)
 {
     typedef void (APIENTRY* PFNDRAWBUFFERSPROC)     (GLsizei, const GLenum*);
     typedef void (APIENTRY* PFNNAMEDDRAWBUFFERSPROC)(GLuint, GLsizei, const GLenum*);
@@ -170,11 +170,11 @@ bool Replay::ReplayEngineDLL::GlIndexReplayer::replay_draw_buffers(const Capture
     {
         /* Position n of the array is the n-th output of the fragment shader; the rest of the places hold nothing. */
         const std::vector<uint32_t> dumped_vec = get_numbers(*m_context_ptr,
-                                                             n_first_argument + 1);
-        const std::vector<uint32_t> live_vec   = permute(dumped_vec,
-                                                         ObjectKind::FRAG_DATA_LOCATION,
-                                                         0, /* in_scope */
-                                                         GL_NONE);
+                                                              n_first_argument + 1);
+        const std::vector<uint32_t> live_vec   = permute    ( dumped_vec,
+                                                              ObjectKind::FRAG_DATA_LOCATION,
+                                                              0, /* in_scope */
+                                                              GL_NONE);
 
         if (in_is_named)
         {

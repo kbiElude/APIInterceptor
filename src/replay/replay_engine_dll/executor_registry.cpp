@@ -13,7 +13,7 @@ Replay::ReplayEngineDLL::ExecutorRegistry::ExecutorRegistry()
 }
 
 void Replay::ReplayEngineDLL::ExecutorRegistry::add(const Capture::APIDumpLoader::APIGroup& in_group,
-                                                      const std::shared_ptr<ICallExecutor>&   in_executor_ptr)
+                                                    const std::shared_ptr<ICallExecutor>&   in_executor_ptr)
 {
     m_executor_ptr_array.at(static_cast<size_t>(in_group) ) = in_executor_ptr;
 

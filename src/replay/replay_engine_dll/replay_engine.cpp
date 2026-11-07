@@ -111,9 +111,9 @@ void Replay::ReplayEngineDLL::ReplayEngine::complete_frame(bool* out_is_done_ptr
         is_interrupted = (m_control.is_reset_requested || m_control.is_stop_requested);
 
         /* A frame which is the one asked for ends the playing, unless a reset is on its way: it is the frame to start over for that. */
-        if (is_interrupted == false         &&
-            m_control.has_stop_frame        &&
-            n_frame >= m_control.stop_frame)
+        if (is_interrupted           == false                &&
+            m_control.has_stop_frame                         &&
+            n_frame                  >= m_control.stop_frame)
         {
             m_control.has_stop_frame = false;
             m_control.should_play    = false;
@@ -259,12 +259,13 @@ Replay::ReplayEngineDLL::PlaybackStatus Replay::ReplayEngineDLL::ReplayEngine::g
     {
         std::lock_guard<std::mutex> lock(m_control.mutex);
 
-        result.error_message      = m_control.error_message;
+        result.error_message = m_control.error_message;
+
         /* Past the end there is nothing to go on to; a stop frame that is the next one is a step. */
-        const bool is_before_stop_frame = (m_control.is_reset_requested ||
-                                           m_control.stop_frame > m_control.n_frames_presented);
-        const bool is_going_on          = (m_control.state != PlaybackState::FAILED   &&
-                                           m_control.state != PlaybackState::FINISHED);
+        const bool is_before_stop_frame = (m_control.is_reset_requested                                  ||
+                                           m_control.stop_frame         >  m_control.n_frames_presented);
+        const bool is_going_on          = (m_control.state              != PlaybackState::FAILED         &&
+                                           m_control.state              != PlaybackState::FINISHED);
 
         result.is_seeking         = (m_control.has_stop_frame &&
                                      m_control.should_play    &&

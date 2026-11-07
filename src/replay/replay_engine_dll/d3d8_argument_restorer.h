@@ -67,13 +67,13 @@ namespace Replay
                         if (call.func == APIInterceptor::APIFUNCTION_D3D8_IDIRECT3D8_CREATEDEVICE)
                         {
                             hresult = APIInterceptor::get_method_ptr<PFNGETADAPTERDISPLAYMODEPROC>(vtable_ptr, Interception::Hooks::D3D8::VTABLE_INDEX_IDIRECT3D8_GETADAPTERDISPLAYMODE)(object,
-                                                                                                                                                                            call.arg_in_vec.at(1).get_u32(),
-                                                                                                                                                                           &mode);
+                                                                                                                                                                                         call.arg_in_vec.at(1).get_u32(),
+                                                                                                                                                                                        &mode);
                         }
                         else
                         {
                             hresult = APIInterceptor::get_method_ptr<PFNGETDISPLAYMODEPROC>(vtable_ptr, Interception::Hooks::D3D8::VTABLE_INDEX_IDIRECT3DDEVICE8_GETDISPLAYMODE)(object,
-                                                                                                                                                                  &mode);
+                                                                                                                                                                                &mode);
                         }
 
                         if (hresult >= 0)
@@ -86,7 +86,7 @@ namespace Replay
                 }
 
                 static void apply(Interception::Hooks::D3D8::D3DPRESENT_PARAMETERS* inout_value_ptr,
-                                  D3D8ReplayContext*           in_context_ptr)
+                                  D3D8ReplayContext*                                in_context_ptr)
                 {
                     uint64_t live_window = 0;
 
@@ -182,7 +182,7 @@ namespace Replay
                     const APIInterceptor::APIFunctionArgument* argument_ptr = in_context_ptr->get_in_argument_ptr(in_n_argument);
                     size_t                                     n_bytes      = 0;
                     const uint8_t*                             data_ptr     = in_context_ptr->get_chunk_data_ptr(argument_ptr,
-                                                                                                                 &n_bytes);
+                                                                                                                &n_bytes);
 
                     (void) out_error_ptr;
 

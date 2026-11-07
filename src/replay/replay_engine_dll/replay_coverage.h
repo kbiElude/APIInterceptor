@@ -41,16 +41,16 @@ namespace Replay
 
             struct Report
             {
-                uint64_t                   first_missing_chunk_call_index  = 0; /* of the first call that refers to a chunk which is not there */
-                uint64_t                   first_missing_chunk_frame_index = 0;
+                uint64_t                    first_missing_chunk_call_index  = 0; /* of the first call that refers to a chunk which is not there */
+                uint64_t                    first_missing_chunk_frame_index = 0;
                 APIInterceptor::APIFunction first_missing_chunk_function    = APIInterceptor::APIFUNCTION_UNKNOWN;
-                std::vector<FunctionEntry> function_entry_vec;                  /* the functions with support other than REPLAYED, in the order of the enum */
-                uint64_t                   n_calls                         = 0;
-                uint64_t                   n_frames                        = 0; /* those that ended                                              */
-                uint64_t                   n_missing_chunk_references      = 0;
-                uint64_t                   n_skipped_calls                 = 0;
-                uint64_t                   n_unsupported_calls             = 0;
-                uint32_t                   pointer_n_bytes                 = 0; /* of the process that was dumped                                */
+                std::vector<FunctionEntry>  function_entry_vec;                  /* the functions with support other than REPLAYED, in the order of the enum */
+                uint64_t                    n_calls                         = 0;
+                uint64_t                    n_frames                        = 0; /* those that ended                                              */
+                uint64_t                    n_missing_chunk_references      = 0;
+                uint64_t                    n_skipped_calls                 = 0;
+                uint64_t                    n_unsupported_calls             = 0;
+                uint32_t                    pointer_n_bytes                 = 0; /* of the process that was dumped                                */
             };
 
             explicit ReplayCoverage(const SupportFunc& in_support_func);

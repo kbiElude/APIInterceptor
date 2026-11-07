@@ -16,8 +16,8 @@ typedef HGLRC (WINAPI* PFNWGLCREATECONTEXTATTRIBSARBPROC)(HDC, HGLRC, const int*
 typedef BOOL  (WINAPI* PFNWGLSWAPINTERVALEXTPROC)        (int);
 
 Replay::ReplayEngineDLL::Win32CallExecutor::Win32CallExecutor(ObjectRemapper*         in_remapper_ptr,
-                                                                const WindowClosedFunc& in_window_closed_func,
-                                                                const WindowPlacedFunc& in_window_placed_func)
+                                                              const WindowClosedFunc& in_window_closed_func,
+                                                              const WindowPlacedFunc& in_window_placed_func)
     :m_are_windows_visible(true),
      m_has_last_placement(false),
      m_remapper_ptr      (in_remapper_ptr),
@@ -69,9 +69,9 @@ Replay::ReplayEngineDLL::Win32CallExecutor::~Win32CallExecutor()
 }
 
 bool Replay::ReplayEngineDLL::Win32CallExecutor::create_window_ex(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                                    const IChunkSource&                          in_chunk_source,
-                                                                    const bool&                                  in_is_wide,
-                                                                    std::string*                                 out_error_ptr)
+                                                                  const IChunkSource&                          in_chunk_source,
+                                                                  const bool&                                  in_is_wide,
+                                                                  std::string*                                 out_error_ptr)
 {
     constexpr size_t N_ARGUMENTS              = 12;
     constexpr size_t N_ARGUMENT_CLASS_NAME    = 1;
@@ -130,7 +130,7 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::create_window_ex(const Capture:
     if (get_live_handle(ObjectKind::HWND,
                         in_call.arg_in_vec.at   (N_ARGUMENT_PARENT),
                         reinterpret_cast<void**>(&live_parent),
-                        out_error_ptr) == false)
+                        out_error_ptr)                               == false)
     {
         out_error_ptr->clear();
 
@@ -151,7 +151,7 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::create_window_ex(const Capture:
     signature.height     = static_cast<int>     (in_call.arg_in_vec.at(N_ARGUMENT_HEIGHT).get_u32() );
     signature.style      = in_call.arg_in_vec.at(N_ARGUMENT_STYLE).get_u32();
     signature.title      = window_name;
-    signature.width      = static_cast<int>(in_call.arg_in_vec.at(N_ARGUMENT_WIDTH).get_u32() );
+    signature.width      = static_cast<int>     (in_call.arg_in_vec.at(N_ARGUMENT_WIDTH).get_u32() );
 
     /* After a reset, the window which the replay already has is used again, so that it stays on the screen. */
     is_reused = take_parked_window(signature,
@@ -235,8 +235,8 @@ void Replay::ReplayEngineDLL::Win32CallExecutor::destroy_parked_windows()
 }
 
 bool Replay::ReplayEngineDLL::Win32CallExecutor::execute(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                           const IChunkSource&                          in_chunk_source,
-                                                           std::string*                                 out_error_ptr)
+                                                         const IChunkSource&                          in_chunk_source,
+                                                         std::string*                                 out_error_ptr)
 {
     const auto handler_iterator = m_handler_func_ptr_map.find(in_call.func);
     bool       result           = false;
@@ -259,13 +259,13 @@ end:
 Replay::ReplayEngineDLL::CallSupport Replay::ReplayEngineDLL::Win32CallExecutor::get_call_support(const APIInterceptor::APIFunction& in_function) const
 {
     return (m_handler_func_ptr_map.find(in_function) != m_handler_func_ptr_map.end() ) ? CallSupport::REPLAYED
-                                                                                      : CallSupport::UNSUPPORTED;
+                                                                                       : CallSupport::UNSUPPORTED;
 }
 
 bool Replay::ReplayEngineDLL::Win32CallExecutor::get_live_handle(const ObjectKind&                          in_kind,
-                                                                   const APIInterceptor::APIFunctionArgument& in_argument,
-                                                                   void**                                     out_live_handle_ptr,
-                                                                   std::string*                               out_error_ptr) const
+                                                                 const APIInterceptor::APIFunctionArgument& in_argument,
+                                                                 void**                                     out_live_handle_ptr,
+                                                                 std::string*                               out_error_ptr) const
 {
     uint64_t live_value = 0;
     bool     result     = m_remapper_ptr->get(in_kind,
@@ -285,7 +285,7 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::get_live_handle(const ObjectKin
 }
 
 void* Replay::ReplayEngineDLL::Win32CallExecutor::get_wgl_function_ptr(const HDC&  in_hdc,
-                                                                         const char* in_name_ptr) const
+                                                                       const char* in_name_ptr) const
 {
     void* result_ptr = reinterpret_cast<void*>(::wglGetProcAddress(in_name_ptr) );
 
@@ -316,7 +316,7 @@ void* Replay::ReplayEngineDLL::Win32CallExecutor::get_wgl_function_ptr(const HDC
 }
 
 std::wstring Replay::ReplayEngineDLL::Win32CallExecutor::get_wide_string(const Capture::APIDumpLoader::DataChunk& in_chunk,
-                                                                           const bool&                              in_is_wide)
+                                                                         const bool&                              in_is_wide)
 {
     std::wstring result;
 
@@ -332,7 +332,7 @@ std::wstring Replay::ReplayEngineDLL::Win32CallExecutor::get_wide_string(const C
         const int n_characters = ::MultiByteToWideChar(CP_ACP,
                                                        0, /* dwFlags */
                                                        reinterpret_cast<const char*>(in_chunk.data() ),
-                                                       static_cast<int>(in_chunk.size() ),
+                                                       static_cast<int>             (in_chunk.size() ),
                                                        nullptr,
                                                        0);
 
@@ -341,7 +341,7 @@ std::wstring Replay::ReplayEngineDLL::Win32CallExecutor::get_wide_string(const C
         ::MultiByteToWideChar(CP_ACP,
                               0, /* dwFlags */
                               reinterpret_cast<const char*>(in_chunk.data() ),
-                              static_cast<int>(in_chunk.size() ),
+                              static_cast<int>             (in_chunk.size() ),
                               &result[0],
                               n_characters);
     }
@@ -357,9 +357,9 @@ std::wstring Replay::ReplayEngineDLL::Win32CallExecutor::get_wide_string(const C
 }
 
 void Replay::ReplayEngineDLL::Win32CallExecutor::make_non_scalable(const DWORD& in_ex_style,
-                                                                     DWORD*       inout_style_ptr,
-                                                                     int*         inout_width_ptr,
-                                                                     int*         inout_height_ptr)
+                                                                   DWORD*       inout_style_ptr,
+                                                                   int*         inout_width_ptr,
+                                                                   int*         inout_height_ptr)
 {
     RECT        new_frame = {};
     const DWORD new_style = *inout_style_ptr & ~(WS_MAXIMIZEBOX | WS_THICKFRAME);
@@ -388,8 +388,8 @@ void Replay::ReplayEngineDLL::Win32CallExecutor::make_non_scalable(const DWORD& 
 }
 
 bool Replay::ReplayEngineDLL::Win32CallExecutor::on_copy_context(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                                   const IChunkSource&                          in_chunk_source,
-                                                                   std::string*                                 out_error_ptr)
+                                                                 const IChunkSource&                          in_chunk_source,
+                                                                 std::string*                                 out_error_ptr)
 {
     constexpr size_t N_ARGUMENT_DESTINATION = 1;
     constexpr size_t N_ARGUMENT_MASK        = 2;
@@ -402,17 +402,17 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::on_copy_context(const Capture::
     (void) in_chunk_source;
 
     if (get_live_handle(ObjectKind::HGLRC,
-                        in_call.arg_in_vec.at(N_ARGUMENT_SOURCE),
+                        in_call.arg_in_vec.at   (N_ARGUMENT_SOURCE),
                         reinterpret_cast<void**>(&source),
-                        out_error_ptr) == false)
+                        out_error_ptr)                              == false)
     {
         goto end;
     }
 
     if (get_live_handle(ObjectKind::HGLRC,
-                        in_call.arg_in_vec.at(N_ARGUMENT_DESTINATION),
+                        in_call.arg_in_vec.at   (N_ARGUMENT_DESTINATION),
                         reinterpret_cast<void**>(&destination),
-                        out_error_ptr) == false)
+                        out_error_ptr)                                      == false)
     {
         goto end;
     }
@@ -428,8 +428,8 @@ end:
 }
 
 bool Replay::ReplayEngineDLL::Win32CallExecutor::on_create_context(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                                     const IChunkSource&                          in_chunk_source,
-                                                                     std::string*                                 out_error_ptr)
+                                                                   const IChunkSource&                          in_chunk_source,
+                                                                   std::string*                                 out_error_ptr)
 {
     HDC   live_hdc = nullptr;
     HGLRC live_rc  = nullptr;
@@ -460,7 +460,7 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::on_create_context(const Capture
     {
         m_remapper_ptr->add(ObjectKind::HGLRC,
                             in_call.returned_value_ptr->get_ptr_as_u64(),
-                            reinterpret_cast<uint64_t>(live_rc) );
+                            reinterpret_cast<uint64_t>                (live_rc) );
     }
 
     result = true;
@@ -470,8 +470,8 @@ end:
 }
 
 bool Replay::ReplayEngineDLL::Win32CallExecutor::on_create_context_attribs_arb(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                                                 const IChunkSource&                          in_chunk_source,
-                                                                                 std::string*                                 out_error_ptr)
+                                                                               const IChunkSource&                          in_chunk_source,
+                                                                               std::string*                                 out_error_ptr)
 {
     constexpr size_t N_ARGUMENT_ATTRIB_LIST = 2;
     constexpr size_t N_ARGUMENT_HDC         = 0;
@@ -485,7 +485,7 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::on_create_context_attribs_arb(c
     bool                              result          = false;
 
     if (get_live_handle(ObjectKind::HDC,
-                        in_call.arg_in_vec.at(N_ARGUMENT_HDC),
+                        in_call.arg_in_vec.at   (N_ARGUMENT_HDC),
                         reinterpret_cast<void**>(&live_hdc),
                         out_error_ptr) == false)
     {
@@ -493,7 +493,7 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::on_create_context_attribs_arb(c
     }
 
     if (get_live_handle(ObjectKind::HGLRC,
-                        in_call.arg_in_vec.at(N_ARGUMENT_SHARE),
+                        in_call.arg_in_vec.at   (N_ARGUMENT_SHARE),
                         reinterpret_cast<void**>(&live_share),
                         out_error_ptr) == false)
     {
@@ -547,8 +547,8 @@ end:
 }
 
 bool Replay::ReplayEngineDLL::Win32CallExecutor::on_create_layer_context(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                                           const IChunkSource&                          in_chunk_source,
-                                                                           std::string*                                 out_error_ptr)
+                                                                         const IChunkSource&                          in_chunk_source,
+                                                                         std::string*                                 out_error_ptr)
 {
     HDC   live_hdc = nullptr;
     HGLRC live_rc  = nullptr;
@@ -557,7 +557,7 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::on_create_layer_context(const C
     (void) in_chunk_source;
 
     if (get_live_handle(ObjectKind::HDC,
-                        in_call.arg_in_vec.at(0),
+                        in_call.arg_in_vec.at   (0),
                         reinterpret_cast<void**>(&live_hdc),
                         out_error_ptr) == false)
     {
@@ -580,7 +580,7 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::on_create_layer_context(const C
     {
         m_remapper_ptr->add(ObjectKind::HGLRC,
                             in_call.returned_value_ptr->get_ptr_as_u64(),
-                            reinterpret_cast<uint64_t>(live_rc) );
+                            reinterpret_cast<uint64_t>                (live_rc) );
     }
 
     result = true;
@@ -590,8 +590,8 @@ end:
 }
 
 bool Replay::ReplayEngineDLL::Win32CallExecutor::on_create_window_ex_a(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                                         const IChunkSource&                          in_chunk_source,
-                                                                         std::string*                                 out_error_ptr)
+                                                                       const IChunkSource&                          in_chunk_source,
+                                                                       std::string*                                 out_error_ptr)
 {
     return create_window_ex(in_call,
                             in_chunk_source,
@@ -600,8 +600,8 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::on_create_window_ex_a(const Cap
 }
 
 bool Replay::ReplayEngineDLL::Win32CallExecutor::on_create_window_ex_w(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                                         const IChunkSource&                          in_chunk_source,
-                                                                         std::string*                                 out_error_ptr)
+                                                                       const IChunkSource&                          in_chunk_source,
+                                                                       std::string*                                 out_error_ptr)
 {
     return create_window_ex(in_call,
                             in_chunk_source,
@@ -610,8 +610,8 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::on_create_window_ex_w(const Cap
 }
 
 bool Replay::ReplayEngineDLL::Win32CallExecutor::on_delete_context(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                                     const IChunkSource&                          in_chunk_source,
-                                                                     std::string*                                 out_error_ptr)
+                                                                   const IChunkSource&                          in_chunk_source,
+                                                                   std::string*                                 out_error_ptr)
 {
     HGLRC live_rc = nullptr;
     bool  result  = false;
@@ -619,7 +619,7 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::on_delete_context(const Capture
     (void) in_chunk_source;
 
     if (get_live_handle(ObjectKind::HGLRC,
-                        in_call.arg_in_vec.at(0),
+                        in_call.arg_in_vec.at   (0),
                         reinterpret_cast<void**>(&live_rc),
                         out_error_ptr)                     == false)
     {
@@ -651,8 +651,8 @@ void Replay::ReplayEngineDLL::Win32CallExecutor::on_frame_presented()
 }
 
 bool Replay::ReplayEngineDLL::Win32CallExecutor::on_get_dc(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                             const IChunkSource&                          in_chunk_source,
-                                                             std::string*                                 out_error_ptr)
+                                                           const IChunkSource&                          in_chunk_source,
+                                                           std::string*                                 out_error_ptr)
 {
     HDC  live_hdc  = nullptr;
     HWND live_hwnd = nullptr;
@@ -683,7 +683,7 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::on_get_dc(const Capture::APIDum
     {
         m_remapper_ptr->add(ObjectKind::HDC,
                             in_call.returned_value_ptr->get_ptr_as_u64(),
-                            reinterpret_cast<uint64_t>(live_hdc) );
+                            reinterpret_cast<uint64_t>                (live_hdc) );
     }
 
     result = true;
@@ -698,8 +698,8 @@ void Replay::ReplayEngineDLL::Win32CallExecutor::on_idle()
 }
 
 bool Replay::ReplayEngineDLL::Win32CallExecutor::on_ignored_call(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                                   const IChunkSource&                          in_chunk_source,
-                                                                   std::string*                                 out_error_ptr)
+                                                                 const IChunkSource&                          in_chunk_source,
+                                                                 std::string*                                 out_error_ptr)
 {
     (void) in_call;
     (void) in_chunk_source;
@@ -709,8 +709,8 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::on_ignored_call(const Capture::
 }
 
 bool Replay::ReplayEngineDLL::Win32CallExecutor::on_make_current(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                                   const IChunkSource&                          in_chunk_source,
-                                                                   std::string*                                 out_error_ptr)
+                                                                 const IChunkSource&                          in_chunk_source,
+                                                                 std::string*                                 out_error_ptr)
 {
     HDC   live_hdc = nullptr;
     HGLRC live_rc  = nullptr;
@@ -749,8 +749,8 @@ end:
 }
 
 bool Replay::ReplayEngineDLL::Win32CallExecutor::on_release_dc(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                                 const IChunkSource&                          in_chunk_source,
-                                                                 std::string*                                 out_error_ptr)
+                                                               const IChunkSource&                          in_chunk_source,
+                                                               std::string*                                 out_error_ptr)
 {
     uint64_t live_hdc  = 0;
     uint64_t live_hwnd = 0;
@@ -790,8 +790,8 @@ end:
 }
 
 bool Replay::ReplayEngineDLL::Win32CallExecutor::on_set_pixel_format(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                                       const IChunkSource&                          in_chunk_source,
-                                                                       std::string*                                 out_error_ptr)
+                                                                     const IChunkSource&                          in_chunk_source,
+                                                                     std::string*                                 out_error_ptr)
 {
     constexpr size_t N_ARGUMENT_DESCRIPTOR = 2;
     constexpr size_t N_ARGUMENT_HDC        = 0;
@@ -847,8 +847,8 @@ end:
 }
 
 bool Replay::ReplayEngineDLL::Win32CallExecutor::on_share_lists(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                                  const IChunkSource&                          in_chunk_source,
-                                                                  std::string*                                 out_error_ptr)
+                                                                const IChunkSource&                          in_chunk_source,
+                                                                std::string*                                 out_error_ptr)
 {
     HGLRC first  = nullptr;
     bool  result = false;
@@ -882,8 +882,8 @@ end:
 }
 
 bool Replay::ReplayEngineDLL::Win32CallExecutor::on_swap_buffers(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                                   const IChunkSource&                          in_chunk_source,
-                                                                   std::string*                                 out_error_ptr)
+                                                                 const IChunkSource&                          in_chunk_source,
+                                                                 std::string*                                 out_error_ptr)
 {
     HDC  live_hdc = nullptr;
     bool result   = false;
@@ -907,8 +907,8 @@ end:
 }
 
 bool Replay::ReplayEngineDLL::Win32CallExecutor::on_swap_interval_ext(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                                        const IChunkSource&                          in_chunk_source,
-                                                                        std::string*                                 out_error_ptr)
+                                                                      const IChunkSource&                          in_chunk_source,
+                                                                      std::string*                                 out_error_ptr)
 {
     const HDC                 live_hdc      = ::wglGetCurrentDC();
     bool                      result        = true;
@@ -933,8 +933,8 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::on_swap_interval_ext(const Capt
 }
 
 bool Replay::ReplayEngineDLL::Win32CallExecutor::on_swap_layer_buffers(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                                         const IChunkSource&                          in_chunk_source,
-                                                                         std::string*                                 out_error_ptr)
+                                                                       const IChunkSource&                          in_chunk_source,
+                                                                       std::string*                                 out_error_ptr)
 {
     HDC  live_hdc = nullptr;
     bool result   = false;
@@ -1060,8 +1060,16 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::register_window_class(const std
         /* An OpenGL window must keep its DC, so that the pixel format sticks. The replay ignores WM_CLOSE: no button. */
         window_class.style         = CS_HREDRAW | CS_NOCLOSE | CS_OWNDC | CS_VREDRAW;
 
-        result = (::RegisterClassExW(&window_class) != 0                           ||
-                  ::GetLastError    ()              == ERROR_CLASS_ALREADY_EXISTS);
+        const ATOM class_atom = ::RegisterClassExW(&window_class);
+
+        result = (class_atom != 0);
+
+        if (result == false)
+        {
+            const DWORD last_error = ::GetLastError();
+
+            result = (last_error == ERROR_CLASS_ALREADY_EXISTS);
+        }
 
         if (result)
         {
@@ -1138,7 +1146,7 @@ void Replay::ReplayEngineDLL::Win32CallExecutor::shutdown()
 }
 
 bool Replay::ReplayEngineDLL::Win32CallExecutor::take_parked_window(const WindowSignature& in_signature,
-                                                                      HWND*                  out_window_ptr)
+                                                                    HWND*                  out_window_ptr)
 {
     bool result = false;
 
@@ -1171,9 +1179,9 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::take_parked_window(const Window
 }
 
 LRESULT CALLBACK Replay::ReplayEngineDLL::Win32CallExecutor::window_proc(HWND   in_hwnd,
-                                                                           UINT   in_message,
-                                                                           WPARAM in_wparam,
-                                                                           LPARAM in_lparam)
+                                                                         UINT   in_message,
+                                                                         WPARAM in_wparam,
+                                                                         LPARAM in_lparam)
 {
     LRESULT result = 0;
 

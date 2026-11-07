@@ -39,16 +39,16 @@ namespace Replay
 
             bool           execute            (const Capture::APIDumpLoader::DumpedAPICall& in_call,
                                                const IChunkSource&                          in_chunk_source,
-                                               std::string*                                 out_error_ptr) override;
+                                               std::string*                                 out_error_ptr)         override;
             CallSupport    get_call_support   (const APIInterceptor::APIFunction&           in_function)     const override;
             ExecutionClass get_execution_class(const Capture::APIDumpLoader::DumpedAPICall& in_call)         const override;
-            void           on_frame_presented ()                                                             override;
+            void           on_frame_presented ()                                                                   override;
             bool           read_back_buffer   (std::vector<uint8_t>*                        out_pixel_u8_vec_ptr,
-                                               FrameImage*                                  out_image_ptr) override;
-            void           reset              ()                                                             override;
-            void           restore_state      ()                                                             override;
-            void           save_state         ()                                                             override;
-            bool           write_back_buffer  (const std::vector<uint8_t>&                  in_pixel_u8_vec) override;
+                                               FrameImage*                                  out_image_ptr)         override;
+            void           reset              ()                                                                   override;
+            void           restore_state      ()                                                                   override;
+            void           save_state         ()                                                                   override;
+            bool           write_back_buffer  (const std::vector<uint8_t>&                  in_pixel_u8_vec)       override;
 
         protected:
             typedef bool (D3D7CallExecutor::*HandlerFuncPtr)(std::string* out_error_ptr);
@@ -101,12 +101,12 @@ namespace Replay
              */
             struct DeviceState
             {
-                std::map<uint32_t, uint32_t>                     render_state_map;
-                void*                                            render_target_ptr = nullptr;
-                std::map<uint32_t, void*>                        stage_texture_map;
+                std::map<uint32_t, uint32_t>                      render_state_map;
+                void*                                             render_target_ptr = nullptr;
+                std::map<uint32_t, void*>                         stage_texture_map;
                 std::map<std::pair<uint32_t, uint32_t>, uint32_t> texture_stage_state_map; /* by the stage and the state */
-                std::map<uint32_t, std::vector<uint8_t> >        transform_map;
-                std::vector<uint8_t>                             viewport_u8_vec;
+                std::map<uint32_t, std::vector<uint8_t> >         transform_map;
+                std::vector<uint8_t>                              viewport_u8_vec;
             };
 
             /* A vertex buffer that is locked: the memory that the replay was given, and how much of it there is. */
@@ -210,29 +210,30 @@ namespace Replay
                                           Arguments...    in_arguments);
 
 
-            void*                                                          m_back_buffer_ptr;     /* the replay's own reference */
-            std::vector<uint8_t>                                           m_capture_u8_vec;
-            void*                                                          m_clipper_ptr;
-            CallContext                                                    m_context;
-            uint32_t                                                       m_display_height;
-            uint32_t                                                       m_display_width;
-            DeviceState                                                    m_device_state;        /* of the render and texture stage states, transforms and viewport; the rest is below */
-            void*                                                          m_device_ptr;          /* the device that the target and textures below are set on */
-            void*                                                          m_direct_draw_ptr;
+            void*                                                           m_back_buffer_ptr;     /* the replay's own reference */
+            std::vector<uint8_t>                                            m_capture_u8_vec;
+            void*                                                           m_clipper_ptr;
+            CallContext                                                     m_context;
+            uint32_t                                                        m_display_height;
+            uint32_t                                                        m_display_width;
+            DeviceState                                                     m_device_state;        /* of the render and texture stage states, transforms and viewport; the rest is below */
+            void*                                                           m_device_ptr;          /* the device that the target and textures below are set on */
+            void*                                                           m_direct_draw_ptr;
             std::unordered_map<APIInterceptor::APIFunction, HandlerFuncPtr> m_handler_map;
-            LiveObjectList                                                 m_live_objects;
-            std::map<void*, LockedSurface>                                 m_locked_surface_map;
-            std::map<void*, LockedVertexBuffer>                            m_locked_vertex_buffer_map;
-            std::map<void*, std::vector<uint64_t> >                        m_dumped_value_map;    /* the pointers of the dump that stand for each object */
-            std::map<void*, uint32_t>                                      m_reference_count_map; /* the references the replay holds to each object */
-            void*                                                          m_primary_ptr;
-            std::unordered_set<APIInterceptor::APIFunction>                m_release_function_set;
-            DeviceState                                                    m_saved_device_state;  /* as save_state() found it */
-            void*                                                          m_render_target_ptr;   /* the left object, as for the textures below */
-            std::map<uint32_t, void*>                                      m_stage_texture_map;   /* the left object set on each texture stage */
-            HWND                                                          m_window;
-            std::unordered_set<APIInterceptor::APIFunction>                m_add_ref_function_set;
-            void*                                                          m_locked_image_ptr;
+            LiveObjectList                                                  m_live_objects;
+            std::map<void*, LockedSurface>                                  m_locked_surface_map;
+            std::map<void*, LockedVertexBuffer>                             m_locked_vertex_buffer_map;
+            std::map<void*, std::vector<uint64_t> >                         m_dumped_value_map;    /* the pointers of the dump that stand for each object */
+            std::map<void*, uint32_t>                                       m_reference_count_map; /* the references the replay holds to each object */
+            void*                                                           m_primary_ptr;
+            std::unordered_set<APIInterceptor::APIFunction>                 m_release_function_set;
+            DeviceState                                                     m_saved_device_state;  /* as save_state() found it */
+            void*                                                           m_render_target_ptr;   /* the left object, as for the textures below */
+            std::map<uint32_t, void*>                                       m_stage_texture_map;   /* the left object set on each texture stage */
+            HWND                                                            m_window;
+
+            std::unordered_set<APIInterceptor::APIFunction> m_add_ref_function_set;
+            void*                                           m_locked_image_ptr;
         };
     }
 }

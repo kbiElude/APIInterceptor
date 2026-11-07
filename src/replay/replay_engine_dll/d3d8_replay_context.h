@@ -90,9 +90,9 @@ namespace Replay
                                                                const bool&                        in_is_output);
 
 
-            void*                               m_device_ptr;
-            bool                                m_is_creation_expected;
-            LiveObjectList                      m_live_objects;
+            void*          m_device_ptr;
+            bool           m_is_creation_expected;
+            LiveObjectList m_live_objects;
         };
     }
 }

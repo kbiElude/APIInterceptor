@@ -1142,13 +1142,23 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::execute(const Capture::APIDumpLo
     }
 
     /* A call which failed in the dump changed nothing. */
-    if (in_call.returned_value_ptr            != nullptr                     &&
-        in_call.returned_value_ptr->type      == APIInterceptor::ARGTYPE_I32 &&
-        in_call.returned_value_ptr->get_i32() <  0)
     {
-        result = true;
+        bool did_call_fail = false;
 
-        goto end;
+        if (in_call.returned_value_ptr       != nullptr                     &&
+            in_call.returned_value_ptr->type == APIInterceptor::ARGTYPE_I32)
+        {
+            const int32_t returned_value = in_call.returned_value_ptr->get_i32();
+
+            did_call_fail = (returned_value < 0);
+        }
+
+        if (did_call_fail)
+        {
+            result = true;
+
+            goto end;
+        }
     }
 
     if (handler_iterator != m_handler_map.end() )
@@ -1484,9 +1494,15 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::get_u32(const size_t& in_n_argum
 {
     const APIInterceptor::APIFunctionArgument* argument_ptr = m_context.get_in_argument_ptr(in_n_argument);
 
-    return (argument_ptr                != nullptr &&
-            read_number(*argument_ptr,
-                         out_value_ptr) );
+    bool result = false;
+
+    if (argument_ptr != nullptr)
+    {
+        result = read_number(*argument_ptr,
+                              out_value_ptr);
+    }
+
+    return result;
 }
 
 bool Replay::ReplayEngineDLL::D3D7CallExecutor::is_ignored_method(const char* in_method_name_ptr)
@@ -1840,13 +1856,23 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::query_interface(std::string* out
     }
 
     /* A query which the dump's application was refused (an interface the driver has not got) gave it nothing. */
-    if (out_argument_ptr                   == nullptr                          ||
-        out_argument_ptr->type             != APIInterceptor::ARGTYPE_VOID_PTR ||
-        out_argument_ptr->get_ptr_as_u64() == 0)
     {
-        result = true;
+        bool was_object_given = false;
 
-        goto end;
+        if (out_argument_ptr       != nullptr                          &&
+            out_argument_ptr->type == APIInterceptor::ARGTYPE_VOID_PTR)
+        {
+            const uint64_t dumped_address = out_argument_ptr->get_ptr_as_u64();
+
+            was_object_given = (dumped_address != 0);
+        }
+
+        if (was_object_given == false)
+        {
+            result = true;
+
+            goto end;
+        }
     }
 
     if (iid_ptr     == nullptr     ||
@@ -1961,12 +1987,20 @@ void Replay::ReplayEngineDLL::D3D7CallExecutor::register_object(const size_t& in
 {
     const APIInterceptor::APIFunctionArgument* out_argument_ptr = m_context.get_out_argument_ptr(in_n_argument);
 
-    if (out_argument_ptr                   != nullptr                          &&
-        out_argument_ptr->type             == APIInterceptor::ARGTYPE_VOID_PTR &&
-        out_argument_ptr->get_ptr_as_u64() != 0)
+    uint64_t dumped_address = 0;
+
+    if (out_argument_ptr             != nullptr                          &&
+        out_argument_ptr->type       == APIInterceptor::ARGTYPE_VOID_PTR)
     {
-        if (take_object(out_argument_ptr->get_ptr_as_u64(),
-                        in_live_object_ptr) )
+        dumped_address = out_argument_ptr->get_ptr_as_u64();
+    }
+
+    if (dumped_address != 0)
+    {
+        const bool is_taken = take_object(dumped_address,
+                                          in_live_object_ptr);
+
+        if (is_taken)
         {
             m_live_objects.add(in_live_object_ptr);
 
@@ -1975,16 +2009,16 @@ void Replay::ReplayEngineDLL::D3D7CallExecutor::register_object(const size_t& in
         else
         {
             m_context.get_remapper_ptr()->add(ObjectKind::D3D7_OBJECT,
-                                              out_argument_ptr->get_ptr_as_u64(),
+                                              dumped_address,
                                               reinterpret_cast<uint64_t>(in_live_object_ptr) );
 
             /* A call that hands out an object hands out a reference to it. */
             m_live_objects.add(in_live_object_ptr);
 
-            m_dumped_value_map[in_live_object_ptr].push_back(out_argument_ptr->get_ptr_as_u64() );
+            m_dumped_value_map[in_live_object_ptr].push_back(dumped_address);
             m_reference_count_map[in_live_object_ptr]++;
 
-            on_object_registered(out_argument_ptr->get_ptr_as_u64(),
+            on_object_registered(dumped_address,
                                  in_live_object_ptr);
         }
     }
@@ -2027,11 +2061,11 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::release(std::string* out_error_p
                                                      dumped_value);
             }
 
-            m_dumped_value_map.erase(object_ptr);
-            m_live_objects.remove(object_ptr);
-            m_locked_surface_map.erase(object_ptr);
+            m_dumped_value_map.erase        (object_ptr);
+            m_live_objects.remove           (object_ptr);
+            m_locked_surface_map.erase      (object_ptr);
             m_locked_vertex_buffer_map.erase(object_ptr);
-            m_reference_count_map.erase(object_ptr);
+            m_reference_count_map.erase     (object_ptr);
 
             on_object_gone(object_ptr);
 
@@ -2080,8 +2114,8 @@ ULONG Replay::ReplayEngineDLL::D3D7CallExecutor::release_object_reference(void* 
 
     if (n_refs == 0)
     {
-        m_live_objects.remove(in_object_ptr);
-        m_locked_surface_map.erase(in_object_ptr);
+        m_live_objects.remove      (in_object_ptr);
+        m_locked_surface_map.erase (in_object_ptr);
         m_reference_count_map.erase(in_object_ptr);
     }
 
@@ -2108,11 +2142,11 @@ void Replay::ReplayEngineDLL::D3D7CallExecutor::reset()
         }
     }
 
-    m_dumped_value_map.clear();
-    m_live_objects.clear();
-    m_locked_surface_map.clear();
+    m_dumped_value_map.clear        ();
+    m_live_objects.clear            ();
+    m_locked_surface_map.clear      ();
     m_locked_vertex_buffer_map.clear();
-    m_reference_count_map.clear();
+    m_reference_count_map.clear     ();
 
     m_back_buffer_ptr   = nullptr;
     m_clipper_ptr       = nullptr;
@@ -2148,13 +2182,13 @@ void Replay::ReplayEngineDLL::D3D7CallExecutor::restore_state()
     {
         const auto current_iterator = m_device_state.render_state_map.find(render_state.first);
 
-        if (current_iterator == m_device_state.render_state_map.end() ||
+        if (current_iterator         == m_device_state.render_state_map.end() ||
             current_iterator->second != render_state.second)
         {
             call_method<HRESULT>(m_device_ptr,
                                  Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_SETRENDERSTATE,
                                  static_cast<Interception::Hooks::D3D7::D3DRENDERSTATETYPE>(render_state.first),
-                                 static_cast<DWORD>(render_state.second) );
+                                 static_cast<DWORD>                                        (render_state.second) );
         }
     }
 
@@ -2162,14 +2196,14 @@ void Replay::ReplayEngineDLL::D3D7CallExecutor::restore_state()
     {
         const auto current_iterator = m_device_state.texture_stage_state_map.find(stage_state.first);
 
-        if (current_iterator == m_device_state.texture_stage_state_map.end() ||
+        if (current_iterator         == m_device_state.texture_stage_state_map.end() ||
             current_iterator->second != stage_state.second)
         {
             call_method<HRESULT>(m_device_ptr,
                                  Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_SETTEXTURESTAGESTATE,
-                                 static_cast<DWORD>(stage_state.first.first),
+                                 static_cast<DWORD>                                              (stage_state.first.first),
                                  static_cast<Interception::Hooks::D3D7::D3DTEXTURESTAGESTATETYPE>(stage_state.first.second),
-                                 static_cast<DWORD>(stage_state.second) );
+                                 static_cast<DWORD>                                              (stage_state.second) );
         }
     }
 
@@ -2177,7 +2211,7 @@ void Replay::ReplayEngineDLL::D3D7CallExecutor::restore_state()
     {
         const auto current_iterator = m_device_state.transform_map.find(transform.first);
 
-        if (current_iterator == m_device_state.transform_map.end() ||
+        if (current_iterator         == m_device_state.transform_map.end() ||
             current_iterator->second != transform.second)
         {
             call_method<HRESULT>(m_device_ptr,
@@ -2187,8 +2221,8 @@ void Replay::ReplayEngineDLL::D3D7CallExecutor::restore_state()
         }
     }
 
-    if (m_saved_device_state.viewport_u8_vec.empty() == false &&
-        m_saved_device_state.viewport_u8_vec       != m_device_state.viewport_u8_vec)
+    if (m_saved_device_state.viewport_u8_vec.empty() == false                          &&
+        m_saved_device_state.viewport_u8_vec         != m_device_state.viewport_u8_vec)
     {
         call_method<HRESULT>(m_device_ptr,
                              Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_SETVIEWPORT,
@@ -2196,7 +2230,7 @@ void Replay::ReplayEngineDLL::D3D7CallExecutor::restore_state()
     }
 
     /* What is rendered to, and the textures: the frame may set them first thing, or may rely on what the frame before left. */
-    if (m_saved_device_state.render_target_ptr != nullptr &&
+    if (m_saved_device_state.render_target_ptr != nullptr             &&
         m_saved_device_state.render_target_ptr != m_render_target_ptr)
     {
         void* const live_render_target_ptr = resolve_object(m_saved_device_state.render_target_ptr);
@@ -2211,7 +2245,7 @@ void Replay::ReplayEngineDLL::D3D7CallExecutor::restore_state()
     {
         const auto current_iterator = m_stage_texture_map.find(stage_texture.first);
 
-        if (current_iterator == m_stage_texture_map.end() ||
+        if (current_iterator         == m_stage_texture_map.end() ||
             current_iterator->second != stage_texture.second)
         {
             void* const live_texture_ptr = resolve_object(stage_texture.second);
@@ -2425,9 +2459,9 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::set_render_state(std::string* ou
     call_method<HRESULT>(device_ptr,
                          Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_SETRENDERSTATE,
                          static_cast<Interception::Hooks::D3D7::D3DRENDERSTATETYPE>(state),
-                         static_cast<DWORD>(value) );
+                         static_cast<DWORD>                                        (value) );
 
-    m_device_ptr                         = device_ptr;
+    m_device_ptr                           = device_ptr;
     m_device_state.render_state_map[state] = value;
 
 end:
@@ -2584,11 +2618,11 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::set_texture_stage_state(std::str
 
     call_method<HRESULT>(device_ptr,
                          Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_SETTEXTURESTAGESTATE,
-                         static_cast<DWORD>(stage),
+                         static_cast<DWORD>                                              (stage),
                          static_cast<Interception::Hooks::D3D7::D3DTEXTURESTAGESTATETYPE>(state),
-                         static_cast<DWORD>(value) );
+                         static_cast<DWORD>                                              (value) );
 
-    m_device_ptr                                                      = device_ptr;
+    m_device_ptr                                                  = device_ptr;
     m_device_state.texture_stage_state_map[std::make_pair(stage,
                                                           state)] = value;
 
@@ -2716,9 +2750,10 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::unlock(std::string* out_error_pt
                                                                    : locked.description.dwWidth;
             const uint32_t       n_row_bytes   = width * (pixel_format.dwRGBBitCount / BITS_PER_BYTE);
             const uint32_t       live_pitch    = static_cast<uint32_t>(locked.description.lPitch);
+
             if (data_ptr != nullptr)
             {
-                if (n_row_bytes == 0 ||
+                if (n_row_bytes         == 0 ||
                     locked.dumped_pitch == 0)
                 {
                     /* A format with no rows of pixels (a compressed one): the data are the bytes of the surface. */
@@ -2867,7 +2902,7 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::write_back_buffer(const std::vec
     {
         const uint32_t n_row_bytes = description.dwWidth * (description.ddpfPixelFormat.dwRGBBitCount / BITS_PER_BYTE);
 
-        result = (n_row_bytes != 0 &&
+        result = (n_row_bytes            != 0                                                        &&
                   in_pixel_u8_vec.size() == static_cast<size_t>(n_row_bytes) * description.dwHeight);
 
         for (uint32_t n_row = 0;

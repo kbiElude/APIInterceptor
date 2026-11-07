@@ -102,14 +102,14 @@ namespace Replay
                                         std::index_sequence<Indices...>)
                 {
                     std::tuple<GlRestore::ArgumentRestorer<Arguments, GlRestore::ArgumentCategoryOf<Arguments>::value>...> restorers;
-                    bool                                                                                                    is_ok  = true;
-                    ReturnHolder<ReturnType>                                                                                holder;
-                    bool                                                                                                    result = false;
+                    bool                                                                                                   is_ok  = true;
+                    ReturnHolder<ReturnType>                                                                               holder;
+                    bool                                                                                                   result = false;
 
                     /* Left to right, and no further once an argument cannot be restored. */
                     const bool prepared_dummy_bvec[] = {true, (is_ok = (is_ok && std::get<Indices>(restorers).prepare(in_context_ptr,
-                                                                                                                        Indices,
-                                                                                                                        out_error_ptr) ))...};
+                                                                                                                      Indices,
+                                                                                                                      out_error_ptr) ))...};
 
                     (void) prepared_dummy_bvec;
 

@@ -38,28 +38,28 @@ namespace Replay
             /* Replaces the executor of the API. Before the workload is loaded. */
             void                                    add_call_executor          (const Capture::APIDumpLoader::APIGroup&       in_group,
                                                                                 const std::shared_ptr<ICallExecutor>&         in_executor_ptr);
-            void                                    add_call_interceptor       (ICallInterceptor*                             in_interceptor_ptr) override;
-            void                                    add_replay_observer        (IReplayObserver*                              in_observer_ptr)    override;
+            void                                    add_call_interceptor       (ICallInterceptor*                             in_interceptor_ptr)       override;
+            void                                    add_replay_observer        (IReplayObserver*                              in_observer_ptr)          override;
             bool                                    execute_call               (const Capture::APIDumpLoader::DumpedAPICall&  in_call,
-                                                                                const IChunkSource&                           in_chunk_source) override;
-            void                                    fail                       (const std::string&                            in_message)         override;
-            ICallExecutor*                          get_call_executor_ptr      (const Capture::APIDumpLoader::APIGroup& in_group)           const override;
+                                                                                const IChunkSource&                           in_chunk_source)          override;
+            void                                    fail                       (const std::string&                            in_message)               override;
+            ICallExecutor*                          get_call_executor_ptr      (const Capture::APIDumpLoader::APIGroup& in_group)                 const override;
             const std::vector<ICallExecutor*>&      get_call_executor_ptr_vec  ()                                                                 const override;
             const IChunkSource&                     get_chunk_source           ()                                                                 const override;
             uint32_t                                get_n_frames_presented     ()                                                                 const override;
-            IPlaybackController*                    get_playback_controller_ptr()                                                                 override;
+            IPlaybackController*                    get_playback_controller_ptr()                                                                       override;
             ObjectRemapper*                         get_remapper_ptr           ();
             const Capture::APIDumpLoader::Workload& get_segment                ()                                                                 const override;
             PlaybackStatus                          get_status                 ()                                                                 const override;
             bool                                    load                       (const char*                                   in_filename_ptr,
-                                                                                std::string*                                  out_error_ptr) override;
-            void                                    pause                      ()                                                                 override;
-            void                                    play                       ()                                                                 override;
-            void                                    play_to_frame              (const uint32_t&                               in_n_frame)         override;
-            bool                                    read_next_call             (const Capture::APIDumpLoader::DumpedAPICall** out_call_ptr_ptr)   override;
-            void                                    remove_call_interceptor    (ICallInterceptor*                             in_interceptor_ptr) override;
-            void                                    remove_replay_observer     (IReplayObserver*                              in_observer_ptr)    override;
-            void                                    reset                      ()                                                                 override;
+                                                                                std::string*                                  out_error_ptr)            override;
+            void                                    pause                      ()                                                                       override;
+            void                                    play                       ()                                                                       override;
+            void                                    play_to_frame              (const uint32_t&                               in_n_frame)               override;
+            bool                                    read_next_call             (const Capture::APIDumpLoader::DumpedAPICall** out_call_ptr_ptr)         override;
+            void                                    remove_call_interceptor    (ICallInterceptor*                             in_interceptor_ptr)       override;
+            void                                    remove_replay_observer     (IReplayObserver*                              in_observer_ptr)          override;
+            void                                    reset                      ()                                                                       override;
             void                                    set_chunk_wanted_func      (const Capture::APIDumpLoader::ChunkWantedFunc& in_func);
             void                                    set_frame_executor         (IFrameExecutor*                               in_executor_ptr);
             void                                    set_windows_visible        (const bool&                                   in_are_visible);

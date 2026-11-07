@@ -10,8 +10,8 @@ Replay::ReplayEngineDLL::NullCallExecutor::NullCallExecutor()
 }
 
 bool Replay::ReplayEngineDLL::NullCallExecutor::execute(const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                                          const IChunkSource&                          in_chunk_source,
-                                                          std::string*                                 out_error_ptr)
+                                                        const IChunkSource&                          in_chunk_source,
+                                                        std::string*                                 out_error_ptr)
 {
     (void) in_call;
     (void) in_chunk_source;

@@ -150,10 +150,10 @@ namespace Replay
 
                     {
                         /* The object is the first argument. */
-                        void* const  object_ptr = std::get<0>(restorers).get();
-                        void** const vtable_ptr = APIInterceptor::get_vtable_ptr(object_ptr);
+                        void* const  object_ptr = std::get<0>(restorers).get               ();
+                        void** const vtable_ptr = APIInterceptor::get_vtable_ptr           (object_ptr);
                         const auto   method_ptr = APIInterceptor::get_method_ptr<MethodPtr>(vtable_ptr,
-                                                                                                vtable_index);
+                                                                                            vtable_index);
 
                         holder.call(method_ptr,
                                     std::get<Indices>(restorers).get()...);

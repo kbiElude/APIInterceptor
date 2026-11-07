@@ -54,7 +54,7 @@ void Replay::ReplayEngineDLL::ReplayCoverage::add_segment(const Capture::APIDump
                 }
 
                 const bool is_chunk_present = (Capture::APIDumpLoader::get_data_chunk_ptr(in_segment,
-                                                                                         argument.get_data_chunk_id() ) != nullptr);
+                                                                                          argument.get_data_chunk_id() ) != nullptr);
 
                 if (is_chunk_present)
                 {

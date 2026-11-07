@@ -98,7 +98,7 @@ end:
 }
 
 void Replay::ReplayEngineDLL::GlClientArrayReplayer::apply_array(const SnapshotArray& in_array,
-                                                                   const uint8_t*       in_data_ptr)
+                                                                 const uint8_t*       in_data_ptr)
 {
     /* ClientArrayKind (see OpenGL/types_enums.h). */
     enum class ArrayKind : uint32_t
@@ -305,13 +305,13 @@ void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_generic(const Snapsho
 }
 
 void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_tex_coord(const SnapshotArray& in_array,
-                                                                       const void*          in_pointer)
+                                                                     const void*          in_pointer)
 {
     typedef void (APIENTRY* PFNCLIENTACTIVETEXTUREPROC)(GLenum);
     typedef void (APIENTRY* PFNPOINTERWITHSIZEPROC)    (GLint, GLenum, GLsizei, const void*);
 
     const auto client_active_func_ptr = reinterpret_cast<PFNCLIENTACTIVETEXTUREPROC>(m_resolve_func("glClientActiveTexture") );
-    const auto pointer_func_ptr       = reinterpret_cast<PFNPOINTERWITHSIZEPROC>(m_resolve_func("glTexCoordPointer") );
+    const auto pointer_func_ptr       = reinterpret_cast<PFNPOINTERWITHSIZEPROC>    (m_resolve_func("glTexCoordPointer") );
 
     /* The texture unit that the app pointed the array at. */
     if (client_active_func_ptr != nullptr &&
@@ -327,8 +327,8 @@ void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_tex_coord(const Snaps
 }
 
 void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_with_size(const char*          in_function_name_ptr,
-                                                                       const SnapshotArray& in_array,
-                                                                       const void*          in_pointer)
+                                                                     const SnapshotArray& in_array,
+                                                                     const void*          in_pointer)
 {
     typedef void (APIENTRY* PFNPOINTERWITHSIZEPROC)(GLint, GLenum, GLsizei, const void*);
 
@@ -344,8 +344,8 @@ void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_with_size(const char*
 }
 
 void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_without_size(const char*          in_function_name_ptr,
-                                                                          const SnapshotArray& in_array,
-                                                                          const void*          in_pointer)
+                                                                        const SnapshotArray& in_array,
+                                                                        const void*          in_pointer)
 {
     typedef void (APIENTRY* PFNPOINTERWITHOUTSIZEPROC)(GLenum, GLsizei, const void*);
 
