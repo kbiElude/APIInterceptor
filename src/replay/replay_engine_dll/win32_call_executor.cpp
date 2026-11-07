@@ -263,6 +263,12 @@ Replay::ReplayEngineDLL::CallSupport Replay::ReplayEngineDLL::Win32CallExecutor:
                                                                                        : CallSupport::UNSUPPORTED;
 }
 
+Replay::ReplayEngineDLL::ExecutionClass Replay::ReplayEngineDLL::Win32CallExecutor::get_execution_class(const Capture::APIDumpLoader::DumpedAPICall& in_call) const
+{
+    return (in_call.func == APIInterceptor::APIFUNCTION_GDI32_SWAPBUFFERS) ? ExecutionClass::AFTER_ALL
+                                                                          : ExecutionClass::FIRST_TIME_ONLY;
+}
+
 bool Replay::ReplayEngineDLL::Win32CallExecutor::get_live_handle(const ObjectKind&                          in_kind,
                                                                  const APIInterceptor::APIFunctionArgument& in_argument,
                                                                  void**                                     out_live_handle_ptr,
