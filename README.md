@@ -2,7 +2,7 @@
 
 A library that hooks the graphics API calls of a Windows program and stores them, with their data, in **workload files**. Projects link it to capture a program, to read what was captured, and to build on both.
 
-Direct3D 8 has the deepest set of hooks; OpenGL and the Win32 windowing calls (WGL, GDI32, User32) are covered too, and the code is arranged for more.
+DirectDraw 7 with Direct3D 7, and Direct3D 8, have the deepest sets of hooks: the printer decodes their arguments and the replay engine plays their calls again. OpenGL and the Win32 windowing calls (WGL, GDI32, User32) are covered too, and the code is arranged for more.
 
 **Documentation: [docs/index.html](docs/index.html)** (open it in a browser; the pages are plain HTML and link to each other).
 
@@ -17,7 +17,7 @@ Direct3D 8 has the deepest set of hooks; OpenGL and the Win32 windowing calls (W
 | `APIDumpPrinter` | Prints a workload as text, every call with every input and result. |
 | `ReplayEngineDLL` + `ReplayPlayer` | Execute the calls of a workload again, without the program, in a window. Useful to check a capture. |
 | `InjectionLauncher` | Library that starts any program with a DLL in it (reads the architecture, injects with Detours while the program is suspended). |
-| `D3D8Utils`, `OpenGLUtils` | What is known about an API besides its hooks: interfaces, methods, argument kinds, readers of values. |
+| `D3D7Utils`, `D3D8Utils`, `OpenGLUtils` | What is known about an API besides its hooks: interfaces, methods, argument kinds, readers of values. |
 
 ## What happens to one call
 
@@ -29,7 +29,7 @@ A hook runs the pre callbacks, makes the original call, then the post callbacks.
 
 ![How the source tree is layered](docs/images/layers.svg)
 
-Public headers are in `include/` and sources in `src/`, with the same groups. Namespaces follow the path (`Interception::Hooks::D3D8`, `Capture::APIDumpLoader`, `Replay::ReplayEngineDLL`). Third-party code is in `deps/`; see [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt).
+Public headers are in `include/` and sources in `src/`, with the same groups. Namespaces follow the path (`Interception::Hooks::D3D7`, `Interception::Hooks::D3D8`, `Capture::APIDumpLoader`, `Replay::ReplayEngineDLL`). Third-party code is in `deps/`; see [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt).
 
 ## Using it from another project
 
