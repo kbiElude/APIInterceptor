@@ -62,3 +62,48 @@ TEST(ObjectRemapper, ARemovedOrClearedValueIsUnknown)
                               3,
                              &live_value) );
 }
+
+TEST(ObjectRemapper, ALiveValueIsFoundByTheDumpedOneItStandsFor)
+{
+    Replay::ReplayEngineDLL::ObjectRemapper remapper;
+    uint64_t                                dumped_value = 0;
+
+    remapper.add(Replay::ReplayEngineDLL::ObjectKind::TEXTURE,
+                 10,
+                 20);
+    remapper.add(Replay::ReplayEngineDLL::ObjectKind::BUFFER,
+                 11,
+                 20);
+
+    /* The kind is told apart: a live buffer of 20 is not the texture of 20. */
+    EXPECT_TRUE (remapper.find_dumped(Replay::ReplayEngineDLL::ObjectKind::TEXTURE,
+                                      20,
+                                     &dumped_value) );
+    EXPECT_EQ   (dumped_value,
+                 10u);
+    EXPECT_FALSE(remapper.find_dumped(Replay::ReplayEngineDLL::ObjectKind::TEXTURE,
+                                      21,
+                                     &dumped_value) );
+}
+
+TEST(ObjectRemapper, WhatIsMappedAgainIsFoundByTheLiveValueItHasNow)
+{
+    Replay::ReplayEngineDLL::ObjectRemapper remapper;
+    uint64_t                                dumped_value = 0;
+
+    remapper.add(Replay::ReplayEngineDLL::ObjectKind::TEXTURE,
+                 10,
+                 20);
+    remapper.add(Replay::ReplayEngineDLL::ObjectKind::TEXTURE,
+                 10,
+                 30);
+
+    EXPECT_FALSE(remapper.find_dumped(Replay::ReplayEngineDLL::ObjectKind::TEXTURE,
+                                      20,
+                                     &dumped_value) );
+    EXPECT_TRUE (remapper.find_dumped(Replay::ReplayEngineDLL::ObjectKind::TEXTURE,
+                                      30,
+                                     &dumped_value) );
+    EXPECT_EQ   (dumped_value,
+                 10u);
+}

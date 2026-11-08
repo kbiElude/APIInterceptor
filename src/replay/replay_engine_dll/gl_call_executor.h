@@ -43,6 +43,10 @@ namespace Replay
             void           restore_state      ()                                                                 override;
             void           save_state         ()                                                                 override;
 
+        protected:
+            /* The function of GL by name (those of opengl32.dll and of the driver); null if there is none. */
+            void* get_proc_ptr(const char* in_name_ptr);
+
         private:
             typedef bool (*InvokeFuncPtr)(GlReplayContext* in_context_ptr,
                                           void*            in_function_ptr,
@@ -64,7 +68,6 @@ namespace Replay
                                           const InvokeFuncPtr&                         in_invoke_func_ptr,
                                           const size_t&                                in_n_head_arguments);
             void  after_call             (const Capture::APIDumpLoader::DumpedAPICall& in_call);
-            void* get_proc_ptr           (const char*                                  in_name_ptr);
             /* Whether the call only reads state into the memory of the application (glGetFloatv, glReadPixels with no pixel pack buffer bound): what the app computed of it
              * is in the calls that follow, as it was dumped, and a replay has no use for the values, so it does not make the call.
              */

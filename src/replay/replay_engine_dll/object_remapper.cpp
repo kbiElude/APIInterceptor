@@ -22,6 +22,27 @@ void Replay::ReplayEngineDLL::ObjectRemapper::clear()
     m_live_value_map.clear();
 }
 
+bool Replay::ReplayEngineDLL::ObjectRemapper::find_dumped(const ObjectKind& in_kind,
+                                                       const uint64_t&   in_live_value,
+                                                       uint64_t*         out_dumped_value_ptr) const
+{
+    bool result = false;
+
+    for (const auto& value_pair : m_live_value_map)
+    {
+        if (value_pair.first.first == in_kind        &&
+            value_pair.second      == in_live_value)
+        {
+            *out_dumped_value_ptr = value_pair.first.second;
+            result                = true;
+
+            break;
+        }
+    }
+
+    return result;
+}
+
 bool Replay::ReplayEngineDLL::ObjectRemapper::get(const ObjectKind& in_kind,
                                                   const uint64_t&   in_dumped_value,
                                                   uint64_t*         out_live_value_ptr) const
