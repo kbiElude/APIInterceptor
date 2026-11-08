@@ -235,6 +235,14 @@ bool Replay::ReplayEngineDLL::CallWalker::rewind(std::string* out_error_ptr)
                 out_error_ptr);
 }
 
+void Replay::ReplayEngineDLL::CallWalker::set_call_kept_func_factory(const Capture::APIDumpLoader::CallKeptFuncFactory& in_factory)
+{
+    std::lock_guard<std::mutex> lock(m_chunk_filter.mutex);
+
+    m_chunk_filter.call_kept_func_factory = in_factory;
+    m_chunk_filter.is_pending             = true;
+}
+
 void Replay::ReplayEngineDLL::CallWalker::set_chunk_wanted_func(const Capture::APIDumpLoader::ChunkWantedFunc& in_func)
 {
     std::lock_guard<std::mutex> lock(m_chunk_filter.mutex);
@@ -277,24 +285,28 @@ bool Replay::ReplayEngineDLL::CallWalker::start_reader(const char*     in_filena
     {
         std::lock_guard<std::mutex> lock(m_chunk_filter.mutex);
 
-        reader_options.chunk_wanted_func = m_chunk_filter.func;
-        m_chunk_filter.is_pending        = false;
+        reader_options.call_kept_func_factory = m_chunk_filter.call_kept_func_factory;
+        reader_options.chunk_wanted_func      = m_chunk_filter.func;
+        m_chunk_filter.is_pending             = false;
     }
 
     /* Without the index of the file there is no telling which frame a segment starts at, and all its chunks are read. */
-    if (reader_options.chunk_wanted_func)
+    if (reader_options.chunk_wanted_func ||
+        reader_options.call_kept_func_factory)
     {
         if (read_segment_starts(in_filename_ptr,
                                &reader_options.segment_start_vec) == false)
         {
-            reader_options.chunk_wanted_func = Capture::APIDumpLoader::ChunkWantedFunc();
+            reader_options.call_kept_func_factory = Capture::APIDumpLoader::CallKeptFuncFactory();
+            reader_options.chunk_wanted_func      = Capture::APIDumpLoader::ChunkWantedFunc();
         }
     }
 
     /* With the chunks of the frames that nothing reads left out, the segments are small (a few MB, and not 100 to 200), and what takes the time is the
      * decompression, which more threads speed up.
      */
-    if (reader_options.chunk_wanted_func)
+    if (reader_options.chunk_wanted_func ||
+        reader_options.call_kept_func_factory)
     {
         reader_options.n_threads            = std::min<uint32_t>(std::max<uint32_t>(n_threads_wanted,
                                                                                     N_READER_THREADS_FILTERED),

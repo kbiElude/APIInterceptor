@@ -525,6 +525,11 @@ bool Replay::ReplayEngineDLL::ReplayEngine::rewind()
     return is_rewound;
 }
 
+void Replay::ReplayEngineDLL::ReplayEngine::set_call_kept_func_factory(const Capture::APIDumpLoader::CallKeptFuncFactory& in_factory)
+{
+    m_walker.set_call_kept_func_factory(in_factory);
+}
+
 void Replay::ReplayEngineDLL::ReplayEngine::set_chunk_wanted_func(const Capture::APIDumpLoader::ChunkWantedFunc& in_func)
 {
     m_walker.set_chunk_wanted_func(in_func);

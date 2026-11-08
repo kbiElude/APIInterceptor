@@ -596,7 +596,8 @@ void Capture::APIDumpLoader::WorkloadReader::decode_frame(ZSTD_DCtx*            
     options.skip_data_chunks_above_n_bytes = in_options.skip_data_chunks_above_n_bytes;
 
     /* The segments the reader has no start of are read in full. */
-    if (in_options.chunk_wanted_func)
+    if (in_options.chunk_wanted_func ||
+        in_options.call_kept_func_factory)
     {
         const auto is_segment_before_offset_func = [](const SegmentStart& in_start,
                                                       const uint64_t&     in_offset_n_bytes)
@@ -612,9 +613,10 @@ void Capture::APIDumpLoader::WorkloadReader::decode_frame(ZSTD_DCtx*            
         if (start_iterator                      != in_options.segment_start_vec.end() &&
             start_iterator->file_offset_n_bytes == in_file_offset_n_bytes)
         {
-            options.chunk_wanted_func   = in_options.chunk_wanted_func;
-            options.first_data_chunk_id = start_iterator->first_data_chunk_id;
-            options.first_frame_index   = start_iterator->first_frame_index;
+            options.call_kept_func_factory = in_options.call_kept_func_factory;
+            options.chunk_wanted_func      = in_options.chunk_wanted_func;
+            options.first_data_chunk_id    = start_iterator->first_data_chunk_id;
+            options.first_frame_index      = start_iterator->first_frame_index;
         }
     }
 

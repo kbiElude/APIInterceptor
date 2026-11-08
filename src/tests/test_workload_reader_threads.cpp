@@ -447,3 +447,89 @@ TEST(WorkloadReaderThreads, ASegmentWhichTheIndexDoesNotHaveIsReadInFull)
     reader_ptr.reset();
     ::remove(Tests::WorkloadFileBuilder::get_filename_ptr() );
 }
+
+TEST(WorkloadReaderThreads, CallsThatTheFunctionDoesNotKeepAreNotMadeIntoCallsAndTheChunksOnlyTheyReferToAreLeftOut)
+{
+    std::vector<uint8_t> file_u8_vec;
+
+    /* Chunks 0 to 3 are of 1 to 4 bytes. Frame 0 refers to chunk 0, frame 1 to chunks 1 and 0, frame 2 to chunk 2; chunk 3 is referred to by none. */
+    Tests::WorkloadFileBuilder::build_chunk_references(&file_u8_vec);
+
+    for (const uint32_t n_threads : {0u, 2u})
+    {
+        Capture::APIDumpLoader::WorkloadReader::Options options;
+        Capture::APIDumpLoader::WorkloadReader::SegmentStart start;
+        Capture::APIDumpLoader::Workload                all_segment;
+        Capture::APIDumpLoader::Workload                kept_segment;
+
+        start.file_offset_n_bytes = sizeof(APIInterceptor::WorkloadFormat::WorkloadFileHeader);
+
+        options.n_threads = n_threads;
+
+        options.segment_start_vec.push_back(start);
+
+        Tests::WorkloadFileBuilder::write_file(file_u8_vec);
+
+        {
+            auto reader_ptr = Capture::APIDumpLoader::WorkloadReader::create(Tests::WorkloadFileBuilder::get_filename_ptr(),
+                                                                             options);
+
+            ASSERT_NE(reader_ptr,
+                      nullptr);
+            ASSERT_TRUE(reader_ptr->read_next_segment(&all_segment) );
+        }
+
+        /* The calls of the frame 1 are not kept (the function is made for each segment, and is asked in the order of the calls). */
+        options.call_kept_func_factory = []()
+                                         {
+                                             return Capture::APIDumpLoader::CallKeptFunc([](const Capture::APIDumpLoader::DumpedAPICall&,
+                                                                                            const uint64_t&                              in_frame_index)
+                                                                                         {
+                                                                                             return (in_frame_index != 1);
+                                                                                         });
+                                         };
+
+        {
+            auto reader_ptr = Capture::APIDumpLoader::WorkloadReader::create(Tests::WorkloadFileBuilder::get_filename_ptr(),
+                                                                             options);
+
+            ASSERT_NE(reader_ptr,
+                      nullptr);
+            ASSERT_TRUE(reader_ptr->read_next_segment(&kept_segment) );
+        }
+
+        size_t n_boundaries_all  = 0;
+        size_t n_boundaries_kept = 0;
+
+        for (const auto& call : *all_segment.dumped_api_call_vec_ptr)
+        {
+            n_boundaries_all += Capture::APIDumpLoader::is_frame_boundary(call) ? 1 : 0;
+        }
+
+        for (const auto& call : *kept_segment.dumped_api_call_vec_ptr)
+        {
+            n_boundaries_kept += Capture::APIDumpLoader::is_frame_boundary(call) ? 1 : 0;
+        }
+
+        EXPECT_LT(kept_segment.dumped_api_call_vec_ptr->size(),
+                  all_segment.dumped_api_call_vec_ptr->size() );
+
+        /* The frames are counted by the calls that end them, and those are all kept. */
+        EXPECT_EQ(n_boundaries_kept,
+                  n_boundaries_all);
+
+        /* The numbers of the chunks stay; chunk 1 was referred to by the frame 1 only, and chunk 0 by the frame 0 as well. */
+        ASSERT_EQ(kept_segment.data_chunk_ptr_vec.size(),
+                  4u);
+        EXPECT_EQ(kept_segment.data_chunk_ptr_vec.at(0)->size(),
+                  1u);
+        EXPECT_EQ(kept_segment.data_chunk_ptr_vec.at(1)->size(),
+                  0u);
+        EXPECT_EQ(kept_segment.data_chunk_ptr_vec.at(2)->size(),
+                  3u);
+        EXPECT_EQ(kept_segment.data_chunk_ptr_vec.at(3)->size(),
+                  4u);
+
+        ::remove(Tests::WorkloadFileBuilder::get_filename_ptr() );
+    }
+}

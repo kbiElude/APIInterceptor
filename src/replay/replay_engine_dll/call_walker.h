@@ -43,18 +43,24 @@ namespace Replay
             /* Goes back to the start of the file opened before. */
             bool rewind(std::string* out_error_ptr);
 
+            /* The calls that the function of the factory does not keep are not made into calls when the file is opened (again), as far as the index of the file is
+             * there to say where its segments are (see WorkloadReader::Options::call_kept_func_factory). Empty: all calls are kept. Any thread.
+             */
+            void set_call_kept_func_factory(const Capture::APIDumpLoader::CallKeptFuncFactory& in_factory);
+
             /* The data chunks that the function says no call needs are left out when the file is opened (again), as far as the index of the file is
              * there to say where its segments are (see WorkloadReader::Options::chunk_wanted_func). Empty: all chunks are read. Any thread.
              */
             void set_chunk_wanted_func(const Capture::APIDumpLoader::ChunkWantedFunc& in_func);
 
         private:
-            /* The chunk filter that the next opening of the file uses. */
+            /* The filters that the next opening of the file uses. */
             struct ChunkFilter
             {
-                Capture::APIDumpLoader::ChunkWantedFunc func;
-                bool                                    is_pending = false; /* set after the reader was started, so the segments yet to be read are to be read with it */
-                std::mutex                              mutex;
+                Capture::APIDumpLoader::CallKeptFuncFactory call_kept_func_factory;
+                Capture::APIDumpLoader::ChunkWantedFunc     func;
+                bool                                        is_pending = false; /* set after the reader was started, so the segments yet to be read are to be read with it */
+                std::mutex                                  mutex;
             };
 
             /* The segment which the thread has read ahead, shared with it. */

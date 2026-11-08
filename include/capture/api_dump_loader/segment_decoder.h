@@ -28,6 +28,9 @@ namespace Capture
             /* How a segment is read. */
             struct Options
             {
+                /* Makes the function that says which calls of the segment are kept (see CallKeptFunc); used with first_frame_index. Empty: all are kept. */
+                CallKeptFuncFactory call_kept_func_factory;
+
                 /* Asked of each call of the segment: a data chunk which calls refer to, and none of them wants, is left out (it comes as an empty
                  * chunk, as below). Chunks which no call refers to are kept. For a replay which leaves out what some frames make, and so does not
                  * read their chunks. Empty: every chunk is wanted.
@@ -58,6 +61,7 @@ namespace Capture
         private:
             /* By the number of the chunk in the segment: whether the options leave it out because of the calls. */
             static std::vector<bool> find_unwanted_chunks(const DumpedAPICallVector& in_call_vec,
+                                                          const std::vector<bool>&   in_is_dropped_chunk_vec,
                                                           const Options&             in_options,
                                                           const size_t&              in_n_chunks);
 

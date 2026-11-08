@@ -12,6 +12,7 @@
 static constexpr uint32_t MAX_ITEM_N_BYTES = 1u << 30; /* 1 GiB */
 
 std::vector<bool> Capture::APIDumpLoader::SegmentDecoder::find_unwanted_chunks(const DumpedAPICallVector& in_call_vec,
+                                                                               const std::vector<bool>&   in_is_dropped_chunk_vec,
                                                                                const Options&             in_options,
                                                                                const size_t&              in_n_chunks)
 {
@@ -28,10 +29,22 @@ std::vector<bool> Capture::APIDumpLoader::SegmentDecoder::find_unwanted_chunks(c
     std::vector<bool>     result(in_n_chunks,
                                  false);
 
+    /* A chunk that a call which is not kept refers to is wanted only if a call that is kept wants it. */
+    for (size_t n_chunk = 0;
+                n_chunk < in_n_chunks;
+              ++n_chunk)
+    {
+        if (in_is_dropped_chunk_vec.at(n_chunk) )
+        {
+            use_vec.at(n_chunk) = ChunkUse::REFERRED_BY_UNWANTING_CALLS_ONLY;
+        }
+    }
+
     for (const auto& call : in_call_vec)
     {
-        const bool is_wanted = in_options.chunk_wanted_func(call,
-                                                            frame_index);
+        const bool is_wanted = (in_options.chunk_wanted_func) ? in_options.chunk_wanted_func(call,
+                                                                                             frame_index)
+                                                              : true;
 
         for (const auto* arg_vec_ptr : {&call.arg_in_vec, &call.arg_out_vec})
         {
@@ -229,7 +242,11 @@ bool Capture::APIDumpLoader::SegmentDecoder::parse_segment(FrameStream*   inout_
 {
     constexpr size_t N_COUNTS = 3; /* API calls, data chunks, surfaces */
 
+    CallKeptFunc      call_kept_func;
     uint32_t          counts_u32vec3[N_COUNTS] = {};
+    uint64_t          frame_index              = in_options.first_frame_index;
+    bool              has_dropped_call         = false;
+    std::vector<bool> is_dropped_chunk_vec;
     std::vector<bool> is_unwanted_vec;
     bool              result                   = false;
     const size_t segment_header_n_bytes   = sizeof(uint32_t) * N_COUNTS;
@@ -255,6 +272,11 @@ bool Capture::APIDumpLoader::SegmentDecoder::parse_segment(FrameStream*   inout_
 
     result = true;
 
+    if (in_options.call_kept_func_factory)
+    {
+        call_kept_func = in_options.call_kept_func_factory();
+    }
+
     for (uint32_t n_api_call = 0;
                   n_api_call < counts_u32vec3[0];
                 ++n_api_call)
@@ -269,12 +291,66 @@ bool Capture::APIDumpLoader::SegmentDecoder::parse_segment(FrameStream*   inout_
             goto end;
         }
 
-        out_workload_ptr->dumped_api_call_vec_ptr->emplace_back(std::move(new_api_call) );
+        /* A call that ends a frame is kept whatever the function says, as the frames are counted by them. */
+        const bool is_boundary = is_frame_boundary(new_api_call);
+        bool       is_kept     = true;
+
+        if (call_kept_func &&
+            is_boundary == false)
+        {
+            is_kept = call_kept_func(new_api_call,
+                                     frame_index);
+        }
+
+        if (is_boundary)
+        {
+            frame_index++;
+        }
+
+        if (is_kept)
+        {
+            out_workload_ptr->dumped_api_call_vec_ptr->emplace_back(std::move(new_api_call) );
+        }
+        else
+        {
+            has_dropped_call = true;
+
+            if (is_dropped_chunk_vec.empty() )
+            {
+                is_dropped_chunk_vec.assign(counts_u32vec3[1],
+                                            false);
+            }
+
+            for (const auto* arg_vec_ptr : {&new_api_call.arg_in_vec, &new_api_call.arg_out_vec})
+            {
+                for (const auto& arg : *arg_vec_ptr)
+                {
+                    if (arg.type == APIInterceptor::ARGTYPE_DATA_CHUNK_ID)
+                    {
+                        const uint32_t chunk_id = arg.get_data_chunk_id();
+
+                        if (chunk_id                                   >= in_options.first_data_chunk_id &&
+                            chunk_id - in_options.first_data_chunk_id  <  counts_u32vec3[1])
+                        {
+                            is_dropped_chunk_vec.at(chunk_id - in_options.first_data_chunk_id) = true;
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    if (in_options.chunk_wanted_func)
+    if (in_options.chunk_wanted_func ||
+        has_dropped_call)
     {
+        if (is_dropped_chunk_vec.empty() )
+        {
+            is_dropped_chunk_vec.assign(counts_u32vec3[1],
+                                        false);
+        }
+
         is_unwanted_vec = find_unwanted_chunks(*out_workload_ptr->dumped_api_call_vec_ptr,
+                                               is_dropped_chunk_vec,
                                                in_options,
                                                counts_u32vec3[1]);
     }

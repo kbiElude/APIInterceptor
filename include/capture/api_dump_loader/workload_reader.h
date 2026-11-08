@@ -44,6 +44,12 @@ namespace Capture
 
             struct Options
             {
+                /* Makes the function that says which calls of a segment are kept, for each segment (see CallKeptFunc). The calls it does not keep never reach the
+                 * caller, which is what makes a replay that leaves out what some frames make cheap: they are not made into calls. Only for the segments that
+                 * segment_start_vec has. Empty: all calls are kept.
+                 */
+                CallKeptFuncFactory call_kept_func_factory;
+
                 /* Asked of each call, with the number of its frame: the data chunks that calls refer to and none of them wants come as empty chunks (the
                  * chunks after them keep their numbers). For a replay that leaves out what some frames make. It is asked by the threads of the reader, as
                  * a segment is decoded, and only of the segments that segment_start_vec has. Empty: all chunks are wanted.

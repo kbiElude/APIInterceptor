@@ -37,6 +37,17 @@ namespace Capture
         typedef std::function<bool(const DumpedAPICall& in_call,
                                    const uint64_t&      in_frame_index)> ChunkWantedFunc;
 
+        /* Whether a call is kept in the segment it is read in (false: it is not made into a call at all, and the chunks that only such calls refer to are left
+         * out): asked with the call and the number of its frame, in the order of the calls of the segment. A call that ends a frame is kept whatever it says.
+         */
+        typedef std::function<bool(const DumpedAPICall& in_call,
+                                   const uint64_t&      in_frame_index)> CallKeptFunc;
+
+        /* Makes the function of one segment. The threads which read segments at the same time each ask it for one, so a function may keep what it follows from
+         * call to call (it sees one segment, from its first call).
+         */
+        typedef std::function<CallKeptFunc()> CallKeptFuncFactory;
+
         typedef std::vector<uint8_t>                 DataChunk;
         typedef std::unique_ptr<DataChunk>           DataChunkUniquePtr;
         typedef std::vector<DumpedAPICall>           DumpedAPICallVector;
