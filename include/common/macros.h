@@ -36,6 +36,19 @@
                                                   #value,                     \
                                                   static_cast<uint64_t>(value) )
 
+/* A condition that must hold in every build, for a use that the code does not support correctly: when it does not, ends the process, saying the condition,
+ * where it is, and the message (which says what is not implemented). Not for what a bug of the code breaks (that is AI_ASSERT, in the debug build).
+ */
+#define AI_ASSERT_ALWAYS(assertion, message)                                  \
+    if ((assertion) == false)                                                 \
+    {                                                                         \
+        APIInterceptor::FatalError::assertion_failed(__FILE__,                \
+                                                     __LINE__,                \
+                                                     __FUNCTION__,            \
+                                                     #assertion,              \
+                                                     message);                \
+    }
+
 #define AI_NOT_IMPLEMENTED() \
     MessageBox(HWND_DESKTOP, "Functionality not implemented!", __FUNCTION__ "()", MB_OK | MB_ICONERROR);
 

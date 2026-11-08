@@ -16,6 +16,13 @@ namespace APIInterceptor
     class FatalError
     {
     public:
+        /* Says which condition does not hold, where, and what it means (see AI_ASSERT_ALWAYS()), the way unsupported_value() does, then ends the process. */
+        [[noreturn]] static void assertion_failed(const char*     in_filename_ptr,
+                                                  const uint32_t& in_line,
+                                                  const char*     in_function_ptr,
+                                                  const char*     in_expression_ptr,
+                                                  const char*     in_message_ptr);
+
         /* What the process exits with. */
         static uint32_t get_exit_code();
 
@@ -27,6 +34,11 @@ namespace APIInterceptor
                                                    const char*     in_function_ptr,
                                                    const char*     in_expression_ptr,
                                                    const uint64_t& in_value);
+
+    private:
+        /* To the standard error stream, to the debugger and (with no console, unless the environment says otherwise) to the user in a box; then ends the process. */
+        [[noreturn]] static void report_and_end_process(const char* in_message_ptr,
+                                                        const char* in_title_ptr);
     };
 }
 
