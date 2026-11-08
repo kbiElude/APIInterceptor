@@ -10,6 +10,7 @@
 #include "gl_index_replayer.h"
 #include "gl_mapping_replayer.h"
 #include "gl_replay_context.h"
+#include "gl_state_saver.h"
 #include "i_call_executor.h"
 #include "object_remapper.h"
 #include <map>
@@ -30,14 +31,17 @@ namespace Replay
              GlCallExecutor(ObjectRemapper* in_remapper_ptr);
             ~GlCallExecutor();
 
-            bool        execute           (const Capture::APIDumpLoader::DumpedAPICall& in_call,
-                                           const IChunkSource&                          in_chunk_source,
-                                           std::string*                                 out_error_ptr) override;
-            CallSupport get_call_support  (const APIInterceptor::APIFunction&           in_function) const override;
-            bool        read_back_buffer  (std::vector<uint8_t>*                        out_pixel_u8_vec_ptr,
-                                           FrameImage*                                  out_image_ptr) override;
-            void        on_frame_presented()                                                         override;
-            void        reset             ()                                                         override;
+            bool           execute            (const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                               const IChunkSource&                          in_chunk_source,
+                                               std::string*                                 out_error_ptr)       override;
+            CallSupport    get_call_support   (const APIInterceptor::APIFunction&           in_function)   const override;
+            ExecutionClass get_execution_class(const Capture::APIDumpLoader::DumpedAPICall& in_call)       const override;
+            void           on_frame_presented ()                                                                 override;
+            bool           read_back_buffer   (std::vector<uint8_t>*                        out_pixel_u8_vec_ptr,
+                                               FrameImage*                                  out_image_ptr)       override;
+            void           reset              ()                                                                 override;
+            void           restore_state      ()                                                                 override;
+            void           save_state         ()                                                                 override;
 
         private:
             typedef bool (*InvokeFuncPtr)(GlReplayContext* in_context_ptr,
@@ -80,6 +84,7 @@ namespace Replay
             GlMappingReplayer                                    m_mapping_replayer;
             HMODULE                                              m_opengl32_module;
             std::map<std::string, void*>                         m_proc_ptr_map;
+            GlStateSaver                                         m_state_saver;
         };
     }
 }

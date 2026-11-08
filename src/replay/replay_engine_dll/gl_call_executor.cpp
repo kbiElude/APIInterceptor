@@ -6,6 +6,7 @@
 #include "gl_function_types.h"
 #include "gl_replay_invoker.h"
 #include <array>
+#include <ctype.h>
 #include <string.h>
 
 /* Turns the parenthesized list of the table's entry into the list of an initializer. */
@@ -32,7 +33,11 @@ Replay::ReplayEngineDLL::GlCallExecutor::GlCallExecutor(ObjectRemapper* in_remap
                              {
                                  return get_proc_ptr(in_name_ptr);
                              }),
-     m_opengl32_module      (::LoadLibraryW(L"opengl32.dll") )
+     m_opengl32_module      (::LoadLibraryW(L"opengl32.dll") ),
+     m_state_saver          ([this](const char* in_name_ptr)
+                             {
+                                 return get_proc_ptr(in_name_ptr);
+                             })
 {
     /* Every function of the table. */
     #define GL_REPLAY_FUNCTION(FUNCTION, NAME, FUNCTION_TYPE, RETURN_KIND, KINDS, IGNORED_MASK) \
@@ -365,6 +370,47 @@ bool Replay::ReplayEngineDLL::GlCallExecutor::is_readback_into_memory(const Capt
     return result;
 }
 
+Replay::ReplayEngineDLL::ExecutionClass Replay::ReplayEngineDLL::GlCallExecutor::get_execution_class(const Capture::APIDumpLoader::DumpedAPICall& in_call) const
+{
+    constexpr char CREATE_PREFIX[] = "glCreate";
+    constexpr char DELETE_PREFIX[] = "glDelete";
+    constexpr char GEN_PREFIX[]    = "glGen";
+
+    const auto     entry_iterator = m_entry_map.find(in_call.func);
+    ExecutionClass result         = ExecutionClass::EVERY_TIME;
+
+    if (entry_iterator != m_entry_map.end() )
+    {
+        const char* name_ptr = entry_iterator->second.info.name_ptr;
+
+        /* What makes an object gives it a name that the replay maps to what the driver hands out: it is done once, or the second execution would make others. glGen is
+         * followed by the plural of the object (glGenTextures), where glGenerateMipmap has a lowercase letter.
+         */
+        const bool makes_object = (::strncmp(name_ptr,
+                                             CREATE_PREFIX,
+                                             sizeof(CREATE_PREFIX) - 1) == 0 ||
+                                   (::strncmp(name_ptr,
+                                              GEN_PREFIX,
+                                              sizeof(GEN_PREFIX) - 1) == 0 &&
+                                    ::isupper(static_cast<unsigned char>(name_ptr[sizeof(GEN_PREFIX) - 1]) ) != 0) );
+
+        if (makes_object)
+        {
+            result = ExecutionClass::FIRST_TIME_ONLY;
+        }
+        else
+        if (::strncmp(name_ptr,
+                      DELETE_PREFIX,
+                      sizeof(DELETE_PREFIX) - 1) == 0)
+        {
+            /* What the last execution may still use. */
+            result = ExecutionClass::AFTER_ALL;
+        }
+    }
+
+    return result;
+}
+
 Replay::ReplayEngineDLL::CallSupport Replay::ReplayEngineDLL::GlCallExecutor::get_call_support(const APIInterceptor::APIFunction& in_function) const
 {
     return (m_entry_map.find(in_function) != m_entry_map.end() ) ? CallSupport::REPLAYED
@@ -471,4 +517,14 @@ void Replay::ReplayEngineDLL::GlCallExecutor::reset()
     m_context.forget_locations();
     m_mapping_replayer.reset  ();
     m_proc_ptr_map.clear      ();
+}
+
+void Replay::ReplayEngineDLL::GlCallExecutor::restore_state()
+{
+    m_state_saver.restore();
+}
+
+void Replay::ReplayEngineDLL::GlCallExecutor::save_state()
+{
+    m_state_saver.save();
 }
