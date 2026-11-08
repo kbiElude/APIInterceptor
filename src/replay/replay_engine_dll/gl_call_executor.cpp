@@ -299,6 +299,13 @@ bool Replay::ReplayEngineDLL::GlCallExecutor::execute(const Capture::APIDumpLoad
         }
     }
 
+    if (is_readback_into_memory(in_call) )
+    {
+        result = true;
+
+        goto end;
+    }
+
     proc_ptr = get_proc_ptr(entry_iterator->second.info.name_ptr);
 
     if (proc_ptr == nullptr)
@@ -325,6 +332,36 @@ bool Replay::ReplayEngineDLL::GlCallExecutor::execute(const Capture::APIDumpLoad
     result = true;
 
 end:
+    return result;
+}
+
+bool Replay::ReplayEngineDLL::GlCallExecutor::is_readback_into_memory(const Capture::APIDumpLoader::DumpedAPICall& in_call) const
+{
+    bool result = false;
+
+    switch (in_call.func)
+    {
+        case APIInterceptor::APIFUNCTION_GL_GLGETFLOATV:
+        {
+            result = true;
+
+            break;
+        }
+
+        case APIInterceptor::APIFUNCTION_GL_GLREADPIXELS:
+        {
+            /* With a pixel pack buffer bound the pixels go to a buffer of the GPU, which later calls may use. */
+            result = (m_context.is_pixel_pack_buffer_bound() == false);
+
+            break;
+        }
+
+        default:
+        {
+            break;
+        }
+    }
+
     return result;
 }
 

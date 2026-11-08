@@ -61,6 +61,10 @@ namespace Replay
                                           const size_t&                                in_n_head_arguments);
             void  after_call             (const Capture::APIDumpLoader::DumpedAPICall& in_call);
             void* get_proc_ptr           (const char*                                  in_name_ptr);
+            /* Whether the call only reads state into the memory of the application (glGetFloatv, glReadPixels with no pixel pack buffer bound): what the app computed of it
+             * is in the calls that follow, as it was dumped, and a replay has no use for the values, so it does not make the call.
+             */
+            bool  is_readback_into_memory(const Capture::APIDumpLoader::DumpedAPICall& in_call) const;
             void  register_returned_index(const Capture::APIDumpLoader::DumpedAPICall& in_call,
                                           const ObjectKind&                            in_kind,
                                           const bool&                                  in_has_scope);
