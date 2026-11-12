@@ -37,7 +37,7 @@ bool Replay::ReplayPlayerSupport::PlayerLauncher::is_handover_needed(const char*
 {
     constexpr uint32_t N_BYTES_PER_POINTER_X86 = 4;
 
-    /* Only a 64-bit player hands over, and only a dump with 32-bit pointers can hold D3D7 or D3D8. */
+    /* Only a 64-bit player hands over, and only a dump with 32-bit pointers can hold D3D7, D3D8 or OpenGL of a 32-bit application. */
     bool result = false;
 
     if (sizeof(void*) != N_BYTES_PER_POINTER_X86)
@@ -59,7 +59,9 @@ bool Replay::ReplayPlayerSupport::PlayerLauncher::is_handover_needed(const char*
                         const auto group = Capture::APIDumpLoader::get_api_group(call.func);
 
                         if (group == Capture::APIDumpLoader::APIGroup::D3D7 ||
-                            group == Capture::APIDumpLoader::APIGroup::D3D8)
+                            group == Capture::APIDumpLoader::APIGroup::D3D8 ||
+                            group == Capture::APIDumpLoader::APIGroup::GL   ||
+                            group == Capture::APIDumpLoader::APIGroup::WGL)
                         {
                             result = true;
 

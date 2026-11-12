@@ -12,11 +12,11 @@ namespace Replay
 {
     namespace ReplayPlayerSupport
     {
-        /* Direct3D 7 and 8 are 32-bit only: a workload with their calls is handed from the 64-bit player to the 32-bit one next to it. */
+        /* Direct3D 7 and 8 are 32-bit only, and so is the OpenGL of a 32-bit application: a workload with their calls is handed from the 64-bit player to the 32-bit one next to it. */
         class PlayerLauncher
         {
         public:
-            /* True if this is the 64-bit player and the workload holds D3D7 or D3D8 calls. False if the file cannot be read: the replay
+            /* True if this is the 64-bit player and the workload holds D3D7, D3D8, OpenGL or WGL calls of a 32-bit application. False if the file cannot be read: the replay
              * reports it.
              */
             static bool is_handover_needed(const char* in_workload_path_ptr);
