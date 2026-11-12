@@ -27,6 +27,7 @@ if (APIINTERCEPTOR_BUILD_TESTS)
                                        "${APIInterceptor_SOURCE_DIR}/src/common/api_call_gate.cpp"
                                        "${APIInterceptor_SOURCE_DIR}/src/common/callback_registry.cpp"
                                        "${APIInterceptor_SOURCE_DIR}/src/common/callbacks.cpp"
+                                       "${APIInterceptor_SOURCE_DIR}/src/common/chunk_pool.cpp"
                                        "${APIInterceptor_SOURCE_DIR}/src/common/data_chunk_store.cpp"
                                        "${APIInterceptor_SOURCE_DIR}/src/common/memory_chunk.cpp"
                                        "${APIInterceptor_SOURCE_DIR}/src/interception/hooks/OpenGL/buffer_manager.cpp"

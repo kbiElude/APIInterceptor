@@ -5,6 +5,7 @@
 #ifndef COMMON_DATA_CHUNK_STORE_H
 #define COMMON_DATA_CHUNK_STORE_H
 
+#include "common/chunk_pool.h"
 #include "common/types.h"
 #include <deque>
 #include <memory>
@@ -17,7 +18,8 @@ namespace APIInterceptor
      *
      * The chunks are numbered as they come, and a number is never used again, but the store holds only those from the oldest one
      * which was not taken or released: the ones before it are gone, and are dropped from the front as soon as they are, or the store
-     * would grow for as long as the process runs. Any thread.
+     * would grow for as long as the process runs. The vectors that held small chunks are kept when the chunks go, to hold the next ones (see ChunkPool), so
+     * that a call that makes a chunk does not allocate. Any thread.
      */
     class DataChunkStore
     {
@@ -32,6 +34,9 @@ namespace APIInterceptor
         /* The numbers which were given out so far: the ones which are gone count. */
         uint32_t get_n_chunks();
 
+        /* How many chunks the store holds: the ones which were not taken or released. */
+        uint32_t get_n_held_chunks();
+
         DataChunkID register_chunk(const void*        in_data_ptr,
                                    const uint32_t&    in_n_bytes);
         void        release       (const DataChunkID& in_data_chunk_id);
@@ -42,6 +47,14 @@ namespace APIInterceptor
         bool take(const DataChunkID&    in_data_chunk_id,
                   std::vector<uint8_t>* out_data_chunk_ptr);
 
+        /* Moves the contents of the chunks of the numbers out of the store, each into the vector that is given for it (the two change contents: nothing is
+         * allocated), with the lock taken once. A chunk which is not there (it was taken, or released, or never made, or is named twice) leaves its vector as
+         * it is, and says so in the flags (1 for each that was taken, one for each number); returns how many were taken.
+         */
+        uint32_t take_chunks(const std::vector<DataChunkID>&            in_data_chunk_id_vec,
+                             const std::vector<std::vector<uint8_t>*>& in_destination_ptr_vec,
+                             std::vector<uint8_t>*                     out_is_taken_u8_vec_ptr);
+
         /* Moves the contents of the chunks out of the store, in one go. A chunk which is not there comes out empty. */
         void take_range(const DataChunkID&                  in_first_data_chunk_id,
                         const uint32_t&                     in_n_data_chunks,
@@ -50,7 +63,7 @@ namespace APIInterceptor
         static DataChunkStore* get_ptr();
 
     private:
-        typedef std::unique_ptr<std::vector<uint8_t> > ChunkUniquePtr;
+        typedef ChunkPool::ChunkUniquePtr ChunkUniquePtr;
 
         /* The chunks, and the mutex that guards them: all accesses to the members must be done with it held. */
         struct Chunks
@@ -58,6 +71,7 @@ namespace APIInterceptor
             std::deque<ChunkUniquePtr> chunk_deque; /* chunk_deque.front() is the chunk numbered first_id */
             uint32_t                   first_id = 0;
             std::mutex                 mutex;
+            ChunkPool                  pool;        /* the vectors of the small chunks that are gone     */
         };
 
         /* The chunk of the number, or nullptr if there is none. */

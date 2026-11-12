@@ -26,6 +26,11 @@ uint32_t APIInterceptor::get_n_data_chunks()
     return DataChunkStore::get_ptr()->get_n_chunks();
 }
 
+uint32_t APIInterceptor::get_n_held_data_chunks()
+{
+    return DataChunkStore::get_ptr()->get_n_held_chunks();
+}
+
 bool APIInterceptor::get_post_callback_for_function(const APIFunction&       in_api_func,
                                                     PFNPOSTCALLBACKFUNCPROC* out_callback_func_ptr,
                                                     void**                   out_user_arg_ptr)
@@ -123,6 +128,15 @@ void APIInterceptor::take_data_chunks(const DataChunkID&                  in_fir
     DataChunkStore::get_ptr()->take_range(in_first_data_chunk_id,
                                           in_n_data_chunks,
                                           out_data_chunk_vec_ptr);
+}
+
+uint32_t APIInterceptor::take_data_chunks_by_id(const std::vector<DataChunkID>&            in_data_chunk_id_vec,
+                                                const std::vector<std::vector<uint8_t>*>& in_destination_ptr_vec,
+                                                std::vector<uint8_t>*                     out_is_taken_u8_vec_ptr)
+{
+    return DataChunkStore::get_ptr()->take_chunks(in_data_chunk_id_vec,
+                                                  in_destination_ptr_vec,
+                                                  out_is_taken_u8_vec_ptr);
 }
 
 bool APIInterceptor::try_quiesce_api_calls(const uint32_t& in_timeout_ms)
