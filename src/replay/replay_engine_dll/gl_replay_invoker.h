@@ -18,7 +18,7 @@ namespace Replay
 {
     namespace ReplayEngineDLL
     {
-        namespace GlReplay
+        namespace GLReplay
         {
             /* Calls the function, and keeps the value it returns. */
             template<typename ReturnType>
@@ -83,8 +83,8 @@ namespace Replay
                     return sizeof...(Arguments);
                 }
 
-                /* The context holds the call (see GlReplayContext::begin_call()). */
-                static bool invoke(GlReplayContext* in_context_ptr,
+                /* The context holds the call (see GLReplayContext::begin_call()). */
+                static bool invoke(GLReplayContext* in_context_ptr,
                                    void*            in_function_ptr,
                                    std::string*     out_error_ptr)
                 {
@@ -96,12 +96,12 @@ namespace Replay
 
             private:
                 template<size_t... Indices>
-                static bool invoke_impl(GlReplayContext*     in_context_ptr,
+                static bool invoke_impl(GLReplayContext*     in_context_ptr,
                                         void*                in_function_ptr,
                                         std::string*         out_error_ptr,
                                         std::index_sequence<Indices...>)
                 {
-                    std::tuple<GlRestore::ArgumentRestorer<Arguments, GlRestore::ArgumentCategoryOf<Arguments>::value>...> restorers;
+                    std::tuple<GLRestore::ArgumentRestorer<Arguments, GLRestore::ArgumentCategoryOf<Arguments>::value>...> restorers;
                     bool                                                                                                   is_ok  = true;
                     ReturnHolder<ReturnType>                                                                               holder;
                     bool                                                                                                   result = false;

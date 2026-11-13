@@ -3,7 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  *
  * The restorer of an argument of a replayed call which has nothing to do after the call: what the restorers of the numbers and of the
- * structures that are only read are made on. The context is that of the API (D3D8ReplayContext, GlReplayContext).
+ * structures that are only read are made on. The context is that of the API (D3D8ReplayContext, GLReplayContext).
  */
 #ifndef REPLAYENGINEDLL_PASSIVE_RESTORER_H
 #define REPLAYENGINEDLL_PASSIVE_RESTORER_H

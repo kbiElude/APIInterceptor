@@ -18,13 +18,13 @@ namespace Replay
 {
     namespace ReplayEngineDLL
     {
-        class GlFrameReader
+        class GLFrameReader
         {
         public:
             /* The way to the functions of GL by name (those of opengl32.dll and of the driver). */
             typedef std::function<void*(const char*)> ResolveFunc;
 
-            explicit GlFrameReader(ResolveFunc in_resolve_func);
+            explicit GLFrameReader(ResolveFunc in_resolve_func);
 
             /* Reads the image of the window of the current context into what is asked for (a null pointer is not asked for): the pixels as rows from the
              * top, four bytes each (blue, green, red and an alpha of 255), with no padding; and the image, valid until the next call. False if there

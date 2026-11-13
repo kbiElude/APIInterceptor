@@ -16,12 +16,12 @@ namespace Replay
          * reads (see Interception::Hooks::OpenGL::ClientArrayManager for the layout) as the last argument of the call; before the call, the arrays
          * are pointed at the copy.
          */
-        class GlClientArrayReplayer
+        class GLClientArrayReplayer
         {
         public:
             typedef std::function<void*(const char*)> ResolveFunc;
 
-            GlClientArrayReplayer(GlReplayContext* in_context_ptr,
+            GLClientArrayReplayer(GLReplayContext* in_context_ptr,
                                   ResolveFunc      in_resolve_func);
 
             /* Points the arrays at the snapshot (a chunk, as the dumper made it). */
@@ -69,7 +69,7 @@ namespace Replay
                                     const SnapshotArray& in_array,
                                     const void*          in_pointer);
 
-            GlReplayContext* m_context_ptr;
+            GLReplayContext* m_context_ptr;
             ResolveFunc      m_resolve_func;
         };
     }

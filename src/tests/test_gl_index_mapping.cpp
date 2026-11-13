@@ -15,10 +15,10 @@ namespace
     struct IndexFixture
     {
         Capture::APIDumpLoader::DumpedAPICall     call;
-        Replay::ReplayEngineDLL::GlFunctionInfo  info;
+        Replay::ReplayEngineDLL::GLFunctionInfo  info;
         Replay::ReplayEngineDLL::ObjectRemapper  remapper;
-        Replay::ReplayEngineDLL::GlReplayContext context;
-        Replay::ReplayEngineDLL::GlIndexReplayer replayer;
+        Replay::ReplayEngineDLL::GLReplayContext context;
+        Replay::ReplayEngineDLL::GLIndexReplayer replayer;
         Replay::ReplayEngineDLL::CallWalker      walker;
 
         IndexFixture()
@@ -45,7 +45,7 @@ namespace
     };
 }
 
-TEST(GlIndexMapping, AnIndexIsMappedOnlyForTheProgramThatHandedItOut)
+TEST(GLIndexMapping, AnIndexIsMappedOnlyForTheProgramThatHandedItOut)
 {
     IndexFixture fixture;
 
@@ -67,7 +67,7 @@ TEST(GlIndexMapping, AnIndexIsMappedOnlyForTheProgramThatHandedItOut)
                       2u);
 }
 
-TEST(GlIndexMapping, TheIndicesOfSubroutinesAreThoseOfTheShaderStage)
+TEST(GLIndexMapping, TheIndicesOfSubroutinesAreThoseOfTheShaderStage)
 {
     IndexFixture fixture;
 
@@ -89,7 +89,7 @@ TEST(GlIndexMapping, TheIndicesOfSubroutinesAreThoseOfTheShaderStage)
                       1u);
 }
 
-TEST(GlIndexMapping, ElementsGoToThePositionsOfTheReplay)
+TEST(GLIndexMapping, ElementsGoToThePositionsOfTheReplay)
 {
     IndexFixture fixture;
 
@@ -119,7 +119,7 @@ TEST(GlIndexMapping, ElementsGoToThePositionsOfTheReplay)
               100u);
 }
 
-TEST(GlIndexMapping, ElementsWithoutAMapStayWhereTheyAre)
+TEST(GLIndexMapping, ElementsWithoutAMapStayWhereTheyAre)
 {
     IndexFixture fixture;
 
@@ -132,7 +132,7 @@ TEST(GlIndexMapping, ElementsWithoutAMapStayWhereTheyAre)
               dumped_vec);
 }
 
-TEST(GlIndexMapping, AnElementThatTakesAFreePlaceDoesNotRunOverAMappedOne)
+TEST(GLIndexMapping, AnElementThatTakesAFreePlaceDoesNotRunOverAMappedOne)
 {
     IndexFixture fixture;
 

@@ -57,7 +57,7 @@ TEST(GLCallExecutor, StateMatricesDrawsAndUploadsAreMadeInEachExecution)
               ExecutionClass::EVERY_TIME);
 }
 
-TEST(GLCallExecutor, GlGenerateMipmapMakesNoObject)
+TEST(GLCallExecutor, GLGenerateMipmapMakesNoObject)
 {
     /* It starts like glGenTextures does, and generates the levels of a texture that is there. */
     EXPECT_EQ(get_class_of(APIInterceptor::APIFUNCTION_GL_GLGENERATEMIPMAP),

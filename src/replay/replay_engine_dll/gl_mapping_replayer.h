@@ -17,12 +17,12 @@ namespace Replay
          * with the call that unmaps (or flushes) it: at that call, the data goes to the memory that the replay's own mapping
          * gave out.
          */
-        class GlMappingReplayer
+        class GLMappingReplayer
         {
         public:
             typedef std::function<void*(const char*)> ResolveFunc;
 
-            GlMappingReplayer(GlReplayContext* in_context_ptr,
+            GLMappingReplayer(GLReplayContext* in_context_ptr,
                               ResolveFunc      in_resolve_func);
 
             bool replay(const Capture::APIDumpLoader::DumpedAPICall& in_call,
@@ -57,7 +57,7 @@ namespace Replay
             static uint32_t get_first_argument(const Capture::APIDumpLoader::DumpedAPICall& in_call);
 
 
-            GlReplayContext*            m_context_ptr;
+            GLReplayContext*            m_context_ptr;
             std::map<uint64_t, Mapping> m_mapping_map;
             ResolveFunc                 m_resolve_func;
         };

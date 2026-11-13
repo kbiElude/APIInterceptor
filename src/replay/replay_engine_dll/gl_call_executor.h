@@ -48,14 +48,14 @@ namespace Replay
             void* get_proc_ptr(const char* in_name_ptr);
 
         private:
-            typedef bool (*InvokeFuncPtr)(GlReplayContext* in_context_ptr,
+            typedef bool (*InvokeFuncPtr)(GLReplayContext* in_context_ptr,
                                           void*            in_function_ptr,
                                           std::string*     out_error_ptr);
 
             /* A function of the table, and the way to replay it. */
             struct FunctionEntry
             {
-                GlFunctionInfo info;
+                GLFunctionInfo info;
                 InvokeFuncPtr  invoke_func_ptr;
                 size_t         n_head_arguments;
             };
@@ -79,15 +79,15 @@ namespace Replay
             /* wglGetProcAddress() says a function is not there by one of these. */
             static bool is_valid_proc(const void* in_proc_ptr);
 
-            GlClientArrayReplayer                                m_client_array_replayer;
-            GlReplayContext                                      m_context;
-            GlIndexReplayer                                      m_index_replayer;
+            GLClientArrayReplayer                                m_client_array_replayer;
+            GLReplayContext                                      m_context;
+            GLIndexReplayer                                      m_index_replayer;
             std::map<APIInterceptor::APIFunction, FunctionEntry> m_entry_map;
-            GlFrameReader                                        m_frame_reader;
-            GlMappingReplayer                                    m_mapping_replayer;
+            GLFrameReader                                        m_frame_reader;
+            GLMappingReplayer                                    m_mapping_replayer;
             HMODULE                                              m_opengl32_module;
             std::map<std::string, void*>                         m_proc_ptr_map;
-            GlStateSaver                                         m_state_saver;
+            GLStateSaver                                         m_state_saver;
         };
     }
 }

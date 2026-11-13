@@ -7,7 +7,7 @@
 #include <Windows.h>
 #include "Khronos/GL/glcorearb.h"
 
-Replay::ReplayEngineDLL::GlIndexReplayer::GlIndexReplayer(GlReplayContext* in_context_ptr,
+Replay::ReplayEngineDLL::GLIndexReplayer::GLIndexReplayer(GLReplayContext* in_context_ptr,
                                                             ResolveFunc      in_resolve_func)
     :m_context_ptr (in_context_ptr),
      m_resolve_func(in_resolve_func)
@@ -15,7 +15,7 @@ Replay::ReplayEngineDLL::GlIndexReplayer::GlIndexReplayer(GlReplayContext* in_co
     /* Stub */
 }
 
-std::vector<uint32_t> Replay::ReplayEngineDLL::GlIndexReplayer::get_numbers(const GlReplayContext& in_context,
+std::vector<uint32_t> Replay::ReplayEngineDLL::GLIndexReplayer::get_numbers(const GLReplayContext& in_context,
                                                                               const size_t&          in_n_argument)
 {
     const APIInterceptor::APIFunctionArgument* argument_ptr = in_context.get_in_argument_ptr(in_n_argument);
@@ -34,14 +34,14 @@ std::vector<uint32_t> Replay::ReplayEngineDLL::GlIndexReplayer::get_numbers(cons
     return result_vec;
 }
 
-bool Replay::ReplayEngineDLL::GlIndexReplayer::is_index_function(const APIInterceptor::APIFunction& in_function)
+bool Replay::ReplayEngineDLL::GLIndexReplayer::is_index_function(const APIInterceptor::APIFunction& in_function)
 {
     return (in_function == APIInterceptor::APIFUNCTION_GL_GLDRAWBUFFERS                 ||
             in_function == APIInterceptor::APIFUNCTION_GL_GLNAMEDFRAMEBUFFERDRAWBUFFERS ||
             in_function == APIInterceptor::APIFUNCTION_GL_GLUNIFORMSUBROUTINESUIV);
 }
 
-std::vector<uint32_t> Replay::ReplayEngineDLL::GlIndexReplayer::permute(const std::vector<uint32_t>& in_dumped_vec,
+std::vector<uint32_t> Replay::ReplayEngineDLL::GLIndexReplayer::permute(const std::vector<uint32_t>& in_dumped_vec,
                                                                         const ObjectKind&            in_kind,
                                                                         const uint32_t&              in_scope,
                                                                         const uint32_t&              in_empty_value) const
@@ -103,7 +103,7 @@ std::vector<uint32_t> Replay::ReplayEngineDLL::GlIndexReplayer::permute(const st
     return result_vec;
 }
 
-bool Replay::ReplayEngineDLL::GlIndexReplayer::replay(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+bool Replay::ReplayEngineDLL::GLIndexReplayer::replay(const Capture::APIDumpLoader::DumpedAPICall& in_call,
                                                       std::string*                                 out_error_ptr)
 {
     bool result = false;
@@ -147,7 +147,7 @@ bool Replay::ReplayEngineDLL::GlIndexReplayer::replay(const Capture::APIDumpLoad
     return result;
 }
 
-bool Replay::ReplayEngineDLL::GlIndexReplayer::replay_draw_buffers(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+bool Replay::ReplayEngineDLL::GLIndexReplayer::replay_draw_buffers(const Capture::APIDumpLoader::DumpedAPICall& in_call,
                                                                    const bool&                                  in_is_named,
                                                                    std::string*                                 out_error_ptr)
 {
@@ -211,7 +211,7 @@ end:
     return result;
 }
 
-bool Replay::ReplayEngineDLL::GlIndexReplayer::replay_uniform_subroutines(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+bool Replay::ReplayEngineDLL::GLIndexReplayer::replay_uniform_subroutines(const Capture::APIDumpLoader::DumpedAPICall& in_call,
                                                                             std::string*                                 out_error_ptr)
 {
     typedef void (APIENTRY* PFNSUBROUTINESPROC)(GLenum, GLsizei, const GLuint*);

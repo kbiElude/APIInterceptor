@@ -19,13 +19,13 @@ namespace Replay
 {
     namespace ReplayEngineDLL
     {
-        class GlStateSaver
+        class GLStateSaver
         {
         public:
             /* The way to the functions of GL by name (those of opengl32.dll and of the driver). */
             typedef std::function<void*(const char*)> ResolveFunc;
 
-            explicit GlStateSaver(ResolveFunc in_resolve_func);
+            explicit GLStateSaver(ResolveFunc in_resolve_func);
 
             /* True after save(), until restore() takes the state back. */
             bool has_saved_state() const;

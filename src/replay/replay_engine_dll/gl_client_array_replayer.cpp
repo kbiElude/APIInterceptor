@@ -8,7 +8,7 @@
 #include "common/macros.h"
 #include "Khronos/GL/glcorearb.h"
 
-Replay::ReplayEngineDLL::GlClientArrayReplayer::GlClientArrayReplayer(GlReplayContext* in_context_ptr,
+Replay::ReplayEngineDLL::GLClientArrayReplayer::GLClientArrayReplayer(GLReplayContext* in_context_ptr,
                                                                         ResolveFunc      in_resolve_func)
     :m_context_ptr (in_context_ptr),
      m_resolve_func(in_resolve_func)
@@ -16,7 +16,7 @@ Replay::ReplayEngineDLL::GlClientArrayReplayer::GlClientArrayReplayer(GlReplayCo
     /* Stub */
 }
 
-bool Replay::ReplayEngineDLL::GlClientArrayReplayer::apply(const uint8_t* in_snapshot_ptr,
+bool Replay::ReplayEngineDLL::GLClientArrayReplayer::apply(const uint8_t* in_snapshot_ptr,
                                                              const size_t&  in_n_bytes)
 {
     /* Compatibility-profile token which the core headers do not have. */
@@ -97,7 +97,7 @@ end:
     return result;
 }
 
-void Replay::ReplayEngineDLL::GlClientArrayReplayer::apply_array(const SnapshotArray& in_array,
+void Replay::ReplayEngineDLL::GLClientArrayReplayer::apply_array(const SnapshotArray& in_array,
                                                                  const uint8_t*       in_data_ptr)
 {
     /* ClientArrayKind (see OpenGL/types_enums.h). */
@@ -207,7 +207,7 @@ void Replay::ReplayEngineDLL::GlClientArrayReplayer::apply_array(const SnapshotA
     }
 }
 
-uint32_t Replay::ReplayEngineDLL::GlClientArrayReplayer::get_element_stride(const SnapshotArray& in_array)
+uint32_t Replay::ReplayEngineDLL::GLClientArrayReplayer::get_element_stride(const SnapshotArray& in_array)
 {
     uint32_t result = in_array.stride;
 
@@ -220,7 +220,7 @@ uint32_t Replay::ReplayEngineDLL::GlClientArrayReplayer::get_element_stride(cons
     return result;
 }
 
-void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_edge_flag(const SnapshotArray& in_array,
+void Replay::ReplayEngineDLL::GLClientArrayReplayer::point_edge_flag(const SnapshotArray& in_array,
                                                                        const void*          in_pointer)
 {
     typedef void (APIENTRY* PFNEDGEFLAGPOINTERPROC)(GLsizei, const void*);
@@ -234,7 +234,7 @@ void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_edge_flag(const Snaps
     }
 }
 
-void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_generic(const SnapshotArray& in_array,
+void Replay::ReplayEngineDLL::GLClientArrayReplayer::point_generic(const SnapshotArray& in_array,
                                                                      const void*          in_pointer)
 {
     /* ClientArrayManager::SNAPSHOT_FLAG_*. */
@@ -304,7 +304,7 @@ void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_generic(const Snapsho
     }
 }
 
-void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_tex_coord(const SnapshotArray& in_array,
+void Replay::ReplayEngineDLL::GLClientArrayReplayer::point_tex_coord(const SnapshotArray& in_array,
                                                                      const void*          in_pointer)
 {
     typedef void (APIENTRY* PFNCLIENTACTIVETEXTUREPROC)(GLenum);
@@ -326,7 +326,7 @@ void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_tex_coord(const Snaps
     }
 }
 
-void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_with_size(const char*          in_function_name_ptr,
+void Replay::ReplayEngineDLL::GLClientArrayReplayer::point_with_size(const char*          in_function_name_ptr,
                                                                      const SnapshotArray& in_array,
                                                                      const void*          in_pointer)
 {
@@ -343,7 +343,7 @@ void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_with_size(const char*
     }
 }
 
-void Replay::ReplayEngineDLL::GlClientArrayReplayer::point_without_size(const char*          in_function_name_ptr,
+void Replay::ReplayEngineDLL::GLClientArrayReplayer::point_without_size(const char*          in_function_name_ptr,
                                                                         const SnapshotArray& in_array,
                                                                         const void*          in_pointer)
 {

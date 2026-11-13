@@ -17,7 +17,7 @@ namespace Replay
     namespace ReplayEngineDLL
     {
         /* What the table of GL functions says about one of them (see gl_replay_table.inl). */
-        struct GlFunctionInfo
+        struct GLFunctionInfo
         {
             bool                    has_explicit_program;  /* the program of its uniform locations is its first parameter */
             uint32_t                ignored_param_mask;    /* the parameters which are not replayed (passed as null)      */
@@ -30,10 +30,10 @@ namespace Replay
          * locations and the indices that a program hands out (of uniforms, uniform blocks, subroutines...) are told by the
          * program, and kept here.
          */
-        class GlReplayContext : public CallContext
+        class GLReplayContext : public CallContext
         {
         public:
-            GlReplayContext(ObjectRemapper* in_remapper_ptr);
+            GLReplayContext(ObjectRemapper* in_remapper_ptr);
 
             /* Memory which lives till the end of the call, for the arguments which the replay has to make up. */
             std::vector<uint8_t>* allocate_scratch(const size_t& in_n_bytes);
@@ -47,7 +47,7 @@ namespace Replay
             void begin_call(const Capture::APIDumpLoader::DumpedAPICall* in_call_ptr,
                             const IChunkSource*                          in_chunk_source_ptr,
                             const size_t&                                in_n_head_arguments,
-                            const GlFunctionInfo*                        in_function_info_ptr);
+                            const GLFunctionInfo*                        in_function_info_ptr);
 
             void forget_locations();
 
@@ -129,7 +129,7 @@ namespace Replay
 
             std::map<uint32_t, uint32_t>          m_attrib_location_map;
             uint64_t                              m_current_program;
-            const GlFunctionInfo*                 m_function_info_ptr;
+            const GLFunctionInfo*                 m_function_info_ptr;
             std::map<IndexKey, uint32_t>          m_index_map;
             bool                                  m_is_pixel_pack_buffer_bound;
             bool                                  m_is_skipped;

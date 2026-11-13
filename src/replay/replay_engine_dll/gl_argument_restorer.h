@@ -24,7 +24,7 @@ namespace Replay
 {
     namespace ReplayEngineDLL
     {
-        namespace GlRestore
+        namespace GLRestore
         {
             template<typename T>
             struct ArgumentCategoryOf
@@ -38,7 +38,7 @@ namespace Replay
             };
 
             /* The restorers which have nothing to do after the call. */
-            typedef ReplayEngineDLL::PassiveRestorer<GlReplayContext> PassiveRestorer;
+            typedef ReplayEngineDLL::PassiveRestorer<GLReplayContext> PassiveRestorer;
 
             template<typename T,
                      ArgumentCategory category>
@@ -54,7 +54,7 @@ namespace Replay
                     return nullptr;
                 }
 
-                bool prepare(GlReplayContext* in_context_ptr,
+                bool prepare(GLReplayContext* in_context_ptr,
                              const size_t&    in_n_argument,
                              std::string*     out_error_ptr)
                 {
@@ -82,7 +82,7 @@ namespace Replay
                     return m_value;
                 }
 
-                bool prepare(GlReplayContext* in_context_ptr,
+                bool prepare(GLReplayContext* in_context_ptr,
                              const size_t&    in_n_argument,
                              std::string*     out_error_ptr)
                 {
@@ -135,7 +135,7 @@ namespace Replay
                 }
 
                 /* The names the driver wrote are the ones the dump holds: from now on, the dump's names mean them. */
-                void finish(GlReplayContext* in_context_ptr,
+                void finish(GLReplayContext* in_context_ptr,
                             const size_t&    in_n_argument,
                             const bool&      in_is_success)
                 {
@@ -174,7 +174,7 @@ namespace Replay
                     return m_value;
                 }
 
-                bool prepare(GlReplayContext* in_context_ptr,
+                bool prepare(GLReplayContext* in_context_ptr,
                              const size_t&    in_n_argument,
                              std::string*     out_error_ptr)
                 {
@@ -212,7 +212,7 @@ namespace Replay
 
             private:
                 /* Data the dumper copied. An array of names has to be mapped, the rest is passed as it is. */
-                void prepare_array(GlReplayContext*                           in_context_ptr,
+                void prepare_array(GLReplayContext*                           in_context_ptr,
                                    const size_t&                              in_n_argument,
                                    const APIInterceptor::APIFunctionArgument& in_argument)
                 {
@@ -258,7 +258,7 @@ namespace Replay
                 }
 
                 /* An offset, or memory of the dumped process: the driver writes to it, and the dump holds what it wrote. */
-                void prepare_pointer(GlReplayContext*                           in_context_ptr,
+                void prepare_pointer(GLReplayContext*                           in_context_ptr,
                                      const size_t&                              in_n_argument,
                                      const APIInterceptor::APIFunctionArgument& in_argument)
                 {
@@ -329,7 +329,7 @@ namespace Replay
                     return m_value;
                 }
 
-                bool prepare(GlReplayContext* in_context_ptr,
+                bool prepare(GLReplayContext* in_context_ptr,
                              const size_t&    in_n_argument,
                              std::string*     out_error_ptr)
                 {
@@ -394,7 +394,7 @@ namespace Replay
                     return m_value;
                 }
 
-                bool prepare(GlReplayContext* in_context_ptr,
+                bool prepare(GLReplayContext* in_context_ptr,
                              const size_t&    in_n_argument,
                              std::string*     out_error_ptr)
                 {
@@ -486,7 +486,7 @@ namespace Replay
                     return m_value;
                 }
 
-                bool prepare(GlReplayContext* in_context_ptr,
+                bool prepare(GLReplayContext* in_context_ptr,
                              const size_t&    in_n_argument,
                              std::string*     out_error_ptr)
                 {

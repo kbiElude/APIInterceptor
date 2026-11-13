@@ -17,12 +17,12 @@ namespace Replay
          * uniform. The driver of the replay can number them otherwise than the driver of the dump, so the array is permuted
          * to what the replay's program has, and the subroutines are those of its own.
          */
-        class GlIndexReplayer
+        class GLIndexReplayer
         {
         public:
             typedef std::function<void*(const char*)> ResolveFunc;
 
-            GlIndexReplayer(GlReplayContext* in_context_ptr,
+            GLIndexReplayer(GLReplayContext* in_context_ptr,
                             ResolveFunc      in_resolve_func);
 
             /* The array in the order of the replay's numbers: where the n-th element goes is told by the map. */
@@ -47,11 +47,11 @@ namespace Replay
 
 
             /* The elements of an array of 32-bit numbers which the dump holds. */
-            static std::vector<uint32_t> get_numbers(const GlReplayContext& in_context,
+            static std::vector<uint32_t> get_numbers(const GLReplayContext& in_context,
                                                      const size_t&          in_n_argument);
 
 
-            GlReplayContext* m_context_ptr;
+            GLReplayContext* m_context_ptr;
             ResolveFunc      m_resolve_func;
         };
     }

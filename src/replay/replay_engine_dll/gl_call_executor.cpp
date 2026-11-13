@@ -42,7 +42,7 @@ Replay::ReplayEngineDLL::GLCallExecutor::GLCallExecutor(ObjectRemapper* in_remap
     /* Every function of the table. */
     #define GL_REPLAY_FUNCTION(FUNCTION, NAME, FUNCTION_TYPE, RETURN_KIND, KINDS, IGNORED_MASK) \
         { \
-            typedef GlReplay::Invoker<FUNCTION_TYPE> FunctionReplay; \
+            typedef GLReplay::Invoker<FUNCTION_TYPE> FunctionReplay; \
             \
             add_function(FUNCTION, \
                          NAME, \
@@ -274,7 +274,7 @@ bool Replay::ReplayEngineDLL::GLCallExecutor::execute(const Capture::APIDumpLoad
                           entry_iterator->second.n_head_arguments,
                          &entry_iterator->second.info);
 
-    if (GlMappingReplayer::is_mapping_function(in_call.func) )
+    if (GLMappingReplayer::is_mapping_function(in_call.func) )
     {
         result = m_mapping_replayer.replay(in_call,
                                            out_error_ptr);
@@ -282,7 +282,7 @@ bool Replay::ReplayEngineDLL::GLCallExecutor::execute(const Capture::APIDumpLoad
         goto end;
     }
 
-    if (GlIndexReplayer::is_index_function(in_call.func) )
+    if (GLIndexReplayer::is_index_function(in_call.func) )
     {
         result = m_index_replayer.replay(in_call,
                                          out_error_ptr);

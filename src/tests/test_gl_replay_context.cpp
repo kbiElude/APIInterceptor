@@ -16,9 +16,9 @@ namespace
     {
         Capture::APIDumpLoader::DumpedAPICall call;
         Replay::ReplayEngineDLL::CallWalker  walker;
-        Replay::ReplayEngineDLL::GlFunctionInfo info;
+        Replay::ReplayEngineDLL::GLFunctionInfo info;
         Replay::ReplayEngineDLL::ObjectRemapper remapper;
-        Replay::ReplayEngineDLL::GlReplayContext context;
+        Replay::ReplayEngineDLL::GLReplayContext context;
 
         ContextFixture()
             :context(&remapper)
@@ -38,7 +38,7 @@ namespace
     };
 }
 
-TEST(GlReplayContext, UnknownNamesPassThrough)
+TEST(GLReplayContext, UnknownNamesPassThrough)
 {
     ContextFixture fixture;
 
@@ -47,7 +47,7 @@ TEST(GlReplayContext, UnknownNamesPassThrough)
                       7u);
 }
 
-TEST(GlReplayContext, NamesAreMappedPerKind)
+TEST(GLReplayContext, NamesAreMappedPerKind)
 {
     ContextFixture fixture;
 
@@ -63,7 +63,7 @@ TEST(GlReplayContext, NamesAreMappedPerKind)
                       1u);
 }
 
-TEST(GlReplayContext, ElementsOfAUniformArrayFollowTheFirstOne)
+TEST(GLReplayContext, ElementsOfAUniformArrayFollowTheFirstOne)
 {
     ContextFixture fixture;
 
@@ -78,7 +78,7 @@ TEST(GlReplayContext, ElementsOfAUniformArrayFollowTheFirstOne)
               12);
 }
 
-TEST(GlReplayContext, LocationsOfAnotherProgramAreNotUsed)
+TEST(GLReplayContext, LocationsOfAnotherProgramAreNotUsed)
 {
     ContextFixture fixture;
 
@@ -91,7 +91,7 @@ TEST(GlReplayContext, LocationsOfAnotherProgramAreNotUsed)
               4);
 }
 
-TEST(GlReplayContext, ARangeOfDisplayListsIsMappedOneByOne)
+TEST(GLReplayContext, ARangeOfDisplayListsIsMappedOneByOne)
 {
     ContextFixture fixture;
 
@@ -152,7 +152,7 @@ namespace
     }
 }
 
-TEST(GlReplayContext, AQueryOfGlWritesAKnownNumberOfBytesToTheMemoryOfTheProgram)
+TEST(GLReplayContext, AQueryOfGlWritesAKnownNumberOfBytesToTheMemoryOfTheProgram)
 {
     ContextFixture fixture;
 
@@ -167,7 +167,7 @@ TEST(GlReplayContext, AQueryOfGlWritesAKnownNumberOfBytesToTheMemoryOfTheProgram
               0u);
 }
 
-TEST(GlReplayContext, ThePixelsOfAReadAreAsManyAsItsSizeSays)
+TEST(GLReplayContext, ThePixelsOfAReadAreAsManyAsItsSizeSays)
 {
     ContextFixture fixture;
 
@@ -185,7 +185,7 @@ TEST(GlReplayContext, ThePixelsOfAReadAreAsManyAsItsSizeSays)
               64u);
 }
 
-TEST(GlReplayContext, TheRowsOfAReadAreCountedWhole)
+TEST(GLReplayContext, TheRowsOfAReadAreCountedWhole)
 {
     ContextFixture fixture;
 
@@ -200,7 +200,7 @@ TEST(GlReplayContext, TheRowsOfAReadAreCountedWhole)
               640u * 480u * 4u);
 }
 
-TEST(GlReplayContext, AReadThatIsTooLargeIsNotGivenMemory)
+TEST(GLReplayContext, AReadThatIsTooLargeIsNotGivenMemory)
 {
     ContextFixture fixture;
 
@@ -215,7 +215,7 @@ TEST(GlReplayContext, AReadThatIsTooLargeIsNotGivenMemory)
               0u);
 }
 
-TEST(GlReplayContext, WithABufferBoundToThePixelsOfAReadThePointerIsAnOffset)
+TEST(GLReplayContext, WithABufferBoundToThePixelsOfAReadThePointerIsAnOffset)
 {
     ContextFixture fixture;
 
@@ -232,7 +232,7 @@ TEST(GlReplayContext, WithABufferBoundToThePixelsOfAReadThePointerIsAnOffset)
               0u);
 }
 
-TEST(GlReplayContext, AFunctionOfNoKnownOutputIsGivenNoMemory)
+TEST(GLReplayContext, AFunctionOfNoKnownOutputIsGivenNoMemory)
 {
     ContextFixture fixture;
 
@@ -245,10 +245,10 @@ TEST(GlReplayContext, AFunctionOfNoKnownOutputIsGivenNoMemory)
               0u);
 }
 
-TEST(GlArgumentRestorer, APlaceThatACallWritesToIsMemoryOfTheReplay)
+TEST(GLArgumentRestorer, APlaceThatACallWritesToIsMemoryOfTheReplay)
 {
-    typedef Replay::ReplayEngineDLL::GlRestore::ArgumentRestorer<GLfloat*,
-                                                                 Replay::ReplayEngineDLL::GlRestore::ArgumentCategory::POINTER> OutputRestorer;
+    typedef Replay::ReplayEngineDLL::GLRestore::ArgumentRestorer<GLfloat*,
+                                                                 Replay::ReplayEngineDLL::GLRestore::ArgumentCategory::POINTER> OutputRestorer;
 
     ContextFixture fixture;
     OutputRestorer restorer;
@@ -271,10 +271,10 @@ TEST(GlArgumentRestorer, APlaceThatACallWritesToIsMemoryOfTheReplay)
     EXPECT_FALSE(fixture.context.is_skipped() );
 }
 
-TEST(GlArgumentRestorer, APlaceThatIsOnlyReadFromIsNotMadeUp)
+TEST(GLArgumentRestorer, APlaceThatIsOnlyReadFromIsNotMadeUp)
 {
-    typedef Replay::ReplayEngineDLL::GlRestore::ArgumentRestorer<const GLfloat*,
-                                                                 Replay::ReplayEngineDLL::GlRestore::ArgumentCategory::POINTER> InputRestorer;
+    typedef Replay::ReplayEngineDLL::GLRestore::ArgumentRestorer<const GLfloat*,
+                                                                 Replay::ReplayEngineDLL::GLRestore::ArgumentCategory::POINTER> InputRestorer;
 
     ContextFixture fixture;
     InputRestorer  restorer;

@@ -34,12 +34,12 @@ namespace
     }
 }
 
-TEST(GlFrameReader, TheRowsAreFromTheTop)
+TEST(GLFrameReader, TheRowsAreFromTheTop)
 {
     auto pixel_u8vec = make_pixels(2,
                                    4);
 
-    Replay::ReplayEngineDLL::GlFrameReader::make_top_down_and_opaque(2,
+    Replay::ReplayEngineDLL::GLFrameReader::make_top_down_and_opaque(2,
                                                                      4,
                                                                      &pixel_u8vec);
 
@@ -58,12 +58,12 @@ TEST(GlFrameReader, TheRowsAreFromTheTop)
               0u);
 }
 
-TEST(GlFrameReader, TheMiddleRowOfAnOddNumberOfThemStaysWhereItIs)
+TEST(GLFrameReader, TheMiddleRowOfAnOddNumberOfThemStaysWhereItIs)
 {
     auto pixel_u8vec = make_pixels(3,
                                    3);
 
-    Replay::ReplayEngineDLL::GlFrameReader::make_top_down_and_opaque(3,
+    Replay::ReplayEngineDLL::GLFrameReader::make_top_down_and_opaque(3,
                                                                      3,
                                                                      &pixel_u8vec);
 
@@ -75,12 +75,12 @@ TEST(GlFrameReader, TheMiddleRowOfAnOddNumberOfThemStaysWhereItIs)
               0u);
 }
 
-TEST(GlFrameReader, EveryPixelIsOpaqueAndTheOtherBytesAreAsTheyWere)
+TEST(GLFrameReader, EveryPixelIsOpaqueAndTheOtherBytesAreAsTheyWere)
 {
     auto pixel_u8vec = make_pixels(2,
                                    2);
 
-    Replay::ReplayEngineDLL::GlFrameReader::make_top_down_and_opaque(2,
+    Replay::ReplayEngineDLL::GLFrameReader::make_top_down_and_opaque(2,
                                                                      2,
                                                                      &pixel_u8vec);
 
@@ -95,9 +95,9 @@ TEST(GlFrameReader, EveryPixelIsOpaqueAndTheOtherBytesAreAsTheyWere)
     }
 }
 
-TEST(GlFrameReader, ThereIsNoImageWithoutAContext)
+TEST(GLFrameReader, ThereIsNoImageWithoutAContext)
 {
-    Replay::ReplayEngineDLL::GlFrameReader reader([](const char*) -> void*
+    Replay::ReplayEngineDLL::GLFrameReader reader([](const char*) -> void*
                                                   {
                                                       return nullptr;
                                                   });

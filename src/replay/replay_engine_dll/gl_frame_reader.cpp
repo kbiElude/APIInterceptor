@@ -6,13 +6,13 @@
 #include <string.h>
 #include <Windows.h>
 
-Replay::ReplayEngineDLL::GlFrameReader::GlFrameReader(ResolveFunc in_resolve_func)
+Replay::ReplayEngineDLL::GLFrameReader::GLFrameReader(ResolveFunc in_resolve_func)
     :m_resolve_func(in_resolve_func)
 {
     /* Stub */
 }
 
-void Replay::ReplayEngineDLL::GlFrameReader::make_top_down_and_opaque(const uint32_t&       in_width,
+void Replay::ReplayEngineDLL::GLFrameReader::make_top_down_and_opaque(const uint32_t&       in_width,
                                                                       const uint32_t&       in_height,
                                                                       std::vector<uint8_t>* inout_pixel_u8_vec_ptr)
 {
@@ -48,7 +48,7 @@ void Replay::ReplayEngineDLL::GlFrameReader::make_top_down_and_opaque(const uint
     }
 }
 
-bool Replay::ReplayEngineDLL::GlFrameReader::read(std::vector<uint8_t>* out_pixel_u8_vec_ptr,
+bool Replay::ReplayEngineDLL::GLFrameReader::read(std::vector<uint8_t>* out_pixel_u8_vec_ptr,
                                                   FrameImage*           out_image_ptr)
 {
     typedef void (APIENTRY* PFNBINDBUFFERPROC)  (unsigned int, unsigned int);

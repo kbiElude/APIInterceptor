@@ -7,7 +7,7 @@
 #include <limits.h>
 #include <string.h>
 
-Replay::ReplayEngineDLL::GlReplayContext::GlReplayContext(ObjectRemapper* in_remapper_ptr)
+Replay::ReplayEngineDLL::GLReplayContext::GLReplayContext(ObjectRemapper* in_remapper_ptr)
     :CallContext        (in_remapper_ptr),
      m_current_program  (0),
      m_function_info_ptr(nullptr),
@@ -18,31 +18,31 @@ Replay::ReplayEngineDLL::GlReplayContext::GlReplayContext(ObjectRemapper* in_rem
     /* Stub */
 }
 
-std::vector<uint8_t>* Replay::ReplayEngineDLL::GlReplayContext::allocate_scratch(const size_t& in_n_bytes)
+std::vector<uint8_t>* Replay::ReplayEngineDLL::GLReplayContext::allocate_scratch(const size_t& in_n_bytes)
 {
     m_scratch_deque.emplace_back(in_n_bytes);
 
     return &m_scratch_deque.back();
 }
 
-std::string* Replay::ReplayEngineDLL::GlReplayContext::allocate_string()
+std::string* Replay::ReplayEngineDLL::GLReplayContext::allocate_string()
 {
     m_string_deque.emplace_back();
 
     return &m_string_deque.back();
 }
 
-std::vector<const char*>* Replay::ReplayEngineDLL::GlReplayContext::allocate_string_pointers()
+std::vector<const char*>* Replay::ReplayEngineDLL::GLReplayContext::allocate_string_pointers()
 {
     m_string_pointers_deque.emplace_back();
 
     return &m_string_pointers_deque.back();
 }
 
-void Replay::ReplayEngineDLL::GlReplayContext::begin_call(const Capture::APIDumpLoader::DumpedAPICall* in_call_ptr,
+void Replay::ReplayEngineDLL::GLReplayContext::begin_call(const Capture::APIDumpLoader::DumpedAPICall* in_call_ptr,
                                                           const IChunkSource*                          in_chunk_source_ptr,
                                                           const size_t&                                in_n_head_arguments,
-                                                          const GlFunctionInfo*                        in_function_info_ptr)
+                                                          const GLFunctionInfo*                        in_function_info_ptr)
 {
     CallContext::begin_call(in_call_ptr,
                             in_chunk_source_ptr,
@@ -57,7 +57,7 @@ void Replay::ReplayEngineDLL::GlReplayContext::begin_call(const Capture::APIDump
     m_string_pointers_deque.clear();
 }
 
-void Replay::ReplayEngineDLL::GlReplayContext::forget_locations()
+void Replay::ReplayEngineDLL::GLReplayContext::forget_locations()
 {
     m_attrib_location_map.clear ();
     m_index_map.clear           ();
@@ -66,12 +66,12 @@ void Replay::ReplayEngineDLL::GlReplayContext::forget_locations()
     m_current_program = 0;
 }
 
-uint64_t Replay::ReplayEngineDLL::GlReplayContext::get_current_program() const
+uint64_t Replay::ReplayEngineDLL::GLReplayContext::get_current_program() const
 {
     return m_current_program;
 }
 
-uint64_t Replay::ReplayEngineDLL::GlReplayContext::get_index_program() const
+uint64_t Replay::ReplayEngineDLL::GLReplayContext::get_index_program() const
 {
     uint64_t result = m_current_program;
 
@@ -91,12 +91,12 @@ uint64_t Replay::ReplayEngineDLL::GlReplayContext::get_index_program() const
     return result;
 }
 
-uint64_t Replay::ReplayEngineDLL::GlReplayContext::get_live_return() const
+uint64_t Replay::ReplayEngineDLL::GLReplayContext::get_live_return() const
 {
     return m_live_return;
 }
 
-uint64_t Replay::ReplayEngineDLL::GlReplayContext::get_pixel_n_components(const uint32_t& in_format)
+uint64_t Replay::ReplayEngineDLL::GLReplayContext::get_pixel_n_components(const uint32_t& in_format)
 {
     constexpr uint64_t MOST_COMPONENTS = 4;
 
@@ -142,7 +142,7 @@ uint64_t Replay::ReplayEngineDLL::GlReplayContext::get_pixel_n_components(const 
     return result;
 }
 
-uint64_t Replay::ReplayEngineDLL::GlReplayContext::get_pixel_type_n_bytes(const uint32_t& in_type)
+uint64_t Replay::ReplayEngineDLL::GLReplayContext::get_pixel_type_n_bytes(const uint32_t& in_type)
 {
     constexpr uint64_t MOST_BYTES = 4;
 
@@ -176,7 +176,7 @@ uint64_t Replay::ReplayEngineDLL::GlReplayContext::get_pixel_type_n_bytes(const 
     return result;
 }
 
-size_t Replay::ReplayEngineDLL::GlReplayContext::get_unrecorded_output_n_bytes(const size_t& in_n_argument) const
+size_t Replay::ReplayEngineDLL::GLReplayContext::get_unrecorded_output_n_bytes(const size_t& in_n_argument) const
 {
     /* The glGet*v() write the values of one query: at most a matrix of doubles (16 of them); this is more than twice that. */
     constexpr size_t   QUERY_N_BYTES            = 256;
@@ -259,13 +259,13 @@ size_t Replay::ReplayEngineDLL::GlReplayContext::get_unrecorded_output_n_bytes(c
     return result;
 }
 
-Replay::ReplayEngineDLL::ObjectKind Replay::ReplayEngineDLL::GlReplayContext::get_param_kind(const size_t& in_n_argument) const
+Replay::ReplayEngineDLL::ObjectKind Replay::ReplayEngineDLL::GLReplayContext::get_param_kind(const size_t& in_n_argument) const
 {
     return (in_n_argument < m_function_info_ptr->param_kind_vec.size() ) ? m_function_info_ptr->param_kind_vec.at(in_n_argument)
                                                                          : ObjectKind::NONE;
 }
 
-uint64_t Replay::ReplayEngineDLL::GlReplayContext::get_uniform_program() const
+uint64_t Replay::ReplayEngineDLL::GLReplayContext::get_uniform_program() const
 {
     uint64_t result = m_current_program;
 
@@ -284,18 +284,18 @@ uint64_t Replay::ReplayEngineDLL::GlReplayContext::get_uniform_program() const
     return result;
 }
 
-bool Replay::ReplayEngineDLL::GlReplayContext::is_param_ignored(const size_t& in_n_argument) const
+bool Replay::ReplayEngineDLL::GLReplayContext::is_param_ignored(const size_t& in_n_argument) const
 {
     return (in_n_argument                                                     <  sizeof(m_function_info_ptr->ignored_param_mask) * CHAR_BIT &&
             (m_function_info_ptr->ignored_param_mask & (1u << in_n_argument)) != 0);
 }
 
-bool Replay::ReplayEngineDLL::GlReplayContext::is_skipped() const
+bool Replay::ReplayEngineDLL::GLReplayContext::is_skipped() const
 {
     return m_is_skipped;
 }
 
-uint32_t Replay::ReplayEngineDLL::GlReplayContext::map_argument(const size_t&   in_n_argument,
+uint32_t Replay::ReplayEngineDLL::GLReplayContext::map_argument(const size_t&   in_n_argument,
                                                                 const uint32_t& in_dumped_value) const
 {
     constexpr uint32_t COMPAT_GL_COLOR = 0x1800;
@@ -336,7 +336,7 @@ uint32_t Replay::ReplayEngineDLL::GlReplayContext::map_argument(const size_t&   
     return result;
 }
 
-uint32_t Replay::ReplayEngineDLL::GlReplayContext::map_attrib_location(const uint32_t& in_dumped_location) const
+uint32_t Replay::ReplayEngineDLL::GLReplayContext::map_attrib_location(const uint32_t& in_dumped_location) const
 {
     const auto iterator = m_attrib_location_map.find(in_dumped_location);
 
@@ -344,7 +344,7 @@ uint32_t Replay::ReplayEngineDLL::GlReplayContext::map_attrib_location(const uin
                                                       : in_dumped_location;
 }
 
-uint32_t Replay::ReplayEngineDLL::GlReplayContext::map_index(const ObjectKind& in_kind,
+uint32_t Replay::ReplayEngineDLL::GLReplayContext::map_index(const ObjectKind& in_kind,
                                                              const uint64_t&   in_dumped_program,
                                                              const uint32_t&   in_scope,
                                                              const uint32_t&   in_dumped_index) const
@@ -358,7 +358,7 @@ uint32_t Replay::ReplayEngineDLL::GlReplayContext::map_index(const ObjectKind& i
                                             : in_dumped_index;
 }
 
-uint32_t Replay::ReplayEngineDLL::GlReplayContext::map_name(const ObjectKind& in_kind,
+uint32_t Replay::ReplayEngineDLL::GLReplayContext::map_name(const ObjectKind& in_kind,
                                                             const uint32_t&   in_dumped_name) const
 {
     uint64_t live_value = 0;
@@ -413,7 +413,7 @@ uint32_t Replay::ReplayEngineDLL::GlReplayContext::map_name(const ObjectKind& in
     return result;
 }
 
-int32_t Replay::ReplayEngineDLL::GlReplayContext::map_uniform_location(const int32_t& in_dumped_location) const
+int32_t Replay::ReplayEngineDLL::GLReplayContext::map_uniform_location(const int32_t& in_dumped_location) const
 {
     constexpr uint32_t PROGRAM_SHIFT = 32;
     constexpr uint64_t LOCATION_MASK = (1ull << PROGRAM_SHIFT) - 1; /* the key has the program in its high half and the location in the low one */
@@ -441,13 +441,13 @@ int32_t Replay::ReplayEngineDLL::GlReplayContext::map_uniform_location(const int
     return result;
 }
 
-void Replay::ReplayEngineDLL::GlReplayContext::register_attrib_location(const uint32_t& in_dumped_location,
+void Replay::ReplayEngineDLL::GLReplayContext::register_attrib_location(const uint32_t& in_dumped_location,
                                                                         const uint32_t& in_live_location)
 {
     m_attrib_location_map[in_dumped_location] = in_live_location;
 }
 
-void Replay::ReplayEngineDLL::GlReplayContext::register_index(const ObjectKind& in_kind,
+void Replay::ReplayEngineDLL::GLReplayContext::register_index(const ObjectKind& in_kind,
                                                               const uint64_t&   in_dumped_program,
                                                               const uint32_t&   in_scope,
                                                               const uint32_t&   in_dumped_index,
@@ -459,7 +459,7 @@ void Replay::ReplayEngineDLL::GlReplayContext::register_index(const ObjectKind& 
                          in_dumped_index)] = in_live_index;
 }
 
-void Replay::ReplayEngineDLL::GlReplayContext::register_name(const ObjectKind& in_kind,
+void Replay::ReplayEngineDLL::GLReplayContext::register_name(const ObjectKind& in_kind,
                                                              const uint32_t&   in_dumped_name,
                                                              const uint32_t&   in_live_name)
 {
@@ -468,7 +468,7 @@ void Replay::ReplayEngineDLL::GlReplayContext::register_name(const ObjectKind& i
                             in_live_name);
 }
 
-void Replay::ReplayEngineDLL::GlReplayContext::register_returned_name(const uint64_t& in_live_value)
+void Replay::ReplayEngineDLL::GLReplayContext::register_returned_name(const uint64_t& in_live_value)
 {
     uint64_t    dumped   = 0;
     const auto  kind     = m_function_info_ptr->return_kind;
@@ -521,7 +521,7 @@ void Replay::ReplayEngineDLL::GlReplayContext::register_returned_name(const uint
     }
 }
 
-void Replay::ReplayEngineDLL::GlReplayContext::register_uniform_location(const uint64_t& in_dumped_program,
+void Replay::ReplayEngineDLL::GLReplayContext::register_uniform_location(const uint64_t& in_dumped_program,
                                                                          const int32_t&  in_dumped_location,
                                                                          const int32_t&  in_live_location)
 {
@@ -530,27 +530,27 @@ void Replay::ReplayEngineDLL::GlReplayContext::register_uniform_location(const u
     m_uniform_location_map[(in_dumped_program << PROGRAM_SHIFT) | static_cast<uint32_t>(in_dumped_location)] = in_live_location;
 }
 
-bool Replay::ReplayEngineDLL::GlReplayContext::is_pixel_pack_buffer_bound() const
+bool Replay::ReplayEngineDLL::GLReplayContext::is_pixel_pack_buffer_bound() const
 {
     return m_is_pixel_pack_buffer_bound;
 }
 
-void Replay::ReplayEngineDLL::GlReplayContext::request_skip()
+void Replay::ReplayEngineDLL::GLReplayContext::request_skip()
 {
     m_is_skipped = true;
 }
 
-void Replay::ReplayEngineDLL::GlReplayContext::set_current_program(const uint64_t& in_dumped_program)
+void Replay::ReplayEngineDLL::GLReplayContext::set_current_program(const uint64_t& in_dumped_program)
 {
     m_current_program = in_dumped_program;
 }
 
-void Replay::ReplayEngineDLL::GlReplayContext::set_live_return(const uint64_t& in_value)
+void Replay::ReplayEngineDLL::GLReplayContext::set_live_return(const uint64_t& in_value)
 {
     m_live_return = in_value;
 }
 
-void Replay::ReplayEngineDLL::GlReplayContext::set_pixel_pack_buffer_bound(const bool& in_is_bound)
+void Replay::ReplayEngineDLL::GLReplayContext::set_pixel_pack_buffer_bound(const bool& in_is_bound)
 {
     m_is_pixel_pack_buffer_bound = in_is_bound;
 }

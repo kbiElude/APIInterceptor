@@ -68,7 +68,7 @@ namespace Replay
             VERTEX_ARRAY
         };
 
-        namespace GlRestore
+        namespace GLRestore
         {
             enum class ArgumentCategory
             {

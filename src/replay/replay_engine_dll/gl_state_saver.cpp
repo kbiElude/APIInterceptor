@@ -43,19 +43,19 @@ namespace
     constexpr int MAX_N_SAVED_TEXTURE_UNITS = 8;
 }
 
-Replay::ReplayEngineDLL::GlStateSaver::GlStateSaver(ResolveFunc in_resolve_func)
+Replay::ReplayEngineDLL::GLStateSaver::GLStateSaver(ResolveFunc in_resolve_func)
     :m_has_saved_state(false),
      m_resolve_func   (in_resolve_func)
 {
     /* Stub */
 }
 
-bool Replay::ReplayEngineDLL::GlStateSaver::has_saved_state() const
+bool Replay::ReplayEngineDLL::GLStateSaver::has_saved_state() const
 {
     return m_has_saved_state;
 }
 
-void Replay::ReplayEngineDLL::GlStateSaver::pop_attributes()
+void Replay::ReplayEngineDLL::GLStateSaver::pop_attributes()
 {
     const auto pop_attrib_func_ptr        = reinterpret_cast<PFNPOPATTRIBPROC>      (m_resolve_func("glPopAttrib") );
     const auto pop_client_attrib_func_ptr = reinterpret_cast<PFNPOPCLIENTATTRIBPROC>(m_resolve_func("glPopClientAttrib") );
@@ -68,7 +68,7 @@ void Replay::ReplayEngineDLL::GlStateSaver::pop_attributes()
     }
 }
 
-void Replay::ReplayEngineDLL::GlStateSaver::restore()
+void Replay::ReplayEngineDLL::GLStateSaver::restore()
 {
     const auto active_texture_func_ptr = reinterpret_cast<PFNACTIVETEXTUREPROC>(m_resolve_func("glActiveTexture") );
     const auto load_matrix_func_ptr    = reinterpret_cast<PFNLOADMATRIXFPROC>   (m_resolve_func("glLoadMatrixf") );
@@ -125,7 +125,7 @@ end:
     return;
 }
 
-void Replay::ReplayEngineDLL::GlStateSaver::save()
+void Replay::ReplayEngineDLL::GLStateSaver::save()
 {
     const auto active_texture_func_ptr     = reinterpret_cast<PFNACTIVETEXTUREPROC>   (m_resolve_func("glActiveTexture") );
     const auto get_floatv_func_ptr         = reinterpret_cast<PFNGETFLOATVPROC>       (m_resolve_func("glGetFloatv") );
@@ -222,7 +222,7 @@ end:
     return;
 }
 
-void Replay::ReplayEngineDLL::GlStateSaver::unwind_stacks()
+void Replay::ReplayEngineDLL::GLStateSaver::unwind_stacks()
 {
     const auto active_texture_func_ptr     = reinterpret_cast<PFNACTIVETEXTUREPROC>   (m_resolve_func("glActiveTexture") );
     const auto get_integerv_func_ptr       = reinterpret_cast<PFNGETINTEGERVPROC>     (m_resolve_func("glGetIntegerv") );

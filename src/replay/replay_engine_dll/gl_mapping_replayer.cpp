@@ -7,7 +7,7 @@
 #include <Windows.h>
 #include "Khronos/GL/glcorearb.h"
 
-Replay::ReplayEngineDLL::GlMappingReplayer::GlMappingReplayer(GlReplayContext* in_context_ptr,
+Replay::ReplayEngineDLL::GLMappingReplayer::GLMappingReplayer(GLReplayContext* in_context_ptr,
                                                               ResolveFunc      in_resolve_func)
     :m_context_ptr (in_context_ptr),
      m_resolve_func(in_resolve_func)
@@ -15,7 +15,7 @@ Replay::ReplayEngineDLL::GlMappingReplayer::GlMappingReplayer(GlReplayContext* i
     /* Stub */
 }
 
-bool Replay::ReplayEngineDLL::GlMappingReplayer::flush(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+bool Replay::ReplayEngineDLL::GLMappingReplayer::flush(const Capture::APIDumpLoader::DumpedAPICall& in_call,
                                                        const bool&                                  in_is_named,
                                                        std::string*                                 out_error_ptr)
 {
@@ -100,7 +100,7 @@ end:
     return result;
 }
 
-uint32_t Replay::ReplayEngineDLL::GlMappingReplayer::get_first_argument(const Capture::APIDumpLoader::DumpedAPICall& in_call)
+uint32_t Replay::ReplayEngineDLL::GLMappingReplayer::get_first_argument(const Capture::APIDumpLoader::DumpedAPICall& in_call)
 {
     uint32_t result = 0;
 
@@ -113,7 +113,7 @@ uint32_t Replay::ReplayEngineDLL::GlMappingReplayer::get_first_argument(const Ca
     return result;
 }
 
-uint64_t Replay::ReplayEngineDLL::GlMappingReplayer::get_mapping_key(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+uint64_t Replay::ReplayEngineDLL::GLMappingReplayer::get_mapping_key(const Capture::APIDumpLoader::DumpedAPICall& in_call,
                                                                      const bool&                                  in_is_named) const
 {
     /* The mappings of named buffers are kept apart from those of the binding points. */
@@ -130,7 +130,7 @@ uint64_t Replay::ReplayEngineDLL::GlMappingReplayer::get_mapping_key(const Captu
     return result;
 }
 
-bool Replay::ReplayEngineDLL::GlMappingReplayer::is_mapping_function(const APIInterceptor::APIFunction& in_function)
+bool Replay::ReplayEngineDLL::GLMappingReplayer::is_mapping_function(const APIInterceptor::APIFunction& in_function)
 {
     return (in_function == APIInterceptor::APIFUNCTION_GL_GLFLUSHMAPPEDBUFFERRANGE      ||
             in_function == APIInterceptor::APIFUNCTION_GL_GLFLUSHMAPPEDNAMEDBUFFERRANGE ||
@@ -142,7 +142,7 @@ bool Replay::ReplayEngineDLL::GlMappingReplayer::is_mapping_function(const APIIn
             in_function == APIInterceptor::APIFUNCTION_GL_GLUNMAPNAMEDBUFFER);
 }
 
-bool Replay::ReplayEngineDLL::GlMappingReplayer::map(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+bool Replay::ReplayEngineDLL::GLMappingReplayer::map(const Capture::APIDumpLoader::DumpedAPICall& in_call,
                                                      const bool&                                  in_is_named,
                                                      const bool&                                  in_is_range,
                                                      std::string*                                 out_error_ptr)
@@ -279,7 +279,7 @@ end:
     return result;
 }
 
-bool Replay::ReplayEngineDLL::GlMappingReplayer::replay(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+bool Replay::ReplayEngineDLL::GLMappingReplayer::replay(const Capture::APIDumpLoader::DumpedAPICall& in_call,
                                                         std::string*                                 out_error_ptr)
 {
     bool result = false;
@@ -373,12 +373,12 @@ bool Replay::ReplayEngineDLL::GlMappingReplayer::replay(const Capture::APIDumpLo
     return result;
 }
 
-void Replay::ReplayEngineDLL::GlMappingReplayer::reset()
+void Replay::ReplayEngineDLL::GLMappingReplayer::reset()
 {
     m_mapping_map.clear();
 }
 
-bool Replay::ReplayEngineDLL::GlMappingReplayer::unmap(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+bool Replay::ReplayEngineDLL::GLMappingReplayer::unmap(const Capture::APIDumpLoader::DumpedAPICall& in_call,
                                                        const bool&                                  in_is_named,
                                                        std::string*                                 out_error_ptr)
 {
