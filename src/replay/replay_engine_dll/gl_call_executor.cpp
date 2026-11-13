@@ -12,7 +12,7 @@
 /* Turns the parenthesized list of the table's entry into the list of an initializer. */
 #define GL_UNPACK_KINDS(...) __VA_ARGS__
 
-Replay::ReplayEngineDLL::GlCallExecutor::GlCallExecutor(ObjectRemapper* in_remapper_ptr)
+Replay::ReplayEngineDLL::GLCallExecutor::GLCallExecutor(ObjectRemapper* in_remapper_ptr)
     :m_client_array_replayer(&m_context,
                              [this](const char* in_name_ptr)
                              {
@@ -58,12 +58,12 @@ Replay::ReplayEngineDLL::GlCallExecutor::GlCallExecutor(ObjectRemapper* in_remap
     #undef GL_REPLAY_FUNCTION
 }
 
-Replay::ReplayEngineDLL::GlCallExecutor::~GlCallExecutor()
+Replay::ReplayEngineDLL::GLCallExecutor::~GLCallExecutor()
 {
     /* The context belongs to the replay thread: reset() has dropped what refers to it already. */
 }
 
-void Replay::ReplayEngineDLL::GlCallExecutor::add_function(const APIInterceptor::APIFunction& in_function,
+void Replay::ReplayEngineDLL::GLCallExecutor::add_function(const APIInterceptor::APIFunction& in_function,
                                                            const char*                        in_name_ptr,
                                                            const ObjectKind&                  in_return_kind,
                                                            const std::vector<ObjectKind>&     in_param_kind_vec,
@@ -88,7 +88,7 @@ void Replay::ReplayEngineDLL::GlCallExecutor::add_function(const APIInterceptor:
     m_entry_map[in_function] = entry;
 }
 
-void Replay::ReplayEngineDLL::GlCallExecutor::after_call(const Capture::APIDumpLoader::DumpedAPICall& in_call)
+void Replay::ReplayEngineDLL::GLCallExecutor::after_call(const Capture::APIDumpLoader::DumpedAPICall& in_call)
 {
     int64_t dumped_location = 0;
     uint64_t dumped_program = 0;
@@ -247,7 +247,7 @@ void Replay::ReplayEngineDLL::GlCallExecutor::after_call(const Capture::APIDumpL
     m_context.register_returned_name(m_context.get_live_return() );
 }
 
-bool Replay::ReplayEngineDLL::GlCallExecutor::execute(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+bool Replay::ReplayEngineDLL::GLCallExecutor::execute(const Capture::APIDumpLoader::DumpedAPICall& in_call,
                                                       const IChunkSource&                          in_chunk_source,
                                                       std::string*                                 out_error_ptr)
 {
@@ -340,7 +340,7 @@ end:
     return result;
 }
 
-bool Replay::ReplayEngineDLL::GlCallExecutor::is_readback_into_memory(const Capture::APIDumpLoader::DumpedAPICall& in_call) const
+bool Replay::ReplayEngineDLL::GLCallExecutor::is_readback_into_memory(const Capture::APIDumpLoader::DumpedAPICall& in_call) const
 {
     bool result = false;
 
@@ -370,7 +370,7 @@ bool Replay::ReplayEngineDLL::GlCallExecutor::is_readback_into_memory(const Capt
     return result;
 }
 
-Replay::ReplayEngineDLL::ExecutionClass Replay::ReplayEngineDLL::GlCallExecutor::get_execution_class(const Capture::APIDumpLoader::DumpedAPICall& in_call) const
+Replay::ReplayEngineDLL::ExecutionClass Replay::ReplayEngineDLL::GLCallExecutor::get_execution_class(const Capture::APIDumpLoader::DumpedAPICall& in_call) const
 {
     constexpr char CREATE_PREFIX[] = "glCreate";
     constexpr char DELETE_PREFIX[] = "glDelete";
@@ -411,13 +411,13 @@ Replay::ReplayEngineDLL::ExecutionClass Replay::ReplayEngineDLL::GlCallExecutor:
     return result;
 }
 
-Replay::ReplayEngineDLL::CallSupport Replay::ReplayEngineDLL::GlCallExecutor::get_call_support(const APIInterceptor::APIFunction& in_function) const
+Replay::ReplayEngineDLL::CallSupport Replay::ReplayEngineDLL::GLCallExecutor::get_call_support(const APIInterceptor::APIFunction& in_function) const
 {
     return (m_entry_map.find(in_function) != m_entry_map.end() ) ? CallSupport::REPLAYED
                                                                  : CallSupport::UNSUPPORTED;
 }
 
-void* Replay::ReplayEngineDLL::GlCallExecutor::get_proc_ptr(const char* in_name_ptr)
+void* Replay::ReplayEngineDLL::GLCallExecutor::get_proc_ptr(const char* in_name_ptr)
 {
     const auto iterator = m_proc_ptr_map.find(in_name_ptr);
     void*      result   = nullptr;
@@ -448,7 +448,7 @@ end:
     return result;
 }
 
-bool Replay::ReplayEngineDLL::GlCallExecutor::is_valid_proc(const void* in_proc_ptr)
+bool Replay::ReplayEngineDLL::GLCallExecutor::is_valid_proc(const void* in_proc_ptr)
 {
     constexpr uintptr_t MAX_INVALID_PROC_VALUE = 3;
 
@@ -458,12 +458,12 @@ bool Replay::ReplayEngineDLL::GlCallExecutor::is_valid_proc(const void* in_proc_
             value != static_cast<uintptr_t>(-1) );
 }
 
-void Replay::ReplayEngineDLL::GlCallExecutor::on_frame_presented()
+void Replay::ReplayEngineDLL::GLCallExecutor::on_frame_presented()
 {
     /* Stub */
 }
 
-void Replay::ReplayEngineDLL::GlCallExecutor::register_returned_index(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+void Replay::ReplayEngineDLL::GLCallExecutor::register_returned_index(const Capture::APIDumpLoader::DumpedAPICall& in_call,
                                                                       const ObjectKind&                            in_kind,
                                                                       const bool&                                  in_has_scope)
 {
@@ -505,26 +505,26 @@ void Replay::ReplayEngineDLL::GlCallExecutor::register_returned_index(const Capt
     }
 }
 
-bool Replay::ReplayEngineDLL::GlCallExecutor::read_back_buffer(std::vector<uint8_t>* out_pixel_u8_vec_ptr,
+bool Replay::ReplayEngineDLL::GLCallExecutor::read_back_buffer(std::vector<uint8_t>* out_pixel_u8_vec_ptr,
                                                                FrameImage*           out_image_ptr)
 {
     return m_frame_reader.read(out_pixel_u8_vec_ptr,
                                out_image_ptr);
 }
 
-void Replay::ReplayEngineDLL::GlCallExecutor::reset()
+void Replay::ReplayEngineDLL::GLCallExecutor::reset()
 {
     m_context.forget_locations();
     m_mapping_replayer.reset  ();
     m_proc_ptr_map.clear      ();
 }
 
-void Replay::ReplayEngineDLL::GlCallExecutor::restore_state()
+void Replay::ReplayEngineDLL::GLCallExecutor::restore_state()
 {
     m_state_saver.restore();
 }
 
-void Replay::ReplayEngineDLL::GlCallExecutor::save_state()
+void Replay::ReplayEngineDLL::GLCallExecutor::save_state()
 {
     m_state_saver.save();
 }

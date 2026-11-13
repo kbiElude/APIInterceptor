@@ -16,7 +16,7 @@ namespace
     ExecutionClass get_class_of(const APIInterceptor::APIFunction& in_function)
     {
         Replay::ReplayEngineDLL::ObjectRemapper  remapper;
-        Replay::ReplayEngineDLL::GlCallExecutor  executor(&remapper);
+        Replay::ReplayEngineDLL::GLCallExecutor  executor(&remapper);
         Capture::APIDumpLoader::DumpedAPICall    call;
 
         call.func = in_function;
@@ -25,7 +25,7 @@ namespace
     }
 }
 
-TEST(GlCallExecutor, WhatMakesAnObjectIsMadeInTheFirstExecutionOnly)
+TEST(GLCallExecutor, WhatMakesAnObjectIsMadeInTheFirstExecutionOnly)
 {
     EXPECT_EQ(get_class_of(APIInterceptor::APIFUNCTION_GL_GLGENTEXTURES),
               ExecutionClass::FIRST_TIME_ONLY);
@@ -33,7 +33,7 @@ TEST(GlCallExecutor, WhatMakesAnObjectIsMadeInTheFirstExecutionOnly)
               ExecutionClass::FIRST_TIME_ONLY);
 }
 
-TEST(GlCallExecutor, WhatDestroysAnObjectWaitsForTheLastExecution)
+TEST(GLCallExecutor, WhatDestroysAnObjectWaitsForTheLastExecution)
 {
     EXPECT_EQ(get_class_of(APIInterceptor::APIFUNCTION_GL_GLDELETETEXTURES),
               ExecutionClass::AFTER_ALL);
@@ -41,7 +41,7 @@ TEST(GlCallExecutor, WhatDestroysAnObjectWaitsForTheLastExecution)
               ExecutionClass::AFTER_ALL);
 }
 
-TEST(GlCallExecutor, StateMatricesDrawsAndUploadsAreMadeInEachExecution)
+TEST(GLCallExecutor, StateMatricesDrawsAndUploadsAreMadeInEachExecution)
 {
     EXPECT_EQ(get_class_of(APIInterceptor::APIFUNCTION_GL_GLENABLE),
               ExecutionClass::EVERY_TIME);
@@ -57,14 +57,14 @@ TEST(GlCallExecutor, StateMatricesDrawsAndUploadsAreMadeInEachExecution)
               ExecutionClass::EVERY_TIME);
 }
 
-TEST(GlCallExecutor, GlGenerateMipmapMakesNoObject)
+TEST(GLCallExecutor, GlGenerateMipmapMakesNoObject)
 {
     /* It starts like glGenTextures does, and generates the levels of a texture that is there. */
     EXPECT_EQ(get_class_of(APIInterceptor::APIFUNCTION_GL_GLGENERATEMIPMAP),
               ExecutionClass::EVERY_TIME);
 }
 
-TEST(GlCallExecutor, WhatMakesAShaderOrAProgramIsMadeInTheFirstExecutionOnly)
+TEST(GLCallExecutor, WhatMakesAShaderOrAProgramIsMadeInTheFirstExecutionOnly)
 {
     EXPECT_EQ(get_class_of(APIInterceptor::APIFUNCTION_GL_GLCREATESHADER),
               ExecutionClass::FIRST_TIME_ONLY);

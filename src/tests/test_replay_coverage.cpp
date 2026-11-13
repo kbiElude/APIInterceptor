@@ -165,7 +165,7 @@ TEST(CallSupport, TheExecutorsSayWhatTheyReplayLeaveOutAndFailOn)
     Replay::ReplayEngineDLL::ObjectRemapper remapper;
     Replay::ReplayEngineDLL::D3D7CallExecutor d3d7_executor(&remapper);
     Replay::ReplayEngineDLL::D3D8CallExecutor d3d8_executor(&remapper);
-    Replay::ReplayEngineDLL::GlCallExecutor   gl_executor  (&remapper);
+    Replay::ReplayEngineDLL::GLCallExecutor   gl_executor  (&remapper);
     Replay::ReplayEngineDLL::NullCallExecutor null_executor;
     Replay::ReplayEngineDLL::Win32CallExecutor win32_executor(&remapper,
                                                               []() {},

@@ -51,7 +51,7 @@ Replay::ReplayEngineDLL::ReplayEngine::ReplayEngine()
     m_executors.add(Capture::APIDumpLoader::APIGroup::D3D8,
                     std::make_shared<D3D8CallExecutor>(&m_remapper) );
     m_executors.add(Capture::APIDumpLoader::APIGroup::GL,
-                    std::make_shared<GlCallExecutor>(&m_remapper) );
+                    std::make_shared<GLCallExecutor>(&m_remapper) );
 }
 
 Replay::ReplayEngineDLL::ReplayEngine::~ReplayEngine()

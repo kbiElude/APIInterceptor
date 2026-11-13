@@ -25,11 +25,11 @@ namespace Replay
          * the system's driver; the names of the objects (textures, buffers...) and the locations of uniforms are mapped to
          * what the driver hands out to the replay.
          */
-        class GlCallExecutor : public ICallExecutor
+        class GLCallExecutor : public ICallExecutor
         {
         public:
-             GlCallExecutor(ObjectRemapper* in_remapper_ptr);
-            ~GlCallExecutor();
+             GLCallExecutor(ObjectRemapper* in_remapper_ptr);
+            ~GLCallExecutor();
 
             bool           execute            (const Capture::APIDumpLoader::DumpedAPICall& in_call,
                                                const IChunkSource&                          in_chunk_source,
