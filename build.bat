@@ -159,14 +159,14 @@ rem ============================================================
 
 :build_both
 echo [*] Building x86 (%BUILD_CONFIG%)...
-cmake --build "%BUILD_X86_DIR%" --config %BUILD_CONFIG%
+cmake --build "%BUILD_X86_DIR%" --config %BUILD_CONFIG% --parallel %NUMBER_OF_PROCESSORS%
 if %errorlevel% neq 0 (
     echo [!] x86 build failed.
     exit /b 1
 )
 
 echo [*] Building x64 (%BUILD_CONFIG%)...
-cmake --build "%BUILD_X64_DIR%" --config %BUILD_CONFIG%
+cmake --build "%BUILD_X64_DIR%" --config %BUILD_CONFIG% --parallel %NUMBER_OF_PROCESSORS%
 if %errorlevel% neq 0 (
     echo [!] x64 build failed.
     exit /b 1
