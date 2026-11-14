@@ -231,15 +231,15 @@ size_t Replay::ReplayEngineDLL::GLReplayContext::get_unrecorded_output_n_bytes(c
             const uint64_t n_type_bytes = (are_read) ? get_pixel_type_n_bytes(static_cast<uint32_t>(argument_array.at(5) ) )
                                                      : 0;
 
-            if (are_read      &&
-                n_components  != 0 &&
-                n_type_bytes  != 0 &&
-                argument_array.at(2) > 0 &&
-                argument_array.at(3) > 0)
+            if (are_read                  &&
+                n_components         != 0 &&
+                n_type_bytes         != 0 &&
+                argument_array.at(2) >  0 &&
+                argument_array.at(3) >  0)
             {
-                const uint64_t row_n_bytes   = static_cast<uint64_t>(argument_array.at(2) ) * n_components * n_type_bytes;
-                const uint64_t padded_n_bytes = (row_n_bytes + ROW_ALIGNMENT_N_BYTES - 1) / ROW_ALIGNMENT_N_BYTES * ROW_ALIGNMENT_N_BYTES;
-                const uint64_t total_n_bytes = padded_n_bytes * static_cast<uint64_t>(argument_array.at(3) ) + ROW_ALIGNMENT_N_BYTES;
+                const uint64_t row_n_bytes    = static_cast<uint64_t>(argument_array.at(2) )                                                * n_components * n_type_bytes;
+                const uint64_t padded_n_bytes = (row_n_bytes + ROW_ALIGNMENT_N_BYTES - 1)    / ROW_ALIGNMENT_N_BYTES                        * ROW_ALIGNMENT_N_BYTES;
+                const uint64_t total_n_bytes  = padded_n_bytes                               * static_cast<uint64_t>(argument_array.at(3) ) + ROW_ALIGNMENT_N_BYTES;
 
                 if (total_n_bytes <= READ_PIXELS_MAX_N_BYTES)
                 {

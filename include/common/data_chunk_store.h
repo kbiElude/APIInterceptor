@@ -24,6 +24,8 @@ namespace APIInterceptor
     class DataChunkStore
     {
     public:
+        static DataChunkStore* get_ptr();
+
         /* Returns false if there is no such chunk (it was taken, or released, or never made). The data stays valid until the chunk is
          * taken or released.
          */
@@ -51,7 +53,7 @@ namespace APIInterceptor
          * allocated), with the lock taken once. A chunk which is not there (it was taken, or released, or never made, or is named twice) leaves its vector as
          * it is, and says so in the flags (1 for each that was taken, one for each number); returns how many were taken.
          */
-        uint32_t take_chunks(const std::vector<DataChunkID>&            in_data_chunk_id_vec,
+        uint32_t take_chunks(const std::vector<DataChunkID>&           in_data_chunk_id_vec,
                              const std::vector<std::vector<uint8_t>*>& in_destination_ptr_vec,
                              std::vector<uint8_t>*                     out_is_taken_u8_vec_ptr);
 
@@ -59,8 +61,6 @@ namespace APIInterceptor
         void take_range(const DataChunkID&                  in_first_data_chunk_id,
                         const uint32_t&                     in_n_data_chunks,
                         std::vector<std::vector<uint8_t> >* out_data_chunk_vec_ptr);
-
-        static DataChunkStore* get_ptr();
 
     private:
         typedef ChunkPool::ChunkUniquePtr ChunkUniquePtr;

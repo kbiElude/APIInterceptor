@@ -45,9 +45,9 @@ namespace APIInterceptor
 
     /* How many data chunks the store holds: the ones that were not taken or released (get_n_data_chunks() counts the numbers that were given out). */
     uint32_t    get_n_held_data_chunks();
-    DataChunkID register_data_chunk  (const void*        in_data_ptr,
-                                      const uint32_t&    in_n_bytes);
-    void        release_data_chunk   (const DataChunkID& in_data_chunk_id);
+    DataChunkID register_data_chunk   (const void*        in_data_ptr,
+                                       const uint32_t&    in_n_bytes);
+    void        release_data_chunk    (const DataChunkID& in_data_chunk_id);
 
     /* Moves the contents of one data chunk out of the store: the vector and the chunk change contents, so nothing is allocated. Returns
      * false if there is no such chunk (it was taken, or released, or never made), and the vector is left as it is.
@@ -63,7 +63,7 @@ namespace APIInterceptor
     /* Moves the contents of the data chunks of the numbers out of the store, each into the vector that is given for it, with the lock taken once (see DataChunkStore::take_chunks()).
      * The flags say, for each number, whether its chunk was taken (1) or was not there; returns how many were taken.
      */
-    uint32_t take_data_chunks_by_id(const std::vector<DataChunkID>&            in_data_chunk_id_vec,
+    uint32_t take_data_chunks_by_id(const std::vector<DataChunkID>&           in_data_chunk_id_vec,
                                     const std::vector<std::vector<uint8_t>*>& in_destination_ptr_vec,
                                     std::vector<uint8_t>*                     out_is_taken_u8_vec_ptr);
 

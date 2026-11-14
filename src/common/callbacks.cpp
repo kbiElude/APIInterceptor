@@ -130,7 +130,7 @@ void APIInterceptor::take_data_chunks(const DataChunkID&                  in_fir
                                           out_data_chunk_vec_ptr);
 }
 
-uint32_t APIInterceptor::take_data_chunks_by_id(const std::vector<DataChunkID>&            in_data_chunk_id_vec,
+uint32_t APIInterceptor::take_data_chunks_by_id(const std::vector<DataChunkID>&           in_data_chunk_id_vec,
                                                 const std::vector<std::vector<uint8_t>*>& in_destination_ptr_vec,
                                                 std::vector<uint8_t>*                     out_is_taken_u8_vec_ptr)
 {

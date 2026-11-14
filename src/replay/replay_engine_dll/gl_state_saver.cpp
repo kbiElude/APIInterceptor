@@ -232,8 +232,8 @@ void Replay::ReplayEngineDLL::GLStateSaver::unwind_stacks()
     const auto pop_matrix_func_ptr         = reinterpret_cast<PFNPOPMATRIXPROC>       (m_resolve_func("glPopMatrix") );
 
     /* A stack that is deeper than it was saved is popped down to that depth; one that is not (the frame popped more than it pushed) is left as it is. */
-    const auto unwind_func = [&](const unsigned int& in_depth_name,
-                                 const int32_t&      in_saved_depth,
+    const auto unwind_func = [&](const unsigned int&          in_depth_name,
+                                 const int32_t&               in_saved_depth,
                                  const std::function<void()>& in_pop_func)
     {
         int depth = 0;

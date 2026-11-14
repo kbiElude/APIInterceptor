@@ -159,12 +159,12 @@ bool APIInterceptor::DataChunkStore::take(const DataChunkID&    in_data_chunk_id
     return result;
 }
 
-uint32_t APIInterceptor::DataChunkStore::take_chunks(const std::vector<DataChunkID>&            in_data_chunk_id_vec,
+uint32_t APIInterceptor::DataChunkStore::take_chunks(const std::vector<DataChunkID>&           in_data_chunk_id_vec,
                                                      const std::vector<std::vector<uint8_t>*>& in_destination_ptr_vec,
                                                      std::vector<uint8_t>*                     out_is_taken_u8_vec_ptr)
 {
     const size_t n_data_chunks = (in_data_chunk_id_vec.size() < in_destination_ptr_vec.size() ) ? in_data_chunk_id_vec.size()
-                                                                                                 : in_destination_ptr_vec.size();
+                                                                                                : in_destination_ptr_vec.size();
     uint32_t     result        = 0;
 
     out_is_taken_u8_vec_ptr->assign(in_data_chunk_id_vec.size(),

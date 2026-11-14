@@ -26,7 +26,7 @@ void Replay::ReplayEngineDLL::GLFrameReader::make_top_down_and_opaque(const uint
                   n_row < in_height / 2;
                 ++n_row)
     {
-        uint8_t* const top_ptr    = inout_pixel_u8_vec_ptr->data() + static_cast<size_t>(n_row)                  * row_n_bytes;
+        uint8_t* const top_ptr    = inout_pixel_u8_vec_ptr->data() + static_cast<size_t>(n_row)                 * row_n_bytes;
         uint8_t* const bottom_ptr = inout_pixel_u8_vec_ptr->data() + static_cast<size_t>(in_height - 1 - n_row) * row_n_bytes;
 
         ::memcpy(row_u8_vec.data(),
@@ -40,8 +40,8 @@ void Replay::ReplayEngineDLL::GLFrameReader::make_top_down_and_opaque(const uint
                  row_n_bytes);
     }
 
-    for (size_t n_alpha = N_BYTES_PER_PIXEL - 1;
-                n_alpha < inout_pixel_u8_vec_ptr->size();
+    for (size_t n_alpha =  N_BYTES_PER_PIXEL - 1;
+                n_alpha <  inout_pixel_u8_vec_ptr->size();
                 n_alpha += N_BYTES_PER_PIXEL)
     {
         inout_pixel_u8_vec_ptr->at(n_alpha) = OPAQUE_ALPHA;
@@ -74,15 +74,16 @@ bool Replay::ReplayEngineDLL::GLFrameReader::read(std::vector<uint8_t>* out_pixe
     const auto pixel_store_func_ptr   = reinterpret_cast<PFNPIXELSTOREIPROC> (m_resolve_func("glPixelStorei") );
     const auto read_buffer_func_ptr   = reinterpret_cast<PFNREADBUFFERPROC>  (m_resolve_func("glReadBuffer") );
     const auto read_pixels_func_ptr   = reinterpret_cast<PFNREADPIXELSPROC>  (m_resolve_func("glReadPixels") );
-    const HDC  device_context         = ::wglGetCurrentDC();
-    const HWND window                 = (device_context != nullptr) ? ::WindowFromDC(device_context)
-                                                                    : nullptr;
+
+    const HDC  device_context  = ::wglGetCurrentDC();
+    const HWND window          = (device_context != nullptr) ? ::WindowFromDC(device_context)
+                                                             : nullptr;
+    RECT       client_rect     = {};
+    bool       has_bind_buffer = (bind_buffer_func_ptr != nullptr);
+    uint32_t   height          = 0;
+    bool       result          = false;
     PackState  saved;
-    RECT       client_rect            = {};
-    bool       has_bind_buffer        = (bind_buffer_func_ptr != nullptr);
-    bool       result                 = false;
-    uint32_t   height                 = 0;
-    uint32_t   width                  = 0;
+    uint32_t   width           = 0;
 
     if (::wglGetCurrentContext() == nullptr ||
         window                   == nullptr ||

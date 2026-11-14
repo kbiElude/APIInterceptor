@@ -104,15 +104,14 @@ void Replay::ReplayEngineDLL::GLCallExecutor::after_call(const Capture::APIDumpL
             bool                    are_read   = (in_call.arg_in_vec.size() >= bind_array.size() );
 
             for (size_t n_value = 0;
-                        are_read &&
-                        n_value < bind_array.size();
+                        are_read && n_value < bind_array.size();
                       ++n_value)
             {
                 are_read = read_number(in_call.arg_in_vec.at(n_value),
-                                       &bind_array.at(n_value) );
+                                       &bind_array.at       (n_value) );
             }
 
-            if (are_read &&
+            if (are_read                              &&
                 bind_array.at(0) == PIXEL_PACK_BUFFER)
             {
                 m_context.set_pixel_pack_buffer_bound(bind_array.at(1) != 0);
