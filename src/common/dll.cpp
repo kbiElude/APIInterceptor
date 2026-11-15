@@ -16,7 +16,7 @@
 #include "interception/hooks/User32/interceptors.h"
 #include "interception/hooks/WGL/interceptors.h"
 
-const std::vector<APIInterceptor::FunctionInterceptor> g_function_interceptors[] =
+const std::vector<APIInterceptor::FunctionHookTarget> g_function_interceptors[] =
 {
     Interception::Hooks::GDI32::get_function_interceptors (),
     Interception::Hooks::Kernel32::get_function_interceptors(),

@@ -9,7 +9,7 @@
 #define APIDUMPERDLL_D3D7_SWAPCHAIN_READER_H
 
 #include "interception/hooks/D3D7/types.h"
-#include "pixel_converter.h"
+#include "swapchain_pixel_rgba8_converter.h"
 #include <array>
 #include <stdint.h>
 #include <vector>

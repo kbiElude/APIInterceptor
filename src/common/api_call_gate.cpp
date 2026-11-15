@@ -6,17 +6,17 @@
 #include <assert.h>
 #include <chrono>
 
-AI_THREADLOCAL uint32_t APIInterceptor::ApiCallGate::m_n_api_calls_intercepted = 0;
-AI_THREADLOCAL uint32_t APIInterceptor::ApiCallGate::m_scope_depth             = 0;
+AI_THREADLOCAL uint32_t APIInterceptor::APICallGate::m_n_api_calls_intercepted = 0;
+AI_THREADLOCAL uint32_t APIInterceptor::APICallGate::m_scope_depth             = 0;
 
-APIInterceptor::ApiCallGate::ApiCallGate()
+APIInterceptor::APICallGate::APICallGate()
     :m_is_closed       (false),
      m_n_threads_inside(0)
 {
     /* Stub */
 }
 
-void APIInterceptor::ApiCallGate::enter()
+void APIInterceptor::APICallGate::enter()
 {
     for (;;)
     {
@@ -43,15 +43,15 @@ void APIInterceptor::ApiCallGate::enter()
     }
 }
 
-APIInterceptor::ApiCallGate* APIInterceptor::ApiCallGate::get_ptr()
+APIInterceptor::APICallGate* APIInterceptor::APICallGate::get_ptr()
 {
     /* Never destroyed: hooks can still run during shutdown. */
-    static ApiCallGate* instance_ptr = new ApiCallGate();
+    static APICallGate* instance_ptr = new APICallGate();
 
     return instance_ptr;
 }
 
-void APIInterceptor::ApiCallGate::leave()
+void APIInterceptor::APICallGate::leave()
 {
     m_n_threads_inside--;
 
@@ -68,7 +68,7 @@ void APIInterceptor::ApiCallGate::leave()
     }
 }
 
-void APIInterceptor::ApiCallGate::on_api_call_interception_finished()
+void APIInterceptor::APICallGate::on_api_call_interception_finished()
 {
     assert(m_n_api_calls_intercepted > 0);
 
@@ -77,7 +77,7 @@ void APIInterceptor::ApiCallGate::on_api_call_interception_finished()
     on_scope_left();
 }
 
-bool APIInterceptor::ApiCallGate::on_api_call_interception_started()
+bool APIInterceptor::APICallGate::on_api_call_interception_started()
 {
     const bool result = (m_n_api_calls_intercepted == 0);
 
@@ -88,7 +88,7 @@ bool APIInterceptor::ApiCallGate::on_api_call_interception_started()
     return result;
 }
 
-void APIInterceptor::ApiCallGate::on_scope_entered()
+void APIInterceptor::APICallGate::on_scope_entered()
 {
     if (m_scope_depth == 0)
     {
@@ -98,7 +98,7 @@ void APIInterceptor::ApiCallGate::on_scope_entered()
     m_scope_depth++;
 }
 
-void APIInterceptor::ApiCallGate::on_scope_left()
+void APIInterceptor::APICallGate::on_scope_left()
 {
     assert(m_scope_depth > 0);
 
@@ -110,7 +110,7 @@ void APIInterceptor::ApiCallGate::on_scope_left()
     }
 }
 
-void APIInterceptor::ApiCallGate::resume()
+void APIInterceptor::APICallGate::resume()
 {
     {
         std::lock_guard<std::mutex> lock(m_mutex);
@@ -121,12 +121,12 @@ void APIInterceptor::ApiCallGate::resume()
     m_cv.notify_all();
 }
 
-void APIInterceptor::ApiCallGate::resume_nesting(const uint32_t& in_depth)
+void APIInterceptor::APICallGate::resume_nesting(const uint32_t& in_depth)
 {
     m_n_api_calls_intercepted = in_depth;
 }
 
-uint32_t APIInterceptor::ApiCallGate::suspend_nesting()
+uint32_t APIInterceptor::APICallGate::suspend_nesting()
 {
     const uint32_t result = m_n_api_calls_intercepted;
 
@@ -135,7 +135,7 @@ uint32_t APIInterceptor::ApiCallGate::suspend_nesting()
     return result;
 }
 
-bool APIInterceptor::ApiCallGate::try_quiesce(const uint32_t& in_timeout_ms)
+bool APIInterceptor::APICallGate::try_quiesce(const uint32_t& in_timeout_ms)
 {
     bool       expected_is_closed = false;
     const auto n_own_threads      = (m_scope_depth > 0) ? 1u : 0u; /* the caller is inside a call itself */

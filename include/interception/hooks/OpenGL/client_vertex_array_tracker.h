@@ -2,8 +2,8 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
-#if !defined(OPENGL_CLIENT_ARRAY_MANAGER_H)
-#define OPENGL_CLIENT_ARRAY_MANAGER_H
+#if !defined(OPENGL_CLIENT_VERTEX_ARRAY_TRACKER_H)
+#define OPENGL_CLIENT_VERTEX_ARRAY_TRACKER_H
 
 #include "interception/hooks/OpenGL/types_enums.h"
 #include <cstdint>
@@ -42,14 +42,14 @@ namespace Interception
              *       uint8_t  data[n_bytes]
              *   }
              */
-            class ClientArrayManager
+            class ClientVertexArrayTracker
             {
             public:
                 static constexpr uint32_t SNAPSHOT_FLAG_IS_INTEGER    = 1 << 0;
                 static constexpr uint32_t SNAPSHOT_FLAG_IS_LONG       = 1 << 1;
                 static constexpr uint32_t SNAPSHOT_FLAG_IS_NORMALIZED = 1 << 2;
 
-                ClientArrayManager();
+                ClientVertexArrayTracker();
 
                 uint32_t get_bound_vertex_array() const;
 
@@ -144,4 +144,4 @@ namespace Interception
     }
 }
 
-#endif /* OPENGL_CLIENT_ARRAY_MANAGER_H */
+#endif /* OPENGL_CLIENT_VERTEX_ARRAY_TRACKER_H */

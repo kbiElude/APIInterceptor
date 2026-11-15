@@ -53,7 +53,7 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiBindVertexArray(GLuint array)
     {
         auto& context = Interception::Hooks::OpenGL::get_context_state();
 
-        context.client_array_manager.set_bound_vertex_array(array);
+        context.client_vertex_array_tracker.set_bound_vertex_array(array);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLBINDVERTEXARRAY,

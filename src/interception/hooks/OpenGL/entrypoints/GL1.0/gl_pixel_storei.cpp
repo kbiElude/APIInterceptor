@@ -92,8 +92,8 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiPixelStorei(GLenum pname,
 
     if (call_scope.is_top_level_api_call() )
     {
-        Interception::Hooks::OpenGL::get_context_state().pixel_store_manager.on_pixel_store(pname,
-                                                                                            param);
+        Interception::Hooks::OpenGL::get_context_state().pixel_store_modes.on_pixel_store(pname,
+                                                                                          param);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLPIXELSTOREI,

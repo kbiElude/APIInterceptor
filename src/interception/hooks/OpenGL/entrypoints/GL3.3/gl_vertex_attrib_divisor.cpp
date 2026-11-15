@@ -57,8 +57,8 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiVertexAttribDivisor(GLuint index
     {
         auto& context = Interception::Hooks::OpenGL::get_context_state();
 
-        context.client_array_manager.set_divisor(index,
-                                               divisor);
+        context.client_vertex_array_tracker.set_divisor(index,
+                                                      divisor);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLVERTEXATTRIBDIVISOR,

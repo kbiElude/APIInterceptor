@@ -15,7 +15,7 @@ namespace Interception
     {
         namespace User32
         {
-            extern std::vector<APIInterceptor::FunctionInterceptor> get_function_interceptors();
+            extern std::vector<APIInterceptor::FunctionHookTarget> get_function_interceptors();
         }
     }
 }

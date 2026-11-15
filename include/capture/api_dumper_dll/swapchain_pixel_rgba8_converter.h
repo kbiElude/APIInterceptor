@@ -4,8 +4,8 @@
  *
  * Turns the pixels of a back buffer which a swapchain reader has locked into RGBA8, whatever API the readers are of.
  */
-#if !defined(APIDUMPERDLL_PIXEL_CONVERTER_H)
-#define APIDUMPERDLL_PIXEL_CONVERTER_H
+#if !defined(APIDUMPERDLL_SWAPCHAIN_PIXEL_RGBA8_CONVERTER_H)
+#define APIDUMPERDLL_SWAPCHAIN_PIXEL_RGBA8_CONVERTER_H
 
 #include "capture/api_dumper_dll/types.h"
 #include <stdint.h>
@@ -15,7 +15,7 @@ namespace Capture
 {
     namespace APIDumperDLL
     {
-        class PixelConverter
+        class SwapchainPixelRgba8Converter
         {
         public:
             /* Stores width x height pixels, whose rows start in_pitch_n_bytes apart, as RGBA8 with the bottom row first (like
@@ -31,4 +31,4 @@ namespace Capture
     }
 }
 
-#endif /* APIDUMPERDLL_PIXEL_CONVERTER_H */
+#endif /* APIDUMPERDLL_SWAPCHAIN_PIXEL_RGBA8_CONVERTER_H */

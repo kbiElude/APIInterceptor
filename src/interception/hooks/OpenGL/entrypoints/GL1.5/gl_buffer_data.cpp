@@ -97,12 +97,12 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiBufferData(GLenum      target,
                                                                                      &binding_target) )
         {
             auto&        context         = Interception::Hooks::OpenGL::get_context_state();
-            const GLuint bound_buffer_id = context.buffer_manager.get_bound_buffer(binding_target);
+            const GLuint bound_buffer_id = context.buffer_binding_tracker.get_bound_buffer(binding_target);
 
             if (bound_buffer_id != 0)
             {
-                context.buffer_manager.set_size(bound_buffer_id,
-                                                static_cast<uint64_t>(size) );
+                context.buffer_binding_tracker.set_size(bound_buffer_id,
+                                                        static_cast<uint64_t>(size) );
             }
         }
     }

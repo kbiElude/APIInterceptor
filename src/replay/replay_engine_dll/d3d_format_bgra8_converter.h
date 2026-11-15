@@ -2,8 +2,8 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
-#ifndef REPLAYENGINEDLL_PIXEL_CONVERTER_H
-#define REPLAYENGINEDLL_PIXEL_CONVERTER_H
+#ifndef REPLAYENGINEDLL_D3D_FORMAT_BGRA8_CONVERTER_H
+#define REPLAYENGINEDLL_D3D_FORMAT_BGRA8_CONVERTER_H
 
 #include "interception/hooks/D3D8/types.h"
 #include <stdint.h>
@@ -13,7 +13,7 @@ namespace Replay
 {
     namespace ReplayEngineDLL
     {
-        class PixelConverter
+        class D3DFormatBgra8Converter
         {
         public:
             /* Converts an image of a Direct3D 8 format (D3DFORMAT) to B, G, R and A (always 255) of 8 bits for each pixel, rows one
@@ -56,4 +56,4 @@ namespace Replay
     }
 }
 
-#endif /* REPLAYENGINEDLL_PIXEL_CONVERTER_H */
+#endif /* REPLAYENGINEDLL_D3D_FORMAT_BGRA8_CONVERTER_H */

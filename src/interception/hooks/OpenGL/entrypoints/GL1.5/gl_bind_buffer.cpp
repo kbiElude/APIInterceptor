@@ -64,8 +64,8 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiBindBuffer(GLenum target,
         {
             auto& context = Interception::Hooks::OpenGL::get_context_state();
 
-            context.buffer_manager.on_buffer_bound(binding_target,
-                                                   buffer);
+            context.buffer_binding_tracker.on_buffer_bound(binding_target,
+                                                           buffer);
         }
     }
 

@@ -5,22 +5,22 @@
  * Checks of the sizes of the images which pixel transfers read and write, given the pixel storage modes.
  */
 #include <gtest/gtest.h>
-#include "interception/hooks/OpenGL/pixel_store_manager.h"
+#include "interception/hooks/OpenGL/pixel_store_modes.h"
 #include "interception/hooks/OpenGL/types.h"
 #include "gl/gl.h"
 
-TEST(PixelStoreManager, RowsArePaddedToTheDefaultAlignment)
+TEST(PixelStoreModes, RowsArePaddedToTheDefaultAlignment)
 {
-    Interception::Hooks::OpenGL::PixelStoreManager manager;
+    Interception::Hooks::OpenGL::PixelStoreModes manager;
 
     /* 3 RGB pixels are 9 bytes, padded to 12 for the first row; the last row is not padded. */
     EXPECT_EQ(manager.get_n_unpack_bytes(3, 2, 1, GL_RGB, GL_UNSIGNED_BYTE),
               12u + 9u);
 }
 
-TEST(PixelStoreManager, TightlyPackedRowsWithAlignmentOfOne)
+TEST(PixelStoreModes, TightlyPackedRowsWithAlignmentOfOne)
 {
-    Interception::Hooks::OpenGL::PixelStoreManager manager;
+    Interception::Hooks::OpenGL::PixelStoreModes manager;
 
     manager.on_pixel_store(GL_UNPACK_ALIGNMENT,
                            1);
@@ -29,9 +29,9 @@ TEST(PixelStoreManager, TightlyPackedRowsWithAlignmentOfOne)
               18u);
 }
 
-TEST(PixelStoreManager, RowLengthSetsTheDistanceBetweenRows)
+TEST(PixelStoreModes, RowLengthSetsTheDistanceBetweenRows)
 {
-    Interception::Hooks::OpenGL::PixelStoreManager manager;
+    Interception::Hooks::OpenGL::PixelStoreModes manager;
 
     manager.on_pixel_store(GL_UNPACK_ROW_LENGTH,
                            8);
@@ -41,9 +41,9 @@ TEST(PixelStoreManager, RowLengthSetsTheDistanceBetweenRows)
               32u + 8u);
 }
 
-TEST(PixelStoreManager, SkippedPixelsAndRowsCountToo)
+TEST(PixelStoreModes, SkippedPixelsAndRowsCountToo)
 {
-    Interception::Hooks::OpenGL::PixelStoreManager manager;
+    Interception::Hooks::OpenGL::PixelStoreModes manager;
 
     manager.on_pixel_store(GL_UNPACK_SKIP_PIXELS,
                            1);
@@ -55,9 +55,9 @@ TEST(PixelStoreManager, SkippedPixelsAndRowsCountToo)
               4u + 8u + 8u);
 }
 
-TEST(PixelStoreManager, ImagesOfAVolumeUseImageHeightAndSkipImages)
+TEST(PixelStoreModes, ImagesOfAVolumeUseImageHeightAndSkipImages)
 {
-    Interception::Hooks::OpenGL::PixelStoreManager manager;
+    Interception::Hooks::OpenGL::PixelStoreModes manager;
 
     manager.on_pixel_store(GL_UNPACK_IMAGE_HEIGHT,
                            4);
@@ -69,18 +69,18 @@ TEST(PixelStoreManager, ImagesOfAVolumeUseImageHeightAndSkipImages)
               32u + 32u + 8u + 8u);
 }
 
-TEST(PixelStoreManager, PackedTypesAreOneElement)
+TEST(PixelStoreModes, PackedTypesAreOneElement)
 {
-    Interception::Hooks::OpenGL::PixelStoreManager manager;
+    Interception::Hooks::OpenGL::PixelStoreModes manager;
 
     /* 3 pixels of 2 bytes are 6 bytes, padded to 8. */
     EXPECT_EQ(manager.get_n_unpack_bytes(3, 2, 1, GL_RGB, GL_UNSIGNED_SHORT_5_6_5),
               8u + 6u);
 }
 
-TEST(PixelStoreManager, PackAndUnpackModesAreIndependent)
+TEST(PixelStoreModes, PackAndUnpackModesAreIndependent)
 {
-    Interception::Hooks::OpenGL::PixelStoreManager manager;
+    Interception::Hooks::OpenGL::PixelStoreModes manager;
 
     manager.on_pixel_store(GL_PACK_ALIGNMENT,
                            1);
@@ -91,9 +91,9 @@ TEST(PixelStoreManager, PackAndUnpackModesAreIndependent)
               12u + 9u);
 }
 
-TEST(PixelStoreManager, EmptyImagesHaveNoBytes)
+TEST(PixelStoreModes, EmptyImagesHaveNoBytes)
 {
-    Interception::Hooks::OpenGL::PixelStoreManager manager;
+    Interception::Hooks::OpenGL::PixelStoreModes manager;
 
     EXPECT_EQ(manager.get_n_unpack_bytes(0, 4, 1, GL_RGBA, GL_UNSIGNED_BYTE),
               0u);
@@ -103,9 +103,9 @@ TEST(PixelStoreManager, EmptyImagesHaveNoBytes)
               0u);
 }
 
-TEST(PixelStoreManager, NegativeValuesAreIgnored)
+TEST(PixelStoreModes, NegativeValuesAreIgnored)
 {
-    Interception::Hooks::OpenGL::PixelStoreManager manager;
+    Interception::Hooks::OpenGL::PixelStoreModes manager;
 
     manager.on_pixel_store(GL_UNPACK_ALIGNMENT,
                            -1);
@@ -114,9 +114,9 @@ TEST(PixelStoreManager, NegativeValuesAreIgnored)
               12u + 9u);
 }
 
-TEST(PixelStoreManager, BitmapsHaveOneBitPerPixel)
+TEST(PixelStoreModes, BitmapsHaveOneBitPerPixel)
 {
-    Interception::Hooks::OpenGL::PixelStoreManager manager;
+    Interception::Hooks::OpenGL::PixelStoreModes manager;
 
     /* 10 pixels are 2 bytes, padded to 4 for the first row. */
     EXPECT_EQ(manager.get_n_unpack_bitmap_bytes(10, 2),

@@ -51,22 +51,22 @@ bool APIInterceptor::get_pre_callback_for_function(const APIFunction&           
 
 void APIInterceptor::on_api_call_interception_finished()
 {
-    ApiCallGate::get_ptr()->on_api_call_interception_finished();
+    APICallGate::get_ptr()->on_api_call_interception_finished();
 }
 
 bool APIInterceptor::on_api_call_interception_started()
 {
-    return ApiCallGate::get_ptr()->on_api_call_interception_started();
+    return APICallGate::get_ptr()->on_api_call_interception_started();
 }
 
 void APIInterceptor::on_gate_scope_entered()
 {
-    ApiCallGate::get_ptr()->on_scope_entered();
+    APICallGate::get_ptr()->on_scope_entered();
 }
 
 void APIInterceptor::on_gate_scope_left()
 {
-    ApiCallGate::get_ptr()->on_scope_left();
+    APICallGate::get_ptr()->on_scope_left();
 }
 
 APIInterceptor::DataChunkID APIInterceptor::register_data_chunk(const void*     in_data_ptr,
@@ -101,17 +101,17 @@ void APIInterceptor::release_data_chunk(const DataChunkID& in_data_chunk_id)
 
 void APIInterceptor::resume_api_call_nesting(const uint32_t& in_depth)
 {
-    ApiCallGate::get_ptr()->resume_nesting(in_depth);
+    APICallGate::get_ptr()->resume_nesting(in_depth);
 }
 
 void APIInterceptor::resume_api_calls()
 {
-    ApiCallGate::get_ptr()->resume();
+    APICallGate::get_ptr()->resume();
 }
 
 uint32_t APIInterceptor::suspend_api_call_nesting()
 {
-    return ApiCallGate::get_ptr()->suspend_nesting();
+    return APICallGate::get_ptr()->suspend_nesting();
 }
 
 bool APIInterceptor::take_data_chunk(const DataChunkID&    in_data_chunk_id,
@@ -141,5 +141,5 @@ uint32_t APIInterceptor::take_data_chunks_by_id(const std::vector<DataChunkID>& 
 
 bool APIInterceptor::try_quiesce_api_calls(const uint32_t& in_timeout_ms)
 {
-    return ApiCallGate::get_ptr()->try_quiesce(in_timeout_ms);
+    return APICallGate::get_ptr()->try_quiesce(in_timeout_ms);
 }

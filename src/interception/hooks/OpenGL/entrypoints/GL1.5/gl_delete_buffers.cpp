@@ -89,8 +89,8 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiDeleteBuffers(GLsizei       n,
                          n_buffer < n;
                        ++n_buffer)
             {
-                context.buffer_manager.on_buffer_deleted(buffers[n_buffer]);
-                context.buffer_mapping_manager.on_buffer_deleted(buffers[n_buffer]);
+                context.buffer_binding_tracker.on_buffer_deleted(buffers[n_buffer]);
+                context.mapped_buffer_write_tracker.on_buffer_deleted(buffers[n_buffer]);
             }
         }
     }

@@ -3,15 +3,15 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "common/macros.h"
-#include "interception/hooks/OpenGL/buffer_mapping_manager.h"
+#include "interception/hooks/OpenGL/mapped_buffer_write_tracker.h"
 #include "interception/hooks/OpenGL/types.h"
 
-Interception::Hooks::OpenGL::BufferMappingManager::BufferMappingManager()
+Interception::Hooks::OpenGL::MappedBufferWriteTracker::MappedBufferWriteTracker()
 {
     /* Stub */
 }
 
-uint32_t Interception::Hooks::OpenGL::BufferMappingManager::get_flags_for_access(const uint32_t& in_access)
+uint32_t Interception::Hooks::OpenGL::MappedBufferWriteTracker::get_flags_for_access(const uint32_t& in_access)
 {
     uint32_t result = 0;
 
@@ -30,9 +30,9 @@ uint32_t Interception::Hooks::OpenGL::BufferMappingManager::get_flags_for_access
     return result;
 }
 
-Interception::Hooks::OpenGL::BufferMappingManager::Region Interception::Hooks::OpenGL::BufferMappingManager::get_flush_region(const uint32_t& in_buffer,
-                                                                                                                              const int64_t&  in_offset,
-                                                                                                                              const int64_t&  in_length) const
+Interception::Hooks::OpenGL::MappedBufferWriteTracker::Region Interception::Hooks::OpenGL::MappedBufferWriteTracker::get_flush_region(const uint32_t& in_buffer,
+                                                                                                                                      const int64_t&  in_offset,
+                                                                                                                                      const int64_t&  in_length) const
 {
     const auto mapping_ptr = get_mapping_ptr(in_buffer);
     Region     result;
@@ -68,7 +68,7 @@ end:
     return result;
 }
 
-Interception::Hooks::OpenGL::BufferMappingManager::Region Interception::Hooks::OpenGL::BufferMappingManager::get_initial_region(const uint32_t& in_buffer) const
+Interception::Hooks::OpenGL::MappedBufferWriteTracker::Region Interception::Hooks::OpenGL::MappedBufferWriteTracker::get_initial_region(const uint32_t& in_buffer) const
 {
     const auto mapping_ptr = get_mapping_ptr(in_buffer);
     Region     result;
@@ -95,7 +95,7 @@ end:
     return result;
 }
 
-const Interception::Hooks::OpenGL::BufferMappingManager::Mapping* Interception::Hooks::OpenGL::BufferMappingManager::get_mapping_ptr(const uint32_t& in_buffer) const
+const Interception::Hooks::OpenGL::MappedBufferWriteTracker::Mapping* Interception::Hooks::OpenGL::MappedBufferWriteTracker::get_mapping_ptr(const uint32_t& in_buffer) const
 {
     const auto     mapping_iterator = m_mapping_map.find(in_buffer);
     const Mapping* result_ptr       = nullptr;
@@ -108,7 +108,7 @@ const Interception::Hooks::OpenGL::BufferMappingManager::Mapping* Interception::
     return result_ptr;
 }
 
-Interception::Hooks::OpenGL::BufferMappingManager::Region Interception::Hooks::OpenGL::BufferMappingManager::get_unmap_region(const uint32_t& in_buffer) const
+Interception::Hooks::OpenGL::MappedBufferWriteTracker::Region Interception::Hooks::OpenGL::MappedBufferWriteTracker::get_unmap_region(const uint32_t& in_buffer) const
 {
     const auto mapping_ptr = get_mapping_ptr(in_buffer);
     Region     result;
@@ -135,12 +135,12 @@ end:
     return result;
 }
 
-bool Interception::Hooks::OpenGL::BufferMappingManager::is_mapped(const uint32_t& in_buffer) const
+bool Interception::Hooks::OpenGL::MappedBufferWriteTracker::is_mapped(const uint32_t& in_buffer) const
 {
     return (get_mapping_ptr(in_buffer) != nullptr);
 }
 
-bool Interception::Hooks::OpenGL::BufferMappingManager::is_persistent(const uint32_t& in_buffer) const
+bool Interception::Hooks::OpenGL::MappedBufferWriteTracker::is_persistent(const uint32_t& in_buffer) const
 {
     const auto mapping_ptr = get_mapping_ptr(in_buffer);
     bool       result      = false;
@@ -153,16 +153,16 @@ bool Interception::Hooks::OpenGL::BufferMappingManager::is_persistent(const uint
     return result;
 }
 
-void Interception::Hooks::OpenGL::BufferMappingManager::on_buffer_deleted(const uint32_t& in_buffer)
+void Interception::Hooks::OpenGL::MappedBufferWriteTracker::on_buffer_deleted(const uint32_t& in_buffer)
 {
     m_mapping_map.erase(in_buffer);
 }
 
-void Interception::Hooks::OpenGL::BufferMappingManager::on_buffer_mapped(const uint32_t& in_buffer,
-                                                                         void*           in_mapped_ptr,
-                                                                         const int64_t&  in_offset,
-                                                                         const int64_t&  in_length,
-                                                                         const uint32_t& in_flags)
+void Interception::Hooks::OpenGL::MappedBufferWriteTracker::on_buffer_mapped(const uint32_t& in_buffer,
+                                                                             void*           in_mapped_ptr,
+                                                                             const int64_t&  in_offset,
+                                                                             const int64_t&  in_length,
+                                                                             const uint32_t& in_flags)
 {
     if (in_mapped_ptr != nullptr)
     {
@@ -175,7 +175,7 @@ void Interception::Hooks::OpenGL::BufferMappingManager::on_buffer_mapped(const u
     }
 }
 
-void Interception::Hooks::OpenGL::BufferMappingManager::on_buffer_unmapped(const uint32_t& in_buffer)
+void Interception::Hooks::OpenGL::MappedBufferWriteTracker::on_buffer_unmapped(const uint32_t& in_buffer)
 {
     m_mapping_map.erase(in_buffer);
 }

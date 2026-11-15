@@ -6,7 +6,7 @@
 #include "d3d8_call_executor.h"
 #include "interception/hooks/D3D8/types.h"
 #include "d3d8_replay_invoker.h"
-#include "pixel_converter.h"
+#include "d3d_format_bgra8_converter.h"
 #include <string.h>
 
 Replay::ReplayEngineDLL::D3D8CallExecutor::D3D8CallExecutor(ObjectRemapper* in_remapper_ptr)
@@ -444,7 +444,7 @@ bool Replay::ReplayEngineDLL::D3D8CallExecutor::read_back_buffer(std::vector<uin
 
     if (out_pixel_u8_vec_ptr != nullptr)
     {
-        n_bytes_per_pixel = PixelConverter::get_bytes_per_pixel(image.description.Format);
+        n_bytes_per_pixel = D3DFormatBgra8Converter::get_bytes_per_pixel(image.description.Format);
 
         if (n_bytes_per_pixel == 0)
         {
@@ -467,12 +467,12 @@ bool Replay::ReplayEngineDLL::D3D8CallExecutor::read_back_buffer(std::vector<uin
 
     if (out_image_ptr != nullptr)
     {
-        if (PixelConverter::convert_to_bgra8(image.description.Format,
-                                             image.description.Width,
-                                             image.description.Height,
-                                             static_cast<uint32_t>      (image.locked_rect.Pitch),
-                                             static_cast<const uint8_t*>(image.locked_rect.pBits),
-                                            &m_capture_u8_vec) == false)
+        if (D3DFormatBgra8Converter::convert_to_bgra8(image.description.Format,
+                                                      image.description.Width,
+                                                      image.description.Height,
+                                                      static_cast<uint32_t>      (image.locked_rect.Pitch),
+                                                      static_cast<const uint8_t*>(image.locked_rect.pBits),
+                                                     &m_capture_u8_vec) == false)
         {
             goto end;
         }
@@ -608,7 +608,7 @@ bool Replay::ReplayEngineDLL::D3D8CallExecutor::write_back_buffer(const std::vec
         goto end;
     }
 
-    n_bytes_per_pixel = PixelConverter::get_bytes_per_pixel(image.description.Format);
+    n_bytes_per_pixel = D3DFormatBgra8Converter::get_bytes_per_pixel(image.description.Format);
     n_row_bytes       = image.description.Width                                       * n_bytes_per_pixel;
 
     if (n_bytes_per_pixel      == 0                                                           ||

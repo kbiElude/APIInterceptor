@@ -5,7 +5,7 @@
  * Checks of the tracking of the vertex arrays which live in the app's memory, and of the snapshots taken of them.
  */
 #include <gtest/gtest.h>
-#include "interception/hooks/OpenGL/client_array_manager.h"
+#include "interception/hooks/OpenGL/client_vertex_array_tracker.h"
 #include "interception/hooks/OpenGL/types.h"
 #include "gl/gl.h"
 #include <string.h>
@@ -88,11 +88,11 @@ static std::vector<SnapshotArray> parse_snapshot(const std::vector<uint8_t>& in_
     return result_vec;
 }
 
-TEST(ClientArrayManager, CopiesTheRangeOfAnEnabledClientArray)
+TEST(ClientVertexArrayTracker, CopiesTheRangeOfAnEnabledClientArray)
 {
     const float vertices_fp32vec12[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
 
-    Interception::Hooks::OpenGL::ClientArrayManager state;
+    Interception::Hooks::OpenGL::ClientVertexArrayTracker state;
 
     state.set_pointer(Interception::Hooks::OpenGL::ClientArrayKind::VERTEX,
                       0,
@@ -132,11 +132,11 @@ TEST(ClientArrayManager, CopiesTheRangeOfAnEnabledClientArray)
               0);
 }
 
-TEST(ClientArrayManager, HonoursTheStride)
+TEST(ClientVertexArrayTracker, HonoursTheStride)
 {
     const uint8_t data_u8vec32[32] = {};
 
-    Interception::Hooks::OpenGL::ClientArrayManager state;
+    Interception::Hooks::OpenGL::ClientVertexArrayTracker state;
 
     state.set_pointer(Interception::Hooks::OpenGL::ClientArrayKind::COLOR,
                       0,
@@ -166,11 +166,11 @@ TEST(ClientArrayManager, HonoursTheStride)
               16u);
 }
 
-TEST(ClientArrayManager, IgnoresArraysInBuffersAndDisabledArrays)
+TEST(ClientVertexArrayTracker, IgnoresArraysInBuffersAndDisabledArrays)
 {
     const float data_fp32vec4[] = {1, 2, 3, 4};
 
-    Interception::Hooks::OpenGL::ClientArrayManager state;
+    Interception::Hooks::OpenGL::ClientVertexArrayTracker state;
 
     /* In a buffer. */
     state.set_pointer(Interception::Hooks::OpenGL::ClientArrayKind::VERTEX,
@@ -206,11 +206,11 @@ TEST(ClientArrayManager, IgnoresArraysInBuffersAndDisabledArrays)
                                     0).empty() );
 }
 
-TEST(ClientArrayManager, ArraysWithADivisorAreReadByInstance)
+TEST(ClientVertexArrayTracker, ArraysWithADivisorAreReadByInstance)
 {
     const float data_fp32vec16[16] = {};
 
-    Interception::Hooks::OpenGL::ClientArrayManager state;
+    Interception::Hooks::OpenGL::ClientVertexArrayTracker state;
 
     state.set_pointer(Interception::Hooks::OpenGL::ClientArrayKind::GENERIC,
                       2,
@@ -245,14 +245,14 @@ TEST(ClientArrayManager, ArraysWithADivisorAreReadByInstance)
     EXPECT_EQ(array_vec[0].divisor,
               2u);
     EXPECT_EQ(array_vec[0].flags,
-              Interception::Hooks::OpenGL::ClientArrayManager::SNAPSHOT_FLAG_IS_NORMALIZED);
+              Interception::Hooks::OpenGL::ClientVertexArrayTracker::SNAPSHOT_FLAG_IS_NORMALIZED);
 }
 
-TEST(ClientArrayManager, NothingIsTrackedWhileAVertexArrayIsBound)
+TEST(ClientVertexArrayTracker, NothingIsTrackedWhileAVertexArrayIsBound)
 {
     const float data_fp32vec4[] = {1, 2, 3, 4};
 
-    Interception::Hooks::OpenGL::ClientArrayManager state;
+    Interception::Hooks::OpenGL::ClientVertexArrayTracker state;
 
     state.set_bound_vertex_array(7);
     state.set_pointer(Interception::Hooks::OpenGL::ClientArrayKind::VERTEX,
@@ -273,12 +273,12 @@ TEST(ClientArrayManager, NothingIsTrackedWhileAVertexArrayIsBound)
     EXPECT_FALSE(state.has_client_arrays() );
 }
 
-TEST(ClientArrayManager, InterleavedArraysSetUpEveryArrayOfTheFormat)
+TEST(ClientVertexArrayTracker, InterleavedArraysSetUpEveryArrayOfTheFormat)
 {
     /* Texture coordinates (2 floats), a color (4 bytes), a vertex (3 floats): 24 bytes per element. */
     const uint8_t data_u8vec48[48] = {};
 
-    Interception::Hooks::OpenGL::ClientArrayManager state;
+    Interception::Hooks::OpenGL::ClientVertexArrayTracker state;
 
     state.set_interleaved_arrays(GL_T2F_C4UB_V3F,
                                  0,
@@ -310,14 +310,14 @@ TEST(ClientArrayManager, InterleavedArraysSetUpEveryArrayOfTheFormat)
               24u);
 }
 
-TEST(ClientArrayManager, MapsArrayTokensToKinds)
+TEST(ClientVertexArrayTracker, MapsArrayTokensToKinds)
 {
     Interception::Hooks::OpenGL::ClientArrayKind kind;
 
-    EXPECT_TRUE(Interception::Hooks::OpenGL::ClientArrayManager::get_kind_for_array_enum(GL_TEXTURE_COORD_ARRAY,
-                                                                 &kind) );
+    EXPECT_TRUE(Interception::Hooks::OpenGL::ClientVertexArrayTracker::get_kind_for_array_enum(GL_TEXTURE_COORD_ARRAY,
+                                                                       &kind) );
     EXPECT_EQ(kind,
               Interception::Hooks::OpenGL::ClientArrayKind::TEX_COORD);
-    EXPECT_FALSE(Interception::Hooks::OpenGL::ClientArrayManager::get_kind_for_array_enum(GL_LIGHTING,
-                                                                  &kind) );
+    EXPECT_FALSE(Interception::Hooks::OpenGL::ClientVertexArrayTracker::get_kind_for_array_enum(GL_LIGHTING,
+                                                                        &kind) );
 }

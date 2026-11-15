@@ -1156,19 +1156,19 @@ namespace APIInterceptor
     /* The most arguments of an API function that a callback is given, the extra ones which a hook adds included. */
     constexpr uint32_t MAX_N_FUNCTION_ARGUMENTS = 14;
 
-    struct FunctionInterceptor
+    struct FunctionHookTarget
     {
         void** pfn_func_to_intercept_ptr_ptr;
         void*  pfn_interceptor_func_ptr;
 
-        FunctionInterceptor()
+        FunctionHookTarget()
         {
             pfn_func_to_intercept_ptr_ptr = nullptr;
             pfn_interceptor_func_ptr      = nullptr;
         }
 
-        FunctionInterceptor(void** in_pfn_func_to_intercept_ptr_ptr,
-                            void*  in_pfn_interceptor_func_ptr)
+        FunctionHookTarget(void** in_pfn_func_to_intercept_ptr_ptr,
+                           void*  in_pfn_interceptor_func_ptr)
         {
             pfn_func_to_intercept_ptr_ptr = in_pfn_func_to_intercept_ptr_ptr;
             pfn_interceptor_func_ptr      = in_pfn_interceptor_func_ptr;

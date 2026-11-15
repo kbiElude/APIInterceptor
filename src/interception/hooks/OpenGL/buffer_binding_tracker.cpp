@@ -3,23 +3,23 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "common/macros.h"
-#include "interception/hooks/OpenGL/buffer_manager.h"
+#include "interception/hooks/OpenGL/buffer_binding_tracker.h"
 
-Interception::Hooks::OpenGL::BufferManager::BufferManager()
+Interception::Hooks::OpenGL::BufferBindingTracker::BufferBindingTracker()
     :m_bound_buffer_vec(static_cast<size_t>(BufferBindingTarget::COUNT),
                         0)
 {
     /* Stub */
 }
 
-uint32_t Interception::Hooks::OpenGL::BufferManager::get_bound_buffer(const BufferBindingTarget& in_target) const
+uint32_t Interception::Hooks::OpenGL::BufferBindingTracker::get_bound_buffer(const BufferBindingTarget& in_target) const
 {
     AI_ASSERT(static_cast<size_t>(in_target) < m_bound_buffer_vec.size() );
 
     return m_bound_buffer_vec.at(static_cast<size_t>(in_target) );
 }
 
-uint64_t Interception::Hooks::OpenGL::BufferManager::get_size(const uint32_t& in_buffer) const
+uint64_t Interception::Hooks::OpenGL::BufferBindingTracker::get_size(const uint32_t& in_buffer) const
 {
     const auto size_iterator = m_size_map.find(in_buffer);
     uint64_t   result        = 0;
@@ -32,15 +32,15 @@ uint64_t Interception::Hooks::OpenGL::BufferManager::get_size(const uint32_t& in
     return result;
 }
 
-void Interception::Hooks::OpenGL::BufferManager::on_buffer_bound(const BufferBindingTarget& in_target,
-                                                                 const uint32_t&            in_buffer)
+void Interception::Hooks::OpenGL::BufferBindingTracker::on_buffer_bound(const BufferBindingTarget& in_target,
+                                                                        const uint32_t&            in_buffer)
 {
     AI_ASSERT(static_cast<size_t>(in_target) < m_bound_buffer_vec.size() );
 
     m_bound_buffer_vec.at(static_cast<size_t>(in_target) ) = in_buffer;
 }
 
-void Interception::Hooks::OpenGL::BufferManager::on_buffer_deleted(const uint32_t& in_buffer)
+void Interception::Hooks::OpenGL::BufferBindingTracker::on_buffer_deleted(const uint32_t& in_buffer)
 {
     m_size_map.erase(in_buffer);
 
@@ -54,8 +54,8 @@ void Interception::Hooks::OpenGL::BufferManager::on_buffer_deleted(const uint32_
     }
 }
 
-void Interception::Hooks::OpenGL::BufferManager::set_size(const uint32_t& in_buffer,
-                                                          const uint64_t& in_size)
+void Interception::Hooks::OpenGL::BufferBindingTracker::set_size(const uint32_t& in_buffer,
+                                                                 const uint64_t& in_size)
 {
     m_size_map[in_buffer] = in_size;
 }

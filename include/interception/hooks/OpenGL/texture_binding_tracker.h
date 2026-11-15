@@ -2,8 +2,8 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
-#if !defined(OPENGL_TEXTURE_MANAGER_H)
-#define OPENGL_TEXTURE_MANAGER_H
+#if !defined(OPENGL_TEXTURE_BINDING_TRACKER_H)
+#define OPENGL_TEXTURE_BINDING_TRACKER_H
 
 #include "interception/hooks/OpenGL/types_enums.h"
 #include <cstdint>
@@ -19,7 +19,7 @@ namespace Interception
             /* Tracks which texture objects are bound to the binding points of a GL context, and what the levels of the texture
              * objects look like. There is one for each GL context (see ContextState).
              */
-            class TextureManager
+            class TextureBindingTracker
             {
             public:
                 /* What the app specified for a level of a texture. All zeroes if it did not. */
@@ -31,7 +31,7 @@ namespace Interception
                     uint32_t width                 = 0;
                 };
 
-                TextureManager();
+                TextureBindingTracker();
 
                 /* Returns 0 if no texture is bound. */
                 uint32_t get_bound_texture(const TextureBindingTarget& in_target) const;
@@ -69,4 +69,4 @@ namespace Interception
     }
 }
 
-#endif /* OPENGL_TEXTURE_MANAGER_H */
+#endif /* OPENGL_TEXTURE_BINDING_TRACKER_H */

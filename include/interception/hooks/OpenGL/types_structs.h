@@ -5,11 +5,11 @@
 #ifndef AI_TYPES_STRUCTS_H
 #define AI_TYPES_STRUCTS_H
 
-#include "interception/hooks/OpenGL/buffer_manager.h"
-#include "interception/hooks/OpenGL/buffer_mapping_manager.h"
-#include "interception/hooks/OpenGL/client_array_manager.h"
-#include "interception/hooks/OpenGL/pixel_store_manager.h"
-#include "interception/hooks/OpenGL/texture_manager.h"
+#include "interception/hooks/OpenGL/buffer_binding_tracker.h"
+#include "interception/hooks/OpenGL/mapped_buffer_write_tracker.h"
+#include "interception/hooks/OpenGL/client_vertex_array_tracker.h"
+#include "interception/hooks/OpenGL/pixel_store_modes.h"
+#include "interception/hooks/OpenGL/texture_binding_tracker.h"
 #include "interception/hooks/OpenGL/i_context.h"
 
 namespace Interception
@@ -20,11 +20,11 @@ namespace Interception
         {
             struct ContextState
             {
-                BufferManager         buffer_manager;
-                BufferMappingManager  buffer_mapping_manager;
-                ClientArrayManager    client_array_manager;
-                PixelStoreManager     pixel_store_manager;
-                TextureManager        texture_manager;
+                BufferBindingTracker     buffer_binding_tracker;
+                ClientVertexArrayTracker client_vertex_array_tracker;
+                MappedBufferWriteTracker mapped_buffer_write_tracker;
+                PixelStoreModes          pixel_store_modes;
+                TextureBindingTracker    texture_binding_tracker;
             };
 
             struct DispatchTable

@@ -8,7 +8,7 @@
 #include "common/macros.h"
 #include "common/memory_chunk.h"
 #include "common/api_call_scope.h"
-#include "interception/hooks/OpenGL/buffer_mapping_manager.h"
+#include "interception/hooks/OpenGL/mapped_buffer_write_tracker.h"
 #include "interception/hooks/OpenGL/entrypoints/GL3.0/gl_map_buffer_range.h"
 #include "interception/hooks/OpenGL/globals.h"
 #include "interception/hooks/OpenGL/state_tracker.h"
@@ -80,22 +80,22 @@ void* AI_APIENTRY Interception::Hooks::OpenGL::aiMapBufferRange(GLenum     targe
 
             AI_ASSERT(is_known_target);
 
-            buffer_id = context.buffer_manager.get_bound_buffer(binding_target);
+            buffer_id = context.buffer_binding_tracker.get_bound_buffer(binding_target);
         }
 
-        context.buffer_mapping_manager.on_buffer_mapped(buffer_id,
-                                                        result,
-                                                        offset,
-                                                        length,
-                                                        access);
+        context.mapped_buffer_write_tracker.on_buffer_mapped(buffer_id,
+                                                             result,
+                                                             offset,
+                                                             length,
+                                                             access);
 
-        if (context.buffer_mapping_manager.is_persistent(buffer_id) )
+        if (context.mapped_buffer_write_tracker.is_persistent(buffer_id) )
         {
             AI_WARN("[!] Buffer [%u] is mapped persistently: writes between flushes or unmapping are not captured.",
                     buffer_id);
         }
 
-        const Interception::Hooks::OpenGL::BufferMappingManager::Region initial_region = context.buffer_mapping_manager.get_initial_region(buffer_id);
+        const Interception::Hooks::OpenGL::MappedBufferWriteTracker::Region initial_region = context.mapped_buffer_write_tracker.get_initial_region(buffer_id);
 
         if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMAPBUFFERRANGE,
                                                           &post_callback_func_ptr,

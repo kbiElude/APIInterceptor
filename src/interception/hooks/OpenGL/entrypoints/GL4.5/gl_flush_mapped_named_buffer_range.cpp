@@ -8,7 +8,7 @@
 #include "common/macros.h"
 #include "common/memory_chunk.h"
 #include "common/api_call_scope.h"
-#include "interception/hooks/OpenGL/buffer_mapping_manager.h"
+#include "interception/hooks/OpenGL/mapped_buffer_write_tracker.h"
 #include "interception/hooks/OpenGL/entrypoints/GL4.5/gl_flush_mapped_named_buffer_range.h"
 #include "interception/hooks/OpenGL/globals.h"
 #include "interception/hooks/OpenGL/state_tracker.h"
@@ -39,9 +39,9 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiFlushMappedNamedBufferRange(GLui
 
         auto& context = Interception::Hooks::OpenGL::get_context_state();
 
-        const Interception::Hooks::OpenGL::BufferMappingManager::Region flush_region = context.buffer_mapping_manager.get_flush_region(buffer,
-                                                                                                                                       offset,
-                                                                                                                                       length);
+        const Interception::Hooks::OpenGL::MappedBufferWriteTracker::Region flush_region = context.mapped_buffer_write_tracker.get_flush_region(buffer,
+                                                                                                                                                offset,
+                                                                                                                                                length);
 
         flush_chunk = APIInterceptor::MemoryChunk(flush_region.data_ptr,
                                                   static_cast<int64_t>(flush_region.n_bytes),

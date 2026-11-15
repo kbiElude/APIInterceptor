@@ -2,8 +2,8 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
-#if !defined(OPENGL_BUFFER_MAPPING_MANAGER_H)
-#define OPENGL_BUFFER_MAPPING_MANAGER_H
+#if !defined(OPENGL_MAPPED_BUFFER_WRITE_TRACKER_H)
+#define OPENGL_MAPPED_BUFFER_WRITE_TRACKER_H
 
 #include <cstdint>
 #include <unordered_map>
@@ -24,7 +24,7 @@ namespace Interception
              *    flushes them; unmapping copies nothing.
              *  - Writes to a persistent mapping (GL_MAP_PERSISTENT_BIT) that happen between those moments are not seen.
              */
-            class BufferMappingManager
+            class MappedBufferWriteTracker
             {
             public:
                 /* A range of the app's memory which a call hands over to the GPU, or receives from it. */
@@ -34,7 +34,7 @@ namespace Interception
                     uint64_t    n_bytes  = 0;
                 };
 
-                BufferMappingManager();
+                MappedBufferWriteTracker();
 
                 /* The range (offset relative to the start of the mapping) which a flush call makes available to the GPU. Empty
                  * unless the mapping is writable and flushed explicitly.
@@ -85,4 +85,4 @@ namespace Interception
     }
 }
 
-#endif /* OPENGL_BUFFER_MAPPING_MANAGER_H */
+#endif /* OPENGL_MAPPED_BUFFER_WRITE_TRACKER_H */

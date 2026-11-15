@@ -138,12 +138,12 @@ bool Capture::APIDumperDLL::D3D7SwapchainReader::read_surface(void*             
         goto end;
     }
 
-    PixelConverter::convert_to_rgba8_bottom_first(source_format,
-                                                  description.lpSurface,
-                                                  static_cast<uint32_t>(description.lPitch),
-                                                  description.dwWidth,
-                                                  description.dwHeight,
-                                                  out_rgba_u8_vec_ptr);
+    SwapchainPixelRgba8Converter::convert_to_rgba8_bottom_first(source_format,
+                                                                description.lpSurface,
+                                                                static_cast<uint32_t>(description.lPitch),
+                                                                description.dwWidth,
+                                                                description.dwHeight,
+                                                                out_rgba_u8_vec_ptr);
 
     (*out_extents_u32vec2_ptr)[0] = description.dwWidth;
     (*out_extents_u32vec2_ptr)[1] = description.dwHeight;

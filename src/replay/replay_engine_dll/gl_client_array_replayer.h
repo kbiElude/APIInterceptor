@@ -13,7 +13,7 @@ namespace Replay
     namespace ReplayEngineDLL
     {
         /* Replays the vertex arrays that the app keeps in its own memory. The dump holds the part of each which a draw call
-         * reads (see Interception::Hooks::OpenGL::ClientArrayManager for the layout) as the last argument of the call; before the call, the arrays
+         * reads (see Interception::Hooks::OpenGL::ClientVertexArrayTracker for the layout) as the last argument of the call; before the call, the arrays
          * are pointed at the copy.
          */
         class GLClientArrayReplayer

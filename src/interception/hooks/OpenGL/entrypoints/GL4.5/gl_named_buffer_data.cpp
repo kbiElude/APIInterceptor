@@ -70,8 +70,8 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiNamedBufferData(GLuint      buff
         {
             auto& context          = Interception::Hooks::OpenGL::get_context_state();
 
-            context.buffer_manager.set_size(buffer,
-                                            static_cast<uint64_t>(size) );
+            context.buffer_binding_tracker.set_size(buffer,
+                                                    static_cast<uint64_t>(size) );
         }
     }
 

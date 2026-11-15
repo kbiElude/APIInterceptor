@@ -74,8 +74,8 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiBindBufferRange(GLenum     targe
         if (Interception::Hooks::OpenGL::Utils::get_buffer_binding_target_for_gl_enum(target,
                                                                                      &binding_target) )
         {
-            Interception::Hooks::OpenGL::get_context_state().buffer_manager.on_buffer_bound(binding_target,
-                                                                                            buffer);
+            Interception::Hooks::OpenGL::get_context_state().buffer_binding_tracker.on_buffer_bound(binding_target,
+                                                                                                    buffer);
         }
     }
 

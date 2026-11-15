@@ -16,7 +16,7 @@ namespace Interception
     {
         namespace OpenGL
         {
-            extern std::vector<APIInterceptor::FunctionInterceptor> get_function_interceptors    ();
+            extern std::vector<APIInterceptor::FunctionHookTarget> get_function_interceptors     ();
             extern std::unordered_map<std::string, void*>           get_func_name_to_func_ptr_map();
         }
     }

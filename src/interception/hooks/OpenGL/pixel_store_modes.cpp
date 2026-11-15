@@ -3,20 +3,20 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "common/macros.h"
-#include "interception/hooks/OpenGL/pixel_store_manager.h"
+#include "interception/hooks/OpenGL/pixel_store_modes.h"
 #include "interception/hooks/OpenGL/utils.h"
 
 /* gl/gl.h provides the compatibility-profile tokens which are absent from glcorearb.h. */
 #include "gl/gl.h"
 
-Interception::Hooks::OpenGL::PixelStoreManager::PixelStoreManager()
+Interception::Hooks::OpenGL::PixelStoreModes::PixelStoreModes()
 {
     /* Stub */
 }
 
-uint64_t Interception::Hooks::OpenGL::PixelStoreManager::get_n_bitmap_bytes(const Params&  in_params,
-                                                                            const int64_t& in_width,
-                                                                            const int64_t& in_height)
+uint64_t Interception::Hooks::OpenGL::PixelStoreModes::get_n_bitmap_bytes(const Params&  in_params,
+                                                                          const int64_t& in_width,
+                                                                          const int64_t& in_height)
 {
     constexpr uint64_t N_BITS_PER_BYTE = 8;
 
@@ -50,12 +50,12 @@ end:
     return result;
 }
 
-uint64_t Interception::Hooks::OpenGL::PixelStoreManager::get_n_image_bytes(const Params&   in_params,
-                                                                           const int64_t&  in_width,
-                                                                           const int64_t&  in_height,
-                                                                           const int64_t&  in_depth,
-                                                                           const uint32_t& in_format,
-                                                                           const uint32_t& in_type)
+uint64_t Interception::Hooks::OpenGL::PixelStoreModes::get_n_image_bytes(const Params&   in_params,
+                                                                         const int64_t&  in_width,
+                                                                         const int64_t&  in_height,
+                                                                         const int64_t&  in_depth,
+                                                                         const uint32_t& in_format,
+                                                                         const uint32_t& in_type)
 {
     uint64_t alignment = in_params.alignment;
     uint64_t element_n_bytes;
@@ -113,11 +113,11 @@ end:
     return result;
 }
 
-uint64_t Interception::Hooks::OpenGL::PixelStoreManager::get_n_pack_bytes(const int64_t&  in_width,
-                                                                          const int64_t&  in_height,
-                                                                          const int64_t&  in_depth,
-                                                                          const uint32_t& in_format,
-                                                                          const uint32_t& in_type) const
+uint64_t Interception::Hooks::OpenGL::PixelStoreModes::get_n_pack_bytes(const int64_t&  in_width,
+                                                                        const int64_t&  in_height,
+                                                                        const int64_t&  in_depth,
+                                                                        const uint32_t& in_format,
+                                                                        const uint32_t& in_type) const
 {
     return get_n_image_bytes(m_pack_params,
                              in_width,
@@ -127,19 +127,19 @@ uint64_t Interception::Hooks::OpenGL::PixelStoreManager::get_n_pack_bytes(const 
                              in_type);
 }
 
-uint64_t Interception::Hooks::OpenGL::PixelStoreManager::get_n_unpack_bitmap_bytes(const int64_t& in_width,
-                                                                                   const int64_t& in_height) const
+uint64_t Interception::Hooks::OpenGL::PixelStoreModes::get_n_unpack_bitmap_bytes(const int64_t& in_width,
+                                                                                 const int64_t& in_height) const
 {
     return get_n_bitmap_bytes(m_unpack_params,
                               in_width,
                               in_height);
 }
 
-uint64_t Interception::Hooks::OpenGL::PixelStoreManager::get_n_unpack_bytes(const int64_t&  in_width,
-                                                                            const int64_t&  in_height,
-                                                                            const int64_t&  in_depth,
-                                                                            const uint32_t& in_format,
-                                                                            const uint32_t& in_type) const
+uint64_t Interception::Hooks::OpenGL::PixelStoreModes::get_n_unpack_bytes(const int64_t&  in_width,
+                                                                          const int64_t&  in_height,
+                                                                          const int64_t&  in_depth,
+                                                                          const uint32_t& in_format,
+                                                                          const uint32_t& in_type) const
 {
     return get_n_image_bytes(m_unpack_params,
                              in_width,
@@ -149,8 +149,8 @@ uint64_t Interception::Hooks::OpenGL::PixelStoreManager::get_n_unpack_bytes(cons
                              in_type);
 }
 
-void Interception::Hooks::OpenGL::PixelStoreManager::on_pixel_store(const uint32_t& in_pname,
-                                                                    const int32_t&  in_value)
+void Interception::Hooks::OpenGL::PixelStoreModes::on_pixel_store(const uint32_t& in_pname,
+                                                                  const int32_t&  in_value)
 {
     /* Negative values are errors, and change nothing. */
     if (in_value >= 0)

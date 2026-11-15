@@ -2,8 +2,8 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
-#if !defined(OPENGL_BUFFER_MANAGER_H)
-#define OPENGL_BUFFER_MANAGER_H
+#if !defined(OPENGL_BUFFER_BINDING_TRACKER_H)
+#define OPENGL_BUFFER_BINDING_TRACKER_H
 
 #include "interception/hooks/OpenGL/types_enums.h"
 #include <cstdint>
@@ -19,10 +19,10 @@ namespace Interception
             /* Tracks which buffer objects are bound to the binding points of a GL context, and how big the buffer objects are.
              * There is one for each GL context (see ContextState).
              */
-            class BufferManager
+            class BufferBindingTracker
             {
             public:
-                BufferManager();
+                BufferBindingTracker();
 
                 /* Returns 0 if no buffer is bound. */
                 uint32_t get_bound_buffer(const BufferBindingTarget& in_target) const;
@@ -44,4 +44,4 @@ namespace Interception
     }
 }
 
-#endif /* OPENGL_BUFFER_MANAGER_H */
+#endif /* OPENGL_BUFFER_BINDING_TRACKER_H */

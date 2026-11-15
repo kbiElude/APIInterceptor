@@ -75,18 +75,18 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiTexStorage1D(GLenum  target,
             if (is_binding_target_known)
             {
                 auto&          context    = get_context_state();
-                const GLuint   texture_id = context.texture_manager.get_bound_texture(binding_target);
+                const GLuint   texture_id = context.texture_binding_tracker.get_bound_texture(binding_target);
                 uint32_t       mip_width  = static_cast<uint32_t>(width);
 
                 for (GLsizei level = 0;
                              level < levels;
                            ++level)
                 {
-                    context.texture_manager.set_level_props(texture_id,
-                                                    level,
-                                                    mip_width,
-                                                    1,
-                                                    1);
+                    context.texture_binding_tracker.set_level_props(texture_id,
+                                                            level,
+                                                            mip_width,
+                                                            1,
+                                                            1);
 
                     mip_width = (std::max)(1u,
                                            mip_width / 2u);

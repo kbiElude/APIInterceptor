@@ -55,7 +55,7 @@ namespace Interception
                 COUNT
             };
 
-            /* The values are stored in workload files (see ClientArrayManager). */
+            /* The values are stored in workload files (see ClientVertexArrayTracker). */
             enum class ClientArrayKind : uint32_t
             {
                 COLOR           = 0,

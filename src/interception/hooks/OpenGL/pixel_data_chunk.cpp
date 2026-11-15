@@ -29,12 +29,12 @@ Interception::Hooks::OpenGL::PixelDataChunk Interception::Hooks::OpenGL::PixelDa
                                                                                                          const uint32_t& in_type)
 {
     auto&          context          = get_context_state();
-    const uint32_t bound_buffer     = context.buffer_manager.get_bound_buffer(BufferBindingTarget::PIXEL_PACK_BUFFER);
-    const uint64_t n_bytes          = context.pixel_store_manager.get_n_pack_bytes(in_width,
-                                                                                   in_height,
-                                                                                   in_depth,
-                                                                                   in_format,
-                                                                                   in_type);
+    const uint32_t bound_buffer     = context.buffer_binding_tracker.get_bound_buffer(BufferBindingTarget::PIXEL_PACK_BUFFER);
+    const uint64_t n_bytes          = context.pixel_store_modes.get_n_pack_bytes(in_width,
+                                                                                 in_height,
+                                                                                 in_depth,
+                                                                                 in_format,
+                                                                                 in_type);
     const bool     is_buffer_offset = (bound_buffer != 0);
 
     return PixelDataChunk(in_pixels_ptr,
@@ -62,12 +62,12 @@ Interception::Hooks::OpenGL::PixelDataChunk Interception::Hooks::OpenGL::PixelDa
                                                                                                            const uint32_t& in_type)
 {
     auto&          context          = get_context_state();
-    const uint32_t bound_buffer     = context.buffer_manager.get_bound_buffer(BufferBindingTarget::PIXEL_UNPACK_BUFFER);
-    const uint64_t n_bytes          = context.pixel_store_manager.get_n_unpack_bytes(in_width,
-                                                                                     in_height,
-                                                                                     in_depth,
-                                                                                     in_format,
-                                                                                     in_type);
+    const uint32_t bound_buffer     = context.buffer_binding_tracker.get_bound_buffer(BufferBindingTarget::PIXEL_UNPACK_BUFFER);
+    const uint64_t n_bytes          = context.pixel_store_modes.get_n_unpack_bytes(in_width,
+                                                                                   in_height,
+                                                                                   in_depth,
+                                                                                   in_format,
+                                                                                   in_type);
     const bool     is_buffer_offset = (bound_buffer != 0);
 
     return PixelDataChunk(in_pixels_ptr,
@@ -80,9 +80,9 @@ Interception::Hooks::OpenGL::PixelDataChunk Interception::Hooks::OpenGL::PixelDa
                                                                                                                   const int64_t& in_height)
 {
     auto&          context          = get_context_state();
-    const uint32_t bound_buffer     = context.buffer_manager.get_bound_buffer(BufferBindingTarget::PIXEL_UNPACK_BUFFER);
-    const uint64_t n_bytes          = context.pixel_store_manager.get_n_unpack_bitmap_bytes(in_width,
-                                                                                            in_height);
+    const uint32_t bound_buffer     = context.buffer_binding_tracker.get_bound_buffer(BufferBindingTarget::PIXEL_UNPACK_BUFFER);
+    const uint64_t n_bytes          = context.pixel_store_modes.get_n_unpack_bitmap_bytes(in_width,
+                                                                                          in_height);
     const bool     is_buffer_offset = (bound_buffer != 0);
 
     return PixelDataChunk(in_bitmap_ptr,
@@ -94,7 +94,7 @@ Interception::Hooks::OpenGL::PixelDataChunk Interception::Hooks::OpenGL::PixelDa
                                                                                                                  const uint64_t& in_n_bytes)
 {
     auto&          context          = get_context_state();
-    const uint32_t bound_buffer     = context.buffer_manager.get_bound_buffer(BufferBindingTarget::PIXEL_UNPACK_BUFFER);
+    const uint32_t bound_buffer     = context.buffer_binding_tracker.get_bound_buffer(BufferBindingTarget::PIXEL_UNPACK_BUFFER);
     const bool     is_buffer_offset = (bound_buffer != 0);
 
     return PixelDataChunk(in_pixels_ptr,

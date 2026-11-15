@@ -68,9 +68,9 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiDeleteVertexArrays(GLsizei      
             if (arrays != nullptr)
             {
                 /* Deleting the bound vertex array binds the default one. */
-                if (arrays[n_array] == context.client_array_manager.get_bound_vertex_array() )
+                if (arrays[n_array] == context.client_vertex_array_tracker.get_bound_vertex_array() )
                 {
-                    context.client_array_manager.set_bound_vertex_array(0);
+                    context.client_vertex_array_tracker.set_bound_vertex_array(0);
                 }
             }
         }

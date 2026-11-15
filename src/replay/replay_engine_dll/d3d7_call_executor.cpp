@@ -9,7 +9,7 @@
 #include "interception/core/D3D7Utils/methods.h"
 #include "interception/core/D3D7Utils/strided_layout.h"
 #include "interception/core/D3D7Utils/value_readers.h"
-#include "pixel_converter.h"
+#include "d3d_format_bgra8_converter.h"
 #include <algorithm>
 #include <string.h>
 
@@ -1936,14 +1936,14 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::read_back_buffer(std::vector<uin
         }
     }
 
-    if (PixelConverter::get_bytes_per_pixel(format) == 0)
+    if (D3DFormatBgra8Converter::get_bytes_per_pixel(format) == 0)
     {
         goto end;
     }
 
     if (out_pixel_u8_vec_ptr != nullptr)
     {
-        const uint32_t n_row_bytes = description.dwWidth * PixelConverter::get_bytes_per_pixel(format);
+        const uint32_t n_row_bytes = description.dwWidth * D3DFormatBgra8Converter::get_bytes_per_pixel(format);
 
         out_pixel_u8_vec_ptr->resize(static_cast<size_t>(n_row_bytes) * description.dwHeight);
 
@@ -1959,12 +1959,12 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::read_back_buffer(std::vector<uin
 
     if (out_image_ptr != nullptr)
     {
-        if (PixelConverter::convert_to_bgra8(format,
-                                             description.dwWidth,
-                                             description.dwHeight,
-                                             static_cast<uint32_t>(description.lPitch),
-                                             static_cast<const uint8_t*>(description.lpSurface),
-                                            &m_capture_u8_vec) == false)
+        if (D3DFormatBgra8Converter::convert_to_bgra8(format,
+                                                      description.dwWidth,
+                                                      description.dwHeight,
+                                                      static_cast<uint32_t>(description.lPitch),
+                                                      static_cast<const uint8_t*>(description.lpSurface),
+                                                     &m_capture_u8_vec) == false)
         {
             goto end;
         }

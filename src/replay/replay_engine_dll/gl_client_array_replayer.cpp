@@ -237,7 +237,7 @@ void Replay::ReplayEngineDLL::GLClientArrayReplayer::point_edge_flag(const Snaps
 void Replay::ReplayEngineDLL::GLClientArrayReplayer::point_generic(const SnapshotArray& in_array,
                                                                      const void*          in_pointer)
 {
-    /* ClientArrayManager::SNAPSHOT_FLAG_*. */
+    /* ClientVertexArrayTracker::SNAPSHOT_FLAG_*. */
     constexpr uint32_t FLAG_IS_INTEGER    = 1 << 0;
     constexpr uint32_t FLAG_IS_LONG       = 1 << 1;
     constexpr uint32_t FLAG_IS_NORMALIZED = 1 << 2;

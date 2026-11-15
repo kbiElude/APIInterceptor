@@ -53,9 +53,9 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiDisableVertexAttribArray(GLuint 
     {
         auto& context = Interception::Hooks::OpenGL::get_context_state();
 
-        context.client_array_manager.set_enabled(Interception::Hooks::OpenGL::ClientArrayKind::GENERIC,
-                                               index,
-                                               false);  /* in_is_enabled */
+        context.client_vertex_array_tracker.set_enabled(Interception::Hooks::OpenGL::ClientArrayKind::GENERIC,
+                                                      index,
+                                                      false);  /* in_is_enabled */
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLDISABLEVERTEXATTRIBARRAY,

@@ -72,9 +72,9 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiGetCompressedTexImage(GLenum tar
                                                              &binding_target) )
             {
                 const auto& context     = get_context_state              ();
-                const auto  texture_id  = context.texture_manager.get_bound_texture(binding_target);
-                const auto  level_props = context.texture_manager.get_level_props(texture_id,
-                                                                          level);
+                const auto  texture_id  = context.texture_binding_tracker.get_bound_texture(binding_target);
+                const auto  level_props = context.texture_binding_tracker.get_level_props(texture_id,
+                                                                                  level);
 
                 AI_ASSERT(level_props.compressed_size_bytes != 0);
 

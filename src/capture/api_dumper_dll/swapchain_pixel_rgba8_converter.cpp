@@ -3,15 +3,15 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "common/macros.h"
-#include "pixel_converter.h"
+#include "swapchain_pixel_rgba8_converter.h"
 #include <string.h>
 
-void Capture::APIDumperDLL::PixelConverter::convert_to_rgba8_bottom_first(const PixelSourceFormat& in_format,
-                                                                          const void*              in_pixels_ptr,
-                                                                          const uint32_t&          in_pitch_n_bytes,
-                                                                          const uint32_t&          in_width,
-                                                                          const uint32_t&          in_height,
-                                                                          std::vector<uint8_t>*    out_rgba_u8_vec_ptr)
+void Capture::APIDumperDLL::SwapchainPixelRgba8Converter::convert_to_rgba8_bottom_first(const PixelSourceFormat& in_format,
+                                                                                        const void*              in_pixels_ptr,
+                                                                                        const uint32_t&          in_pitch_n_bytes,
+                                                                                        const uint32_t&          in_width,
+                                                                                        const uint32_t&          in_height,
+                                                                                        std::vector<uint8_t>*    out_rgba_u8_vec_ptr)
 {
     constexpr uint32_t A1R5G5B5_ALPHA_SHIFT = 15;
     constexpr uint32_t CHANNEL_MAX          = 255;

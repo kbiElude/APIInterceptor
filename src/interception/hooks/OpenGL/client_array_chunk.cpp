@@ -107,7 +107,7 @@ APIInterceptor::DataChunkID Interception::Hooks::OpenGL::ClientArrayChunk::get_i
     if (m_is_registered == false)
     {
         std::vector<uint8_t> snapshot_u8_vec;
-        auto&                state = Interception::Hooks::OpenGL::get_context_state().client_array_manager;
+        auto&                state = Interception::Hooks::OpenGL::get_context_state().client_vertex_array_tracker;
 
         if (state.has_client_arrays() )
         {
@@ -174,7 +174,7 @@ bool Interception::Hooks::OpenGL::ClientArrayChunk::get_index_range(const Reques
 {
     std::vector<uint8_t> buffer_u8_vec;
     const uint8_t*       data_u8_ptr          = nullptr;
-    const auto           element_array_buffer = Interception::Hooks::OpenGL::get_context_state().buffer_manager.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ELEMENT_ARRAY_BUFFER);
+    const auto           element_array_buffer = Interception::Hooks::OpenGL::get_context_state().buffer_binding_tracker.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ELEMENT_ARRAY_BUFFER);
     int64_t              max_index            = -1;
     int64_t              min_index            = INT64_MAX;
     const uint32_t       n_index_bytes        = get_n_index_bytes(in_request.type);
@@ -208,7 +208,7 @@ bool Interception::Hooks::OpenGL::ClientArrayChunk::get_index_range(const Reques
         const auto& context      = Interception::Hooks::OpenGL::get_context_state();
         void*       get_func_ptr = Interception::Hooks::OpenGL::g_cached_gl_get_buffer_sub_data;
 
-        if (context.buffer_mapping_manager.is_mapped(element_array_buffer) )
+        if (context.mapped_buffer_write_tracker.is_mapped(element_array_buffer) )
         {
             goto end;
         }
@@ -288,7 +288,7 @@ APIInterceptor::APIFunctionArgument Interception::Hooks::OpenGL::ClientArrayChun
 {
     if (m_is_indices_arg_ready == false)
     {
-        const auto element_array_buffer = Interception::Hooks::OpenGL::get_context_state().buffer_manager.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ELEMENT_ARRAY_BUFFER);
+        const auto element_array_buffer = Interception::Hooks::OpenGL::get_context_state().buffer_binding_tracker.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ELEMENT_ARRAY_BUFFER);
 
         for (const auto& current_request : m_request_vec)
         {
@@ -324,7 +324,7 @@ APIInterceptor::APIFunctionArgument Interception::Hooks::OpenGL::ClientArrayChun
 {
     if (m_is_multi_indices_arg_ready == false)
     {
-        const auto element_array_buffer = Interception::Hooks::OpenGL::get_context_state().buffer_manager.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ELEMENT_ARRAY_BUFFER);
+        const auto element_array_buffer = Interception::Hooks::OpenGL::get_context_state().buffer_binding_tracker.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ELEMENT_ARRAY_BUFFER);
 
         if (element_array_buffer != 0)
         {

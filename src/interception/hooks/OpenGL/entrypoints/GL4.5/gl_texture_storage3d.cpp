@@ -82,11 +82,11 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiTextureStorage3D(GLuint  texture
                          level < levels;
                        ++level)
             {
-                context.texture_manager.set_level_props(texture,
-                                                level,
-                                                mip_width,
-                                                mip_height,
-                                                mip_depth);
+                context.texture_binding_tracker.set_level_props(texture,
+                                                        level,
+                                                        mip_width,
+                                                        mip_height,
+                                                        mip_depth);
 
                 mip_width  = (std::max)(1u,
                                         mip_width  / 2u);

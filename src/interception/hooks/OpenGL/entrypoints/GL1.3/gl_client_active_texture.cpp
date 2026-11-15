@@ -54,7 +54,7 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiClientActiveTexture(GLenum textu
     {
         auto& context = Interception::Hooks::OpenGL::get_context_state();
 
-        context.client_array_manager.set_client_active_texture(texture - GL_TEXTURE0);
+        context.client_vertex_array_tracker.set_client_active_texture(texture - GL_TEXTURE0);
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCLIENTACTIVETEXTURE,

@@ -43,7 +43,7 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiDrawElements(GLenum      mode,
 
         {
             const auto& context   = Interception::Hooks::OpenGL::get_context_state();
-            const auto  bound_ebo = context.buffer_manager.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ELEMENT_ARRAY_BUFFER);
+            const auto  bound_ebo = context.buffer_binding_tracker.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ELEMENT_ARRAY_BUFFER);
 
             if (bound_ebo != 0)
             {

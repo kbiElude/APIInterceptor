@@ -78,9 +78,9 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiGetTexImage(GLenum target,
         if (Utils::get_texture_binding_target_for_gl_enum(target, &binding_target) )
         {
             const auto& context = get_context_state();
-            const auto  texture_id  = context.texture_manager.get_bound_texture(binding_target);
-            const auto  level_props = context.texture_manager.get_level_props(texture_id,
-                                                                              level);
+            const auto  texture_id  = context.texture_binding_tracker.get_bound_texture(binding_target);
+            const auto  level_props = context.texture_binding_tracker.get_level_props(texture_id,
+                                                                                      level);
 
             AI_ASSERT(level_props.width != 0);
 

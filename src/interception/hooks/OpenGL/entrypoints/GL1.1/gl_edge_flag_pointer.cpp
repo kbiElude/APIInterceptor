@@ -57,18 +57,18 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiEdgeFlagPointer(GLsizei       st
     if (call_scope.is_top_level_api_call() )
     {
         auto&          context      = Interception::Hooks::OpenGL::get_context_state();
-        const uint32_t bound_buffer = context.buffer_manager.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ARRAY_BUFFER);
+        const uint32_t bound_buffer = context.buffer_binding_tracker.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ARRAY_BUFFER);
 
-        context.client_array_manager.set_pointer(Interception::Hooks::OpenGL::ClientArrayKind::EDGE_FLAG,
-                                               0,
-                                               1,
-                                               GL_UNSIGNED_BYTE,
-                                               stride,
-                                               pointer,
-                                               bound_buffer,
-                                               false,  /* in_is_integer    */
-                                               false,  /* in_is_long       */
-                                               false); /* in_is_normalized */
+        context.client_vertex_array_tracker.set_pointer(Interception::Hooks::OpenGL::ClientArrayKind::EDGE_FLAG,
+                                                      0,
+                                                      1,
+                                                      GL_UNSIGNED_BYTE,
+                                                      stride,
+                                                      pointer,
+                                                      bound_buffer,
+                                                      false,  /* in_is_integer    */
+                                                      false,  /* in_is_long       */
+                                                      false); /* in_is_normalized */
     }
 
     if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLEDGEFLAGPOINTER,

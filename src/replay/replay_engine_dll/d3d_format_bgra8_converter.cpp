@@ -3,15 +3,15 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "interception/hooks/D3D8/types.h"
-#include "pixel_converter.h"
+#include "d3d_format_bgra8_converter.h"
 #include <string.h>
 
-bool Replay::ReplayEngineDLL::PixelConverter::convert_to_bgra8(const uint32_t&       in_format,
-                                                               const uint32_t&       in_width,
-                                                               const uint32_t&       in_height,
-                                                               const uint32_t&       in_pitch,
-                                                               const uint8_t*        in_pixel_ptr,
-                                                               std::vector<uint8_t>* out_pixel_u8_vec_ptr)
+bool Replay::ReplayEngineDLL::D3DFormatBgra8Converter::convert_to_bgra8(const uint32_t&       in_format,
+                                                                        const uint32_t&       in_width,
+                                                                        const uint32_t&       in_height,
+                                                                        const uint32_t&       in_pitch,
+                                                                        const uint8_t*        in_pixel_ptr,
+                                                                        std::vector<uint8_t>* out_pixel_u8_vec_ptr)
 {
     constexpr uint32_t N_BYTES_PER_OUTPUT_PIXEL = sizeof(uint32_t);
     constexpr uint32_t OPAQUE_ALPHA_MASK        = 0xff000000;
@@ -79,7 +79,7 @@ end:
     return (layout_ptr != nullptr);
 }
 
-const Replay::ReplayEngineDLL::PixelConverter::PixelLayout* Replay::ReplayEngineDLL::PixelConverter::find_layout_ptr(const uint32_t& in_format)
+const Replay::ReplayEngineDLL::D3DFormatBgra8Converter::PixelLayout* Replay::ReplayEngineDLL::D3DFormatBgra8Converter::find_layout_ptr(const uint32_t& in_format)
 {
     const PixelLayout* result_ptr = nullptr;
 
@@ -94,7 +94,7 @@ const Replay::ReplayEngineDLL::PixelConverter::PixelLayout* Replay::ReplayEngine
     return result_ptr;
 }
 
-uint32_t Replay::ReplayEngineDLL::PixelConverter::get_bytes_per_pixel(const uint32_t& in_format)
+uint32_t Replay::ReplayEngineDLL::D3DFormatBgra8Converter::get_bytes_per_pixel(const uint32_t& in_format)
 {
     const PixelLayout* layout_ptr = find_layout_ptr(in_format);
 
@@ -102,7 +102,7 @@ uint32_t Replay::ReplayEngineDLL::PixelConverter::get_bytes_per_pixel(const uint
                                    : 0;
 }
 
-const std::vector<Replay::ReplayEngineDLL::PixelConverter::PixelLayout>& Replay::ReplayEngineDLL::PixelConverter::get_layout_vec()
+const std::vector<Replay::ReplayEngineDLL::D3DFormatBgra8Converter::PixelLayout>& Replay::ReplayEngineDLL::D3DFormatBgra8Converter::get_layout_vec()
 {
     /* The columns are the fields of PixelLayout: blue, format, green, bytes of a pixel, red; a channel is its number of bits and its shift. */
     static const std::vector<PixelLayout> result_vec =
@@ -118,7 +118,7 @@ const std::vector<Replay::ReplayEngineDLL::PixelConverter::PixelLayout>& Replay:
     return result_vec;
 }
 
-const std::vector<uint32_t>& Replay::ReplayEngineDLL::PixelConverter::get_lookup_vec(const PixelLayout& in_layout)
+const std::vector<uint32_t>& Replay::ReplayEngineDLL::D3DFormatBgra8Converter::get_lookup_vec(const PixelLayout& in_layout)
 {
     constexpr uint32_t GREEN_SHIFT       = 8;
     constexpr uint32_t MAX_CHANNEL_VALUE = 255;

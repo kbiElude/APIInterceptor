@@ -68,7 +68,7 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiDeleteTextures(GLsizei       n,
                              n_texture < n;
                            ++n_texture)
                 {
-                    context.texture_manager.on_texture_deleted(textures[n_texture]);
+                    context.texture_binding_tracker.on_texture_deleted(textures[n_texture]);
                 }
             }
         }

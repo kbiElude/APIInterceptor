@@ -8,7 +8,7 @@
 #include "common/macros.h"
 #include "common/memory_chunk.h"
 #include "common/api_call_scope.h"
-#include "interception/hooks/OpenGL/buffer_mapping_manager.h"
+#include "interception/hooks/OpenGL/mapped_buffer_write_tracker.h"
 #include "interception/hooks/OpenGL/entrypoints/GL4.5/gl_map_named_buffer.h"
 #include "interception/hooks/OpenGL/globals.h"
 #include "interception/hooks/OpenGL/state_tracker.h"
@@ -63,22 +63,22 @@ void* AI_APIENTRY Interception::Hooks::OpenGL::aiMapNamedBuffer(GLuint buffer,
     {
         auto& context = Interception::Hooks::OpenGL::get_context_state();
 
-        const uint32_t flags  = Interception::Hooks::OpenGL::BufferMappingManager::get_flags_for_access(access);
-        const int64_t  length = static_cast<int64_t>(context.buffer_manager.get_size(buffer) );
+        const uint32_t flags  = Interception::Hooks::OpenGL::MappedBufferWriteTracker::get_flags_for_access(access);
+        const int64_t  length = static_cast<int64_t>(context.buffer_binding_tracker.get_size(buffer) );
 
-        context.buffer_mapping_manager.on_buffer_mapped(buffer,
-                                                        result,
-                                                        0,
-                                                        length,
-                                                        flags);
+        context.mapped_buffer_write_tracker.on_buffer_mapped(buffer,
+                                                             result,
+                                                             0,
+                                                             length,
+                                                             flags);
 
-        if (context.buffer_mapping_manager.is_persistent(buffer) )
+        if (context.mapped_buffer_write_tracker.is_persistent(buffer) )
         {
             AI_WARN("[!] Buffer [%u] is mapped persistently: writes between flushes or unmapping are not captured.",
                     buffer);
         }
 
-        const Interception::Hooks::OpenGL::BufferMappingManager::Region initial_region = context.buffer_mapping_manager.get_initial_region(buffer);
+        const Interception::Hooks::OpenGL::MappedBufferWriteTracker::Region initial_region = context.mapped_buffer_write_tracker.get_initial_region(buffer);
 
         if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLMAPNAMEDBUFFER,
                                                           &post_callback_func_ptr,

@@ -74,11 +74,11 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiTextureStorage2DMultisample(GLui
         {
             auto& context = Interception::Hooks::OpenGL::get_context_state();
 
-            context.texture_manager.set_level_props(texture,
-                                            0, /* multisample textures have a single implicit level */
-                                            static_cast<uint32_t>(width),
-                                            static_cast<uint32_t>(height),
-                                            1);
+            context.texture_binding_tracker.set_level_props(texture,
+                                                    0, /* multisample textures have a single implicit level */
+                                                    static_cast<uint32_t>(width),
+                                                    static_cast<uint32_t>(height),
+                                                    1);
         }
     }
 

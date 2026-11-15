@@ -10,14 +10,14 @@
 #include "interception/hooks/GDI32/globals.h"
 #include "interception/hooks/GDI32/interceptors.h"
 
-std::vector<APIInterceptor::FunctionInterceptor> Interception::Hooks::GDI32::get_function_interceptors()
+std::vector<APIInterceptor::FunctionHookTarget> Interception::Hooks::GDI32::get_function_interceptors()
 {
-    return std::vector<APIInterceptor::FunctionInterceptor>
+    return std::vector<APIInterceptor::FunctionHookTarget>
     {
-        APIInterceptor::FunctionInterceptor(&(PVOID&)Interception::Hooks::GDI32::g_cached_choose_pixel_format_func_ptr,   Interception::Hooks::GDI32::choose_pixel_format),
-        APIInterceptor::FunctionInterceptor(&(PVOID&)Interception::Hooks::GDI32::g_cached_describe_pixel_format_func_ptr, Interception::Hooks::GDI32::describe_pixel_format),
-        APIInterceptor::FunctionInterceptor(&(PVOID&)Interception::Hooks::GDI32::g_cached_get_pixel_format_func_ptr,      Interception::Hooks::GDI32::get_pixel_format),
-        APIInterceptor::FunctionInterceptor(&(PVOID&)Interception::Hooks::GDI32::g_cached_set_pixel_format_func_ptr,      Interception::Hooks::GDI32::set_pixel_format),
-        APIInterceptor::FunctionInterceptor(&(PVOID&)Interception::Hooks::GDI32::g_cached_swap_buffers_func_ptr,          Interception::Hooks::GDI32::swap_buffers)
+        APIInterceptor::FunctionHookTarget(&(PVOID&)Interception::Hooks::GDI32::g_cached_choose_pixel_format_func_ptr,    Interception::Hooks::GDI32::choose_pixel_format),
+        APIInterceptor::FunctionHookTarget(&(PVOID&)Interception::Hooks::GDI32::g_cached_describe_pixel_format_func_ptr, Interception::Hooks::GDI32::describe_pixel_format),
+        APIInterceptor::FunctionHookTarget(&(PVOID&)Interception::Hooks::GDI32::g_cached_get_pixel_format_func_ptr,       Interception::Hooks::GDI32::get_pixel_format),
+        APIInterceptor::FunctionHookTarget(&(PVOID&)Interception::Hooks::GDI32::g_cached_set_pixel_format_func_ptr,       Interception::Hooks::GDI32::set_pixel_format),
+        APIInterceptor::FunctionHookTarget(&(PVOID&)Interception::Hooks::GDI32::g_cached_swap_buffers_func_ptr,           Interception::Hooks::GDI32::swap_buffers)
     };
 }

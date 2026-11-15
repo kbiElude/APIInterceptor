@@ -15,7 +15,7 @@ namespace Interception
     {
         namespace OpenGL
         {
-            /* Takes a snapshot of the vertex arrays which a draw call reads from the app's memory (see ClientArrayManager for the
+            /* Takes a snapshot of the vertex arrays which a draw call reads from the app's memory (see ClientVertexArrayTracker for the
              * layout), and of the indices of an indexed draw call. As with StringChunk, the copies are made when the ID is
              * asked for for the first time, and only then, so nothing is copied unless a callback wants the arguments.
              *

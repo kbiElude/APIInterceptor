@@ -55,15 +55,15 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiEnableClientState(GLenum array)
         Interception::Hooks::OpenGL::ClientArrayKind kind;
         auto&                                        context = Interception::Hooks::OpenGL::get_context_state();
 
-        if (Interception::Hooks::OpenGL::ClientArrayManager::get_kind_for_array_enum(array,
-                                                             &kind) )
+        if (Interception::Hooks::OpenGL::ClientVertexArrayTracker::get_kind_for_array_enum(array,
+                                                                   &kind) )
         {
-            const uint32_t index = (kind == Interception::Hooks::OpenGL::ClientArrayKind::TEX_COORD) ? context.client_array_manager.get_client_active_texture()
+            const uint32_t index = (kind == Interception::Hooks::OpenGL::ClientArrayKind::TEX_COORD) ? context.client_vertex_array_tracker.get_client_active_texture()
                                                                                 : 0;
 
-            context.client_array_manager.set_enabled(kind,
-                                                   index,
-                                                   true);  /* in_is_enabled */
+            context.client_vertex_array_tracker.set_enabled(kind,
+                                                          index,
+                                                          true);  /* in_is_enabled */
         }
     }
 

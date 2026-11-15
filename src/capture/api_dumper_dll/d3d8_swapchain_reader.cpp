@@ -4,7 +4,7 @@
  */
 #include "interception/hooks/D3D8/types.h"
 #include "d3d8_swapchain_reader.h"
-#include "pixel_converter.h"
+#include "swapchain_pixel_rgba8_converter.h"
 
 bool Capture::APIDumperDLL::D3D8SwapchainReader::read(void*                    in_device_ptr,
                                                       std::array<uint32_t, 2>* out_extents_u32vec2_ptr,
@@ -132,12 +132,12 @@ bool Capture::APIDumperDLL::D3D8SwapchainReader::read(void*                    i
 
         is_locked = true;
 
-        PixelConverter::convert_to_rgba8_bottom_first(source_format,
-                                                      locked_rect.pBits,
-                                                      static_cast<uint32_t>(locked_rect.Pitch),
-                                                      description.Width,
-                                                      description.Height,
-                                                      out_rgba_u8_vec_ptr);
+        SwapchainPixelRgba8Converter::convert_to_rgba8_bottom_first(source_format,
+                                                                    locked_rect.pBits,
+                                                                    static_cast<uint32_t>(locked_rect.Pitch),
+                                                                    description.Width,
+                                                                    description.Height,
+                                                                    out_rgba_u8_vec_ptr);
     }
 
     (*out_extents_u32vec2_ptr)[0] = description.Width;

@@ -2,8 +2,8 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
-#if !defined(OPENGL_PIXEL_STORE_MANAGER_H)
-#define OPENGL_PIXEL_STORE_MANAGER_H
+#if !defined(OPENGL_PIXEL_STORE_MODES_H)
+#define OPENGL_PIXEL_STORE_MODES_H
 
 #include <cstdint>
 
@@ -19,10 +19,10 @@ namespace Interception
              * The sizes cover everything from the pointer which the app passes to the last byte which the transfer touches,
              * so that the skipped rows and pixels are included.
              */
-            class PixelStoreManager
+            class PixelStoreModes
             {
             public:
-                PixelStoreManager();
+                PixelStoreModes();
 
                 /* Size of the image that a transfer to client memory (e.g. glReadPixels) writes. */
                 uint64_t get_n_pack_bytes(const int64_t&  in_width,
@@ -77,4 +77,4 @@ namespace Interception
     }
 }
 
-#endif /* OPENGL_PIXEL_STORE_MANAGER_H */
+#endif /* OPENGL_PIXEL_STORE_MODES_H */

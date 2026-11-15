@@ -5,13 +5,13 @@
  * Checks of the tracking of mapped buffers, and of what is handed over to the GPU by unmapping and flushing them.
  */
 #include <gtest/gtest.h>
-#include "interception/hooks/OpenGL/buffer_mapping_manager.h"
+#include "interception/hooks/OpenGL/mapped_buffer_write_tracker.h"
 #include "interception/hooks/OpenGL/types.h"
 
-TEST(BufferMappingManager, UnmappingHandsOverTheWholeMappedRange)
+TEST(MappedBufferWriteTracker, UnmappingHandsOverTheWholeMappedRange)
 {
-    uint8_t                  memory_u8vec64[64] = {};
-    Interception::Hooks::OpenGL::BufferMappingManager   mappings;
+    uint8_t                                               memory_u8vec64[64] = {};
+    Interception::Hooks::OpenGL::MappedBufferWriteTracker mappings;
 
     mappings.on_buffer_mapped(7,
                               memory_u8vec64 + 16,
@@ -35,10 +35,10 @@ TEST(BufferMappingManager, UnmappingHandsOverTheWholeMappedRange)
               0u);
 }
 
-TEST(BufferMappingManager, ExplicitFlushHandsOverOnlyTheFlushedRange)
+TEST(MappedBufferWriteTracker, ExplicitFlushHandsOverOnlyTheFlushedRange)
 {
-    uint8_t                memory_u8vec32[32] = {};
-    Interception::Hooks::OpenGL::BufferMappingManager mappings;
+    uint8_t                                               memory_u8vec32[32] = {};
+    Interception::Hooks::OpenGL::MappedBufferWriteTracker mappings;
 
     mappings.on_buffer_mapped(3,
                               memory_u8vec32,
@@ -66,10 +66,10 @@ TEST(BufferMappingManager, ExplicitFlushHandsOverOnlyTheFlushedRange)
               0u);
 }
 
-TEST(BufferMappingManager, FlushingAMappingWhichIsNotExplicitHandsOverNothing)
+TEST(MappedBufferWriteTracker, FlushingAMappingWhichIsNotExplicitHandsOverNothing)
 {
-    uint8_t                memory_u8vec32[32] = {};
-    Interception::Hooks::OpenGL::BufferMappingManager mappings;
+    uint8_t                                               memory_u8vec32[32] = {};
+    Interception::Hooks::OpenGL::MappedBufferWriteTracker mappings;
 
     mappings.on_buffer_mapped(3,
                               memory_u8vec32,
@@ -83,10 +83,10 @@ TEST(BufferMappingManager, FlushingAMappingWhichIsNotExplicitHandsOverNothing)
               0u);
 }
 
-TEST(BufferMappingManager, ReadOnlyMappingsAreNotWrittenBack)
+TEST(MappedBufferWriteTracker, ReadOnlyMappingsAreNotWrittenBack)
 {
     uint8_t                memory_u8vec16[16] = {};
-    Interception::Hooks::OpenGL::BufferMappingManager mappings;
+    Interception::Hooks::OpenGL::MappedBufferWriteTracker mappings;
 
     mappings.on_buffer_mapped(1,
                               memory_u8vec16,
@@ -100,10 +100,10 @@ TEST(BufferMappingManager, ReadOnlyMappingsAreNotWrittenBack)
               16u);
 }
 
-TEST(BufferMappingManager, InvalidatingMappingsHaveNoInitialContents)
+TEST(MappedBufferWriteTracker, InvalidatingMappingsHaveNoInitialContents)
 {
     uint8_t                memory_u8vec16[16] = {};
-    Interception::Hooks::OpenGL::BufferMappingManager mappings;
+    Interception::Hooks::OpenGL::MappedBufferWriteTracker mappings;
 
     mappings.on_buffer_mapped(1,
                               memory_u8vec16,
@@ -117,10 +117,10 @@ TEST(BufferMappingManager, InvalidatingMappingsHaveNoInitialContents)
               16u);
 }
 
-TEST(BufferMappingManager, FailedMapsAndDeletedBuffersLeaveNothingBehind)
+TEST(MappedBufferWriteTracker, FailedMapsAndDeletedBuffersLeaveNothingBehind)
 {
     uint8_t                memory_u8vec16[16] = {};
-    Interception::Hooks::OpenGL::BufferMappingManager mappings;
+    Interception::Hooks::OpenGL::MappedBufferWriteTracker mappings;
 
     mappings.on_buffer_mapped(5,
                               nullptr,
@@ -144,12 +144,12 @@ TEST(BufferMappingManager, FailedMapsAndDeletedBuffersLeaveNothingBehind)
     EXPECT_FALSE(mappings.is_persistent(6) );
 }
 
-TEST(BufferMappingManager, AccessTokensStandForMapFlags)
+TEST(MappedBufferWriteTracker, AccessTokensStandForMapFlags)
 {
-    EXPECT_EQ(Interception::Hooks::OpenGL::BufferMappingManager::get_flags_for_access(GL_READ_ONLY),
+    EXPECT_EQ(Interception::Hooks::OpenGL::MappedBufferWriteTracker::get_flags_for_access(GL_READ_ONLY),
               static_cast<uint32_t>(GL_MAP_READ_BIT) );
-    EXPECT_EQ(Interception::Hooks::OpenGL::BufferMappingManager::get_flags_for_access(GL_WRITE_ONLY),
+    EXPECT_EQ(Interception::Hooks::OpenGL::MappedBufferWriteTracker::get_flags_for_access(GL_WRITE_ONLY),
               static_cast<uint32_t>(GL_MAP_WRITE_BIT) );
-    EXPECT_EQ(Interception::Hooks::OpenGL::BufferMappingManager::get_flags_for_access(GL_READ_WRITE),
+    EXPECT_EQ(Interception::Hooks::OpenGL::MappedBufferWriteTracker::get_flags_for_access(GL_READ_WRITE),
               static_cast<uint32_t>(GL_MAP_READ_BIT | GL_MAP_WRITE_BIT) );
 }

@@ -5,11 +5,11 @@
  * Checks of the tracking of the texture bindings and of the levels of textures.
  */
 #include <gtest/gtest.h>
-#include "interception/hooks/OpenGL/texture_manager.h"
+#include "interception/hooks/OpenGL/texture_binding_tracker.h"
 
-TEST(TextureManager, NothingIsBoundInitially)
+TEST(TextureBindingTracker, NothingIsBoundInitially)
 {
-    Interception::Hooks::OpenGL::TextureManager manager;
+    Interception::Hooks::OpenGL::TextureBindingTracker manager;
 
     EXPECT_EQ(manager.get_bound_texture(Interception::Hooks::OpenGL::TextureBindingTarget::TEXTURE_2D),
               0u);
@@ -18,9 +18,9 @@ TEST(TextureManager, NothingIsBoundInitially)
               0u);
 }
 
-TEST(TextureManager, BindingsAreTrackedPerTarget)
+TEST(TextureBindingTracker, BindingsAreTrackedPerTarget)
 {
-    Interception::Hooks::OpenGL::TextureManager manager;
+    Interception::Hooks::OpenGL::TextureBindingTracker manager;
 
     manager.on_texture_bound(Interception::Hooks::OpenGL::TextureBindingTarget::TEXTURE_2D,
                              4);
@@ -33,9 +33,9 @@ TEST(TextureManager, BindingsAreTrackedPerTarget)
               9u);
 }
 
-TEST(TextureManager, LevelPropsKeepEachDimensionInItsOwnField)
+TEST(TextureBindingTracker, LevelPropsKeepEachDimensionInItsOwnField)
 {
-    Interception::Hooks::OpenGL::TextureManager manager;
+    Interception::Hooks::OpenGL::TextureBindingTracker manager;
 
     manager.set_level_props(3,
                             2,
@@ -61,9 +61,9 @@ TEST(TextureManager, LevelPropsKeepEachDimensionInItsOwnField)
               0u);
 }
 
-TEST(TextureManager, CompressedLevelsRememberTheirSize)
+TEST(TextureBindingTracker, CompressedLevelsRememberTheirSize)
 {
-    Interception::Hooks::OpenGL::TextureManager manager;
+    Interception::Hooks::OpenGL::TextureBindingTracker manager;
 
     manager.set_compressed_level_props(3,
                                        0,
@@ -88,9 +88,9 @@ TEST(TextureManager, CompressedLevelsRememberTheirSize)
               0u);
 }
 
-TEST(TextureManager, DeletingATextureForgetsItsLevelsOnly)
+TEST(TextureBindingTracker, DeletingATextureForgetsItsLevelsOnly)
 {
-    Interception::Hooks::OpenGL::TextureManager manager;
+    Interception::Hooks::OpenGL::TextureBindingTracker manager;
 
     manager.set_level_props(2, 0, 4, 4, 1);
     manager.set_level_props(2, 1, 2, 2, 1);

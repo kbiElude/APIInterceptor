@@ -5,11 +5,11 @@
  * Checks of the tracking of the buffer bindings and of the sizes of buffers.
  */
 #include <gtest/gtest.h>
-#include "interception/hooks/OpenGL/buffer_manager.h"
+#include "interception/hooks/OpenGL/buffer_binding_tracker.h"
 
-TEST(BufferManager, NothingIsBoundInitially)
+TEST(BufferBindingTracker, NothingIsBoundInitially)
 {
-    Interception::Hooks::OpenGL::BufferManager manager;
+    Interception::Hooks::OpenGL::BufferBindingTracker manager;
 
     EXPECT_EQ(manager.get_bound_buffer(Interception::Hooks::OpenGL::BufferBindingTarget::ARRAY_BUFFER),
               0u);
@@ -17,9 +17,9 @@ TEST(BufferManager, NothingIsBoundInitially)
               0u);
 }
 
-TEST(BufferManager, BindingsAreTrackedPerTarget)
+TEST(BufferBindingTracker, BindingsAreTrackedPerTarget)
 {
-    Interception::Hooks::OpenGL::BufferManager manager;
+    Interception::Hooks::OpenGL::BufferBindingTracker manager;
 
     manager.on_buffer_bound(Interception::Hooks::OpenGL::BufferBindingTarget::ARRAY_BUFFER,
                             7);
@@ -32,9 +32,9 @@ TEST(BufferManager, BindingsAreTrackedPerTarget)
               8u);
 }
 
-TEST(BufferManager, SizesAreNotLimitedTo32Bits)
+TEST(BufferBindingTracker, SizesAreNotLimitedTo32Bits)
 {
-    Interception::Hooks::OpenGL::BufferManager manager;
+    Interception::Hooks::OpenGL::BufferBindingTracker manager;
 
     manager.set_size(2,
                      6ull * 1024 * 1024 * 1024);
@@ -43,9 +43,9 @@ TEST(BufferManager, SizesAreNotLimitedTo32Bits)
               6ull * 1024 * 1024 * 1024);
 }
 
-TEST(BufferManager, DeletingABufferForgetsItAndUnbindsIt)
+TEST(BufferBindingTracker, DeletingABufferForgetsItAndUnbindsIt)
 {
-    Interception::Hooks::OpenGL::BufferManager manager;
+    Interception::Hooks::OpenGL::BufferBindingTracker manager;
 
     manager.set_size(5,
                      128);

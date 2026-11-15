@@ -62,8 +62,8 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiBindTexture(GLenum target,
         if (Utils::get_texture_binding_target_for_gl_enum(target,
                                                          &binding_target) )
         {
-            get_context_state().texture_manager.on_texture_bound(binding_target,
-                                                                 texture);
+            get_context_state().texture_binding_tracker.on_texture_bound(binding_target,
+                                                                         texture);
         }
     }
 

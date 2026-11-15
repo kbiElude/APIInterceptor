@@ -21,10 +21,10 @@ namespace APIInterceptor
      * checks the flag, while the thread closing it sets the flag and then checks the counter. Whichever goes second sees the other, so
      * a thread is never inside while the gate is reported as quiescent.
      */
-    class ApiCallGate
+    class APICallGate
     {
     public:
-        ApiCallGate();
+        APICallGate();
 
         void on_api_call_interception_finished();
         bool on_api_call_interception_started ();
@@ -46,7 +46,7 @@ namespace APIInterceptor
          */
         bool try_quiesce(const uint32_t& in_timeout_ms);
 
-        static ApiCallGate* get_ptr();
+        static APICallGate* get_ptr();
 
     private:
         void enter();

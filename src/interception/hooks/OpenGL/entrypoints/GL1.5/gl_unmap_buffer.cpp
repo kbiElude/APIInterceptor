@@ -8,7 +8,7 @@
 #include "common/macros.h"
 #include "common/memory_chunk.h"
 #include "common/api_call_scope.h"
-#include "interception/hooks/OpenGL/buffer_mapping_manager.h"
+#include "interception/hooks/OpenGL/mapped_buffer_write_tracker.h"
 #include "interception/hooks/OpenGL/entrypoints/GL1.5/gl_unmap_buffer.h"
 #include "interception/hooks/OpenGL/globals.h"
 #include "interception/hooks/OpenGL/state_tracker.h"
@@ -44,11 +44,11 @@ GLboolean AI_APIENTRY Interception::Hooks::OpenGL::aiUnmapBuffer(GLenum target)
 
             AI_ASSERT(is_known_target);
 
-            buffer_id = context.buffer_manager.get_bound_buffer(binding_target);
+            buffer_id = context.buffer_binding_tracker.get_bound_buffer(binding_target);
         }
 
         /* The pointer is not valid once the buffer is unmapped, so the copy is made now. */
-        const Interception::Hooks::OpenGL::BufferMappingManager::Region unmap_region = context.buffer_mapping_manager.get_unmap_region(buffer_id);
+        const Interception::Hooks::OpenGL::MappedBufferWriteTracker::Region unmap_region = context.mapped_buffer_write_tracker.get_unmap_region(buffer_id);
 
         unmap_chunk = APIInterceptor::MemoryChunk(unmap_region.data_ptr,
                                                   static_cast<int64_t>(unmap_region.n_bytes),
@@ -88,7 +88,7 @@ GLboolean AI_APIENTRY Interception::Hooks::OpenGL::aiUnmapBuffer(GLenum target)
 
     if (call_scope.is_top_level_api_call() )
     {
-        Interception::Hooks::OpenGL::get_context_state().buffer_mapping_manager.on_buffer_unmapped(buffer_id);
+        Interception::Hooks::OpenGL::get_context_state().mapped_buffer_write_tracker.on_buffer_unmapped(buffer_id);
 
         if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLUNMAPBUFFER,
                                                           &post_callback_func_ptr,
