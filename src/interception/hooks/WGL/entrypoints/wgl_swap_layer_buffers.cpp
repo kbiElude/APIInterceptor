@@ -5,7 +5,7 @@
 #include "common/callbacks.h"
 #include "common/globals.h"
 #include "common/logger.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/WGL/globals.h"
 #include "interception/hooks/WGL/entrypoints/wgl_swap_layer_buffers.h"
 
@@ -18,9 +18,9 @@ BOOL WINAPI Interception::Hooks::WGL::swap_layer_buffers(HDC  in_hdc,
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     BOOL                                    result                 = false;
     bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("wglSwapLayerBuffers(in_hdc=[%p] in_planes=[%d])",
                    in_hdc,
@@ -50,7 +50,7 @@ BOOL WINAPI Interception::Hooks::WGL::swap_layer_buffers(HDC  in_hdc,
                                                                                                                                                         in_planes);
     }
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_WGL_WGLSWAPLAYERBUFFERS,
                                                           &post_callback_func_ptr,

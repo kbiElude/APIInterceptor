@@ -5,7 +5,7 @@
 #include "common/callbacks.h"
 #include "common/logger.h"
 #include "common/macros.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/OpenGL/entrypoints/GL1.1/gl_bitmap.h"
 #include "interception/hooks/OpenGL/globals.h"
 #include "interception/hooks/OpenGL/pixel_data_chunk.h"
@@ -26,16 +26,16 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiBitmap(GLsizei        width,
     void*                                       pre_callback_func_arg  = nullptr;
     APIInterceptor::PFNPRECALLBACKFUNCPROC      pre_callback_func_ptr  = nullptr;
     bool                                        should_pass_through    = true;
-    APIInterceptor::Tracker                     tracker;
+    APIInterceptor::APICallScope                call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         pixels_chunk = Interception::Hooks::OpenGL::PixelDataChunk::create_for_unpack_bitmap(bitmapef,
                                                                                              width,
                                                                                              height);
     }
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("glBitmap(width=[%d] width=[%d] xorig=[%.4f] yorig=[%.4f] xmove=[%.4f] ymove=[%.4f] bitmapef=[%p])",
                  width,

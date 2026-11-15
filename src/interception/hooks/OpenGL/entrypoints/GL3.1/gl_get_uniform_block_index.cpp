@@ -5,7 +5,7 @@
 #include "common/callbacks.h"
 #include "common/logger.h"
 #include "common/macros.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/OpenGL/entrypoints/GL3.1/gl_get_uniform_block_index.h"
 #include "interception/hooks/OpenGL/globals.h"
 #include "interception/hooks/OpenGL/string_chunk.h"
@@ -20,10 +20,10 @@ GLuint AI_APIENTRY Interception::Hooks::OpenGL::aiGetUniformBlockIndex(GLuint   
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     GLuint                                  result                 = GL_INVALID_INDEX;
     bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
     Interception::Hooks::OpenGL::StringChunk                     uniform_block_name_chunk(uniformBlockName);
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("glGetUniformBlockIndex(program=[%u] uniformBlockName=[%s])",
                  program,
@@ -53,7 +53,7 @@ GLuint AI_APIENTRY Interception::Hooks::OpenGL::aiGetUniformBlockIndex(GLuint   
                                                                                                                                    uniformBlockName);
     }
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETUNIFORMBLOCKINDEX,
                                                           &post_callback_func_ptr,

@@ -6,7 +6,7 @@
 #include "common/logger.h"
 #include "common/macros.h"
 #include "common/memory_chunk.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/OpenGL/entrypoints/GL1.1/gl_delete_textures.h"
 #include "interception/hooks/OpenGL/globals.h"
 #include "interception/hooks/OpenGL/state_tracker.h"
@@ -23,9 +23,9 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiDeleteTextures(GLsizei       n,
     APIInterceptor::MemoryChunk             textures_chunk(textures,
                                                            n,
                                                            sizeof(GLuint));
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("glDeleteTextures(n=[%d] texture=[%p])",
                  static_cast<int32_t>(n),
@@ -56,7 +56,7 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiDeleteTextures(GLsizei       n,
         reinterpret_cast<PFNGLDELETETEXTURESPROC>(Interception::Hooks::OpenGL::g_cached_gl_delete_textures)(n,
                                                                                                             textures);
 
-        const bool is_top_level = tracker.is_top_level_api_call();
+        const bool is_top_level = call_scope.is_top_level_api_call();
 
         if (is_top_level)
         {

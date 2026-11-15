@@ -5,7 +5,7 @@
 #include "common/callbacks.h"
 #include "common/logger.h"
 #include "common/macros.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/OpenGL/client_array_chunk.h"
 #include "interception/hooks/OpenGL/entrypoints/GL3.2/gl_draw_elements_instanced_base_vertex.h"
 #include "interception/hooks/OpenGL/globals.h"
@@ -25,7 +25,7 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiDrawElementsInstancedBaseVertex(
     void*                                         pre_callback_func_arg  = nullptr;
     APIInterceptor::PFNPRECALLBACKFUNCPROC        pre_callback_func_ptr  = nullptr;
     bool                                          should_pass_through    = true;
-    APIInterceptor::Tracker                       tracker;
+    APIInterceptor::APICallScope                  call_scope;
 
     client_arrays_chunk.add_elements(count,
                                      type,
@@ -35,7 +35,7 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiDrawElementsInstancedBaseVertex(
     client_arrays_chunk.set_instancing(instancecount,
                                        0);
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("glDrawElementsInstancedBaseVertex(mode=[%s] count=[%d] type=[%s] indices=[%p] instancecount=[%d] basevertex=[%d])",
                  Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(mode),

@@ -6,7 +6,7 @@
 #include "common/logger.h"
 #include "common/macros.h"
 #include "common/memory_chunk.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/OpenGL/entrypoints/GL4.1/gl_shader_binary.h"
 #include "interception/hooks/OpenGL/globals.h"
 #include "interception/core/OpenGLUtils/utils_enum.h"
@@ -29,9 +29,9 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiShaderBinary(GLsizei       count
                                                           count,
                                                           sizeof(GLuint));
     bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("glShaderBinary(count=[%d] shaders=[%p] binaryformat=[%s] binary=[%p] length=[%d])",
                  static_cast<int32_t>(count),

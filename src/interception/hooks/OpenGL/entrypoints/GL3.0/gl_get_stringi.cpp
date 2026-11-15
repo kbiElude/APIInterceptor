@@ -5,7 +5,7 @@
 #include "common/callbacks.h"
 #include "common/logger.h"
 #include "common/macros.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/OpenGL/entrypoints/GL3.0/gl_get_stringi.h"
 #include "interception/hooks/OpenGL/globals.h"
 #include "interception/core/OpenGLUtils/utils_enum.h"
@@ -20,9 +20,9 @@ const GLubyte* APIENTRY Interception::Hooks::OpenGL::aiGetStringi(GLenum name,
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     const GLubyte*                          result_ptr             = reinterpret_cast<const GLubyte*>("?!");
     bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("glGetStringi(name=[%s] index=[%u])",
                  Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(name),

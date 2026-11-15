@@ -69,7 +69,7 @@ namespace APIInterceptor
 
     /* The dumper cuts the workload into segments, and a cut must not fall between the moment a call registers its data
      * chunks and the moment the call is recorded. For that, it closes a gate which every thread passes when it enters
-     * an intercepted API call (see Tracker and GateScope), and waits for the threads which are inside one to leave.
+     * an intercepted API call (see APICallScope and GateScope), and waits for the threads which are inside one to leave.
      *
      * Must be called from within an intercepted API call (e.g. from a callback). Returns false, and leaves the gate
      * open, if other threads are still inside intercepted calls after in_timeout_ms. Otherwise, other threads are held
@@ -87,7 +87,7 @@ namespace APIInterceptor
     uint32_t suspend_api_call_nesting();
     void     resume_api_call_nesting (const uint32_t& in_depth);
 
-    /* Used by Tracker and GateScope: the thread counts as being inside an intercepted API call from the first scope it
+    /* Used by APICallScope and GateScope: the thread counts as being inside an intercepted API call from the first scope it
      * enters to the last one it leaves.
      */
     void on_gate_scope_entered();

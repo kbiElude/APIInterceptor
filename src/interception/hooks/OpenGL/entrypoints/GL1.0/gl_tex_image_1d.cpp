@@ -5,7 +5,7 @@
 #include "common/callbacks.h"
 #include "common/logger.h"
 #include "common/macros.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/OpenGL/entrypoints/GL1.0/gl_tex_image_1d.h"
 #include "interception/hooks/OpenGL/globals.h"
 #include "interception/hooks/OpenGL/pixel_data_chunk.h"
@@ -29,9 +29,9 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiTexImage1D(GLenum      target,
     void*                                       pre_callback_func_arg  = nullptr;
     APIInterceptor::PFNPRECALLBACKFUNCPROC      pre_callback_func_ptr  = nullptr;
     bool                                        should_pass_through    = true;
-    APIInterceptor::Tracker                     tracker;
+    APIInterceptor::APICallScope                call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("glTexImage1D(target=[%s] level=[%d] internalformat=[%s] width=[%d] border=[%d] format=[%s] type=[%s] pixels=[%p])",
                  Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),
@@ -89,7 +89,7 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiTexImage1D(GLenum      target,
 
         TextureBindingTarget binding_target;
 
-        const bool is_top_level = tracker.is_top_level_api_call();
+        const bool is_top_level = call_scope.is_top_level_api_call();
 
         if (is_top_level)
         {

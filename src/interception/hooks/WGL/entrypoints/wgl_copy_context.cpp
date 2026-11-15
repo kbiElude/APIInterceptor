@@ -5,7 +5,7 @@
 #include "common/callbacks.h"
 #include "common/globals.h"
 #include "common/logger.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/WGL/globals.h"
 #include "interception/hooks/WGL/entrypoints/wgl_copy_context.h"
 
@@ -19,9 +19,9 @@ BOOL WINAPI Interception::Hooks::WGL::copy_context(HGLRC in_hglrc_source,
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     BOOL                                    result                 = false;
     bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("wglCopyContext(in_hglrc_source=[%p] in_hglrc_destination=[%p] in_mask=[%d])",
                    in_hglrc_source,
@@ -54,7 +54,7 @@ BOOL WINAPI Interception::Hooks::WGL::copy_context(HGLRC in_hglrc_source,
                                                                                                                    in_mask);
     }
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_WGL_WGLCOPYCONTEXT,
                                                           &post_callback_func_ptr,

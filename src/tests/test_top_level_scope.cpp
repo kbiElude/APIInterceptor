@@ -7,12 +7,12 @@
  */
 #include <gtest/gtest.h>
 #include "common/top_level_scope.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 
 TEST(TopLevelScope, ACallWithinAnotherIsNotATopLevelOne)
 {
-    APIInterceptor::Tracker outer;
-    APIInterceptor::Tracker inner;
+    APIInterceptor::APICallScope outer;
+    APIInterceptor::APICallScope inner;
 
     EXPECT_TRUE (outer.is_top_level_api_call() );
     EXPECT_FALSE(inner.is_top_level_api_call() );
@@ -20,16 +20,16 @@ TEST(TopLevelScope, ACallWithinAnotherIsNotATopLevelOne)
 
 TEST(TopLevelScope, ACallInTheScopeIsATopLevelOneAndTheNestingComesBackAfterIt)
 {
-    APIInterceptor::Tracker outer;
+    APIInterceptor::APICallScope outer;
 
     {
         APIInterceptor::TopLevelScope scope;
-        APIInterceptor::Tracker       in_callback;
+        APIInterceptor::APICallScope  in_callback;
 
         EXPECT_TRUE(in_callback.is_top_level_api_call() );
     }
 
-    APIInterceptor::Tracker after;
+    APIInterceptor::APICallScope after;
 
     EXPECT_TRUE (outer.is_top_level_api_call() );
     EXPECT_FALSE(after.is_top_level_api_call() );

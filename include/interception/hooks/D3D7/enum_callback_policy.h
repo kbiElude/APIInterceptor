@@ -4,7 +4,7 @@
  *
  * The enumerations of DirectDraw and Direct3D call a function of the application for each thing they find, from within the call. The
  * calls that the application makes in it (it creates its DirectDraw object there, usually) are its own, and not the driver's, which the
- * tracker would take them for, as they are made from within an intercepted call. So the callback is replaced by one which has the
+ * call scope would take them for, as they are made from within an intercepted call. So the callback is replaced by one which has the
  * thread count as outside any call while the application's callback runs (see APIInterceptor::TopLevelScope), and puts the
  * application's own back as soon as the call is over, so that it is what is recorded.
  */

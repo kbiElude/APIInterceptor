@@ -3,22 +3,22 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "common/macros.h"
-#include "interception/hooks/OpenGL/namespace.h"
+#include "interception/hooks/OpenGL/gl_name_allocator.h"
 
-Interception::Hooks::OpenGL::Namespace::Namespace(const GLuint& in_start_id)
+Interception::Hooks::OpenGL::GLNameAllocator::GLNameAllocator(const GLuint& in_start_id)
     :m_n_allocated_ids(0),
      m_start_id       (in_start_id)
 {
     /* Stub */
 }
 
-Interception::Hooks::OpenGL::Namespace::~Namespace()
+Interception::Hooks::OpenGL::GLNameAllocator::~GLNameAllocator()
 {
     /* Stub */
 }
 
-void Interception::Hooks::OpenGL::Namespace::allocate(const uint32_t& in_n_ids,
-                                                      GLuint*         out_ids_ptr)
+void Interception::Hooks::OpenGL::GLNameAllocator::allocate(const uint32_t& in_n_ids,
+                                                            GLuint*         out_ids_ptr)
 {
     uint32_t n_allocated_ids = 0;
 
@@ -48,8 +48,8 @@ void Interception::Hooks::OpenGL::Namespace::allocate(const uint32_t& in_n_ids,
     }
 }
 
-void Interception::Hooks::OpenGL::Namespace::release(const uint32_t& in_n_ids,
-                                                     const GLuint*   in_ids_ptr)
+void Interception::Hooks::OpenGL::GLNameAllocator::release(const uint32_t& in_n_ids,
+                                                           const GLuint*   in_ids_ptr)
 {
     for (uint32_t n_id = 0;
                   n_id < in_n_ids;

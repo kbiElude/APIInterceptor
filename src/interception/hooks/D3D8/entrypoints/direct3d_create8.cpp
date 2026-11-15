@@ -5,7 +5,7 @@
 #include "common/callbacks.h"
 #include "common/logger.h"
 #include "common/macros.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/D3D8/entrypoints.h"
 #include "interception/hooks/D3D8/globals.h"
 #include "interception/hooks/D3D8/hook_table.h"
@@ -18,9 +18,9 @@ Interception::Hooks::D3D8::IDirect3D8* __stdcall Interception::Hooks::D3D8::aiDi
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_function_ptr       = nullptr;
     IDirect3D8*                             result                          = nullptr;
     bool                                    should_pass_through             = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("Direct3DCreate8(in_sdk_version=[%u])",
                  in_sdk_version);
@@ -53,7 +53,7 @@ Interception::Hooks::D3D8::IDirect3D8* __stdcall Interception::Hooks::D3D8::aiDi
     get_hook_table_ptr()->patch_object(static_cast<uint32_t>(Interface::IDIRECT3D8),
                                        result);
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_D3D8_DIRECT3DCREATE8,
                                                           &post_callback_function_ptr,

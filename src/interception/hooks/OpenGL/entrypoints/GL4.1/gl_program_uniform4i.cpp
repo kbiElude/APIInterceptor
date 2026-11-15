@@ -5,7 +5,7 @@
 #include "common/callbacks.h"
 #include "common/logger.h"
 #include "common/macros.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/OpenGL/entrypoints/GL4.1/gl_program_uniform4i.h"
 #include "interception/hooks/OpenGL/globals.h"
 #include "interception/hooks/WGL/globals.h"
@@ -22,9 +22,9 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiProgramUniform4i(GLuint program,
     void*                                   pre_callback_func_arg  = nullptr;
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("glProgramUniform4i(program=[%u] location=[%d] v0=[%d] v1=[%d] v2=[%d] v3=[%d])",
                  program,

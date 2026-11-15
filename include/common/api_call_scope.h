@@ -2,24 +2,27 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
-#ifndef COMMON_TRACKER_H
-#define COMMON_TRACKER_H
+#ifndef COMMON_API_CALL_SCOPE_H
+#define COMMON_API_CALL_SCOPE_H
 
 #include "callbacks.h"
 
 namespace APIInterceptor
 {
-    class Tracker
+    /* Counts the thread as being inside an intercepted API call while it lives, and says whether this is the outermost such call
+     * (is_top_level_api_call()): only that one is recorded, not the calls that a driver makes from within it.
+     */
+    class APICallScope
     {
     public:
         /* Public funcs */
-        Tracker()
+        APICallScope()
             :m_is_top_level(APIInterceptor::on_api_call_interception_started() )
         {
             /* Stub */
         }
 
-        ~Tracker()
+        ~APICallScope()
         {
             APIInterceptor::on_api_call_interception_finished();
         }
@@ -34,4 +37,4 @@ namespace APIInterceptor
     };
 }
 
-#endif /* COMMON_TRACKER_H */
+#endif /* COMMON_API_CALL_SCOPE_H */

@@ -2,8 +2,8 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
-#ifndef AI_NAMESPACE_H
-#define AI_NAMESPACE_H
+#ifndef AI_GL_NAME_ALLOCATOR_H
+#define AI_GL_NAME_ALLOCATOR_H
 
 #include "interception/hooks/OpenGL/types.h"
 
@@ -19,12 +19,12 @@ namespace Interception
              * MT-safety should not be required, given only one thread at a time is allowed to issue GL commands
              * against a given GL context.
              */
-            class Namespace
+            class GLNameAllocator
             {
             public:
                 /* Public functions */
-                 Namespace(const GLuint& in_start_id = 0);
-                ~Namespace();
+                 GLNameAllocator(const GLuint& in_start_id = 0);
+                ~GLNameAllocator();
 
                 void allocate(const uint32_t& in_n_ids,
                               GLuint*         out_ids_ptr);
@@ -39,9 +39,9 @@ namespace Interception
                 const GLuint m_start_id;
             };
 
-            typedef std::unique_ptr<Namespace> NamespaceUniquePtr;
+            typedef std::unique_ptr<GLNameAllocator> GLNameAllocatorUniquePtr;
         }
     }
 }
 
-#endif /* AI_NAMESPACE_H */
+#endif /* AI_GL_NAME_ALLOCATOR_H */

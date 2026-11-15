@@ -6,7 +6,7 @@
 #include "common/logger.h"
 #include "common/macros.h"
 #include "common/memory_chunk.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/OpenGL/entrypoints/GL3.3/gl_vertex_attrib_p4uiv.h"
 #include "interception/hooks/OpenGL/globals.h"
 #include "interception/core/OpenGLUtils/utils_enum.h"
@@ -22,12 +22,12 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiVertexAttribP4uiv(GLuint        
     void*                                   pre_callback_func_arg  = nullptr;
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
     APIInterceptor::MemoryChunk             value_chunk(value,
                                                         1,
                                                         sizeof(GLuint));
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("glVertexAttribP4uiv(index=[%u] type=[%s] normalized=[%u] value=[%p])",
                  index,

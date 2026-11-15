@@ -5,7 +5,7 @@
 #include "common/callbacks.h"
 #include "common/logger.h"
 #include "common/macros.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/OpenGL/entrypoints/GL2.0/gl_shader_source.h"
 #include "interception/hooks/OpenGL/globals.h"
 #include "interception/hooks/OpenGL/string_array_chunk.h"
@@ -24,9 +24,9 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiShaderSource(GLuint             
     Interception::Hooks::OpenGL::StringArrayChunk                strings_chunk(string,
                                                                                count,
                                                                                length);
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("glShaderSource(shader=[%u] count=[%d] string=[%p] length=[%p])",
                  shader,

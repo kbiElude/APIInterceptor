@@ -5,7 +5,7 @@
 #include "common/callbacks.h"
 #include "common/logger.h"
 #include "common/macros.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/OpenGL/entrypoints/GL1.3/gl_multi_tex_coord_4f.h"
 #include "interception/hooks/OpenGL/globals.h"
 #include "interception/core/OpenGLUtils/utils_enum.h"
@@ -22,9 +22,9 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiMultiTexCoord4f(GLenum  target,
     void*                                   pre_callback_func_arg  = nullptr;
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("glMultiTexCoord4f(target=[%s] s=[%.4f] t=[%.4f] r=[%.4f] q=[%.4f])",
                  Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),

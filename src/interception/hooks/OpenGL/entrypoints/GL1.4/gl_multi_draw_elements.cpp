@@ -6,7 +6,7 @@
 #include "common/globals.h"
 #include "common/logger.h"
 #include "common/macros.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/OpenGL/client_array_chunk.h"
 #include "interception/hooks/OpenGL/entrypoints/GL1.4/gl_multi_draw_elements.h"
 #include "interception/hooks/OpenGL/globals.h"
@@ -28,7 +28,7 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiMultiDrawElements(GLenum        
     void*                                         pre_callback_func_arg  = nullptr;
     APIInterceptor::PFNPRECALLBACKFUNCPROC        pre_callback_func_ptr  = nullptr;
     bool                                          should_pass_through    = true;
-    APIInterceptor::Tracker                       tracker;
+    APIInterceptor::APICallScope                  call_scope;
 
     client_arrays_chunk.add_multi_elements(count,
                                            type,
@@ -36,7 +36,7 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiMultiDrawElements(GLenum        
                                            drawcount,
                                            nullptr);
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("glMultiDrawElements(mode=[%s] count=[%p] type=[%s] indices=[%p] drawcount=[%d])",
                  Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(mode),

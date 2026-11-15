@@ -5,7 +5,7 @@
 #include "common/callbacks.h"
 #include "common/logger.h"
 #include "common/macros.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/OpenGL/entrypoints/GL3.2/gl_client_wait_sync.h"
 #include "interception/hooks/OpenGL/globals.h"
 #include "interception/core/OpenGLUtils/utils_enum.h"
@@ -21,9 +21,9 @@ GLenum AI_APIENTRY Interception::Hooks::OpenGL::aiClientWaitSync(GLsync     sync
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     GLenum                                  result                 = GL_WAIT_FAILED;
     bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("glClientWaitSync(sync=[%p] flags=[%s] timeout=[%llu])",
                  sync,
@@ -56,7 +56,7 @@ GLenum AI_APIENTRY Interception::Hooks::OpenGL::aiClientWaitSync(GLsync     sync
                                                                                                                        timeout);
     }
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCLIENTWAITSYNC,
                                                           &post_callback_func_ptr,

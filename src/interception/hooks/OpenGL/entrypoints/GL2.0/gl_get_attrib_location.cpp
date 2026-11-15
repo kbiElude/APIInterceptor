@@ -5,7 +5,7 @@
 #include "common/callbacks.h"
 #include "common/logger.h"
 #include "common/macros.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/OpenGL/entrypoints/GL2.0/gl_get_attrib_location.h"
 #include "interception/hooks/OpenGL/globals.h"
 #include "interception/hooks/OpenGL/string_chunk.h"
@@ -21,9 +21,9 @@ GLint AI_APIENTRY Interception::Hooks::OpenGL::aiGetAttribLocation(GLuint       
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     GLint                                   result                 = -1;
     bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("glGetAttribLocation(program=[%u] name=[%s])",
                  program,

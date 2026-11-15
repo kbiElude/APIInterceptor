@@ -6,7 +6,7 @@
 #include "common/logger.h"
 #include "common/macros.h"
 #include "common/memory_chunk.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/OpenGL/entrypoints/GL4.4/gl_bind_buffers_range.h"
 #include "interception/hooks/OpenGL/globals.h"
 #include "interception/core/OpenGLUtils/utils_enum.h"
@@ -33,9 +33,9 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiBindBuffersRange(GLenum         
     APIInterceptor::MemoryChunk             sizes_chunk(sizes,
                                                         count,
                                                         sizeof(GLsizeiptr));
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("glBindBuffersRange(target=[%s] first=[%u] count=[%d] buffers=[%p] offsets=[%p] sizes=[%p])",
                  Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target),

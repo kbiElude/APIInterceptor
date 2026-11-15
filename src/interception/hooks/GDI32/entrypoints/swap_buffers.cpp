@@ -5,7 +5,7 @@
 #include "common/callbacks.h"
 #include "common/globals.h"
 #include "common/logger.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/GDI32/entrypoints/swap_buffers.h"
 #include "interception/hooks/GDI32/globals.h"
 
@@ -17,9 +17,9 @@ BOOL WINAPI Interception::Hooks::GDI32::swap_buffers(HDC in_hdc)
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     BOOL                                    result                 = TRUE;
     bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("SwapBuffers(in_hdc=[%p])",
                  in_hdc);
@@ -48,7 +48,7 @@ BOOL WINAPI Interception::Hooks::GDI32::swap_buffers(HDC in_hdc)
         result = reinterpret_cast<Interception::Hooks::GDI32::PFNSWAPBUFFERSPROC>(Interception::Hooks::GDI32::g_cached_swap_buffers_func_ptr)(in_hdc);
     }
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GDI32_SWAPBUFFERS,
                                                           &post_callback_func_ptr,

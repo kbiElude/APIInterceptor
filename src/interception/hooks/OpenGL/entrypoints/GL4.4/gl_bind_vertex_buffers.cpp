@@ -6,7 +6,7 @@
 #include "common/logger.h"
 #include "common/macros.h"
 #include "common/memory_chunk.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/OpenGL/entrypoints/GL4.4/gl_bind_vertex_buffers.h"
 #include "interception/hooks/OpenGL/globals.h"
 #include "interception/hooks/WGL/globals.h"
@@ -31,9 +31,9 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiBindVertexBuffers(GLuint        
     APIInterceptor::MemoryChunk             strides_chunk(strides,
                                                           count,
                                                           sizeof(GLsizei));
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("glBindVertexBuffers(first=[%u] count=[%d] buffers=[%p] offsets=[%p] strides=[%p])",
                  first,

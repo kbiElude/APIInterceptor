@@ -5,7 +5,7 @@
 #include "common/callbacks.h"
 #include "common/logger.h"
 #include "common/macros.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/OpenGL/entrypoints/GL1.1/gl_copy_tex_image_2d.h"
 #include "interception/hooks/OpenGL/globals.h"
 #include "interception/hooks/OpenGL/state_tracker.h"
@@ -27,9 +27,9 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiCopyTexImage2D(GLenum  target,
     void*                                   pre_callback_func_arg  = nullptr;
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("glCopyTexImage2D(target=[%s] level=[%d] internalformat=[%s] x=[%d] y=[%d] width=[%d] height={%d] border=[%d])", Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(target), level, Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(internalformat), x, y, static_cast<int32_t>(width), static_cast<int32_t>(height), border);
 
@@ -72,7 +72,7 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiCopyTexImage2D(GLenum  target,
 
         TextureBindingTarget binding_target;
 
-        const bool is_top_level = tracker.is_top_level_api_call();
+        const bool is_top_level = call_scope.is_top_level_api_call();
 
         if (is_top_level)
         {

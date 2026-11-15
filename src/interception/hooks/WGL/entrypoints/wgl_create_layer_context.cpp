@@ -5,7 +5,7 @@
 #include "common/callbacks.h"
 #include "common/globals.h"
 #include "common/logger.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "Khronos/GL/glcorearb.h"
 #include "Khronos/GL/wglext.h"
 #include "interception/hooks/WGL/globals.h"
@@ -20,9 +20,9 @@ HGLRC WINAPI Interception::Hooks::WGL::create_layer_context(HDC in_hdc,
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     HGLRC                                   result                 = nullptr;
     bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("wglCreateLayerContext(in_hdc=[%p] in_layer_plane_index=[%d])",
                  in_hdc,
@@ -52,7 +52,7 @@ HGLRC WINAPI Interception::Hooks::WGL::create_layer_context(HDC in_hdc,
                                                                                                                                   in_layer_plane_index);
     }
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_WGL_WGLCREATELAYERCONTEXT,
                                                           &post_callback_func_ptr,

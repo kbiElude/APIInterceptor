@@ -5,7 +5,7 @@
 #include "common/callbacks.h"
 #include "common/logger.h"
 #include "common/macros.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/OpenGL/entrypoints/GL3.2/gl_is_sync.h"
 #include "interception/hooks/OpenGL/globals.h"
 #include "interception/hooks/WGL/globals.h"
@@ -18,9 +18,9 @@ GLboolean AI_APIENTRY Interception::Hooks::OpenGL::aiIsSync(GLsync sync)
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     GLboolean                               result                 = GL_FALSE;
     bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("glIsSync(sync=[%p])",
                  sync);
@@ -47,7 +47,7 @@ GLboolean AI_APIENTRY Interception::Hooks::OpenGL::aiIsSync(GLsync sync)
         result = reinterpret_cast<PFNGLISSYNCPROC>(Interception::Hooks::OpenGL::g_cached_gl_is_sync)(sync);
     }
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLISSYNC,
                                                           &post_callback_func_ptr,

@@ -21,7 +21,7 @@ int WINAPI Interception::Hooks::User32::release_dc(HWND in_hwnd,
     int                                     result                  = 0;
     bool                                    should_pass_through     = true;
 
-    /* NOTE: We do NOT use a Tracker instance to track this call. The reason is drivers often call ReleaseDC() from driver-managed
+    /* NOTE: We do NOT use an APICallScope instance to track this call. The reason is drivers often call ReleaseDC() from driver-managed
      * threads, and being able to track these DC allocations is important.
      *       A GateScope is used: it only keeps the dumper from cutting a segment in the middle of the call.
      **/

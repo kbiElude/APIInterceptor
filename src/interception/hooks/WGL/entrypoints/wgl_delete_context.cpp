@@ -5,7 +5,7 @@
 #include "common/callbacks.h"
 #include "common/globals.h"
 #include "common/logger.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/OpenGL/state_tracker.h"
 #include "interception/hooks/WGL/entrypoints/wgl_delete_context.h"
 #include "interception/hooks/WGL/globals.h"
@@ -15,9 +15,9 @@ BOOL WINAPI Interception::Hooks::WGL::delete_context(HGLRC in_hglrc)
     void*                                  callback_func_arg   = nullptr;
     APIInterceptor::PFNPRECALLBACKFUNCPROC callback_func_ptr   = nullptr;
     bool                                   should_pass_through = true;
-    APIInterceptor::Tracker                tracker;
+    APIInterceptor::APICallScope           call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("wglDeleteContext(in_hglrc=[%p])",
                    in_hglrc);

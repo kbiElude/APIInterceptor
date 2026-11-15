@@ -6,7 +6,7 @@
 #include "common/logger.h"
 #include "common/macros.h"
 #include "common/memory_chunk.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/OpenGL/entrypoints/GL4.0/gl_patch_parameterfv.h"
 #include "interception/hooks/OpenGL/globals.h"
 #include "interception/hooks/OpenGL/param_counts.h"
@@ -21,13 +21,13 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiPatchParameterfv(GLenum         
     void*                                   pre_callback_func_arg  = nullptr;
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
     const uint32_t                          n_values = Interception::Hooks::OpenGL::Utils::get_n_patch_parameter_values(pname);
     APIInterceptor::MemoryChunk             values_chunk(values,
                                                          n_values,
                                                          sizeof(GLfloat));
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("glPatchParameterfv(pname=[%s] values=[%p])",
                  Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(pname),

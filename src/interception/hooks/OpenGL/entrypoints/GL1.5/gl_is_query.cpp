@@ -4,7 +4,7 @@
  */
 #include "common/callbacks.h"
 #include "common/logger.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/OpenGL/entrypoints/GL1.5/gl_is_query.h"
 #include "interception/hooks/OpenGL/globals.h"
 #include "interception/hooks/WGL/globals.h"
@@ -17,9 +17,9 @@ GLboolean AI_APIENTRY Interception::Hooks::OpenGL::aiIsQuery(GLuint id)
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     GLboolean                               result                 = GL_FALSE;
     bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("glIsQuery(id=[%u])",
                  id);

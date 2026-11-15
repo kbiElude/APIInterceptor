@@ -5,7 +5,7 @@
 #include "common/callbacks.h"
 #include "common/globals.h"
 #include "common/logger.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/WGL/globals.h"
 #include "interception/hooks/WGL/entrypoints/wgl_get_current_dc.h"
 
@@ -17,9 +17,9 @@ HDC WINAPI Interception::Hooks::WGL::get_current_dc()
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     HDC                                     result                 = nullptr;
     bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("wglGetCurrentDC()");
 
@@ -40,7 +40,7 @@ HDC WINAPI Interception::Hooks::WGL::get_current_dc()
         result = reinterpret_cast<PFNWGLGETCURRENTDCPROC>(Interception::Hooks::WGL::g_cached_get_current_dc_func_ptr)();
     }
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_WGL_WGLGETCURRENTDC,
                                                           &post_callback_func_ptr,

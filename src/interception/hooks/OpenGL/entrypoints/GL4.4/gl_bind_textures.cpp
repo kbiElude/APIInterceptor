@@ -6,7 +6,7 @@
 #include "common/logger.h"
 #include "common/macros.h"
 #include "common/memory_chunk.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/OpenGL/entrypoints/GL4.4/gl_bind_textures.h"
 #include "interception/hooks/OpenGL/globals.h"
 #include "interception/hooks/WGL/globals.h"
@@ -23,9 +23,9 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiBindTextures(GLuint        first
     APIInterceptor::MemoryChunk             textures_chunk(textures,
                                                            count,
                                                            sizeof(GLuint));
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("glBindTextures(first=[%u] count=[%d] textures=[%p])",
                  first,

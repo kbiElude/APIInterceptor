@@ -6,7 +6,7 @@
 #include "common/logger.h"
 #include "common/macros.h"
 #include "common/memory_chunk.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/OpenGL/entrypoints/GL4.5/gl_clear_named_framebufferiv.h"
 #include "interception/hooks/OpenGL/globals.h"
 #include "interception/hooks/OpenGL/param_counts.h"
@@ -23,13 +23,13 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiClearNamedFramebufferiv(GLuint  
     void*                                   pre_callback_func_arg  = nullptr;
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
     const uint32_t                          n_values = Interception::Hooks::OpenGL::Utils::get_n_clear_buffer_values(buffer);
     APIInterceptor::MemoryChunk             value_chunk(value,
                                                         n_values,
                                                         sizeof(GLint));
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("glClearNamedFramebufferiv(framebuffer=[%u] buffer=[%s] drawbuffer=[%d] value=[%p])",
                  framebuffer,

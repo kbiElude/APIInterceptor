@@ -5,7 +5,7 @@
 #include "common/callbacks.h"
 #include "common/logger.h"
 #include "common/macros.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/OpenGL/entrypoints/GL4.0/gl_get_subroutine_uniform_location.h"
 #include "interception/hooks/OpenGL/globals.h"
 #include "interception/hooks/OpenGL/string_chunk.h"
@@ -23,9 +23,9 @@ GLint AI_APIENTRY Interception::Hooks::OpenGL::aiGetSubroutineUniformLocation(GL
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     GLint                                   result                 = -1;
     bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("glGetSubroutineUniformLocation(program=[%u] shadertype=[%s] name=[%s])",
                  program,
@@ -58,7 +58,7 @@ GLint AI_APIENTRY Interception::Hooks::OpenGL::aiGetSubroutineUniformLocation(GL
                                                                                                                                                    name);
     }
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETSUBROUTINEUNIFORMLOCATION,
                                                           &post_callback_func_ptr,

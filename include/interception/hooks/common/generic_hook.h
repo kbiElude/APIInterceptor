@@ -20,7 +20,7 @@
 #include "common/callbacks.h"
 #include "common/logger.h"
 #include "common/macros.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/common/hook_result.h"
 #include "interception/hooks/common/original_function_providers.h"
 #include "interception/hooks/common/types.h"
@@ -92,11 +92,11 @@ ReturnType __stdcall Interception::Hooks::Common::GenericHook<Traits, ReturnType
     bool                                    should_pass_through             = true;
     ArgumentArray                           pre_argument_array;
     bool                                    is_pre_argument_valid           = false;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
     OriginalFunctionPtr original_function_ptr = reinterpret_cast<OriginalFunctionPtr>(OriginalFunction::get_ptr(in_arguments...) );
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         if (APIInterceptor::get_pre_callback_for_function(function,
                                                          &pre_callback_function_ptr,
@@ -134,7 +134,7 @@ ReturnType __stdcall Interception::Hooks::Common::GenericHook<Traits, ReturnType
         original_function_ptr != nullptr)
     {
         /* What the callbacks of the interceptor call on the device is not for a modifier to change. */
-        if (tracker.is_top_level_api_call() )
+        if (call_scope.is_top_level_api_call() )
         {
             Policy::on_call_starting(in_arguments...);
         }
@@ -160,7 +160,7 @@ ReturnType __stdcall Interception::Hooks::Common::GenericHook<Traits, ReturnType
     Policy::on_call_finished(result.is_success(),
                              in_arguments...);
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         if (APIInterceptor::get_post_callback_for_function(function,
                                                           &post_callback_function_ptr,

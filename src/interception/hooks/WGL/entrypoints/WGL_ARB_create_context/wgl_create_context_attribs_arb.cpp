@@ -6,7 +6,7 @@
 #include "common/globals.h"
 #include "common/logger.h"
 #include "common/memory_chunk.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/WGL/entrypoints/WGL_ARB_create_context/wgl_create_context_attribs_arb.h"
 #include "interception/hooks/WGL/globals.h"
 #include "interception/hooks/WGL/utils.h"
@@ -26,9 +26,9 @@ HGLRC WINAPI Interception::Hooks::WGL::create_context_attribs_arb(HDC        in_
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     HGLRC                                   result                 = nullptr;
     bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("wglCreateContextAttribsARB(\n"
                    " in_hdc                  = [%p]\n"
@@ -71,7 +71,7 @@ HGLRC WINAPI Interception::Hooks::WGL::create_context_attribs_arb(HDC        in_
                                                                                                                                              in_attrib_list_ptr);
     }
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_WGL_WGLCREATECONTEXTATTRIBSARB,
                                                           &post_callback_func_ptr,

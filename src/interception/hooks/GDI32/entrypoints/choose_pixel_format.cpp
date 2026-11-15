@@ -6,7 +6,7 @@
 #include "common/globals.h"
 #include "common/logger.h"
 #include "common/macros.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/GDI32/globals.h"
 #include "interception/hooks/GDI32/entrypoints/choose_pixel_format.h"
 #include "interception/hooks/GDI32/utils_trace.h"
@@ -20,9 +20,9 @@ int WINAPI Interception::Hooks::GDI32::choose_pixel_format(HDC                  
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr   = nullptr;
     int                                     result                  = 0;
     bool                                    should_pass_through     = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("ChoosePixelFormat(\n"
                  " in_hdc                         = [%p]\n"
@@ -57,7 +57,7 @@ int WINAPI Interception::Hooks::GDI32::choose_pixel_format(HDC                  
                                                                                                                                                            in_pixel_format_descriptor_ptr);
     }
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GDI32_CHOOSEPIXELFORMAT,
                                                           &post_callback_func_ptr,

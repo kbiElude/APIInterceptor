@@ -5,7 +5,7 @@
 #include "common/callbacks.h"
 #include "common/logger.h"
 #include "common/macros.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/OpenGL/entrypoints/GL2.0/gl_enable_vertex_attrib_array.h"
 #include "interception/hooks/OpenGL/globals.h"
 #include "interception/hooks/OpenGL/state_tracker.h"
@@ -18,9 +18,9 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiEnableVertexAttribArray(GLuint i
     void*                                   pre_callback_func_arg  = nullptr;
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("glEnableVertexAttribArray(index=[%u])",
                  index);
@@ -49,7 +49,7 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiEnableVertexAttribArray(GLuint i
         reinterpret_cast<PFNGLENABLEVERTEXATTRIBARRAYPROC>(Interception::Hooks::OpenGL::g_cached_gl_enable_vertex_attrib_array)(index);
     }
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         auto& context = Interception::Hooks::OpenGL::get_context_state();
 

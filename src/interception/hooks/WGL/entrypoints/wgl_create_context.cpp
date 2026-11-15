@@ -5,7 +5,7 @@
 #include "common/callbacks.h"
 #include "common/globals.h"
 #include "common/logger.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/WGL/globals.h"
 #include "interception/hooks/WGL/entrypoints/wgl_create_context.h"
 
@@ -17,9 +17,9 @@ HGLRC WINAPI Interception::Hooks::WGL::create_context(HDC in_hdc)
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     HGLRC                                   result                 = nullptr;
     bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("wglCreateContext(in_hdc=[%p])",
                    in_hdc);
@@ -46,7 +46,7 @@ HGLRC WINAPI Interception::Hooks::WGL::create_context(HDC in_hdc)
         result = reinterpret_cast<PFNWGLCREATECONTEXTPROC>(Interception::Hooks::WGL::g_cached_create_context_func_ptr)(in_hdc);
     }
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_WGL_WGLCREATECONTEXT,
                                                           &post_callback_func_ptr,

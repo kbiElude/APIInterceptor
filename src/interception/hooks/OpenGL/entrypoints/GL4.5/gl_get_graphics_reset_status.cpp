@@ -5,7 +5,7 @@
 #include "common/callbacks.h"
 #include "common/logger.h"
 #include "common/macros.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/OpenGL/entrypoints/GL4.5/gl_get_graphics_reset_status.h"
 #include "interception/hooks/OpenGL/globals.h"
 #include "interception/core/OpenGLUtils/utils_enum.h"
@@ -19,9 +19,9 @@ GLenum AI_APIENTRY Interception::Hooks::OpenGL::aiGetGraphicsResetStatus(void)
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     GLenum                                  result                 = GL_NO_ERROR;
     bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("glGetGraphicsResetStatus()");
 
@@ -42,7 +42,7 @@ GLenum AI_APIENTRY Interception::Hooks::OpenGL::aiGetGraphicsResetStatus(void)
         result = reinterpret_cast<PFNGLGETGRAPHICSRESETSTATUSPROC>(Interception::Hooks::OpenGL::g_cached_gl_get_graphics_reset_status)();
     }
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLGETGRAPHICSRESETSTATUS,
                                                           &post_callback_func_ptr,

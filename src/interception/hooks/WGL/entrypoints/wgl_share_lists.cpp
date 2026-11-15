@@ -5,7 +5,7 @@
 #include "common/callbacks.h"
 #include "common/globals.h"
 #include "common/logger.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/WGL/globals.h"
 #include "interception/hooks/WGL/entrypoints/wgl_share_lists.h"
 
@@ -18,9 +18,9 @@ BOOL WINAPI Interception::Hooks::WGL::share_lists(HGLRC in_hglrc1,
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     BOOL                                    result                 = false;
     bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("wglShareLists(in_hglrc1=[%p] in_hglrc2=[%p])",
                    in_hglrc1,
@@ -50,7 +50,7 @@ BOOL WINAPI Interception::Hooks::WGL::share_lists(HGLRC in_hglrc1,
                                                                                                                  in_hglrc2);
     }
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_WGL_WGLSHARELISTS,
                                                           &post_callback_func_ptr,

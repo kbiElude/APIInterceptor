@@ -5,7 +5,7 @@
 #include "common/callbacks.h"
 #include "common/globals.h"
 #include "common/logger.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/WGL/entrypoints/WGL_ARB_extensions_string/wgl_get_extensions_string_arb.h"
 #include "interception/hooks/WGL/globals.h"
 #include "interception/hooks/WGL/utils_trace.h"
@@ -18,9 +18,9 @@ const char* WINAPI Interception::Hooks::WGL::get_extensions_string_arb(HDC in_hd
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     const char*                             result                 = "?!";
     bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("wglGetExtensionsStringARB(in_hdc = [%p])\n",
                    in_hdc);
@@ -47,7 +47,7 @@ const char* WINAPI Interception::Hooks::WGL::get_extensions_string_arb(HDC in_hd
         result = reinterpret_cast<PFNWGLGETEXTENSIONSSTRINGARGPROC>(Interception::Hooks::WGL::g_cached_get_extensions_string_arb_func_ptr)(in_hdc);
     }
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_WGL_WGLGETEXTENSIONSSTRINGARB,
                                                           &post_callback_func_ptr,

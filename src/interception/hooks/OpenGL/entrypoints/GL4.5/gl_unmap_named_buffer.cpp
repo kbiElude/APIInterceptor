@@ -7,7 +7,7 @@
 #include "common/logger.h"
 #include "common/macros.h"
 #include "common/memory_chunk.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/OpenGL/buffer_mapping_manager.h"
 #include "interception/hooks/OpenGL/entrypoints/GL4.5/gl_unmap_named_buffer.h"
 #include "interception/hooks/OpenGL/globals.h"
@@ -24,12 +24,12 @@ GLboolean AI_APIENTRY Interception::Hooks::OpenGL::aiUnmapNamedBuffer(GLuint buf
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     GLboolean                               result                 = GL_FALSE;
     bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
     APIInterceptor::MemoryChunk             unmap_chunk(nullptr,
                                                         0,
                                                         sizeof(uint8_t) );
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("glUnmapNamedBuffer(buffer=[%u])",
                  buffer);
@@ -75,7 +75,7 @@ GLboolean AI_APIENTRY Interception::Hooks::OpenGL::aiUnmapNamedBuffer(GLuint buf
         result = reinterpret_cast<PFNGLUNMAPNAMEDBUFFERPROC>(Interception::Hooks::OpenGL::g_cached_gl_unmap_named_buffer)(buffer);
     }
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         Interception::Hooks::OpenGL::get_context_state().buffer_mapping_manager.on_buffer_unmapped(buffer);
 

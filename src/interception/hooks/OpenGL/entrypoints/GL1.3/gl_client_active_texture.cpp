@@ -5,7 +5,7 @@
 #include "common/callbacks.h"
 #include "common/logger.h"
 #include "common/macros.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/OpenGL/entrypoints/GL1.3/gl_client_active_texture.h"
 #include "interception/hooks/OpenGL/globals.h"
 #include "interception/hooks/OpenGL/state_tracker.h"
@@ -19,9 +19,9 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiClientActiveTexture(GLenum textu
     void*                                   pre_callback_func_arg  = nullptr;
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("glClientActiveTexture(texture=[%s])",
                  Interception::Core::OpenGLUtils::get_raw_string_for_gl_enum(texture));
@@ -50,7 +50,7 @@ void AI_APIENTRY Interception::Hooks::OpenGL::aiClientActiveTexture(GLenum textu
         reinterpret_cast<PFNGLCLIENTACTIVETEXTUREPROC>(Interception::Hooks::OpenGL::g_cached_gl_client_active_texture)(texture);
     }
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         auto& context = Interception::Hooks::OpenGL::get_context_state();
 

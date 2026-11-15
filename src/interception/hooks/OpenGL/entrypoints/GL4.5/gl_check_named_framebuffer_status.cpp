@@ -5,7 +5,7 @@
 #include "common/callbacks.h"
 #include "common/logger.h"
 #include "common/macros.h"
-#include "common/tracker.h"
+#include "common/api_call_scope.h"
 #include "interception/hooks/OpenGL/entrypoints/GL4.5/gl_check_named_framebuffer_status.h"
 #include "interception/hooks/OpenGL/globals.h"
 #include "interception/core/OpenGLUtils/utils_enum.h"
@@ -20,9 +20,9 @@ GLenum AI_APIENTRY Interception::Hooks::OpenGL::aiCheckNamedFramebufferStatus(GL
     APIInterceptor::PFNPRECALLBACKFUNCPROC  pre_callback_func_ptr  = nullptr;
     GLenum                                  result                 = 0x8219; /* GL_FRAMEBUFFER_UNDEFINED */
     bool                                    should_pass_through    = true;
-    APIInterceptor::Tracker                 tracker;
+    APIInterceptor::APICallScope            call_scope;
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         AI_TRACE("glCheckNamedFramebufferStatus(framebuffer=[%u] target=[%s])",
                  framebuffer,
@@ -52,7 +52,7 @@ GLenum AI_APIENTRY Interception::Hooks::OpenGL::aiCheckNamedFramebufferStatus(GL
                                                                                                                                                  target);
     }
 
-    if (tracker.is_top_level_api_call() )
+    if (call_scope.is_top_level_api_call() )
     {
         if (APIInterceptor::get_post_callback_for_function(APIInterceptor::APIFUNCTION_GL_GLCHECKNAMEDFRAMEBUFFERSTATUS,
                                                           &post_callback_func_ptr,

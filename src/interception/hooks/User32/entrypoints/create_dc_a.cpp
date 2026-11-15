@@ -23,7 +23,7 @@ HDC WINAPI Interception::Hooks::User32::create_dc_a(LPCSTR          in_driver_pt
     HDC                                     result                  = 0;
     bool                                    should_pass_through     = true;
 
-    /* NOTE: We do NOT use a Tracker instance to track this call. The reason is drivers often call CreateDCA() and later call it
+    /* NOTE: We do NOT use an APICallScope instance to track this call. The reason is drivers often call CreateDCA() and later call it
      *       from driver-managed threads, and being able to track these DC allocations is important.
      *       A GateScope is used: it only keeps the dumper from cutting a segment in the middle of the call.
      **/
