@@ -4,7 +4,7 @@
  *
  * How the vertices of a strided draw are dumped, and how they are made a structure of the draw again. The arrays that a strided draw reads from are
  * in the memory of the application, and the structure that points at them is of no use once the process is gone: the dump has the structure (for the
- * distance between the vertices of each array) and the arrays as one chunk (see HookPolicyHelper::create_strided_data_argument), which is the number
+ * distance between the vertices of each array) and the arrays as one chunk (see StridedDataCapture::create_argument), which is the number
  * of the arrays (a uint32_t), then the size in bytes of each, then the arrays themselves, one after the other.
  */
 #ifndef D3D7UTILS_STRIDED_LAYOUT_H

@@ -10,7 +10,7 @@
 
 #include "common/api_function_argument.h"
 #include "interception/hooks/common/hook_policy_base.h"
-#include "interception/hooks/D3D7/hook_policy_helper.h"
+#include "interception/hooks/D3D7/interface_patcher.h"
 
 namespace Interception
 {
@@ -144,7 +144,7 @@ namespace Interception
             template<>
             struct HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_DRAWINDEXEDPRIMITIVESTRIDED> : public HookPolicyBase
             {
-                static const uint32_t n_extra_arguments = 2; /* indices, the arrays of the vertices (see HookPolicyHelper) */
+                static const uint32_t n_extra_arguments = 2; /* indices, the arrays of the vertices (see StridedDataCapture) */
 
                 static void create_extra_arguments(APIInterceptor::APIFunctionArgument*  out_arguments_ptr,
                                                    IDirect3DDevice7*                     in_self,
@@ -190,7 +190,7 @@ namespace Interception
             template<>
             struct HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_DRAWPRIMITIVESTRIDED> : public HookPolicyBase
             {
-                static const uint32_t n_extra_arguments = 1; /* the arrays of the vertices (see HookPolicyHelper) */
+                static const uint32_t n_extra_arguments = 1; /* the arrays of the vertices (see StridedDataCapture) */
 
                 static void create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
                                                    IDirect3DDevice7*                    in_self,
@@ -298,7 +298,7 @@ void Interception::Hooks::D3D7::QueryInterfaceHookPolicy<ObjectType>::on_call_fi
     if (in_is_success                &&
         in_object_ptr_ptr != nullptr)
     {
-        HookPolicyHelper::patch_object_for_iid(in_iid,
+        InterfacePatcher::patch_object_for_iid(in_iid,
                                               *in_object_ptr_ptr);
     }
 }

@@ -11,7 +11,7 @@
 
 #include "common/api_function_argument.h"
 #include "interception/hooks/common/hook_policy_base.h"
-#include "interception/hooks/D3D8/hook_policy_helper.h"
+#include "interception/hooks/D3D8/present_capture.h"
 
 namespace Interception
 {
@@ -27,7 +27,7 @@ namespace Interception
                 /* Stub */
             };
 
-            /* The rectangles of a Present call (see HookPolicyHelper::create_present_arguments()): both the device and the swap
+            /* The rectangles of a Present call (see PresentCapture::create_arguments()): both the device and the swap
              * chain present.
              */
             template<typename Interface>
@@ -45,10 +45,10 @@ namespace Interception
                     (void) in_self;
                     (void) in_dest_window_override;
 
-                    HookPolicyHelper::create_present_arguments(out_arguments_ptr,
-                                                               in_source_rect_ptr,
-                                                               in_dest_rect_ptr,
-                                                               in_dirty_region_ptr);
+                    PresentCapture::create_arguments(out_arguments_ptr,
+                                                     in_source_rect_ptr,
+                                                     in_dest_rect_ptr,
+                                                     in_dirty_region_ptr);
                 }
             };
 

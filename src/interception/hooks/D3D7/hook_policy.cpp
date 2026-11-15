@@ -5,7 +5,10 @@
 #include "interception/hooks/common/argument_factory.h"
 #include "interception/hooks/common/lock_tracker.h"
 #include "interception/hooks/D3D7/hook_policy.h"
-#include "interception/hooks/D3D7/hook_policy_helper.h"
+#include "interception/hooks/D3D7/interface_patcher.h"
+#include "interception/hooks/D3D7/locked_resource_capture.h"
+#include "interception/hooks/D3D7/strided_data_capture.h"
+#include "interception/hooks/D3D7/surface_caps.h"
 #include "interception/core/D3D7Utils/palette_layout.h"
 #include "interception/core/D3D7Utils/vertex_format.h"
 #include <algorithm>
@@ -22,7 +25,7 @@ void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_DIRE
     if (in_is_success                    &&
         in_direct_draw_ptr_ptr != nullptr)
     {
-        HookPolicyHelper::patch_object_for_iid(in_iid,
+        InterfacePatcher::patch_object_for_iid(in_iid,
                                               *in_direct_draw_ptr_ptr);
     }
 }
@@ -41,8 +44,8 @@ void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIR
     (void) in_flags;
     (void) in_effects_ptr;
 
-    out_arguments_ptr[0] = Interception::Hooks::Common::ArgumentFactory::create_scalar(HookPolicyHelper::is_primary_surface(in_self) ? 1u
-                                                                                                                                      : 0u);
+    out_arguments_ptr[0] = Interception::Hooks::Common::ArgumentFactory::create_scalar(SurfaceCaps::is_primary_surface(in_self) ? 1u
+                                                                                                                                : 0u);
 }
 
 void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIRECTDRAWSURFACE7_BLTFAST>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
@@ -59,8 +62,8 @@ void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIR
     (void) in_source_rect_ptr;
     (void) in_transfer_flags;
 
-    out_arguments_ptr[0] = Interception::Hooks::Common::ArgumentFactory::create_scalar(HookPolicyHelper::is_primary_surface(in_self) ? 1u
-                                                                                                                                      : 0u);
+    out_arguments_ptr[0] = Interception::Hooks::Common::ArgumentFactory::create_scalar(SurfaceCaps::is_primary_surface(in_self) ? 1u
+                                                                                                                                : 0u);
 }
 
 void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_CLEAR>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
@@ -147,9 +150,9 @@ void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIR
     out_arguments_ptr[0] = Interception::Hooks::Common::ArgumentFactory::create_chunk(in_indices_ptr,
                                                                                       in_n_indices * static_cast<uint32_t>(sizeof(WORD) ));
 
-    out_arguments_ptr[1] = HookPolicyHelper::create_strided_data_argument(in_vertex_array_ptr,
-                                                                          in_vertex_format,
-                                                                          in_n_vertices);
+    out_arguments_ptr[1] = StridedDataCapture::create_argument(in_vertex_array_ptr,
+                                                               in_vertex_format,
+                                                               in_n_vertices);
 }
 
 void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_DRAWINDEXEDPRIMITIVEVB>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
@@ -203,9 +206,9 @@ void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIR
     (void) in_primitive_type;
     (void) in_flags;
 
-    out_arguments_ptr[0] = HookPolicyHelper::create_strided_data_argument(in_vertex_array_ptr,
-                                                                          in_vertex_format,
-                                                                          in_n_vertices);
+    out_arguments_ptr[0] = StridedDataCapture::create_argument(in_vertex_array_ptr,
+                                                               in_vertex_format,
+                                                               in_n_vertices);
 }
 
 void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIRECTDRAW7_CREATEPALETTE>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
@@ -268,18 +271,18 @@ void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIR
         in_data_ptr_ptr != nullptr   &&
        *in_data_ptr_ptr != nullptr)
     {
-        HookPolicyHelper::on_vertex_buffer_locked(in_self,
-                                                  in_flags,
-                                                  in_data_ptr_ptr,
-                                                  in_size_ptr);
+        LockedResourceCapture::on_vertex_buffer_locked(in_self,
+                                                       in_flags,
+                                                       in_data_ptr_ptr,
+                                                       in_size_ptr);
     }
 }
 
 void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DVERTEXBUFFER7_UNLOCK>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
                                                                                                                                    IDirect3DVertexBuffer7*              in_self)
 {
-    out_arguments_ptr[0] = HookPolicyHelper::create_locked_data_argument(in_self,
-                                                                         0); /* in_level */
+    out_arguments_ptr[0] = LockedResourceCapture::create_locked_data_argument(in_self,
+                                                                              0); /* in_level */
 }
 
 void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DVERTEXBUFFER7_UNLOCK>::on_call_finished(const bool&             in_is_success,
@@ -303,10 +306,10 @@ void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIR
     if (in_is_success                &&
         in_description_ptr != nullptr)
     {
-        HookPolicyHelper::on_surface_locked(in_self,
-                                            in_rect_ptr,
-                                            in_description_ptr,
-                                            in_flags);
+        LockedResourceCapture::on_surface_locked(in_self,
+                                                 in_rect_ptr,
+                                                 in_description_ptr,
+                                                 in_flags);
     }
 }
 
@@ -316,8 +319,8 @@ void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIR
 {
     (void) in_rect_ptr;
 
-    out_arguments_ptr[0] = HookPolicyHelper::create_locked_data_argument(in_self,
-                                                                         0); /* in_level */
+    out_arguments_ptr[0] = LockedResourceCapture::create_locked_data_argument(in_self,
+                                                                              0); /* in_level */
 }
 
 void Interception::Hooks::D3D7::HookPolicy<APIInterceptor::APIFUNCTION_D3D7_IDIRECTDRAWSURFACE7_UNLOCK>::on_call_finished(const bool&          in_is_success,

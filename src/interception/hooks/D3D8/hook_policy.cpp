@@ -7,8 +7,9 @@
 #include "interception/hooks/common/primitive_utils.h"
 #include "interception/hooks/common/vtable_registry.h"
 #include "interception/hooks/D3D8/hook_policy.h"
-#include "interception/hooks/D3D8/hook_policy_helper.h"
+#include "interception/hooks/D3D8/locked_resource_capture.h"
 #include "interception/hooks/D3D8/argument_modifier.h"
+#include "interception/core/D3D8Utils/shader_tokens.h"
 #include <algorithm>
 
 void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3D8_CREATEDEVICE>::on_call_starting(IDirect3D8*            in_self,
@@ -71,8 +72,8 @@ void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIR
     if (in_is_success)
     {
         D3DSURFACE_DESC description              = {};
-        const uint32_t  face_level_key           = HookPolicyHelper::get_cube_face_level_key(in_face,
-                                                                                             in_level);
+        const uint32_t  face_level_key           = LockedResourceCapture::get_cube_face_level_key(in_face,
+                                                                                                  in_level);
         const auto      get_description_func_ptr = reinterpret_cast<PFN_IDIRECT3DCUBETEXTURE8_GETLEVELDESC>(
                                                 Interception::Hooks::Common::VTableRegistry::get_ptr()->get_original_function_ptr(in_self,
                                                                                                      VTABLE_INDEX_IDIRECT3DCUBETEXTURE8_GETLEVELDESC) );
@@ -84,12 +85,12 @@ void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIR
                                     &description);
         }
 
-        HookPolicyHelper::on_rect_locked(in_self,
-                                         face_level_key,
-                                         description,
-                                         in_locked_rect_ptr,
-                                         in_rect_ptr,
-                                         in_flags);
+        LockedResourceCapture::on_rect_locked(in_self,
+                                              face_level_key,
+                                              description,
+                                              in_locked_rect_ptr,
+                                              in_rect_ptr,
+                                              in_flags);
     }
 }
 
@@ -98,11 +99,11 @@ void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIR
                                                                                                                                       D3DCUBEMAP_FACES                     in_face,
                                                                                                                                       UINT                                 in_level)
 {
-    const uint32_t face_level_key = HookPolicyHelper::get_cube_face_level_key(in_face,
-                                                                              in_level);
+    const uint32_t face_level_key = LockedResourceCapture::get_cube_face_level_key(in_face,
+                                                                                   in_level);
 
-    out_arguments_ptr[0] = HookPolicyHelper::create_locked_data_argument(in_self,
-                                                                         face_level_key);
+    out_arguments_ptr[0] = LockedResourceCapture::create_locked_data_argument(in_self,
+                                                                              face_level_key);
 }
 
 void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DCUBETEXTURE8_UNLOCKRECT>::on_call_finished(const bool&            in_is_success,
@@ -110,8 +111,8 @@ void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIR
                                                                                                                                 D3DCUBEMAP_FACES       in_face,
                                                                                                                                 UINT                   in_level)
 {
-    const uint32_t face_level_key = HookPolicyHelper::get_cube_face_level_key(in_face,
-                                                                              in_level);
+    const uint32_t face_level_key = LockedResourceCapture::get_cube_face_level_key(in_face,
+                                                                                   in_level);
 
     (void) in_is_success;
 
@@ -171,7 +172,7 @@ void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIR
                                                                                                                                         const DWORD*                         in_function_ptr,
                                                                                                                                         DWORD*                               in_handle_ptr)
 {
-    const uint32_t n_function_tokens = HookPolicyHelper::get_n_shader_function_tokens(in_function_ptr);
+    const uint32_t n_function_tokens = Interception::Core::D3D8Utils::get_n_shader_function_tokens(in_function_ptr);
 
     (void) in_self;
     (void) in_handle_ptr;
@@ -187,8 +188,8 @@ void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIR
                                                                                                                                          DWORD*                               in_handle_ptr,
                                                                                                                                          DWORD                                in_usage)
 {
-    const uint32_t n_declaration_tokens = HookPolicyHelper::get_n_vertex_declaration_tokens(in_declaration_ptr);
-    const uint32_t n_function_tokens    = HookPolicyHelper::get_n_shader_function_tokens(in_function_ptr);
+    const uint32_t n_declaration_tokens = Interception::Core::D3D8Utils::get_n_vertex_declaration_tokens(in_declaration_ptr);
+    const uint32_t n_function_tokens    = Interception::Core::D3D8Utils::get_n_shader_function_tokens(in_function_ptr);
 
     (void) in_self;
     (void) in_handle_ptr;
@@ -350,20 +351,20 @@ void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIR
                                     &description);
         }
 
-        HookPolicyHelper::on_buffer_locked(in_self,
-                                           description.Size,
-                                           in_offset_to_lock,
-                                           in_size_to_lock,
-                                           in_data_ptr_ptr,
-                                           in_flags);
+        LockedResourceCapture::on_buffer_locked(in_self,
+                                                description.Size,
+                                                in_offset_to_lock,
+                                                in_size_to_lock,
+                                                in_data_ptr_ptr,
+                                                in_flags);
     }
 }
 
 void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DINDEXBUFFER8_UNLOCK>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
                                                                                                                                   IDirect3DIndexBuffer8*               in_self)
 {
-    out_arguments_ptr[0] = HookPolicyHelper::create_locked_data_argument(in_self,
-                                                                         0); /* in_level */
+    out_arguments_ptr[0] = LockedResourceCapture::create_locked_data_argument(in_self,
+                                                                              0); /* in_level */
 }
 
 void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DINDEXBUFFER8_UNLOCK>::on_call_finished(const bool&            in_is_success,
@@ -408,20 +409,20 @@ void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIR
                                     &description);
         }
 
-        HookPolicyHelper::on_rect_locked(in_self,
-                                         0, /* in_level */
-                                         description,
-                                         in_locked_rect_ptr,
-                                         in_rect_ptr,
-                                         in_flags);
+        LockedResourceCapture::on_rect_locked(in_self,
+                                              0, /* in_level */
+                                              description,
+                                              in_locked_rect_ptr,
+                                              in_rect_ptr,
+                                              in_flags);
     }
 }
 
 void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DSURFACE8_UNLOCKRECT>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
                                                                                                                                   IDirect3DSurface8*                   in_self)
 {
-    out_arguments_ptr[0] = HookPolicyHelper::create_locked_data_argument(in_self,
-                                                                         0); /* in_level */
+    out_arguments_ptr[0] = LockedResourceCapture::create_locked_data_argument(in_self,
+                                                                              0); /* in_level */
 }
 
 void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DSURFACE8_UNLOCKRECT>::on_call_finished(const bool&        in_is_success,
@@ -470,12 +471,12 @@ void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIR
                                     &description);
         }
 
-        HookPolicyHelper::on_rect_locked(in_self,
-                                         in_level,
-                                         description,
-                                         in_locked_rect_ptr,
-                                         in_rect_ptr,
-                                         in_flags);
+        LockedResourceCapture::on_rect_locked(in_self,
+                                              in_level,
+                                              description,
+                                              in_locked_rect_ptr,
+                                              in_rect_ptr,
+                                              in_flags);
     }
 }
 
@@ -483,8 +484,8 @@ void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIR
                                                                                                                                   IDirect3DTexture8*                   in_self,
                                                                                                                                   UINT                                 in_level)
 {
-    out_arguments_ptr[0] = HookPolicyHelper::create_locked_data_argument(in_self,
-                                                                         in_level);
+    out_arguments_ptr[0] = LockedResourceCapture::create_locked_data_argument(in_self,
+                                                                              in_level);
 }
 
 void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DTEXTURE8_UNLOCKRECT>::on_call_finished(const bool&        in_is_success,
@@ -517,20 +518,20 @@ void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIR
                                     &description);
         }
 
-        HookPolicyHelper::on_buffer_locked(in_self,
-                                           description.Size,
-                                           in_offset_to_lock,
-                                           in_size_to_lock,
-                                           in_data_ptr_ptr,
-                                           in_flags);
+        LockedResourceCapture::on_buffer_locked(in_self,
+                                                description.Size,
+                                                in_offset_to_lock,
+                                                in_size_to_lock,
+                                                in_data_ptr_ptr,
+                                                in_flags);
     }
 }
 
 void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DVERTEXBUFFER8_UNLOCK>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
                                                                                                                                    IDirect3DVertexBuffer8*              in_self)
 {
-    out_arguments_ptr[0] = HookPolicyHelper::create_locked_data_argument(in_self,
-                                                                         0); /* in_level */
+    out_arguments_ptr[0] = LockedResourceCapture::create_locked_data_argument(in_self,
+                                                                              0); /* in_level */
 }
 
 void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DVERTEXBUFFER8_UNLOCK>::on_call_finished(const bool&             in_is_success,
@@ -561,20 +562,20 @@ void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIR
                                     &description);
         }
 
-        HookPolicyHelper::on_box_locked(in_self,
-                                        0, /* in_level */
-                                        description,
-                                        in_locked_box_ptr,
-                                        in_box_ptr,
-                                        in_flags);
+        LockedResourceCapture::on_box_locked(in_self,
+                                             0, /* in_level */
+                                             description,
+                                             in_locked_box_ptr,
+                                             in_box_ptr,
+                                             in_flags);
     }
 }
 
 void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DVOLUME8_UNLOCKBOX>::create_extra_arguments(APIInterceptor::APIFunctionArgument* out_arguments_ptr,
                                                                                                                                 IDirect3DVolume8*                    in_self)
 {
-    out_arguments_ptr[0] = HookPolicyHelper::create_locked_data_argument(in_self,
-                                                                         0); /* in_level */
+    out_arguments_ptr[0] = LockedResourceCapture::create_locked_data_argument(in_self,
+                                                                              0); /* in_level */
 }
 
 void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DVOLUME8_UNLOCKBOX>::on_call_finished(const bool&       in_is_success,
@@ -607,12 +608,12 @@ void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIR
                                     &description);
         }
 
-        HookPolicyHelper::on_box_locked(in_self,
-                                        in_level,
-                                        description,
-                                        in_locked_box_ptr,
-                                        in_box_ptr,
-                                        in_flags);
+        LockedResourceCapture::on_box_locked(in_self,
+                                             in_level,
+                                             description,
+                                             in_locked_box_ptr,
+                                             in_box_ptr,
+                                             in_flags);
     }
 }
 
@@ -620,8 +621,8 @@ void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIR
                                                                                                                                        IDirect3DVolumeTexture8*             in_self,
                                                                                                                                        UINT                                 in_level)
 {
-    out_arguments_ptr[0] = HookPolicyHelper::create_locked_data_argument(in_self,
-                                                                         in_level);
+    out_arguments_ptr[0] = LockedResourceCapture::create_locked_data_argument(in_self,
+                                                                              in_level);
 }
 
 void Interception::Hooks::D3D8::HookPolicy<APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DVOLUMETEXTURE8_UNLOCKBOX>::on_call_finished(const bool&              in_is_success,

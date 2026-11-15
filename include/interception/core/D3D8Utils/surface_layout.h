@@ -21,6 +21,12 @@ namespace Interception
                                            const uint32_t&                             in_height,
                                            uint32_t*                                   out_n_rows_ptr,
                                            uint32_t*                                   out_n_row_bytes_ptr);
+
+            /* Bytes of the pixels in rows of a surface, for a given format: the last row is not padded up to the pitch. */
+            uint32_t get_surface_region_n_bytes(const Interception::Hooks::D3D8::D3DFORMAT& in_format,
+                                                const uint32_t&                             in_width,
+                                                const uint32_t&                             in_height,
+                                                const uint32_t&                             in_pitch);
         }
     }
 }

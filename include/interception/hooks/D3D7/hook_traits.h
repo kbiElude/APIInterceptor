@@ -9,6 +9,7 @@
 
 #include "common/frame_boundary.h"
 #include "interception/hooks/D3D7/argument_capture.h"
+#include "interception/hooks/D3D7/surface_caps.h"
 #include "interception/hooks/D3D7/hook_policy.h"
 #include "interception/hooks/D3D7/object_patcher.h"
 
@@ -58,7 +59,7 @@ namespace Interception
                         in_function == APIInterceptor::APIFUNCTION_D3D7_IDIRECTDRAWSURFACE7_BLTFAST)
                     {
                         /* The first argument of a method is its object. */
-                        result = HookPolicyHelper::is_primary_surface(as_surface_ptr(in_first_argument) );
+                        result = SurfaceCaps::is_primary_surface(as_surface_ptr(in_first_argument) );
                     }
                     else
                     {

@@ -100,3 +100,27 @@ void Interception::Core::D3D8Utils::get_surface_region_layout(const Interception
     *out_n_rows_ptr      = n_rows;
     *out_n_row_bytes_ptr = n_row_bytes;
 }
+
+uint32_t Interception::Core::D3D8Utils::get_surface_region_n_bytes(const Interception::Hooks::D3D8::D3DFORMAT& in_format,
+                                                                   const uint32_t&                             in_width,
+                                                                   const uint32_t&                             in_height,
+                                                                   const uint32_t&                             in_pitch)
+{
+    uint32_t n_row_bytes = 0;
+    uint32_t n_rows      = 0;
+    uint32_t result      = 0;
+
+    get_surface_region_layout(in_format,
+                              in_width,
+                              in_height,
+                             &n_rows,
+                             &n_row_bytes);
+
+    /* The last row is not padded up to the pitch. */
+    if (n_rows != 0)
+    {
+        result = (n_rows - 1) * in_pitch + n_row_bytes;
+    }
+
+    return result;
+}

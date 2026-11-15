@@ -183,7 +183,7 @@ namespace Replay
                                  std::string*  out_error_ptr) const;
 
             /* The arrays of a strided draw, as the dump has them: the structure that says the distance between the vertices of each, and the chunk
-             * that holds the arrays (see HookPolicyHelper::create_strided_data_argument). Pointers into the chunk.
+             * that holds the arrays (see StridedDataCapture::create_argument). Pointers into the chunk.
              */
             bool get_strided_data(const size_t&                                           in_n_strided_argument,
                                   const size_t&                                           in_n_data_argument,
