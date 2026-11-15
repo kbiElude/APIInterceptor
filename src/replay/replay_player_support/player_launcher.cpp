@@ -51,7 +51,7 @@ bool Replay::ReplayPlayerSupport::PlayerLauncher::is_handover_needed(const char*
                 Capture::APIDumpLoader::Workload workload;
 
                 /* One pass for both APIs: a reader only goes forward, so what the first look has read is gone for the second. */
-                while (result == false                                &&
+                while (result                                   == false &&
                        reader_ptr->read_next_segment(&workload) )
                 {
                     for (const auto& call : *workload.dumped_api_call_vec_ptr)
