@@ -2,7 +2,7 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  *
- * Compresses what is written to a file into one Zstandard frame.
+ * Compresses what is written to a file into one Zstandard frame, with worker threads of the compressor if asked.
  */
 #if !defined(APIDUMPERDLL_ZSTD_FILE_WRITER_H)
 #define APIDUMPERDLL_ZSTD_FILE_WRITER_H
@@ -25,9 +25,13 @@ namespace Capture
         class ZstdFileWriter
         {
         public:
-            /* The file is appended to, and stays open. Returns nullptr if the compressor cannot be set up. */
+            /* The file is appended to, and stays open. in_n_workers is how many threads the compressor may add to the calling one (0: it
+             * compresses on the calling thread only; also what a compressor built without threads does). The frame is the same whatever it is.
+             * Returns nullptr if the compressor cannot be set up.
+             */
             static ZstdFileWriterUniquePtr create(FILE*      in_file_handle,
-                                                  const int& in_compression_level);
+                                                  const int& in_compression_level,
+                                                  const int& in_n_workers);
 
             ~ZstdFileWriter();
 

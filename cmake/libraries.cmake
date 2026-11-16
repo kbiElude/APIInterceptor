@@ -11,7 +11,8 @@ if (APIINTERCEPTOR_BUILD_LIBS)
 
     add_library(Zstd STATIC ${ZstdSources})
 
-    target_compile_definitions(Zstd PRIVATE ZSTD_DISABLE_ASM)
+    # ZSTD_MULTITHREAD: the dumper compresses a segment with several threads (ZSTD_c_nbWorkers), which a single one cannot keep up with.
+    target_compile_definitions(Zstd PRIVATE ZSTD_DISABLE_ASM ZSTD_MULTITHREAD)
     target_include_directories(Zstd PUBLIC  "$<BUILD_INTERFACE:${APIInterceptor_SOURCE_DIR}/deps/zstd/lib>"
                                            "$<INSTALL_INTERFACE:include>")
 

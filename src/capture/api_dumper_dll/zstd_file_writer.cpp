@@ -62,7 +62,8 @@ end:
 }
 
 Capture::APIDumperDLL::ZstdFileWriterUniquePtr Capture::APIDumperDLL::ZstdFileWriter::create(FILE*      in_file_handle,
-                                                                                             const int& in_compression_level)
+                                                                                             const int& in_compression_level,
+                                                                                             const int& in_n_workers)
 {
     ZstdFileWriterUniquePtr result_ptr(new ZstdFileWriter() );
 
@@ -83,6 +84,14 @@ Capture::APIDumperDLL::ZstdFileWriterUniquePtr Capture::APIDumperDLL::ZstdFileWr
     ::ZSTD_CCtx_setParameter(result_ptr->m_compressor_ptr,
                              ZSTD_c_compressionLevel,
                              in_compression_level);
+
+    /* A compressor built without threads refuses this, and then compresses on the calling thread: that is not an error. */
+    if (in_n_workers > 0)
+    {
+        ::ZSTD_CCtx_setParameter(result_ptr->m_compressor_ptr,
+                                 ZSTD_c_nbWorkers,
+                                 in_n_workers);
+    }
 
     result_ptr->m_output_u8_vec.resize(::ZSTD_CStreamOutSize() );
 

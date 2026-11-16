@@ -580,10 +580,15 @@ void APIDumper::wait_for_writer()
 
 void APIDumper::write_segment(SegmentJobUniquePtr in_job_ptr)
 {
-    /* Compression happens on the writer thread, which runs at a low priority; this level keeps up with the app. */
-    constexpr int    COMPRESSION_LEVEL       = 3;
-    constexpr size_t N_SEGMENT_COUNTS        = 3; /* API calls, data chunks, surfaces */
-    constexpr size_t N_SURFACE_HEADER_FIELDS = 3; /* width, height, n bytes           */
+    /* Compression happens on the writer thread, which runs at a low priority. One thread compresses about 160 MB/s at this level, while an app
+     * can make a segment (128 MB, the spill threshold) in under 100 ms and then waits for the writer (see submit_segment()). The compressor therefore
+     * adds worker threads: with 8 of them the same segment takes about a sixth of the time, and the file is the same size.
+     */
+    constexpr int    COMPRESSION_LEVEL         = 3;
+    constexpr int    MAX_N_COMPRESSION_WORKERS = 8;
+    constexpr int    N_CORES_LEFT_TO_THE_APP   = 2;
+    constexpr size_t N_SEGMENT_COUNTS          = 3; /* API calls, data chunks, surfaces */
+    constexpr size_t N_SURFACE_HEADER_FIELDS   = 3; /* width, height, n bytes           */
 
     FILE* const                                    file_handle = in_job_ptr->file_handle;
     Capture::APIDumperDLL::ZstdFileWriterUniquePtr writer_ptr;
@@ -596,8 +601,22 @@ void APIDumper::write_segment(SegmentJobUniquePtr in_job_ptr)
 
     if (file_handle != nullptr)
     {
+        const int n_cores   = static_cast<int>(std::thread::hardware_concurrency() );
+        int       n_workers = n_cores - N_CORES_LEFT_TO_THE_APP;
+
+        if (n_workers > MAX_N_COMPRESSION_WORKERS)
+        {
+            n_workers = MAX_N_COMPRESSION_WORKERS;
+        }
+
+        if (n_workers < 0)
+        {
+            n_workers = 0;
+        }
+
         writer_ptr = Capture::APIDumperDLL::ZstdFileWriter::create(file_handle,
-                                                                   COMPRESSION_LEVEL);
+                                                                   COMPRESSION_LEVEL,
+                                                                   n_workers);
     }
 
     if (writer_ptr != nullptr)
