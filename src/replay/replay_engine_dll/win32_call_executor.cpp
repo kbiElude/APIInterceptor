@@ -803,8 +803,15 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::on_release_dc(const Capture::AP
     ::ReleaseDC(reinterpret_cast<HWND>(live_hwnd),
                 reinterpret_cast<HDC>(live_hdc) );
 
-    m_remapper_ptr->remove(ObjectKind::HDC,
-                           in_call.arg_in_vec.at(1).get_ptr_as_u64() );
+    /* A window whose class owns its DC keeps it: the release does nothing, and a program may go on using the DC afterwards (OpenGL demos do,
+     * for SwapBuffers). Only the DC of another window is forgotten.
+     */
+    if ( (::GetClassLongW(reinterpret_cast<HWND>(live_hwnd),
+                          GCL_STYLE) & CS_OWNDC) == 0)
+    {
+        m_remapper_ptr->remove(ObjectKind::HDC,
+                               in_call.arg_in_vec.at(1).get_ptr_as_u64() );
+    }
 
 end:
     return result;
