@@ -2,71 +2,71 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  *
- * Tests for PixelConverter: the formats of a Direct3D 8 back buffer become 8-bit B, G, R and A.
+ * Tests for D3DFormatBgra8Converter: the formats of a Direct3D 8 back buffer become 8-bit B, G, R and A.
  */
 #include <gtest/gtest.h>
 #include "interception/hooks/D3D8/types.h"
 #include "replay/replay_engine_dll/d3d_format_bgra8_converter.h"
 #include <string.h>
 
-TEST(PixelConverter, A32BitFormatKeepsItsColorsAndIsOpaque)
+TEST(D3DFormatBgra8Converter, A32BitFormatKeepsItsColorsAndIsOpaque)
 {
     /* Two pixels of 2x1, B, G, R, A in memory; the alpha of an X8R8G8B8 pixel is not part of the image. */
     const uint8_t        pixel_array[] = {10, 20, 30, 0,   40, 50, 60, 7};
     std::vector<uint8_t> out_vec;
 
-    ASSERT_TRUE(Replay::ReplayEngineDLL::PixelConverter::convert_to_bgra8(Interception::Hooks::D3D8::D3DFMT_X8R8G8B8,
-                                                                            2,
-                                                                            1,
-                                                                            sizeof(pixel_array),
-                                                                            pixel_array,
-                                                                           &out_vec) );
+    ASSERT_TRUE(Replay::ReplayEngineDLL::D3DFormatBgra8Converter::convert_to_bgra8(Interception::Hooks::D3D8::D3DFMT_X8R8G8B8,
+                                                                                   2,
+                                                                                   1,
+                                                                                   sizeof(pixel_array),
+                                                                                   pixel_array,
+                                                                                  &out_vec) );
     EXPECT_EQ(out_vec,
               (std::vector<uint8_t>{10, 20, 30, 255,   40, 50, 60, 255}) );
 }
 
-TEST(PixelConverter, A16BitFormatIsExpandedToEightBitsPerChannel)
+TEST(D3DFormatBgra8Converter, A16BitFormatIsExpandedToEightBitsPerChannel)
 {
     /* R5G6B5: red 31, green 63, blue 31 is white; red 0, green 0, blue 31 is blue. */
     const uint16_t       pixel_array[] = {0xffff, 0x001f};
     std::vector<uint8_t> out_vec;
 
-    ASSERT_TRUE(Replay::ReplayEngineDLL::PixelConverter::convert_to_bgra8(Interception::Hooks::D3D8::D3DFMT_R5G6B5,
-                                                                            2,
-                                                                            1,
-                                                                            sizeof(pixel_array),
-                                                                            reinterpret_cast<const uint8_t*>(pixel_array),
-                                                                           &out_vec) );
+    ASSERT_TRUE(Replay::ReplayEngineDLL::D3DFormatBgra8Converter::convert_to_bgra8(Interception::Hooks::D3D8::D3DFMT_R5G6B5,
+                                                                                   2,
+                                                                                   1,
+                                                                                   sizeof(pixel_array),
+                                                                                   reinterpret_cast<const uint8_t*>(pixel_array),
+                                                                                  &out_vec) );
     EXPECT_EQ(out_vec,
               (std::vector<uint8_t>{255, 255, 255, 255,   255, 0, 0, 255}) );
 }
 
-TEST(PixelConverter, TheFourBitAndFiveBitFormatsAreExpandedToo)
+TEST(D3DFormatBgra8Converter, TheFourBitAndFiveBitFormatsAreExpandedToo)
 {
     const uint16_t       argb4444[] = {0xf0f0};         /* A 15, R 0, G 15, B 0 */
     const uint16_t       xrgb1555[] = {0x7c00};         /* R 31 */
     std::vector<uint8_t> out_vec;
 
-    ASSERT_TRUE(Replay::ReplayEngineDLL::PixelConverter::convert_to_bgra8(Interception::Hooks::D3D8::D3DFMT_A4R4G4B4,
-                                                                            1,
-                                                                            1,
-                                                                            sizeof(argb4444),
-                                                                            reinterpret_cast<const uint8_t*>(argb4444),
-                                                                           &out_vec) );
+    ASSERT_TRUE(Replay::ReplayEngineDLL::D3DFormatBgra8Converter::convert_to_bgra8(Interception::Hooks::D3D8::D3DFMT_A4R4G4B4,
+                                                                                   1,
+                                                                                   1,
+                                                                                   sizeof(argb4444),
+                                                                                   reinterpret_cast<const uint8_t*>(argb4444),
+                                                                                  &out_vec) );
     EXPECT_EQ(out_vec,
               (std::vector<uint8_t>{0, 255, 0, 255}) );
 
-    ASSERT_TRUE(Replay::ReplayEngineDLL::PixelConverter::convert_to_bgra8(Interception::Hooks::D3D8::D3DFMT_X1R5G5B5,
-                                                                            1,
-                                                                            1,
-                                                                            sizeof(xrgb1555),
-                                                                            reinterpret_cast<const uint8_t*>(xrgb1555),
-                                                                           &out_vec) );
+    ASSERT_TRUE(Replay::ReplayEngineDLL::D3DFormatBgra8Converter::convert_to_bgra8(Interception::Hooks::D3D8::D3DFMT_X1R5G5B5,
+                                                                                   1,
+                                                                                   1,
+                                                                                   sizeof(xrgb1555),
+                                                                                   reinterpret_cast<const uint8_t*>(xrgb1555),
+                                                                                  &out_vec) );
     EXPECT_EQ(out_vec,
               (std::vector<uint8_t>{0, 0, 255, 255}) );
 }
 
-TEST(PixelConverter, RowsAreReadWhereThePitchSaysAndWrittenWithoutPadding)
+TEST(D3DFormatBgra8Converter, RowsAreReadWhereThePitchSaysAndWrittenWithoutPadding)
 {
     /* 1x2 pixels, 8 bytes between the starts of the rows. */
     uint8_t              pixel_array[16] = {};
@@ -79,27 +79,27 @@ TEST(PixelConverter, RowsAreReadWhereThePitchSaysAndWrittenWithoutPadding)
     pixel_array[9] = 5;
     pixel_array[10] = 6;
 
-    ASSERT_TRUE(Replay::ReplayEngineDLL::PixelConverter::convert_to_bgra8(Interception::Hooks::D3D8::D3DFMT_A8R8G8B8,
-                                                                            1,
-                                                                            2,
-                                                                            8,
-                                                                            pixel_array,
-                                                                           &out_vec) );
+    ASSERT_TRUE(Replay::ReplayEngineDLL::D3DFormatBgra8Converter::convert_to_bgra8(Interception::Hooks::D3D8::D3DFMT_A8R8G8B8,
+                                                                                   1,
+                                                                                   2,
+                                                                                   8,
+                                                                                   pixel_array,
+                                                                                  &out_vec) );
     EXPECT_EQ(out_vec,
               (std::vector<uint8_t>{1, 2, 3, 255,   4, 5, 6, 255}) );
 }
 
-TEST(PixelConverter, AFormatThatIsNotConvertedGivesNothing)
+TEST(D3DFormatBgra8Converter, AFormatThatIsNotConvertedGivesNothing)
 {
     const uint8_t        pixel_array[4] = {};
     std::vector<uint8_t> out_vec       = {1, 2, 3};
 
-    EXPECT_FALSE(Replay::ReplayEngineDLL::PixelConverter::convert_to_bgra8(Interception::Hooks::D3D8::D3DFMT_UNKNOWN,
-                                                                             1,
-                                                                             1,
-                                                                             4,
-                                                                             pixel_array,
-                                                                            &out_vec) );
+    EXPECT_FALSE(Replay::ReplayEngineDLL::D3DFormatBgra8Converter::convert_to_bgra8(Interception::Hooks::D3D8::D3DFMT_UNKNOWN,
+                                                                                    1,
+                                                                                    1,
+                                                                                    4,
+                                                                                    pixel_array,
+                                                                                   &out_vec) );
     EXPECT_TRUE (out_vec.empty() );
 }
 
@@ -113,7 +113,7 @@ static uint8_t scale_channel(const uint32_t& in_value,
     return static_cast<uint8_t>(((in_value >> in_shift) & max_value) * 255 / max_value);
 }
 
-TEST(PixelConverter, EveryValueOfEvery16BitFormatIsConvertedAsTheFormatSays)
+TEST(D3DFormatBgra8Converter, EveryValueOfEvery16BitFormatIsConvertedAsTheFormatSays)
 {
     struct Format16
     {
@@ -148,12 +148,12 @@ TEST(PixelConverter, EveryValueOfEvery16BitFormatIsConvertedAsTheFormatSays)
     {
         std::vector<uint8_t> out_vec;
 
-        ASSERT_TRUE(Replay::ReplayEngineDLL::PixelConverter::convert_to_bgra8(format.format,
-                                                                                N_VALUES,
-                                                                                1,
-                                                                                N_VALUES * sizeof(uint16_t),
-                                                                                reinterpret_cast<const uint8_t*>(value_vec.data() ),
-                                                                               &out_vec) );
+        ASSERT_TRUE(Replay::ReplayEngineDLL::D3DFormatBgra8Converter::convert_to_bgra8(format.format,
+                                                                                       N_VALUES,
+                                                                                       1,
+                                                                                       N_VALUES * sizeof(uint16_t),
+                                                                                       reinterpret_cast<const uint8_t*>(value_vec.data() ),
+                                                                                      &out_vec) );
         ASSERT_EQ(out_vec.size(),
                   static_cast<size_t>(N_VALUES) * 4);
 
@@ -175,7 +175,7 @@ TEST(PixelConverter, EveryValueOfEvery16BitFormatIsConvertedAsTheFormatSays)
     }
 }
 
-TEST(PixelConverter, RowsWithPaddingAreReadByTheirPitchAndTheOutputHasNone)
+TEST(D3DFormatBgra8Converter, RowsWithPaddingAreReadByTheirPitchAndTheOutputHasNone)
 {
     constexpr uint32_t HEIGHT = 3;
     constexpr uint32_t PITCH  = 20; /* two pixels of 4 bytes, and 12 bytes of padding */
@@ -202,12 +202,12 @@ TEST(PixelConverter, RowsWithPaddingAreReadByTheirPitchAndTheOutputHasNone)
         }
     }
 
-    ASSERT_TRUE(Replay::ReplayEngineDLL::PixelConverter::convert_to_bgra8(Interception::Hooks::D3D8::D3DFMT_X8R8G8B8,
-                                                                            WIDTH,
-                                                                            HEIGHT,
-                                                                            PITCH,
-                                                                            in_vec.data(),
-                                                                           &out_vec) );
+    ASSERT_TRUE(Replay::ReplayEngineDLL::D3DFormatBgra8Converter::convert_to_bgra8(Interception::Hooks::D3D8::D3DFMT_X8R8G8B8,
+                                                                                   WIDTH,
+                                                                                   HEIGHT,
+                                                                                   PITCH,
+                                                                                   in_vec.data(),
+                                                                                  &out_vec) );
     ASSERT_EQ(out_vec.size(),
               static_cast<size_t>(WIDTH * HEIGHT * 4) );
 
@@ -233,17 +233,17 @@ TEST(PixelConverter, RowsWithPaddingAreReadByTheirPitchAndTheOutputHasNone)
     }
 }
 
-TEST(PixelConverter, AFormatWhichIsNotConvertedLeavesTheOutputEmptyEvenIfItHeldAnImage)
+TEST(D3DFormatBgra8Converter, AFormatWhichIsNotConvertedLeavesTheOutputEmptyEvenIfItHeldAnImage)
 {
     const uint8_t        pixel_array[4] = {};
     std::vector<uint8_t> out_vec(100,
                                  1);
 
-    EXPECT_FALSE(Replay::ReplayEngineDLL::PixelConverter::convert_to_bgra8(Interception::Hooks::D3D8::D3DFMT_D24S8,
-                                                                             1,
-                                                                             1,
-                                                                             sizeof(pixel_array),
-                                                                             pixel_array,
-                                                                            &out_vec) );
+    EXPECT_FALSE(Replay::ReplayEngineDLL::D3DFormatBgra8Converter::convert_to_bgra8(Interception::Hooks::D3D8::D3DFMT_D24S8,
+                                                                                    1,
+                                                                                    1,
+                                                                                    sizeof(pixel_array),
+                                                                                    pixel_array,
+                                                                                   &out_vec) );
     EXPECT_TRUE(out_vec.empty() );
 }
