@@ -14,6 +14,7 @@ int main(int   in_argc,
     uint32_t    dump_swapchain_on_present = 0;
     uint32_t    n_file_path_cmd_line_arg  = 1;
     uint32_t    n_frames_to_dump          = UINT32_MAX;
+    uint32_t    n_max_frames_per_second   = 0; /* 0: the app is not held */
     uint32_t    n_spill_threshold_mb      = 128;
     int         result                    = EXIT_FAILURE;
     std::string working_dir;
@@ -45,6 +46,27 @@ int main(int   in_argc,
             {
                 fprintf(stderr,
                         "[!] User requested zero frames to dump - exiting.\n");
+
+                goto end;
+            }
+
+            n_file_path_cmd_line_arg += 2;
+        }
+        else
+        if (std::string(in_argv[n_file_path_cmd_line_arg]) == "--max-frame-rate")
+        {
+            constexpr uint32_t MAX_FRAME_RATE = 1000;
+
+            if (static_cast<uint32_t>(in_argc) <= (n_file_path_cmd_line_arg + 1) ||
+                sscanf(in_argv[n_file_path_cmd_line_arg + 1],
+                       "%u",
+                       &n_max_frames_per_second) != 1                            ||
+                n_max_frames_per_second == 0                                     ||
+                n_max_frames_per_second >  MAX_FRAME_RATE)
+            {
+                fprintf(stderr,
+                        "[!] --max-frame-rate argument must be followed by a number of frames a second, from 1 to %u.\n",
+                        MAX_FRAME_RATE);
 
                 goto end;
             }
@@ -99,7 +121,7 @@ int main(int   in_argc,
         fprintf(stderr,
                 "To dump API calls used by an app, launch it with the following cmd line args:\n"
                 "\n"
-                "APIDumper.exe (--dump-n-frames VALUE) (--dump-swapchain-on-present) (--spill-threshold-mb VALUE) c:\\path\\to\\file\\file.exe (app args)\n"
+                "APIDumper.exe (--dump-n-frames VALUE) (--dump-swapchain-on-present) (--max-frame-rate VALUE) (--spill-threshold-mb VALUE) c:\\path\\to\\file\\file.exe (app args)\n"
                 "\n"
                 "The --dump-n-frames VALUE is optional; if specified, VALUE should be an uint\n"
                 "telling the number of presented frames to include in the dump. By default,\n"
@@ -109,6 +131,10 @@ int main(int   in_argc,
                 "The --dump-swapchain-on-present is optional; if specified, the color buffer (OpenGL, D3D7, D3D8) is taken\n"
                 "right before present and stored in the dump as RGBA8, bottom row first. Use --dump-n-frames to\n"
                 "limit the number of frames to be dumped.\n"
+                "\n"
+                "The --max-frame-rate VALUE is optional; if specified, the app is held to at most that many frames a second (1 to 1000) while it is dumped.\n"
+                "An app that has no limit of its own makes thousands of frames a second, which makes the dump enormous and of no more use than a dump of\n"
+                "a few dozen a second. By default the app is not held.\n"
                 "\n"
                 "The --spill-threshold-mb VALUE is optional (128 by default). Once that many megabytes of dump data\n"
                 "are waiting in memory, they are written to the dump file at the next frame boundary and freed, so that\n"
@@ -239,20 +265,24 @@ int main(int   in_argc,
         auto              settings_file_handle = ::fopen(settings_filename.c_str(),
                                                          "w+");
 
-        uint8_t settings_data_u8vec12[12] = {};
+        uint8_t settings_data_u8vec16[16] = {};
 
         static_assert(sizeof(n_frames_to_dump)          == sizeof(uint32_t), "Size mismatch");
+        static_assert(sizeof(n_max_frames_per_second)   == sizeof(uint32_t), "Size mismatch");
         static_assert(sizeof(dump_swapchain_on_present) == sizeof(uint32_t), "Size mismatch");
         static_assert(sizeof(n_spill_threshold_mb)      == sizeof(uint32_t), "Size mismatch");
 
-        memcpy(settings_data_u8vec12,
+        memcpy(settings_data_u8vec16,
               &n_frames_to_dump,
                sizeof(uint32_t) );
-        memcpy(settings_data_u8vec12 + sizeof(uint32_t),
+        memcpy(settings_data_u8vec16 + sizeof(uint32_t),
               &dump_swapchain_on_present,
                sizeof(uint32_t) );
-        memcpy(settings_data_u8vec12 + sizeof(uint32_t) * 2,
+        memcpy(settings_data_u8vec16 + sizeof(uint32_t) * 2,
               &n_spill_threshold_mb,
+               sizeof(uint32_t) );
+        memcpy(settings_data_u8vec16 + sizeof(uint32_t) * 3,
+              &n_max_frames_per_second,
                sizeof(uint32_t) );
 
         if (settings_file_handle == nullptr)
@@ -264,8 +294,8 @@ int main(int   in_argc,
             goto end;
         }
 
-        if (::fwrite(settings_data_u8vec12,
-                     sizeof(settings_data_u8vec12),
+        if (::fwrite(settings_data_u8vec16,
+                     sizeof(settings_data_u8vec16),
                      1,
                      settings_file_handle) != 1)
         {

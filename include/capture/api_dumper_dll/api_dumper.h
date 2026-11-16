@@ -6,6 +6,7 @@
 #if !defined(APIDUMPER_H)
 #define APIDUMPER_H
 
+#include "frame_rate_limiter.h"
 #include <array>
 #include <atomic>
 #include <deque>
@@ -96,6 +97,7 @@ private:
     struct Settings
     {
         bool     dump_swapchain_on_present = false;
+        uint32_t max_frames_per_second     = 0;          /* 0: the app is not held; see APIDumper --max-frame-rate */
         uint64_t n_bytes_before_spill      = 0;          /* spill threshold; see APIDumper --spill-threshold-mb */
         uint32_t n_frames_to_dump          = UINT32_MAX;
     };
@@ -163,7 +165,8 @@ private:
     static void write_segment     (SegmentJobUniquePtr                        in_job_ptr);
 
     /* Private vars */
-    CutState          m_cut;
+    CutState                                    m_cut;
+    Capture::APIDumperDLL::FrameRateLimiterUniquePtr m_frame_rate_limiter_ptr; /* null: the app is not held */
     std::atomic<bool> m_is_dump_complete = {false}; /* the last segment was handed over; read without the mutex by drain_data_chunks() */
     RecordedState     m_recorded;
     Settings          m_settings;

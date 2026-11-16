@@ -3,6 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include <Windows.h>
+#include <mmsystem.h>
 #include "common/callbacks.h"
 #include "common/data_chunk_store.h"
 #include "common/frame_boundary.h"
@@ -43,6 +44,11 @@ APIDumper::~APIDumper()
     /* The hooks can still run during shutdown, and must not call into a dumper that is gone. */
     APIInterceptor::set_data_chunk_drain(0, /* in_capacity_n_bytes: no bound */
                                          nullptr);
+
+    if (m_frame_rate_limiter_ptr != nullptr)
+    {
+        ::timeEndPeriod(1);
+    }
 }
 
 APIDumperUniquePtr APIDumper::create()
@@ -120,7 +126,8 @@ bool APIDumper::init()
     {
         constexpr uint64_t N_BYTES_PER_MB = 1024 * 1024;
 
-        uint8_t settings_data_raw_u8vec12[12] = {};
+        uint8_t settings_data_raw_u8vec16[16] = {};
+        size_t  n_settings_bytes_read         = 0;
         FILE*   settings_file_handle          = ::fopen("apidumper_settings.bin",
                                                         "rb");
 
@@ -131,21 +138,62 @@ bool APIDumper::init()
             goto end;
         }
 
-        if (::fread(settings_data_raw_u8vec12,
-                     sizeof(settings_data_raw_u8vec12),
-                     1,
-                     settings_file_handle) != 1)
+        n_settings_bytes_read = ::fread(settings_data_raw_u8vec16,
+                                        1,
+                                        sizeof(settings_data_raw_u8vec16),
+                                        settings_file_handle);
+
+        /* The three fields that the dumper wrote before there was a frame rate are all that is needed. */
+        if (n_settings_bytes_read < sizeof(uint32_t) * 3)
         {
             assert(false);
 
             goto end;
         }
 
-        m_settings.n_frames_to_dump          = *reinterpret_cast<const uint32_t*>(settings_data_raw_u8vec12 + 0 * sizeof(uint32_t) );
-        m_settings.dump_swapchain_on_present = *reinterpret_cast<const uint32_t*>(settings_data_raw_u8vec12 + 1 * sizeof(uint32_t) ) != 0;
-        m_settings.n_bytes_before_spill      = static_cast<uint64_t>(*reinterpret_cast<const uint32_t*>(settings_data_raw_u8vec12 + 2 * sizeof(uint32_t) ) ) * N_BYTES_PER_MB;
+        m_settings.n_frames_to_dump          = *reinterpret_cast<const uint32_t*>(settings_data_raw_u8vec16 + 0 * sizeof(uint32_t) );
+        m_settings.dump_swapchain_on_present = *reinterpret_cast<const uint32_t*>(settings_data_raw_u8vec16 + 1 * sizeof(uint32_t) ) != 0;
+        m_settings.n_bytes_before_spill      = static_cast<uint64_t>(*reinterpret_cast<const uint32_t*>(settings_data_raw_u8vec16 + 2 * sizeof(uint32_t) ) ) * N_BYTES_PER_MB;
+
+        /* A file of the three fields that the dumper wrote before this one has no frame rate: the app is not held. */
+        if (n_settings_bytes_read >= sizeof(uint32_t) * 4)
+        {
+            m_settings.max_frames_per_second = *reinterpret_cast<const uint32_t*>(settings_data_raw_u8vec16 + 3 * sizeof(uint32_t) );
+        }
 
         ::fclose(settings_file_handle);
+    }
+
+    /* An app that has no limit of its own is held to the rate it was asked for while it is dumped. */
+    if (m_settings.max_frames_per_second != 0)
+    {
+        LARGE_INTEGER frequency = {};
+
+        ::QueryPerformanceFrequency(&frequency);
+
+        const auto now_func = []()
+        {
+            LARGE_INTEGER now = {};
+
+            ::QueryPerformanceCounter(&now);
+
+            return static_cast<int64_t>(now.QuadPart);
+        };
+
+        const auto sleep_func = [frequency](const int64_t& in_n_ticks)
+        {
+            constexpr int64_t N_MILLISECONDS_PER_SECOND = 1000;
+
+            ::Sleep(static_cast<DWORD>(in_n_ticks * N_MILLISECONDS_PER_SECOND / frequency.QuadPart) );
+        };
+
+        /* A sleep of a few milliseconds would otherwise last a whole tick of the system timer, which is longer than a frame at a high rate. */
+        ::timeBeginPeriod(1);
+
+        m_frame_rate_limiter_ptr.reset(new Capture::APIDumperDLL::FrameRateLimiter(m_settings.max_frames_per_second,
+                                                                                    frequency.QuadPart,
+                                                                                    now_func,
+                                                                                    sleep_func) );
     }
 
     /* The hooks make data chunks whether or not a callback takes them, so the store has to be kept from filling the address space of the program. */
@@ -317,6 +365,12 @@ void APIDumper::on_post_callback(APIInterceptor::APIFunction                in_a
     if (is_frame_presented)
     {
         this_ptr->on_frame_presented();
+
+        /* After the cut, so that the time of a spill counts as part of the frame: a frame that was late is not held. */
+        if (this_ptr->m_frame_rate_limiter_ptr != nullptr)
+        {
+            this_ptr->m_frame_rate_limiter_ptr->hold();
+        }
     }
 }
 

@@ -24,6 +24,7 @@ if (APIINTERCEPTOR_BUILD_TESTS)
 
     # Sources under test which are not part of a library.
     add_executable(APIInterceptorTests ${APIInterceptorTestsSources}
+                                       "${APIInterceptor_SOURCE_DIR}/src/capture/api_dumper_dll/frame_rate_limiter.cpp"
                                        "${APIInterceptor_SOURCE_DIR}/src/capture/api_dumper_dll/zstd_file_writer.cpp"
                                        "${APIInterceptor_SOURCE_DIR}/src/common/api_call_gate.cpp"
                                        "${APIInterceptor_SOURCE_DIR}/src/common/callback_registry.cpp"
