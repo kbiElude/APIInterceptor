@@ -33,6 +33,7 @@ rem extra source-directory argument.
 if "%SCRIPT_DIR:~-1%"=="\" set SCRIPT_DIR=%SCRIPT_DIR:~0,-1%
 
 set SOURCE_DIR=%SCRIPT_DIR%
+rem Visual Studio 18 2026 needs CMake 4.2 or newer (the CMakeLists.txt files ask only for the 3.10 policies).
 set CMAKE_GENERATOR=Visual Studio 18 2026
 set BUILD_CONFIG=Release
 set MODE=incremental
@@ -182,14 +183,13 @@ rem  SUBROUTINES
 rem ============================================================
 
 rem --- :configure_x86 ------------------------------------------
-rem  Runs CMake configure for the x86 build tree.
-rem  Tests are disabled: the test runner is x64-only.
+rem  Runs CMake configure for the x86 build tree. Tests are built only if
+rem  APIINTERCEPTOR_BUILD_TESTS is on, as in the x64 tree.
 
 :configure_x86
-cmake -B "%BUILD_X86_DIR%"           ^
-      -G "%CMAKE_GENERATOR%"         ^
-      -A Win32                       ^
-      -DAPIINTERCEPTOR_BUILD_TESTS=OFF ^
+cmake -B "%BUILD_X86_DIR%" ^
+      -G "%CMAKE_GENERATOR%" ^
+      -A Win32               ^
       "%SOURCE_DIR%"
 exit /b %errorlevel%
 
