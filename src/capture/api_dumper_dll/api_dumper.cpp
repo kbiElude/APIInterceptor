@@ -4,6 +4,7 @@
  */
 #include <Windows.h>
 #include "common/callbacks.h"
+#include "common/data_chunk_store.h"
 #include "common/frame_boundary.h"
 #include "common/macros.h"
 #include "common/workload_format.h"
@@ -21,6 +22,14 @@
 /* Used by the constructor. */
 static constexpr uint64_t DEFAULT_N_BYTES_BEFORE_SPILL = 128ull * 1024 * 1024;
 
+/* The store of the data chunks may hold this many times what makes the dumper spill: a spill is made at the end of a frame, so a frame can add to what
+ * is held before it, and the chunks are only part of what is unwritten. The address space of a 32-bit program is all there is.
+ */
+static constexpr uint64_t CHUNK_STORE_N_SPILL_THRESHOLDS = 4;
+
+/* Once the dump is complete nothing reads the chunks, and the program has its address space to itself: the store may hold this much. */
+static constexpr uint64_t CHUNK_STORE_N_BYTES_AFTER_DUMP = 16ull * 1024 * 1024;
+
 APIDumper::APIDumper()
 {
     m_settings.n_bytes_before_spill = DEFAULT_N_BYTES_BEFORE_SPILL;
@@ -30,6 +39,10 @@ APIDumper::~APIDumper()
 {
     write_workload ();
     wait_for_writer();
+
+    /* The hooks can still run during shutdown, and must not call into a dumper that is gone. */
+    APIInterceptor::set_data_chunk_drain(0, /* in_capacity_n_bytes: no bound */
+                                         nullptr);
 }
 
 APIDumperUniquePtr APIDumper::create()
@@ -68,6 +81,14 @@ void APIDumper::cut_segment(const bool& in_is_last)
     }
 }
 
+void APIDumper::drain_data_chunks()
+{
+    if (m_is_dump_complete.load() )
+    {
+        APIInterceptor::release_all_data_chunks();
+    }
+}
+
 uint64_t APIDumper::get_n_unwritten_bytes()
 {
     const uint32_t n_data_chunks = APIInterceptor::get_n_data_chunks();
@@ -84,7 +105,7 @@ uint64_t APIDumper::get_n_unwritten_bytes()
                                           &data_chunk_ptr,
                                           &data_chunk_size) )
         {
-            m_recorded.n_chunk_bytes_counted += data_chunk_size;
+            m_recorded.n_chunk_bytes_counted += data_chunk_size + APIInterceptor::DataChunkStore::get_chunk_overhead_n_bytes();
         }
     }
 
@@ -125,6 +146,17 @@ bool APIDumper::init()
         m_settings.n_bytes_before_spill      = static_cast<uint64_t>(*reinterpret_cast<const uint32_t*>(settings_data_raw_u8vec12 + 2 * sizeof(uint32_t) ) ) * N_BYTES_PER_MB;
 
         ::fclose(settings_file_handle);
+    }
+
+    /* The hooks make data chunks whether or not a callback takes them, so the store has to be kept from filling the address space of the program. */
+    {
+        const auto drain_func = [this]()
+        {
+            drain_data_chunks();
+        };
+
+        APIInterceptor::set_data_chunk_drain(CHUNK_STORE_N_SPILL_THRESHOLDS * m_settings.n_bytes_before_spill,
+                                             drain_func);
     }
 
     /* Register for callbacks */
@@ -750,8 +782,25 @@ void APIDumper::write_workload()
         /* The writer closes the file once it is done with the last segment. */
         submit_segment(true); /* in_is_last */
 
-        /* Nothing more will be recorded. Without callbacks, the interceptors skip capturing the arguments, too, so the
-         * app keeps running without piling up data which would be thrown away.
+        /* From now on nothing takes data chunks: the hooks go on making them, and drain_data_chunks() releases them when the store is full. What is
+         * held now is of no use to anyone, and the bound is made small so that the program gets its address space back.
+         */
+        m_is_dump_complete = true;
+
+        APIInterceptor::release_all_data_chunks();
+
+        {
+            const auto drain_func = [this]()
+            {
+                drain_data_chunks();
+            };
+
+            APIInterceptor::set_data_chunk_drain(CHUNK_STORE_N_BYTES_AFTER_DUMP,
+                                                 drain_func);
+        }
+
+        /* Nothing more will be recorded. Without callbacks, the interceptors do not build the arguments of the calls, but they still make the data
+         * chunks (see above).
          */
         for (uint32_t n_api_func = 0;
                       n_api_func < APIInterceptor::APIFUNCTION_COUNT;

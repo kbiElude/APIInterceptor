@@ -8,6 +8,7 @@
 #include <gtest/gtest.h>
 #include "common/chunk_pool.h"
 #include "common/data_chunk_store.h"
+#include <atomic>
 #include <thread>
 #include <vector>
 
@@ -315,4 +316,230 @@ TEST(DataChunkStore, ThreadsThatRegisterAndTakeChunksEachGetTheirOwnBytes)
               0u);
     EXPECT_EQ(store.get_n_chunks(),
               N_THREADS * N_TURNS_PER_THREAD);
+}
+
+TEST(DataChunkStore, AChunkThatWouldOverfillTheStoreRunsTheDrainFirstAndWhatItFreesMakesRoom)
+{
+    constexpr uint64_t CAPACITY_N_BYTES = 1000;
+    constexpr uint32_t CHUNK_N_BYTES    = 600;
+
+    APIInterceptor::DataChunkStore store;
+    uint32_t                       n_drains = 0;
+    const auto                     bytes    = make_bytes(1,
+                                                         CHUNK_N_BYTES);
+
+    const auto drain_func = [&]()
+    {
+        n_drains++;
+
+        store.release_all();
+    };
+
+    store.set_drain(CAPACITY_N_BYTES,
+                    drain_func);
+
+    for (uint32_t n_chunk = 0;
+                  n_chunk < 5;
+                ++n_chunk)
+    {
+        store.register_chunk(bytes.data(),
+                             CHUNK_N_BYTES);
+
+        EXPECT_LE(store.get_n_held_bytes(),
+                  CAPACITY_N_BYTES);
+    }
+
+    /* The first chunk fits; each of the next four finds the store full. */
+    EXPECT_EQ(n_drains,
+              4u);
+    EXPECT_EQ(store.get_n_held_chunks(),
+              1u);
+    EXPECT_EQ(store.get_n_held_bytes(),
+              CHUNK_N_BYTES + APIInterceptor::DataChunkStore::get_chunk_overhead_n_bytes() );
+    EXPECT_EQ(store.get_n_chunks(),
+              5u);
+}
+
+TEST(DataChunkStore, TheDrainDoesNotRunWhileTheChunksFit)
+{
+    APIInterceptor::DataChunkStore store;
+    uint32_t                       n_drains = 0;
+    const auto                     bytes    = make_bytes(1,
+                                                         100);
+
+    const auto drain_func = [&]()
+    {
+        n_drains++;
+    };
+
+    store.set_drain(10 * (100 + APIInterceptor::DataChunkStore::get_chunk_overhead_n_bytes() ),
+                    drain_func);
+
+    for (uint32_t n_chunk = 0;
+                  n_chunk < 10;
+                ++n_chunk)
+    {
+        store.register_chunk(bytes.data(),
+                             100);
+    }
+
+    EXPECT_EQ(n_drains,
+              0u);
+    EXPECT_EQ(store.get_n_held_bytes(),
+              10 * (100 + APIInterceptor::DataChunkStore::get_chunk_overhead_n_bytes() ) );
+}
+
+TEST(DataChunkStore, AChunkLargerThanTheWholeStoreIsTakenWhenNothingElseIsHeld)
+{
+    APIInterceptor::DataChunkStore store;
+    bool                           is_there = false;
+    const auto                     bytes    = make_bytes(2,
+                                                         5000);
+
+    store.set_drain(1000,
+                    [&store]() { store.release_all(); });
+
+    const auto id = store.register_chunk(bytes.data(),
+                                         5000);
+
+    EXPECT_EQ(read_chunk(&store,
+                         id,
+                        &is_there),
+              bytes);
+    EXPECT_TRUE(is_there);
+    EXPECT_EQ(store.get_n_held_bytes(),
+              5000 + APIInterceptor::DataChunkStore::get_chunk_overhead_n_bytes() );
+}
+
+TEST(DataChunkStore, TheBytesHeldFollowEveryWayAChunkLeavesTheStore)
+{
+    APIInterceptor::DataChunkStore store;
+    const auto                     small_bytes = make_bytes(1,
+                                                            10);
+    const auto                     large_bytes = make_bytes(2,
+                                                            APIInterceptor::ChunkPool::get_small_chunk_max_n_bytes() + 100);
+    const uint32_t                 small_n     = static_cast<uint32_t>(small_bytes.size() );
+    const uint32_t                 large_n     = static_cast<uint32_t>(large_bytes.size() );
+
+    const auto add_five_func = [&]()
+    {
+        std::vector<APIInterceptor::DataChunkID> id_vec;
+
+        for (uint32_t n_chunk = 0;
+                      n_chunk < 5;
+                    ++n_chunk)
+        {
+            id_vec.push_back(store.register_chunk( (n_chunk % 2 == 0) ? small_bytes.data() : large_bytes.data(),
+                                                   (n_chunk % 2 == 0) ? small_n            : large_n) );
+        }
+
+        return id_vec;
+    };
+
+    const uint64_t overhead     = APIInterceptor::DataChunkStore::get_chunk_overhead_n_bytes();
+    const uint64_t five_n_bytes = 3ull * (small_n + overhead) + 2ull * (large_n + overhead);
+
+    auto id_vec = add_five_func();
+
+    EXPECT_EQ(store.get_n_held_bytes(),
+              five_n_bytes);
+
+    store.release(id_vec.at(0) );
+
+    EXPECT_EQ(store.get_n_held_bytes(),
+              five_n_bytes - (small_n + overhead) );
+
+    std::vector<uint8_t> taken_u8_vec;
+
+    ASSERT_TRUE(store.take(id_vec.at(1),
+                          &taken_u8_vec) );
+
+    EXPECT_EQ(store.get_n_held_bytes(),
+              five_n_bytes - (small_n + overhead) - (large_n + overhead) );
+
+    std::vector<std::vector<uint8_t> > range_vec;
+
+    store.take_range(id_vec.at(2),
+                     1,
+                    &range_vec);
+
+    EXPECT_EQ(store.get_n_held_bytes(),
+              five_n_bytes - 2ull * (small_n + overhead) - (large_n + overhead) );
+
+    std::vector<uint8_t>               taken_flag_u8_vec;
+    std::vector<uint8_t>               destination_u8_vec;
+    std::vector<std::vector<uint8_t>*> destination_ptr_vec = {&destination_u8_vec};
+
+    store.take_chunks({id_vec.at(3)},
+                      destination_ptr_vec,
+                     &taken_flag_u8_vec);
+
+    EXPECT_EQ(store.get_n_held_bytes(),
+              static_cast<uint64_t>(small_n) + overhead);
+
+    store.release_all();
+
+    EXPECT_EQ(store.get_n_held_bytes(),
+              0u);
+    EXPECT_EQ(store.get_n_held_chunks(),
+              0u);
+}
+
+TEST(DataChunkStore, ThreadsThatRegisterChunksTogetherNeverTakeTheStoreOverItsCapacity)
+{
+    constexpr uint64_t CAPACITY_N_BYTES = 64 * 1024;
+    constexpr uint32_t CHUNK_N_BYTES    = 1024;
+    constexpr uint32_t N_CHUNKS         = 3000;
+    constexpr uint32_t N_THREADS        = 4;
+
+    APIInterceptor::DataChunkStore store;
+    std::atomic<uint64_t>          peak_n_bytes(0);
+    const auto                     bytes = make_bytes(1,
+                                                      CHUNK_N_BYTES);
+
+    store.set_drain(CAPACITY_N_BYTES,
+                    [&store]() { store.release_all(); });
+
+    const auto register_func = [&]()
+    {
+        for (uint32_t n_chunk = 0;
+                      n_chunk < N_CHUNKS;
+                    ++n_chunk)
+        {
+            store.register_chunk(bytes.data(),
+                                 CHUNK_N_BYTES);
+
+            const uint64_t n_held = store.get_n_held_bytes();
+            uint64_t       peak   = peak_n_bytes.load();
+
+            while (n_held > peak &&
+                   peak_n_bytes.compare_exchange_weak(peak,
+                                                      n_held) == false)
+            {
+            }
+        }
+    };
+
+    std::vector<std::thread> thread_vec;
+
+    for (uint32_t n_thread = 0;
+                  n_thread < N_THREADS;
+                ++n_thread)
+    {
+        thread_vec.emplace_back(register_func);
+    }
+
+    for (auto& thread : thread_vec)
+    {
+        thread.join();
+    }
+
+    EXPECT_EQ(store.get_n_chunks(),
+              N_THREADS * N_CHUNKS);
+    EXPECT_LE(store.get_n_held_bytes(),
+              CAPACITY_N_BYTES);
+
+    /* A thread may add a chunk between another thread's check and its own, so the store can pass the capacity by a chunk for each thread, never more. */
+    EXPECT_LE(peak_n_bytes.load(),
+              CAPACITY_N_BYTES + static_cast<uint64_t>(N_THREADS) * (CHUNK_N_BYTES + APIInterceptor::DataChunkStore::get_chunk_overhead_n_bytes() ) );
 }

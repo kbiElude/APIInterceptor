@@ -94,9 +94,21 @@ void APIInterceptor::register_for_pre_callback(APIFunction                      
                                                        in_func_user_arg);
 }
 
+void APIInterceptor::release_all_data_chunks()
+{
+    DataChunkStore::get_ptr()->release_all();
+}
+
 void APIInterceptor::release_data_chunk(const DataChunkID& in_data_chunk_id)
 {
     DataChunkStore::get_ptr()->release(in_data_chunk_id);
+}
+
+void APIInterceptor::set_data_chunk_drain(const uint64_t&              in_capacity_n_bytes,
+                                          const std::function<void()>& in_drain_func)
+{
+    DataChunkStore::get_ptr()->set_drain(in_capacity_n_bytes,
+                                         in_drain_func);
 }
 
 void APIInterceptor::resume_api_call_nesting(const uint32_t& in_depth)

@@ -110,6 +110,13 @@ private:
      */
     void cut_segment(const bool& in_is_last);
 
+    /* What the store of the data chunks runs when it is full (see APIInterceptor::set_data_chunk_drain()). Any thread. Once the dump is complete nothing
+     * reads the chunks, so it releases them all. While the dump is in progress the chunks belong to calls that are not written yet, and a segment is cut
+     * only between frames (the tools that seek by frame rely on it), so it frees nothing: the cut that on_frame_presented() makes does, and a frame that
+     * holds more than the store may makes the store end the process, saying so.
+     */
+    void drain_data_chunks();
+
     /* Bytes held in memory by what has not been handed over to the writer yet. */
     uint64_t get_n_unwritten_bytes();
 
@@ -156,9 +163,10 @@ private:
     static void write_segment     (SegmentJobUniquePtr                        in_job_ptr);
 
     /* Private vars */
-    CutState      m_cut;
-    RecordedState m_recorded;
-    Settings      m_settings;
+    CutState          m_cut;
+    std::atomic<bool> m_is_dump_complete = {false}; /* the last segment was handed over; read without the mutex by drain_data_chunks() */
+    RecordedState     m_recorded;
+    Settings          m_settings;
 };
 
 #endif /* APIDUMPER_H */

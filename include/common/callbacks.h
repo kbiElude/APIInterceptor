@@ -6,6 +6,7 @@
 #define COMMON_CALLBACKS_H
 
 #include "common/api_function_argument.h"
+#include <functional>
 #include "types.h"
 
 namespace APIInterceptor
@@ -48,6 +49,15 @@ namespace APIInterceptor
     DataChunkID register_data_chunk   (const void*        in_data_ptr,
                                        const uint32_t&    in_n_bytes);
     void        release_data_chunk    (const DataChunkID& in_data_chunk_id);
+
+    /* Releases every data chunk that the store holds: for a consumer that has no use for them any more. */
+    void        release_all_data_chunks();
+
+    /* Bounds the store of the data chunks (see DataChunkStore::set_drain()): when a chunk would take it over in_capacity_n_bytes, in_drain_func runs first
+     * and has to free chunks (take or release them). A consumer that takes the chunks of the calls it records sets it before the first call.
+     */
+    void        set_data_chunk_drain  (const uint64_t&                  in_capacity_n_bytes,
+                                       const std::function<void()>&     in_drain_func);
 
     /* Moves the contents of one data chunk out of the store: the vector and the chunk change contents, so nothing is allocated. Returns
      * false if there is no such chunk (it was taken, or released, or never made), and the vector is left as it is.

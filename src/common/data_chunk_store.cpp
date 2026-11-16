@@ -3,6 +3,8 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "common/data_chunk_store.h"
+#include "common/fatal_error.h"
+#include "common/macros.h"
 #include <string.h>
 
 APIInterceptor::DataChunkStore::ChunkUniquePtr* APIInterceptor::DataChunkStore::find_chunk_ptr(const DataChunkID& in_data_chunk_id)
@@ -53,6 +55,19 @@ uint32_t APIInterceptor::DataChunkStore::get_n_chunks()
     return m_chunks.first_id + static_cast<uint32_t>(m_chunks.chunk_deque.size() );
 }
 
+uint64_t APIInterceptor::DataChunkStore::get_chunk_overhead_n_bytes()
+{
+    /* A vector (3 pointers) and the pointer to it, the heap's header for each of the two blocks, and the slot of the deque. */
+    constexpr uint64_t CHUNK_OVERHEAD_N_BYTES = 96;
+
+    return CHUNK_OVERHEAD_N_BYTES;
+}
+
+uint64_t APIInterceptor::DataChunkStore::get_n_held_bytes() const
+{
+    return m_n_held_bytes.load();
+}
+
 uint32_t APIInterceptor::DataChunkStore::get_n_held_chunks()
 {
     uint32_t result = 0;
@@ -80,12 +95,47 @@ APIInterceptor::DataChunkStore* APIInterceptor::DataChunkStore::get_ptr()
     return instance_ptr;
 }
 
+void APIInterceptor::DataChunkStore::make_room(const uint64_t& in_n_data_bytes)
+{
+    const uint64_t capacity = m_capacity_n_bytes.load();
+    const uint64_t n_bytes  = in_n_data_bytes + get_chunk_overhead_n_bytes();
+
+    /* The usual case: it fits, and no lock is taken. */
+    if (capacity                           == 0 ||
+        m_n_held_bytes.load() + n_bytes    <= capacity)
+    {
+        goto end;
+    }
+
+    {
+        std::lock_guard<std::mutex> drain_lock(m_drain_mutex);
+
+        /* Another thread may have drained while this one waited for its turn. */
+        if (m_drain_func                      &&
+            m_n_held_bytes.load() + n_bytes   >  capacity)
+        {
+            m_drain_func();
+
+            AI_ASSERT_ALWAYS(m_n_held_bytes.load() == 0 ||
+                             m_n_held_bytes.load() + n_bytes <= capacity,
+                             "The store of data chunks is full, and what drains it has not freed enough: whatever holds the chunks does not take them. "
+                             "Raise the capacity or make the consumer take the chunks before it is full.");
+        }
+    }
+
+end:
+    return;
+}
+
 APIInterceptor::DataChunkID APIInterceptor::DataChunkStore::register_chunk(const void*     in_data_ptr,
                                                                            const uint32_t& in_n_bytes)
 {
     const bool      is_small      = (in_n_bytes <= ChunkPool::get_small_chunk_max_n_bytes() );
     ChunkUniquePtr  new_chunk_ptr;
     DataChunkID     result        = 0;
+
+    /* Before the chunk is copied, so that what is freed is freed before the copy needs the memory. */
+    make_room(in_n_bytes);
 
     /* A large chunk is made outside the lock: the copy of it can take a while. */
     if (is_small == false)
@@ -114,6 +164,8 @@ APIInterceptor::DataChunkID APIInterceptor::DataChunkStore::register_chunk(const
         result = m_chunks.first_id + static_cast<uint32_t>(m_chunks.chunk_deque.size() );
 
         m_chunks.chunk_deque.emplace_back(std::move(new_chunk_ptr) );
+
+        m_n_held_bytes += static_cast<uint64_t>(in_n_bytes) + get_chunk_overhead_n_bytes();
     }
 
     return result;
@@ -127,10 +179,39 @@ void APIInterceptor::DataChunkStore::release(const DataChunkID& in_data_chunk_id
 
     if (slot_ptr != nullptr)
     {
+        m_n_held_bytes -= (*slot_ptr)->size() + get_chunk_overhead_n_bytes();
+
         m_chunks.pool.recycle(slot_ptr);
 
         trim();
     }
+}
+
+void APIInterceptor::DataChunkStore::release_all()
+{
+    std::lock_guard<std::mutex> lock(m_chunks.mutex);
+
+    for (auto& chunk_ptr : m_chunks.chunk_deque)
+    {
+        if (chunk_ptr != nullptr)
+        {
+            m_n_held_bytes -= chunk_ptr->size() + get_chunk_overhead_n_bytes();
+
+            m_chunks.pool.recycle(&chunk_ptr);
+        }
+    }
+
+    trim();
+}
+
+void APIInterceptor::DataChunkStore::set_drain(const uint64_t&  in_capacity_n_bytes,
+                                               const DrainFunc& in_drain_func)
+{
+    std::lock_guard<std::mutex> drain_lock(m_drain_mutex);
+
+    m_drain_func = in_drain_func;
+
+    m_capacity_n_bytes.store(in_capacity_n_bytes);
 }
 
 bool APIInterceptor::DataChunkStore::take(const DataChunkID&    in_data_chunk_id,
@@ -145,6 +226,8 @@ bool APIInterceptor::DataChunkStore::take(const DataChunkID&    in_data_chunk_id
 
         if (slot_ptr != nullptr)
         {
+            m_n_held_bytes -= (*slot_ptr)->size() + get_chunk_overhead_n_bytes();
+
             /* The buffer which the caller had goes to the store, which keeps it if it is small: nothing is allocated here. */
             out_data_chunk_ptr->swap(**slot_ptr);
 
@@ -182,6 +265,8 @@ uint32_t APIInterceptor::DataChunkStore::take_chunks(const std::vector<DataChunk
             if (slot_ptr                                    != nullptr &&
                 in_destination_ptr_vec.at(n_data_chunk)     != nullptr)
             {
+                m_n_held_bytes -= (*slot_ptr)->size() + get_chunk_overhead_n_bytes();
+
                 in_destination_ptr_vec.at(n_data_chunk)->swap(**slot_ptr);
 
                 m_chunks.pool.recycle(slot_ptr);
@@ -216,6 +301,8 @@ void APIInterceptor::DataChunkStore::take_range(const DataChunkID&              
 
             if (slot_ptr != nullptr)
             {
+                m_n_held_bytes -= (*slot_ptr)->size() + get_chunk_overhead_n_bytes();
+
                 out_data_chunk_vec_ptr->at(n_data_chunk) = std::move(**slot_ptr);
 
                 m_chunks.pool.recycle(slot_ptr);
