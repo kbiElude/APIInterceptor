@@ -594,6 +594,7 @@ void Capture::APIDumpLoader::WorkloadReader::decode_frame(ZSTD_DCtx*            
     SegmentDecoder::Options options;
 
     options.skip_data_chunks_above_n_bytes = in_options.skip_data_chunks_above_n_bytes;
+    options.skip_surfaces                  = in_options.skip_surfaces;
 
     /* The segments the reader has no start of are read in full. */
     if (in_options.chunk_wanted_func ||

@@ -276,6 +276,7 @@ bool Replay::ReplayEngineDLL::CallWalker::start_reader(const char*     in_filena
 
     /* A replay reads a workload again and again (a seek starts over): the checksums of its frames are for the tools that say what is in it. */
     reader_options.ignores_checksums     = true;
+    reader_options.skip_surfaces         = true; /* a replay makes its own images */
     reader_options.n_threads             = std::min<uint32_t>(n_threads_wanted,
                                                               n_cores - 1);
     reader_options.n_segments_in_flight  = reader_options.n_threads + 1;

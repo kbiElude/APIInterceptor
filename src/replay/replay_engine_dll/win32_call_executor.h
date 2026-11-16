@@ -133,6 +133,8 @@ namespace Replay
             bool  on_swap_layer_buffers        (const Capture::APIDumpLoader::DumpedAPICall& in_call,
                                                 const IChunkSource&                          in_chunk_source,
                                                 std::string*                                 out_error_ptr);
+            /* Makes the release of the context that on_make_current() put off. */
+            void  flush_release                ();
             void  place_window                 (const HWND&                                  in_window);
             void  pump_messages                ();
             bool  register_window_class        (const std::wstring&                          in_name);
@@ -150,8 +152,11 @@ namespace Replay
 
             bool                                                  m_are_windows_visible;
             std::set<HGLRC>                                       m_context_set;
+            HDC                                                   m_current_hdc;      /* what the driver has current, as far as the executor made it so */
+            HGLRC                                                 m_current_rc;
             std::map<APIInterceptor::APIFunction, HandlerFuncPtr> m_handler_func_ptr_map;
             bool                                                  m_has_last_placement;
+            bool                                                  m_is_release_pending; /* wglMakeCurrent(0, 0) is not made until another call needs it; a context that is made current again at once is never released */
             WindowPlacement                                       m_last_placement;
             std::map<HWND, WindowSignature>                       m_parked_window_map;
             std::set<std::wstring>                                m_registered_class_name_set;

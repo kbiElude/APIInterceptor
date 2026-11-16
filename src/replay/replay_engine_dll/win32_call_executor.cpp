@@ -20,7 +20,10 @@ Replay::ReplayEngineDLL::Win32CallExecutor::Win32CallExecutor(ObjectRemapper*   
                                                               const WindowClosedFunc& in_window_closed_func,
                                                               const WindowPlacedFunc& in_window_placed_func)
     :m_are_windows_visible(true),
+     m_current_hdc       (nullptr),
+     m_current_rc        (nullptr),
      m_has_last_placement(false),
+     m_is_release_pending(false),
      m_remapper_ptr      (in_remapper_ptr),
      m_window_closed_func(in_window_closed_func),
      m_window_placed_func(in_window_placed_func)
@@ -249,12 +252,33 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::execute(const Capture::APIDumpL
         goto end;
     }
 
+    /* A swap does not need the release to be made; any other call (a context deleted, a window destroyed) does. */
+    if (in_call.func != APIInterceptor::APIFUNCTION_WGL_WGLMAKECURRENT       &&
+        in_call.func != APIInterceptor::APIFUNCTION_GDI32_SWAPBUFFERS        &&
+        in_call.func != APIInterceptor::APIFUNCTION_WGL_WGLSWAPLAYERBUFFERS)
+    {
+        flush_release();
+    }
+
     result = (this->*handler_iterator->second)(in_call,
                                                in_chunk_source,
                                                out_error_ptr);
 
 end:
     return result;
+}
+
+void Replay::ReplayEngineDLL::Win32CallExecutor::flush_release()
+{
+    if (m_is_release_pending)
+    {
+        ::wglMakeCurrent(nullptr,
+                         nullptr);
+
+        m_current_hdc        = nullptr;
+        m_current_rc         = nullptr;
+        m_is_release_pending = false;
+    }
 }
 
 Replay::ReplayEngineDLL::CallSupport Replay::ReplayEngineDLL::Win32CallExecutor::get_call_support(const APIInterceptor::APIFunction& in_function) const
@@ -741,11 +765,41 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::on_make_current(const Capture::
         goto end;
     }
 
+    /* A program that releases the context and makes it current again (as Gerbera does in every frame) costs the driver two calls for nothing. The
+     * release is put off, and dropped if the same context comes back. The context stays current meanwhile: a call made then would have failed in the
+     * program, so none is made.
+     */
+    if (live_hdc == nullptr &&
+        live_rc  == nullptr)
+    {
+        m_is_release_pending = (m_current_rc != nullptr);
+        result               = true;
+
+        goto end;
+    }
+
+    if (live_hdc == m_current_hdc &&
+        live_rc  == m_current_rc)
+    {
+        m_is_release_pending = false;
+        result               = true;
+
+        goto end;
+    }
+
     {
         uint32_t recorded_result = 1; /* a call with no recorded result is expected to have worked */
 
         const BOOL is_made_current = ::wglMakeCurrent(live_hdc,
                                                       live_rc);
+
+        m_is_release_pending = false;
+
+        if (is_made_current != FALSE)
+        {
+            m_current_hdc = live_hdc;
+            m_current_rc  = live_rc;
+        }
 
         if (in_call.returned_value_ptr != nullptr)
         {
@@ -1112,6 +1166,10 @@ void Replay::ReplayEngineDLL::Win32CallExecutor::reset()
 {
     ::wglMakeCurrent(nullptr,
                      nullptr);
+
+    m_current_hdc        = nullptr;
+    m_current_rc         = nullptr;
+    m_is_release_pending = false;
 
     for (const auto context : m_context_set)
     {

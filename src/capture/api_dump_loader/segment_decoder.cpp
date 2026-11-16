@@ -248,6 +248,7 @@ bool Capture::APIDumpLoader::SegmentDecoder::parse_segment(FrameStream*   inout_
     bool              has_dropped_call         = false;
     std::vector<bool> is_dropped_chunk_vec;
     std::vector<bool> is_unwanted_vec;
+    DumpedAPICall     new_api_call; /* one object for all the calls: its vectors keep their room, and most calls of a seek are dropped */
     bool              result                   = false;
     const size_t segment_header_n_bytes   = sizeof(uint32_t) * N_COUNTS;
 
@@ -281,7 +282,9 @@ bool Capture::APIDumpLoader::SegmentDecoder::parse_segment(FrameStream*   inout_
                   n_api_call < counts_u32vec3[0];
                 ++n_api_call)
     {
-        DumpedAPICall new_api_call;
+        new_api_call.arg_in_vec.clear        ();
+        new_api_call.arg_out_vec.clear       ();
+        new_api_call.returned_value_ptr.reset();
 
         if (parse_api_call(inout_stream_ptr,
                           &new_api_call) == false)
@@ -381,6 +384,7 @@ bool Capture::APIDumpLoader::SegmentDecoder::parse_segment(FrameStream*   inout_
         DumpedSurface new_surface;
 
         if (parse_surface(inout_stream_ptr,
+                         in_options.skip_surfaces,
                          &new_surface) == false)
         {
             *out_is_truncated_ptr = true;
@@ -396,6 +400,7 @@ end:
 }
 
 bool Capture::APIDumpLoader::SegmentDecoder::parse_surface(FrameStream*   inout_stream_ptr,
+                                                           const bool&    in_is_unwanted,
                                                            DumpedSurface* out_surface_ptr)
 {
     constexpr size_t N_HEADER_FIELDS = 3; /* width, height, n bytes */
@@ -422,6 +427,13 @@ bool Capture::APIDumpLoader::SegmentDecoder::parse_surface(FrameStream*   inout_
 
     out_surface_ptr->extents_u32vec2[0] = header_u32vec3[0];
     out_surface_ptr->extents_u32vec2[1] = header_u32vec3[1];
+
+    if (in_is_unwanted)
+    {
+        result = inout_stream_ptr->skip_bytes(header_u32vec3[2]);
+
+        goto end;
+    }
 
     out_surface_ptr->data_u8_vec.resize(header_u32vec3[2]);
 

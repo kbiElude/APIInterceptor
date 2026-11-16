@@ -7,6 +7,7 @@
 
 #include "types.h"
 #include <map>
+#include <set>
 #include <stdint.h>
 #include <utility>
 
@@ -39,7 +40,13 @@ namespace Replay
                         const uint64_t&   in_dumped_value);
 
         private:
-            std::map<std::pair<ObjectKind, uint64_t>, uint64_t> m_live_value_map;
+            /* The dumped value stops being found by the live one. */
+            void forget_dumped(const ObjectKind& in_kind,
+                               const uint64_t&   in_dumped_value,
+                               const uint64_t&   in_live_value);
+
+            std::map<std::pair<ObjectKind, uint64_t>, std::set<uint64_t> > m_dumped_value_set_by_live_map; /* the reverse of m_live_value_map: the dumped values of a live one */
+            std::map<std::pair<ObjectKind, uint64_t>, uint64_t>                m_live_value_map;
         };
     }
 }

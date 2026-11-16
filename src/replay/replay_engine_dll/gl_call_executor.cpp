@@ -310,7 +310,13 @@ bool Replay::ReplayEngineDLL::GLCallExecutor::execute(const Capture::APIDumpLoad
         goto end;
     }
 
-    proc_ptr = get_proc_ptr(entry_iterator->second.info.name_ptr);
+    /* The driver is asked once for a function, not at each call. */
+    if (entry_iterator->second.proc_ptr == nullptr)
+    {
+        entry_iterator->second.proc_ptr = get_proc_ptr(entry_iterator->second.info.name_ptr);
+    }
+
+    proc_ptr = entry_iterator->second.proc_ptr;
 
     if (proc_ptr == nullptr)
     {
@@ -516,6 +522,11 @@ void Replay::ReplayEngineDLL::GLCallExecutor::reset()
     m_context.forget_locations();
     m_mapping_replayer.reset  ();
     m_proc_ptr_map.clear      ();
+
+    for (auto& entry_pair : m_entry_map)
+    {
+        entry_pair.second.proc_ptr = nullptr;
+    }
 }
 
 void Replay::ReplayEngineDLL::GLCallExecutor::restore_state()

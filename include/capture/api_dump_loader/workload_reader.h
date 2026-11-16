@@ -82,6 +82,10 @@ namespace Capture
                  */
                 uint32_t skip_data_chunks_above_n_bytes = 0;
 
+                /* The images of the swap chains in the file come as empty ones (their sizes are kept, so they are counted): for tools which have no use for them, as
+                 * a replay makes its own. */
+                bool skip_surfaces = false;
+
                 /* Where in the file the reader starts: at the start of a segment (a frame of the file, see Workload::file_offset_n_bytes). 0: after the header,
                  * which is the start of the file. The calls of the segments before it are not read, so what a tool follows from call to call is not
                  * what it would be if it read them (the names of objects, for one).

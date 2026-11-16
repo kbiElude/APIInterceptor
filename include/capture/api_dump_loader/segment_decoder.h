@@ -47,6 +47,9 @@ namespace Capture
                  * tools which look at the calls and not at the vertices and pixels. 0: none is left out.
                  */
                 uint32_t skip_data_chunks_above_n_bytes = 0;
+
+                /* The images of the swap chains come as empty ones, with their sizes. */
+                bool skip_surfaces = false;
             };
 
             /* Reads the segment from the frame. False if there are not even the counts. The segment is as complete as the frame lets it be: what
@@ -72,6 +75,7 @@ namespace Capture
                                          const bool&     in_is_unwanted,
                                          DataChunk*      out_data_chunk_ptr);
             static bool parse_surface   (FrameStream*    inout_stream_ptr,
+                                         const bool&     in_is_unwanted,
                                          DumpedSurface*  out_surface_ptr);
         };
     }

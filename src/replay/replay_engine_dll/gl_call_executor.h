@@ -58,6 +58,7 @@ namespace Replay
                 GLFunctionInfo info;
                 InvokeFuncPtr  invoke_func_ptr;
                 size_t         n_head_arguments;
+                void*          proc_ptr = nullptr; /* the function in the driver, once it is looked up; forgotten by reset() */
             };
 
             void  add_function           (const APIInterceptor::APIFunction&           in_function,

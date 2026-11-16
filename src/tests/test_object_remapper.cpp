@@ -107,3 +107,58 @@ TEST(ObjectRemapper, WhatIsMappedAgainIsFoundByTheLiveValueItHasNow)
     EXPECT_EQ   (dumped_value,
                  10u);
 }
+
+TEST(ObjectRemapper, OfSeveralDumpedValuesForOneLiveValueTheSmallestIsFoundAndAnotherWhenItIsGone)
+{
+    Replay::ReplayEngineDLL::ObjectRemapper remapper;
+    uint64_t                                dumped_value = 0;
+
+    remapper.add(Replay::ReplayEngineDLL::ObjectKind::TEXTURE,
+                 12,
+                 20);
+    remapper.add(Replay::ReplayEngineDLL::ObjectKind::TEXTURE,
+                 10,
+                 20);
+    remapper.add(Replay::ReplayEngineDLL::ObjectKind::TEXTURE,
+                 14,
+                 20);
+
+    ASSERT_TRUE(remapper.find_dumped(Replay::ReplayEngineDLL::ObjectKind::TEXTURE,
+                                     20,
+                                    &dumped_value) );
+    EXPECT_EQ  (dumped_value,
+                10u);
+
+    remapper.remove(Replay::ReplayEngineDLL::ObjectKind::TEXTURE,
+                    10);
+
+    ASSERT_TRUE(remapper.find_dumped(Replay::ReplayEngineDLL::ObjectKind::TEXTURE,
+                                     20,
+                                    &dumped_value) );
+    EXPECT_EQ  (dumped_value,
+                12u);
+
+    remapper.remove(Replay::ReplayEngineDLL::ObjectKind::TEXTURE,
+                    12);
+    remapper.remove(Replay::ReplayEngineDLL::ObjectKind::TEXTURE,
+                    14);
+
+    EXPECT_FALSE(remapper.find_dumped(Replay::ReplayEngineDLL::ObjectKind::TEXTURE,
+                                      20,
+                                     &dumped_value) );
+}
+
+TEST(ObjectRemapper, AClearedRemapperFindsNoDumpedValue)
+{
+    Replay::ReplayEngineDLL::ObjectRemapper remapper;
+    uint64_t                                dumped_value = 0;
+
+    remapper.add(Replay::ReplayEngineDLL::ObjectKind::TEXTURE,
+                 10,
+                 20);
+    remapper.clear();
+
+    EXPECT_FALSE(remapper.find_dumped(Replay::ReplayEngineDLL::ObjectKind::TEXTURE,
+                                      20,
+                                     &dumped_value) );
+}

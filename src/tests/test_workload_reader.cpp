@@ -319,3 +319,35 @@ TEST(WorkloadReader, FindsTheCallsOfAnAPIGroup)
     EXPECT_FALSE(d3d8_reader_ptr->contains_api_group(Capture::APIDumpLoader::APIGroup::D3D8) );
     EXPECT_TRUE (gdi32_reader_ptr->contains_api_group(Capture::APIDumpLoader::APIGroup::GDI32) );
 }
+
+TEST(WorkloadReader, SurfacesThatAreSkippedAreCountedWithoutTheirBytesAndTheNextSegmentIsStillRead)
+{
+    std::vector<uint8_t>                            file_u8_vec;
+    Capture::APIDumpLoader::Workload                segment;
+    Capture::APIDumpLoader::WorkloadReader::Options options;
+
+    options.skip_surfaces = true;
+
+    Tests::WorkloadFileBuilder::build_two_segments(&file_u8_vec);
+    Tests::WorkloadFileBuilder::write_file(file_u8_vec);
+
+    auto reader_ptr = Capture::APIDumpLoader::WorkloadReader::create(Tests::WorkloadFileBuilder::get_filename_ptr(),
+                                                                     options,
+                                                                     nullptr);
+
+    ASSERT_NE(reader_ptr,
+              nullptr);
+
+    ASSERT_TRUE(reader_ptr->read_next_segment(&segment) );
+    ASSERT_EQ  (segment.dumped_surface_vec_ptr->size(),
+                1u);
+    EXPECT_TRUE(segment.dumped_surface_vec_ptr->at(0).data_u8_vec.empty() );
+    EXPECT_EQ  (segment.dumped_api_call_vec_ptr->size(),
+                2u);
+    EXPECT_EQ  (segment.data_chunk_ptr_vec.size(),
+                2u);
+
+    ASSERT_TRUE(reader_ptr->read_next_segment(&segment) );
+    EXPECT_EQ  (segment.dumped_api_call_vec_ptr->size(),
+                1u);
+}
