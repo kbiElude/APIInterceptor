@@ -15,6 +15,7 @@
 #include "object_remapper.h"
 #include <map>
 #include <string>
+#include <vector>
 #include <Windows.h>
 
 namespace Replay
@@ -84,6 +85,7 @@ namespace Replay
             GLReplayContext                                      m_context;
             GLIndexReplayer                                      m_index_replayer;
             std::map<APIInterceptor::APIFunction, FunctionEntry> m_entry_map;
+            std::vector<FunctionEntry*>                          m_entry_ptr_vec; /* by function, into m_entry_map; nullptr: not replayed */
             GLFrameReader                                        m_frame_reader;
             GLMappingReplayer                                    m_mapping_replayer;
             HMODULE                                              m_opengl32_module;

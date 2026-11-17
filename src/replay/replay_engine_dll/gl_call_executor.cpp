@@ -86,6 +86,14 @@ void Replay::ReplayEngineDLL::GLCallExecutor::add_function(const APIInterceptor:
     entry.n_head_arguments          = in_n_head_arguments;
 
     m_entry_map[in_function] = entry;
+
+    if (m_entry_ptr_vec.empty() )
+    {
+        m_entry_ptr_vec.assign(static_cast<size_t>(APIInterceptor::APIFUNCTION_COUNT),
+                               nullptr);
+    }
+
+    m_entry_ptr_vec.at(static_cast<size_t>(in_function) ) = &m_entry_map[in_function];
 }
 
 void Replay::ReplayEngineDLL::GLCallExecutor::after_call(const Capture::APIDumpLoader::DumpedAPICall& in_call)
@@ -250,11 +258,13 @@ bool Replay::ReplayEngineDLL::GLCallExecutor::execute(const Capture::APIDumpLoad
                                                       const IChunkSource&                          in_chunk_source,
                                                       std::string*                                 out_error_ptr)
 {
-    const auto entry_iterator = m_entry_map.find(in_call.func);
+    const size_t function_index = static_cast<size_t>(in_call.func);
+    FunctionEntry* const entry_ptr = (function_index < m_entry_ptr_vec.size() ) ? m_entry_ptr_vec.at(function_index)
+                                                                                : nullptr;
     void*      proc_ptr       = nullptr;
     bool       result         = false;
 
-    if (get_call_support(in_call.func) == CallSupport::UNSUPPORTED)
+    if (entry_ptr == nullptr)
     {
         *out_error_ptr = "The GL executor does not know the function.";
 
@@ -270,8 +280,8 @@ bool Replay::ReplayEngineDLL::GLCallExecutor::execute(const Capture::APIDumpLoad
 
     m_context.begin_call(&in_call,
                          &in_chunk_source,
-                          entry_iterator->second.n_head_arguments,
-                         &entry_iterator->second.info);
+                          entry_ptr->n_head_arguments,
+                         &entry_ptr->info);
 
     if (GLMappingReplayer::is_mapping_function(in_call.func) )
     {
@@ -290,10 +300,10 @@ bool Replay::ReplayEngineDLL::GLCallExecutor::execute(const Capture::APIDumpLoad
     }
 
     /* What the dumper stored after the arguments of a draw call: the part of the app's vertex arrays which it reads. */
-    if (in_call.arg_in_vec.size() > entry_iterator->second.n_head_arguments)
+    if (in_call.arg_in_vec.size() > entry_ptr->n_head_arguments)
     {
         size_t         n_bytes  = 0;
-        const uint8_t* data_ptr = m_context.get_chunk_data_ptr(&in_call.arg_in_vec.at(entry_iterator->second.n_head_arguments),
+        const uint8_t* data_ptr = m_context.get_chunk_data_ptr(&in_call.arg_in_vec.at(entry_ptr->n_head_arguments),
                                                                &n_bytes);
 
         if (data_ptr != nullptr)
@@ -311,23 +321,23 @@ bool Replay::ReplayEngineDLL::GLCallExecutor::execute(const Capture::APIDumpLoad
     }
 
     /* The driver is asked once for a function, not at each call. */
-    if (entry_iterator->second.proc_ptr == nullptr)
+    if (entry_ptr->proc_ptr == nullptr)
     {
-        entry_iterator->second.proc_ptr = get_proc_ptr(entry_iterator->second.info.name_ptr);
+        entry_ptr->proc_ptr = get_proc_ptr(entry_ptr->info.name_ptr);
     }
 
-    proc_ptr = entry_iterator->second.proc_ptr;
+    proc_ptr = entry_ptr->proc_ptr;
 
     if (proc_ptr == nullptr)
     {
         *out_error_ptr = std::string("The driver does not have ") +
-                         entry_iterator->second.info.name_ptr     +
+                         entry_ptr->info.name_ptr     +
                          ".";
 
         goto end;
     }
 
-    if (entry_iterator->second.invoke_func_ptr(&m_context,
+    if (entry_ptr->invoke_func_ptr(&m_context,
                                                proc_ptr,
                                                out_error_ptr) == false)
     {
