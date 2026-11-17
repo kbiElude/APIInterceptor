@@ -18,11 +18,10 @@ namespace APIInterceptor
          Logger();
         ~Logger();
 
-        void disable_logging_for_this_thread();
-        void log                            (const LogLevel& in_log_level,
-                                             const char*     in_message_template,
-                                             ...);
-        void on_frame_presented             ();
+        void log               (const LogLevel& in_log_level,
+                                const char*     in_message_template,
+                                ...);
+        void on_frame_presented();
 
         static void deinit();
         static void init  ();

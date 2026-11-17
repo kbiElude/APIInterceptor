@@ -265,11 +265,6 @@ namespace APIInterceptor
          */
         uint64_t get_ptr_as_u64() const;
 
-        const void* get_value_ptr() const
-        {
-            return &value;
-        }
-
         uint32_t deserialize_from_u8_ptr(const uint8_t*        in_u8_ptr);
         void     serialize_to_u8_vec    (std::vector<uint8_t>* inout_u8_vec_ptr) const;
 

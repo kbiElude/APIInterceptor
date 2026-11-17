@@ -17,7 +17,6 @@
  *       cached trace data is only written at dll detach time!
  */
 APIInterceptor::Logger* APIInterceptor::g_logger_ptr = nullptr;
-AI_THREADLOCAL bool     g_logging_enabled            = true;
 
 
 APIInterceptor::Logger::Logger()
@@ -71,11 +70,6 @@ void APIInterceptor::Logger::deinit()
     }
 }
 
-void APIInterceptor::Logger::disable_logging_for_this_thread()
-{
-    g_logging_enabled = false;
-}
-
 std::string APIInterceptor::Logger::get_frame_log_filename(const uint32_t& n_frame) const
 {
     return std::string   (LOG_FILE_NAME_PREFIX) +
@@ -103,11 +97,6 @@ void APIInterceptor::Logger::log(const LogLevel& in_log_level,
 {
     va_list arguments;
     char    temp_i8vec4096[MAX_PER_FUNC_LOCAL_HELPER_STORAGE_SIZE];
-
-    if (g_logging_enabled == false)
-    {
-        goto end;
-    }
 
     va_start(arguments,
              in_message_template);
@@ -177,11 +166,6 @@ void APIInterceptor::Logger::on_frame_presented()
     {
         std::lock_guard<std::mutex> lock(m_mutex);
 
-        if (g_logging_enabled == false)
-        {
-            goto end;
-        }
-
         if (g_logger_ptr->m_currentframe_file_ptr != nullptr)
         {
             ::fclose(g_logger_ptr->m_currentframe_file_ptr);
@@ -191,7 +175,4 @@ void APIInterceptor::Logger::on_frame_presented()
 
         m_n_current_frame++;
     }
-
-end:
-    ;
 }
