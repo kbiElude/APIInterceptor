@@ -63,6 +63,7 @@ namespace Replay
             void                                    set_call_kept_func_factory (const Capture::APIDumpLoader::CallKeptFuncFactory& in_factory);
             void                                    set_chunk_wanted_func      (const Capture::APIDumpLoader::ChunkWantedFunc&     in_func);
             void                                    set_frame_executor         (IFrameExecutor*                                    in_executor_ptr);
+            void                                    set_state_only_func        (const Capture::APIDumpLoader::StateOnlyFunc&       in_func);
             void                                    set_windows_visible        (const bool&                                        in_are_visible);
 
         private:

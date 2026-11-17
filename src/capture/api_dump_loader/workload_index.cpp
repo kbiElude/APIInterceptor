@@ -4,6 +4,8 @@
  */
 #include "capture/api_dump_loader/workload_index.h"
 #include "capture/api_dump_loader/api_info.h"
+#include "capture/api_dump_loader/call_describer_set.h"
+#include "capture/api_dump_loader/state_segment_builder.h"
 #include <algorithm>
 #include <stdio.h>
 #include <string.h>
@@ -12,7 +14,7 @@ namespace
 {
     /* What an index file begins with. */
     constexpr char     INDEX_MAGIC[8] = {'A', 'P', 'I', 'D', 'W', 'I', 'D', 'X'};
-    constexpr uint32_t INDEX_VERSION  = 1;
+    constexpr uint32_t INDEX_VERSION  = 2;
 
     struct IndexFileHeader
     {
@@ -39,9 +41,11 @@ namespace
         uint32_t n_calls;
         uint32_t n_data_chunks;
         uint32_t n_frames_ended;
+        uint64_t state_n_bytes;
+        uint64_t state_offset_n_bytes;
     };
 
-    static_assert(sizeof(IndexFileEntry) == 48,
+    static_assert(sizeof(IndexFileEntry) == 64,
                   "Unexpected padding in an entry of the index file");
 
     /* The hash of what is of the file from the offset on, up to 4 KiB of it. */
@@ -90,9 +94,10 @@ bool Capture::APIDumpLoader::WorkloadIndex::build(const char*     in_workload_fi
                                                   WorkloadIndex*  out_index_ptr,
                                                   std::string*    out_error_ptr)
 {
-    /* The data chunks are not what the index is of, and most of the bytes of a workload are in them: any chunk of more than a byte is left out. */
-    constexpr uint32_t SKIP_CHUNKS_ABOVE_N_BYTES = 1;
+    /* The state frames need the chunks of the calls they keep, so the segments are read in full (without their images). */
+    constexpr uint32_t MAX_N_SEGMENTS_IN_FLIGHT = (sizeof(void*) == sizeof(uint32_t) ) ? 2 : 5; /* a 32-bit process has 2 GB */
 
+    CallDescriberSet          describer_set;
     WorkloadIndex             index;
     bool                      is_in_open_frame = false; /* a call was made after the last one that ended a frame */
     WorkloadReader::Options   options;
@@ -100,8 +105,10 @@ bool Capture::APIDumpLoader::WorkloadIndex::build(const char*     in_workload_fi
     bool                      result = false;
     Workload                  segment;
 
-    options.n_threads                      = in_n_threads;
-    options.skip_data_chunks_above_n_bytes = SKIP_CHUNKS_ABOVE_N_BYTES;
+    options.n_segments_in_flight = (in_n_threads != 0) ? (std::min)(in_n_threads + 1, MAX_N_SEGMENTS_IN_FLIGHT)
+                                                       : 0;
+    options.n_threads            = in_n_threads;
+    options.skip_surfaces        = true;
 
     if (get_identity(in_workload_filename_ptr,
                     &index.m_identity) == false)
@@ -132,9 +139,19 @@ bool Capture::APIDumpLoader::WorkloadIndex::build(const char*     in_workload_fi
         entry.n_compressed_bytes  = segment.n_compressed_bytes;
         entry.n_data_chunks       = static_cast<uint32_t>(segment.data_chunk_ptr_vec.size() );
 
+        std::vector<bool> is_kept_vec;
+
+        is_kept_vec.reserve(entry.n_calls);
+
         for (const auto& call : *segment.dumped_api_call_vec_ptr)
         {
-            if (is_frame_boundary(call) )
+            const bool is_boundary = is_frame_boundary(call);
+            const auto call_class  = describer_set.describe(call);
+
+            is_kept_vec.push_back(call_class != CallClass::CONTENT ||
+                                  is_boundary);
+
+            if (is_boundary)
             {
                 entry.n_frames_ended++;
 
@@ -146,6 +163,22 @@ bool Capture::APIDumpLoader::WorkloadIndex::build(const char*     in_workload_fi
             }
         }
 
+        {
+            std::vector<uint8_t> state_frame_byte_vec;
+
+            if (StateSegmentBuilder::build(segment,
+                                           is_kept_vec,
+                                          &state_frame_byte_vec) )
+            {
+                entry.state_n_bytes        = state_frame_byte_vec.size();
+                entry.state_offset_n_bytes = index.m_state_byte_vec.size();
+
+                index.m_state_byte_vec.insert(index.m_state_byte_vec.end(),
+                                              state_frame_byte_vec.begin(),
+                                              state_frame_byte_vec.end() );
+            }
+        }
+
         index.m_n_calls  += entry.n_calls;
         index.m_n_frames += entry.n_frames_ended;
 
@@ -153,6 +186,13 @@ bool Capture::APIDumpLoader::WorkloadIndex::build(const char*     in_workload_fi
     }
 
     index.m_is_truncated = reader_ptr->is_truncated();
+
+    /* The last segment of a cut file is not whole: it is read from the file. */
+    if (index.m_is_truncated &&
+        index.m_segment_vec.empty() == false)
+    {
+        index.m_segment_vec.back().state_n_bytes = 0;
+    }
 
     /* The calls after the last end of a frame are a frame too. */
     if (is_in_open_frame)
@@ -346,6 +386,8 @@ bool Capture::APIDumpLoader::WorkloadIndex::load(const char*    in_index_filenam
         entry.n_compressed_bytes  = file_entry.n_compressed_bytes;
         entry.n_data_chunks       = file_entry.n_data_chunks;
         entry.n_frames_ended      = file_entry.n_frames_ended;
+        entry.state_n_bytes        = file_entry.state_n_bytes;
+        entry.state_offset_n_bytes = file_entry.state_offset_n_bytes;
 
         index.m_segment_vec.push_back(entry);
     }
@@ -423,6 +465,29 @@ Capture::APIDumpLoader::WorkloadReader::Options Capture::APIDumpLoader::Workload
     return result;
 }
 
+std::vector<Capture::APIDumpLoader::WorkloadReader::SegmentStart> Capture::APIDumpLoader::WorkloadIndex::make_segment_start_vec() const
+{
+    const uint64_t                            state_area_offset = sizeof(IndexFileHeader) + m_segment_vec.size() * sizeof(IndexFileEntry);
+    std::vector<WorkloadReader::SegmentStart> result;
+
+    for (const auto& entry : m_segment_vec)
+    {
+        WorkloadReader::SegmentStart start;
+
+        start.file_offset_n_bytes  = entry.file_offset_n_bytes;
+        start.first_data_chunk_id  = entry.first_data_chunk_id;
+        start.first_frame_index    = entry.first_frame_index;
+        start.n_compressed_bytes   = entry.n_compressed_bytes;
+        start.n_frames_ended       = entry.n_frames_ended;
+        start.state_n_bytes        = entry.state_n_bytes;
+        start.state_offset_n_bytes = state_area_offset + entry.state_offset_n_bytes;
+
+        result.push_back(start);
+    }
+
+    return result;
+}
+
 bool Capture::APIDumpLoader::WorkloadIndex::save(const char*  in_index_filename_ptr,
                                                  std::string* out_error_ptr) const
 {
@@ -469,6 +534,8 @@ bool Capture::APIDumpLoader::WorkloadIndex::save(const char*  in_index_filename_
         file_entry.n_compressed_bytes  = entry.n_compressed_bytes;
         file_entry.n_data_chunks       = entry.n_data_chunks;
         file_entry.n_frames_ended      = entry.n_frames_ended;
+        file_entry.state_n_bytes        = entry.state_n_bytes;
+        file_entry.state_offset_n_bytes = entry.state_offset_n_bytes;
 
         if (result)
         {
@@ -479,6 +546,15 @@ bool Capture::APIDumpLoader::WorkloadIndex::save(const char*  in_index_filename_
 
             result = (n_entries_written == 1);
         }
+    }
+
+    if (result &&
+        m_state_byte_vec.empty() == false)
+    {
+        result = (::fwrite(m_state_byte_vec.data(),
+                           1,
+                           m_state_byte_vec.size(),
+                           file_handle) == m_state_byte_vec.size() );
     }
 
     {

@@ -37,9 +37,13 @@ namespace Capture
             /* Where a segment is in the file and what it numbers from, as the index of the workload has it (see WorkloadIndex). */
             struct SegmentStart
             {
-                uint64_t file_offset_n_bytes = 0;
-                uint32_t first_data_chunk_id = 0;
-                uint64_t first_frame_index   = 0;
+                uint64_t file_offset_n_bytes  = 0;
+                uint32_t first_data_chunk_id  = 0;
+                uint64_t first_frame_index    = 0;
+                uint32_t n_frames_ended       = 0;
+                uint64_t n_compressed_bytes   = 0;
+                uint64_t state_n_bytes        = 0; /* in the index file; 0: none */
+                uint64_t state_offset_n_bytes = 0; /* in the index file */
             };
 
             struct Options
@@ -81,6 +85,10 @@ namespace Capture
                  * anywhere: for tools which look at the calls and not at the vertices and pixels, which are most of a workload. 0: none is left out.
                  */
                 uint32_t skip_data_chunks_above_n_bytes = 0;
+
+                /* The index file, and which segments come from its state frames: those of segment_start_vec with one that the function wants as state only. */
+                std::string state_filename;
+                StateOnlyFunc state_only_func;
 
                 /* The images of the swap chains in the file come as empty ones (their sizes are kept, so they are counted): for tools which have no use for them, as
                  * a replay makes its own. */

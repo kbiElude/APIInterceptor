@@ -53,6 +53,11 @@ namespace Replay
              */
             void set_chunk_wanted_func(const Capture::APIDumpLoader::ChunkWantedFunc& in_func);
 
+            /* Segments whose frames the function says are wanted as state calls only are read from the state frames of the index when the file is opened
+             * (again), as far as the index has them (see WorkloadReader::Options::state_only_func). Empty: all segments are read in full. Any thread.
+             */
+            void set_state_only_func(const Capture::APIDumpLoader::StateOnlyFunc& in_func);
+
         private:
             /* The filters that the next opening of the file uses. */
             struct ChunkFilter
@@ -61,6 +66,7 @@ namespace Replay
                 Capture::APIDumpLoader::ChunkWantedFunc     func;
                 bool                                        is_pending = false; /* set after the reader was started, so the segments yet to be read are to be read with it */
                 std::mutex                                  mutex;
+                Capture::APIDumpLoader::StateOnlyFunc       state_only_func;
             };
 
             /* The segment which the thread has read ahead, shared with it. */

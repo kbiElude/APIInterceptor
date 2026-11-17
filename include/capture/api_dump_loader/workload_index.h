@@ -6,10 +6,12 @@
  * them where it starts, how many calls it has, and which frames it holds, so that a tool which looks at a few frames reads the segments of those and
  * not all of the file (see WorkloadReader::Options::start_offset_n_bytes).
  *
+ * The index also holds, for each segment, its state frame: the calls of the segment that a replay of frames nobody needs still makes (see
+ * CallDescriberSet, StateSegmentBuilder). A reader takes a segment from it, and not from the workload file, when only those calls are wanted.
+ *
  * Frames are counted as the printer counts them: from 0, a frame ends with a call that APIDumpLoader::is_frame_boundary() says presents.
  *
- * The index is made by reading the workload once (the segments are decoded with the data chunks left out, which is most of a workload), and is kept in
- * a file next to it. It knows the workload it is of (its size, and hashes of 4 KiB from its start, its middle and its end), and is not used for another.
+ * The index is made by reading the workload once, and is kept in a file next to it. It knows the workload it is of (its size, and hashes of 4 KiB from its start, its middle and its end), and is not used for another.
  */
 #ifndef APIDUMPLOADER_WORKLOAD_INDEX_H
 #define APIDUMPLOADER_WORKLOAD_INDEX_H
@@ -34,6 +36,8 @@ namespace Capture
             uint64_t n_compressed_bytes  = 0;
             uint32_t n_data_chunks       = 0;
             uint32_t n_frames_ended      = 0; /* the calls in it which end a frame                                                           */
+            uint64_t state_n_bytes        = 0; /* of its state frame; 0: none                                                                */
+            uint64_t state_offset_n_bytes = 0; /* of its state frame, from the start of the state frames in the index file                    */
         };
 
         class WorkloadIndex
@@ -85,6 +89,9 @@ namespace Capture
             WorkloadReader::Options make_reader_options(const size_t&                   in_n_segment,
                                                         const WorkloadReader::Options& in_options) const;
 
+            /* The segments as a reader wants them (see WorkloadReader::Options::segment_start_vec), with where their state frames are in the index file. */
+            std::vector<WorkloadReader::SegmentStart> make_segment_start_vec() const;
+
             /* False, and why, if the file cannot be written. */
             bool save(const char*  in_index_filename_ptr,
                       std::string* out_error_ptr) const;
@@ -108,6 +115,7 @@ namespace Capture
             uint64_t                       m_n_calls;
             uint64_t                       m_n_frames;
             std::vector<SegmentIndexEntry> m_segment_vec;
+            std::vector<uint8_t>           m_state_byte_vec; /* the state frames, between build() and save() */
         };
     }
 }

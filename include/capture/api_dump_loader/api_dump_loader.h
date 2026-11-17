@@ -48,6 +48,10 @@ namespace Capture
          */
         typedef std::function<CallKeptFunc()> CallKeptFuncFactory;
 
+        /* Whether only the state calls of the frames first..last are wanted (see WorkloadIndex). */
+        typedef std::function<bool(const uint64_t& in_first_frame_index,
+                                   const uint64_t& in_last_frame_index)> StateOnlyFunc;
+
         typedef std::vector<uint8_t>                 DataChunk;
         typedef std::unique_ptr<DataChunk>           DataChunkUniquePtr;
         typedef std::vector<DumpedAPICall>           DumpedAPICallVector;

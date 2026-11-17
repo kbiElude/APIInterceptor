@@ -23,6 +23,14 @@ namespace Capture
             UNKNOWN
         };
 
+        /* What a call does to the frames a replay makes (see ICallDescriber). */
+        enum class CallClass
+        {
+            CONDITIONAL, /* content or state, by what it refers to (a display list call) */
+            CONTENT,     /* draws, clears, copies, uploads, locks                        */
+            STATE        /* everything else                                              */
+        };
+
         /* What the next frame of the file came to. */
         enum class FrameFetch
         {

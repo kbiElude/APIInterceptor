@@ -564,6 +564,11 @@ void Replay::ReplayEngineDLL::ReplayEngine::set_state(const PlaybackState& in_st
     }
 }
 
+void Replay::ReplayEngineDLL::ReplayEngine::set_state_only_func(const Capture::APIDumpLoader::StateOnlyFunc& in_func)
+{
+    m_walker.set_state_only_func(in_func);
+}
+
 void Replay::ReplayEngineDLL::ReplayEngine::set_windows_visible(const bool& in_are_visible)
 {
     for (const auto executor_ptr : m_executors.get_executor_ptr_vec() )

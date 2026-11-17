@@ -210,16 +210,7 @@ bool Replay::ReplayEngineDLL::CallWalker::read_segment_starts(const char*       
         goto end;
     }
 
-    for (const auto& entry : index.get_segment_vec() )
-    {
-        Capture::APIDumpLoader::WorkloadReader::SegmentStart start;
-
-        start.file_offset_n_bytes = entry.file_offset_n_bytes;
-        start.first_data_chunk_id = entry.first_data_chunk_id;
-        start.first_frame_index   = entry.first_frame_index;
-
-        out_start_vec_ptr->push_back(start);
-    }
+    *out_start_vec_ptr = index.make_segment_start_vec();
 
     result = true;
 
@@ -249,6 +240,14 @@ void Replay::ReplayEngineDLL::CallWalker::set_chunk_wanted_func(const Capture::A
 
     m_chunk_filter.func       = in_func;
     m_chunk_filter.is_pending = true;
+}
+
+void Replay::ReplayEngineDLL::CallWalker::set_state_only_func(const Capture::APIDumpLoader::StateOnlyFunc& in_func)
+{
+    std::lock_guard<std::mutex> lock(m_chunk_filter.mutex);
+
+    m_chunk_filter.state_only_func = in_func;
+    m_chunk_filter.is_pending      = true;
 }
 
 bool Replay::ReplayEngineDLL::CallWalker::start_reader(const char*     in_filename_ptr,
@@ -288,18 +287,26 @@ bool Replay::ReplayEngineDLL::CallWalker::start_reader(const char*     in_filena
 
         reader_options.call_kept_func_factory = m_chunk_filter.call_kept_func_factory;
         reader_options.chunk_wanted_func      = m_chunk_filter.func;
+        reader_options.state_only_func        = m_chunk_filter.state_only_func;
         m_chunk_filter.is_pending             = false;
     }
 
     /* Without the index of the file there is no telling which frame a segment starts at, and all its chunks are read. */
     if (reader_options.chunk_wanted_func ||
-        reader_options.call_kept_func_factory)
+        reader_options.call_kept_func_factory ||
+        reader_options.state_only_func)
     {
         if (read_segment_starts(in_filename_ptr,
                                &reader_options.segment_start_vec) == false)
         {
             reader_options.call_kept_func_factory = Capture::APIDumpLoader::CallKeptFuncFactory();
             reader_options.chunk_wanted_func      = Capture::APIDumpLoader::ChunkWantedFunc();
+            reader_options.state_only_func        = Capture::APIDumpLoader::StateOnlyFunc();
+        }
+        else
+        if (reader_options.state_only_func)
+        {
+            reader_options.state_filename = Capture::APIDumpLoader::WorkloadIndex::get_default_filename(in_filename_ptr);
         }
     }
 
@@ -307,7 +314,8 @@ bool Replay::ReplayEngineDLL::CallWalker::start_reader(const char*     in_filena
      * decompression, which more threads speed up.
      */
     if (reader_options.chunk_wanted_func ||
-        reader_options.call_kept_func_factory)
+        reader_options.call_kept_func_factory ||
+        reader_options.state_only_func)
     {
         reader_options.n_threads            = std::min<uint32_t>(std::max<uint32_t>(n_threads_wanted,
                                                                                     N_READER_THREADS_FILTERED),

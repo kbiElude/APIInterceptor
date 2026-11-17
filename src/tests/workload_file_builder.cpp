@@ -365,6 +365,55 @@ void Tests::WorkloadFileBuilder::build_many_segments(std::vector<uint8_t>* out_u
     }
 }
 
+void Tests::WorkloadFileBuilder::build_mixed_segments(std::vector<uint8_t>* out_u8_vec_ptr,
+                                                      const uint32_t&       in_n_segments)
+{
+    append_file_header(out_u8_vec_ptr);
+
+    for (uint32_t n_segment = 0;
+                  n_segment < in_n_segments;
+                ++n_segment)
+    {
+        std::vector<uint8_t> segment_u8_vec;
+
+        append_header(&segment_u8_vec,
+                      5, /* in_n_api_calls   */
+                      2, /* in_n_data_chunks */
+                      0); /* in_n_surfaces    */
+
+        append_call_with_argument(&segment_u8_vec,
+                                  APIInterceptor::APIFUNCTION_GL_GLENABLE,
+                                  APIInterceptor::APIFunctionArgument::create_data_chunk_id(2 * n_segment),
+                                  n_segment);
+        append_call_with_argument(&segment_u8_vec,
+                                  APIInterceptor::APIFUNCTION_GL_GLVERTEX3FV,
+                                  APIInterceptor::APIFunctionArgument::create_data_chunk_id(2 * n_segment + 1),
+                                  n_segment);
+        append_call              (&segment_u8_vec,
+                                  n_segment,
+                                  APIInterceptor::APIFUNCTION_D3D8_IDIRECT3DDEVICE8_DRAWPRIMITIVE);
+        append_call              (&segment_u8_vec,
+                                  n_segment,
+                                  APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_SETRENDERSTATE);
+        append_call_with_argument(&segment_u8_vec,
+                                  APIInterceptor::APIFUNCTION_GDI32_SWAPBUFFERS,
+                                  APIInterceptor::APIFunctionArgument::create_void_ptr(nullptr),
+                                  n_segment);
+
+        for (uint32_t n_chunk = 0;
+                      n_chunk < 2;
+                    ++n_chunk)
+        {
+            append_chunk(&segment_u8_vec,
+                         std::vector<uint8_t>(4,
+                                              static_cast<uint8_t>(10 * n_segment + n_chunk) ) );
+        }
+
+        append_compressed_segment(out_u8_vec_ptr,
+                                  segment_u8_vec);
+    }
+}
+
 void Tests::WorkloadFileBuilder::build_segments(std::vector<uint8_t>* out_u8_vec_ptr,
                                                 const uint32_t&       in_n_segments,
                                                 const uint32_t&       in_n_calls_per_segment,

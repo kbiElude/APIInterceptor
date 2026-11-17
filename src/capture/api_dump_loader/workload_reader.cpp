@@ -28,23 +28,104 @@ struct Capture::APIDumpLoader::WorkloadReader::FrameSource
         FRAME
     };
 
-    FrameSource(FILE*           in_file_handle,
-                const uint64_t& in_first_frame_offset)
+    FrameSource(FILE*                          in_file_handle,
+                const uint64_t&                in_first_frame_offset,
+                const WorkloadReader::Options& in_options)
         :buffer_u8_vec    (INITIAL_BUFFER_N_BYTES),
          end              (0),
          file_handle      (in_file_handle),
+         has_seek_failed  (false),
          is_at_end        (false),
          last_frame_offset(0),
          next_frame_offset(in_first_frame_offset),
-         start            (0)
+         segment_start_vec(in_options.segment_start_vec),
+         start            (0),
+         state_file_handle(nullptr),
+         state_only_func  (in_options.state_only_func)
     {
-        /* Stub */
+        if (in_options.state_only_func &&
+            in_options.state_filename.empty() == false)
+        {
+            state_file_handle = ::fopen(in_options.state_filename.c_str(),
+                                        "rb");
+        }
     }
 
-    /* The bytes of the next frame, if there is one. */
-    Result read_next(std::vector<uint8_t>* out_frame_byte_vec_ptr)
+    ~FrameSource()
+    {
+        if (state_file_handle != nullptr)
+        {
+            ::fclose(state_file_handle);
+        }
+    }
+
+    /* The segment that starts at the offset, or nullptr. */
+    const SegmentStart* find_start(const uint64_t& in_offset) const
+    {
+        const auto is_before_func = [](const SegmentStart& in_start,
+                                       const uint64_t&     in_offset_n_bytes)
+        {
+            return (in_start.file_offset_n_bytes < in_offset_n_bytes);
+        };
+
+        const auto iterator = std::lower_bound(segment_start_vec.begin(),
+                                               segment_start_vec.end(),
+                                               in_offset,
+                                               is_before_func);
+
+        return (iterator != segment_start_vec.end() &&
+                iterator->file_offset_n_bytes == in_offset) ? &(*iterator)
+                                                            : nullptr;
+    }
+
+    /* The next frame: the state frame of the segment if the options say so (the workload file goes on after the segment). */
+    Result read_next(std::vector<uint8_t>* out_frame_byte_vec_ptr,
+                     uint64_t*             out_n_workload_bytes_ptr)
+    {
+        const SegmentStart* start_ptr = (state_file_handle != nullptr) ? find_start(next_frame_offset)
+                                                                       : nullptr;
+        Result              result    = Result::END;
+
+        if (start_ptr != nullptr &&
+            start_ptr->state_n_bytes != 0)
+        {
+            const bool is_wanted = state_only_func(start_ptr->first_frame_index,
+                                                   start_ptr->first_frame_index + start_ptr->n_frames_ended);
+
+            if (is_wanted &&
+                read_state_frame(*start_ptr,
+                                 out_frame_byte_vec_ptr) )
+            {
+                last_frame_offset         = next_frame_offset;
+                *out_n_workload_bytes_ptr = start_ptr->n_compressed_bytes;
+
+                skip_to(start_ptr->file_offset_n_bytes + start_ptr->n_compressed_bytes);
+
+                result = Result::FRAME;
+
+                goto end;
+            }
+        }
+
+        result = read_raw(out_frame_byte_vec_ptr);
+
+        *out_n_workload_bytes_ptr = out_frame_byte_vec_ptr->size();
+
+end:
+        return result;
+    }
+
+    /* The bytes of the next frame of the workload file, if there is one. */
+    Result read_raw(std::vector<uint8_t>* out_frame_byte_vec_ptr)
     {
         Result result = Result::END;
+
+        if (has_seek_failed)
+        {
+            result = Result::DAMAGED;
+
+            goto end;
+        }
 
         for (;;)
         {
@@ -97,7 +178,41 @@ struct Capture::APIDumpLoader::WorkloadReader::FrameSource
             fill_buffer();
         }
 
+end:
         return result;
+    }
+
+    /* False if the state frame cannot be read. */
+    bool read_state_frame(const SegmentStart&     in_start,
+                          std::vector<uint8_t>*   out_frame_byte_vec_ptr) const
+    {
+        bool result = false;
+
+        if (::_fseeki64(state_file_handle,
+                        static_cast<__int64>(in_start.state_offset_n_bytes),
+                        SEEK_SET) == 0)
+        {
+            out_frame_byte_vec_ptr->resize(in_start.state_n_bytes);
+
+            result = (::fread(out_frame_byte_vec_ptr->data(),
+                              1,
+                              out_frame_byte_vec_ptr->size(),
+                              state_file_handle) == out_frame_byte_vec_ptr->size() );
+        }
+
+        return result;
+    }
+
+    /* Goes on from the frame at the offset. */
+    void skip_to(const uint64_t& in_offset)
+    {
+        has_seek_failed   = (::_fseeki64(file_handle,
+                                         static_cast<__int64>(in_offset),
+                                         SEEK_SET) != 0);
+        start             = 0;
+        end               = 0;
+        is_at_end         = false;
+        next_frame_offset = in_offset;
     }
 
     /* Reads more of the file after the bytes which are held, making room for it. */
@@ -137,10 +252,14 @@ struct Capture::APIDumpLoader::WorkloadReader::FrameSource
     std::vector<uint8_t> buffer_u8_vec;
     size_t               end;
     FILE*                file_handle;
+    bool                 has_seek_failed;
     bool                 is_at_end;
     uint64_t             last_frame_offset; /* of the frame that read_next() last gave                              */
     uint64_t             next_frame_offset; /* of the one it will give                                              */
+    std::vector<SegmentStart> segment_start_vec;
     size_t               start;
+    FILE*                state_file_handle; /* the index file; nullptr: no state frames */
+    StateOnlyFunc        state_only_func;
 };
 
 /* The threads which read segments ahead of the caller. */
@@ -151,6 +270,7 @@ struct Capture::APIDumpLoader::WorkloadReader::Pipeline
     {
         uint64_t             file_offset = 0; /* of the frame, in the file        */
         std::vector<uint8_t> frame_byte_vec;
+        uint64_t             n_workload_bytes = 0;    /* of the segment in the workload file      */
         uint64_t             sequence    = 0; /* the place of the frame in the file */
     };
 
@@ -272,7 +392,8 @@ struct Capture::APIDumpLoader::WorkloadReader::Pipeline
                 }
             }
 
-            source_result   = frame_source_ptr->read_next(&job.frame_byte_vec);
+            source_result   = frame_source_ptr->read_next(&job.frame_byte_vec,
+                                                         &job.n_workload_bytes);
             job.file_offset = frame_source_ptr->last_frame_offset;
 
             {
@@ -357,7 +478,7 @@ struct Capture::APIDumpLoader::WorkloadReader::Pipeline
             }
 
             decoded_segment.file_offset_n_bytes = job.file_offset;
-            decoded_segment.n_compressed_bytes  = job.frame_byte_vec.size();
+            decoded_segment.n_compressed_bytes  = job.n_workload_bytes;
 
             {
                 std::lock_guard<std::mutex> lock(mutex);
@@ -554,7 +675,8 @@ Capture::APIDumpLoader::WorkloadReaderUniquePtr Capture::APIDumpLoader::Workload
 
     result_ptr->m_frame_source_ptr.reset(new FrameSource(result_ptr->m_file_handle,
                                                          (in_options.start_offset_n_bytes != 0) ? in_options.start_offset_n_bytes
-                                                                                                : sizeof(header) ) );
+                                                                                                : sizeof(header),
+                                                         in_options) );
 
     if (in_options.n_threads != 0)
     {
@@ -640,7 +762,8 @@ void Capture::APIDumpLoader::WorkloadReader::decode_frame(ZSTD_DCtx*            
 Capture::APIDumpLoader::FrameFetch Capture::APIDumpLoader::WorkloadReader::fetch_next_segment(DecodedSegment* out_segment_ptr)
 {
     std::vector<uint8_t> frame_byte_vec;
-    FrameFetch           result = FrameFetch::CLEAN_END;
+    uint64_t             n_workload_bytes = 0;
+    FrameFetch           result           = FrameFetch::CLEAN_END;
 
     if (m_pipeline_ptr != nullptr)
     {
@@ -649,7 +772,8 @@ Capture::APIDumpLoader::FrameFetch Capture::APIDumpLoader::WorkloadReader::fetch
         goto end;
     }
 
-    switch (m_frame_source_ptr->read_next(&frame_byte_vec) )
+    switch (m_frame_source_ptr->read_next(&frame_byte_vec,
+                                          &n_workload_bytes) )
     {
         case FrameSource::Result::CUT:
         case FrameSource::Result::FRAME:
@@ -661,7 +785,7 @@ Capture::APIDumpLoader::FrameFetch Capture::APIDumpLoader::WorkloadReader::fetch
                          out_segment_ptr);
 
             out_segment_ptr->file_offset_n_bytes = m_frame_source_ptr->last_frame_offset;
-            out_segment_ptr->n_compressed_bytes  = frame_byte_vec.size();
+            out_segment_ptr->n_compressed_bytes  = n_workload_bytes;
 
             result = FrameFetch::SEGMENT;
 
