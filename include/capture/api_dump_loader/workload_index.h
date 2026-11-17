@@ -2,16 +2,13 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  *
- * Where the frames of a workload are in its file. A workload is a sequence of segments, each a Zstandard frame of its own, and the index says for each of
- * them where it starts, how many calls it has, and which frames it holds, so that a tool which looks at a few frames reads the segments of those and
- * not all of the file (see WorkloadReader::Options::start_offset_n_bytes).
+ * Locates the frames of a workload in its file: per segment (a Zstandard frame) its offset, call count and frames, so a tool reads only
+ * the segments it needs (see WorkloadReader::Options::start_offset_n_bytes). Each segment also has a state frame with the calls that
+ * a replay of unneeded frames still makes (see CallDescriberSet, StateSegmentBuilder); a reader uses it when only those calls are wanted.
  *
- * The index also holds, for each segment, its state frame: the calls of the segment that a replay of frames nobody needs still makes (see
- * CallDescriberSet, StateSegmentBuilder). A reader takes a segment from it, and not from the workload file, when only those calls are wanted.
- *
- * Frames are counted as the printer counts them: from 0, a frame ends with a call that APIDumpLoader::is_frame_boundary() says presents.
- *
- * The index is made by reading the workload once, and is kept in a file next to it. It knows the workload it is of (its size, and hashes of 4 KiB from its start, its middle and its end), and is not used for another.
+ * Frames count from 0 as the printer counts them; a frame ends with a call for which APIDumpLoader::is_frame_boundary() is true.
+ * The index is built by one read of the workload and kept in a file next to it. It records the workload's size and 4 KiB hashes
+ * of its start, middle and end, and is not used for another file.
  */
 #ifndef APIDUMPLOADER_WORKLOAD_INDEX_H
 #define APIDUMPLOADER_WORKLOAD_INDEX_H
@@ -28,16 +25,16 @@ namespace Capture
         /* One segment of the workload. */
         struct SegmentIndexEntry
         {
-            uint64_t file_offset_n_bytes = 0; /* of its frame in the file                                                                   */
-            uint64_t first_call_index    = 0; /* of the calls of the whole workload                                                          */
-            uint64_t first_frame_index   = 0; /* the number of the frame that its first call is in: the frames which ended before it        */
-            uint32_t first_data_chunk_id = 0; /* the number of data chunks before it                                                         */
+            uint64_t file_offset_n_bytes = 0; /* of its frame in the file                      */
+            uint64_t first_call_index    = 0; /* in the whole workload                         */
+            uint64_t first_frame_index   = 0; /* frame of its first call: frames ended before it */
+            uint32_t first_data_chunk_id = 0; /* data chunks before it                         */
             uint32_t n_calls             = 0;
             uint64_t n_compressed_bytes  = 0;
             uint32_t n_data_chunks       = 0;
-            uint32_t n_frames_ended      = 0; /* the calls in it which end a frame                                                           */
-            uint64_t state_n_bytes        = 0; /* of its state frame; 0: none                                                                */
-            uint64_t state_offset_n_bytes = 0; /* of its state frame, from the start of the state frames in the index file                    */
+            uint32_t n_frames_ended      = 0; /* its calls that end a frame                     */
+            uint64_t state_n_bytes        = 0; /* of its state frame; 0: none                   */
+            uint64_t state_offset_n_bytes = 0; /* of its state frame, from the first state frame */
         };
 
         class WorkloadIndex
@@ -45,59 +42,57 @@ namespace Capture
         public:
             WorkloadIndex();
 
-            /* The index of the workload: its own name and a suffix. */
+            /* The workload's name plus a suffix. */
             static std::string get_default_filename(const std::string& in_workload_filename);
 
-            /* Reads the index file, or makes the index of the workload and writes it if there is none, or there is one of another workload (or of this one
-             * as it was). Failing to write it is not a failure: the index is returned all the same.
-             */
+            /* Loads the index file, or builds and saves it if missing or of another (or a changed) workload. A failed save is not an error. */
             static bool load_or_build(const char*    in_workload_filename_ptr,
                                       const uint32_t& in_n_threads,
                                       WorkloadIndex*  out_index_ptr,
                                       bool*           out_was_built_ptr,
                                       std::string*    out_error_ptr);
 
-            /* Reads the workload, segment by segment, and makes the index of it. */
+            /* Builds the index by reading the workload segment by segment. */
             static bool build(const char*     in_workload_filename_ptr,
                               const uint32_t& in_n_threads,
                               WorkloadIndex*  out_index_ptr,
                               std::string*    out_error_ptr);
 
-            /* False, and why, if the file is not an index of this version. */
+            /* False (with the reason) if the file is not an index of this version. */
             static bool load(const char*    in_index_filename_ptr,
                              WorkloadIndex* out_index_ptr,
                              std::string*   out_error_ptr);
 
-            /* The segment which has the first call of the frame, or an earlier one if the frame started in it; false if the workload has no such frame. */
+            /* Segment holding the frame's first call (an earlier one if the frame started there); false if there is no such frame. */
             bool find_segment_of_frame(const uint64_t& in_frame_index,
                                        size_t*         out_n_segment_ptr) const;
 
             uint64_t get_n_calls() const;
 
-            /* The frames which ended, and the one that is still going on if calls follow the last of them. */
+            /* Ended frames, plus the open one if calls follow the last. */
             uint64_t get_n_frames() const;
 
             const std::vector<SegmentIndexEntry>& get_segment_vec() const;
 
-            /* True if the index was made of this file, as it is now. */
+            /* True if the index was built from this file in its current state. */
             bool is_of(const char* in_workload_filename_ptr) const;
 
-            /* True if the file ended in the middle of a segment: what follows was not read. */
+            /* True if the file ended mid-segment; the rest was not read. */
             bool is_truncated() const;
 
-            /* The options of a reader which starts at the segment, with its numbers of data chunks; the other options are the ones that are given. */
+            /* in_options with the start offset and data chunk count of the segment. */
             WorkloadReader::Options make_reader_options(const size_t&                   in_n_segment,
                                                         const WorkloadReader::Options& in_options) const;
 
-            /* The segments as a reader wants them (see WorkloadReader::Options::segment_start_vec), with where their state frames are in the index file. */
+            /* For WorkloadReader::Options::segment_start_vec, including state frame locations. */
             std::vector<WorkloadReader::SegmentStart> make_segment_start_vec() const;
 
-            /* False, and why, if the file cannot be written. */
+            /* False (with the reason) if the file cannot be written. */
             bool save(const char*  in_index_filename_ptr,
                       std::string* out_error_ptr) const;
 
         private:
-            /* What the file is, as far as the index can tell (see is_of()). */
+            /* Size and hashes used by is_of(). */
             struct Identity
             {
                 uint64_t head_hash = 0;
@@ -115,7 +110,7 @@ namespace Capture
             uint64_t                       m_n_calls;
             uint64_t                       m_n_frames;
             std::vector<SegmentIndexEntry> m_segment_vec;
-            std::vector<uint8_t>           m_state_byte_vec; /* the state frames, between build() and save() */
+            std::vector<uint8_t>           m_state_byte_vec; /* state frames, between build() and save() */
         };
     }
 }

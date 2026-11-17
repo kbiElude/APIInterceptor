@@ -50,11 +50,6 @@ Replay::ReplayEngineDLL::GLStateSaver::GLStateSaver(ResolveFunc in_resolve_func)
     /* Stub */
 }
 
-bool Replay::ReplayEngineDLL::GLStateSaver::has_saved_state() const
-{
-    return m_has_saved_state;
-}
-
 void Replay::ReplayEngineDLL::GLStateSaver::pop_attributes()
 {
     const auto pop_attrib_func_ptr        = reinterpret_cast<PFNPOPATTRIBPROC>      (m_resolve_func("glPopAttrib") );

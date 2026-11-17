@@ -307,13 +307,8 @@ void APIDumper::on_post_callback(APIInterceptor::APIFunction                in_a
         /* Ignore this callback if we've already dumped sufficient number of frames! */
         if (this_ptr->m_recorded.n_frames_dumped < this_ptr->m_settings.n_frames_to_dump)
         {
-            /* Update the cached API call's out args and returned value.
-             *
-             * In cases where OS DLL implementing the API function calls intercepted API functions, the relevant item
-             * may be a few items back. Calls from other threads may be in between, too, so look for the latest call of
-             * this function made by this thread which is still waiting for its results.
-             *
-             * A call which is not there was recorded before the dump was completed, and is already written.
+            /* Updates the cached call's out args and return value. The call may be several items back (nested intercepted calls, other threads),
+             * so find this thread's latest call of the function still awaiting results; a missing one was written before the dump completed.
              */
             const auto this_thread_id = static_cast<uint32_t>(::GetCurrentThreadId() );
 
@@ -348,10 +343,7 @@ void APIDumper::on_post_callback(APIInterceptor::APIFunction                in_a
             }
         }
 
-        /* If this is a frame present call, increment internal counter.
-         *
-         * TODO: This will break down badly for apps that do NOT use back buffer..
-         */
+        /* Counts frame present calls. Limitation: wrong for apps that do not use a back buffer. */
         if (APIInterceptor::is_frame_boundary(in_api_func,
                                               in_n_arguments_out,
                                               in_arguments_out_ptr) )
@@ -405,12 +397,7 @@ void APIDumper::on_pre_callback(APIInterceptor::APIFunction                in_ap
     /* Do NOT dump the API call if we've already dumped sufficient number of frames! */
     if (this_ptr->m_recorded.n_frames_dumped < this_ptr->m_settings.n_frames_to_dump)
     {
-        /* Cache API call's properties.
-         *
-         * TODO: This code totally ignores the fact that pointers passed to API calls may go out of scope
-         *       as soon as the API call is handled. This works fine for Q1 but will fail massively for
-         *       any more complex workload!
-         */
+        /* Caches the call's properties. Limitation: pointers passed to the call may go out of scope once it is handled. */
         {
             DumpedAPICall new_item;
             LARGE_INTEGER qpc_timestamp;
@@ -666,10 +653,7 @@ void APIDumper::wait_for_writer()
 
 void APIDumper::write_segment(SegmentJobUniquePtr in_job_ptr)
 {
-    /* Compression happens on the writer thread, which runs at a low priority. One thread compresses about 160 MB/s at this level, while an app
-     * can make a segment (128 MB, the spill threshold) in under 100 ms and then waits for the writer (see submit_segment()). The compressor therefore
-     * adds worker threads: with 8 of them the same segment takes about a sixth of the time, and the file is the same size.
-     */
+    /* Compression runs on the low-priority writer thread; the app waits for it in submit_segment(), so the compressor uses worker threads (same file size). */
     constexpr int    COMPRESSION_LEVEL         = 3;
     constexpr int    MAX_N_COMPRESSION_WORKERS = 8;
     constexpr int    N_CORES_LEFT_TO_THE_APP   = 2;

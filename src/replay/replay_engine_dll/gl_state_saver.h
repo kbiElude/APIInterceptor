@@ -27,9 +27,6 @@ namespace Replay
 
             explicit GLStateSaver(ResolveFunc in_resolve_func);
 
-            /* True after save(), until restore() takes the state back. */
-            bool has_saved_state() const;
-
             /* Puts back the state that save() found, and lets go of it. Does nothing if none is held, or if no context is current. */
             void restore();
 

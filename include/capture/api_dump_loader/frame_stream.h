@@ -35,9 +35,6 @@ namespace Capture
 
             const uint8_t* get_buffered_ptr() const;
 
-            /* Whether the frame is known to be cut or damaged so far (a frame which was read to the end is also checked by finish()). */
-            bool is_broken() const;
-
             /* Takes the bytes at the front out of the buffer, which peek() has made available. */
             void consume(const size_t& in_n_bytes);
 

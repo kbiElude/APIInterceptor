@@ -16,34 +16,33 @@ namespace Replay
 {
     namespace ReplayEngineDLL
     {
-        /* What the table of GL functions says about one of them (see gl_replay_table.inl). */
+        /* One entry of the GL function table (see gl_replay_table.inl). */
         struct GLFunctionInfo
         {
-            bool                    has_explicit_program;  /* the program of its uniform locations is its first parameter */
-            uint32_t                ignored_param_mask;    /* the parameters which are not replayed (passed as null)      */
+            bool                    has_explicit_program;  /* the uniform locations' program is the first parameter */
+            uint32_t                ignored_param_mask;    /* parameters not replayed (passed as null)              */
             const char*             name_ptr;
             std::vector<ObjectKind> param_kind_vec;
             ObjectKind              return_kind;
         };
 
-        /* What the replay of one GL call needs to know. The names of the objects are mapped through the remapper; the
-         * locations and the indices that a program hands out (of uniforms, uniform blocks, subroutines...) are told by the
-         * program, and kept here.
+        /* Per-call replay context. Object names go through the remapper; program-assigned locations and indices (uniforms, blocks,
+         * subroutines...) are kept here.
          */
         class GLReplayContext : public CallContext
         {
         public:
             GLReplayContext(ObjectRemapper* in_remapper_ptr);
 
-            /* Memory which lives till the end of the call, for the arguments which the replay has to make up. */
+            /* Memory valid until the end of the call, for arguments the replay makes up. */
             std::vector<uint8_t>* allocate_scratch(const size_t& in_n_bytes);
 
             std::string* allocate_string();
 
-            /* The arguments which stand for the strings of a string array. */
+            /* Pointers standing for the strings of a string array argument. */
             std::vector<const char*>* allocate_string_pointers();
 
-            /* Starts the call: what the previous one asked for is gone. */
+            /* Starts a call; state of the previous call is discarded. */
             void begin_call(const Capture::APIDumpLoader::DumpedAPICall* in_call_ptr,
                             const IChunkSource*                          in_chunk_source_ptr,
                             const size_t&                                in_n_head_arguments,
@@ -51,7 +50,7 @@ namespace Replay
 
             void forget_locations();
 
-            /* The program that glUseProgram() set: its dumped name. */
+            /* Dumped name of the program set by glUseProgram(). */
             uint64_t get_current_program() const;
 
             uint64_t   get_live_return ()                            const;
@@ -59,29 +58,21 @@ namespace Replay
             bool       is_param_ignored(const size_t& in_n_argument) const;
             bool       is_skipped      ()                            const;
 
-            /* True if a buffer is bound to the target that glReadPixels and the other reads of pixels write to: the pointer of such a call is then an offset in
-             * the buffer, and not the address of memory of the program.
-             */
+            /* True if a buffer is bound to the pixel pack target: the pointer of glReadPixels and similar calls is then a buffer offset. */
             bool is_pixel_pack_buffer_bound() const;
 
-            /* How many bytes the driver writes to a pointer of the call which the dump holds no data of (the dumper does not know how much a call writes
-             * to a place of the program, which is not a name of an object): the calls that write a known number of bytes, to memory of the dumped process.
-             * 0 for any other pointer, which the replay cannot give memory to.
+            /* Bytes the driver writes through a pointer the dump has no data for (the dumper cannot know), for calls writing a known
+             * size into the dumped process's memory. 0 for any other pointer (the replay cannot provide memory).
              */
             size_t get_unrecorded_output_n_bytes(const size_t& in_n_argument) const;
 
-            /* Maps what the dump holds to what the replay has: a name, or a location, or an index. Values which the replay
-             * has not seen are passed on as they are.
-             */
-            /* A numeric argument of the call: it can be a name or a location. */
+            /* Maps a dumped numeric argument (name, location or index) to the replay's; unseen values pass through unchanged. */
             uint32_t map_argument(const size_t&   in_n_argument,
                                   const uint32_t& in_dumped_value) const;
 
             uint32_t map_attrib_location(const uint32_t& in_dumped_location) const;
 
-            /* The indices that a program hands out to the app are those of the program (and, for subroutines, of a shader
-             * stage): the scope is the shader type, or 0.
-             */
+            /* Indices are per program (and per shader stage for subroutines): the scope is the shader type, or 0. */
             uint32_t map_index(const ObjectKind& in_kind,
                                const uint64_t&   in_dumped_program,
                                const uint32_t&   in_scope,
@@ -101,7 +92,7 @@ namespace Replay
                                               const uint32_t&   in_dumped_name,
                                               const uint32_t&   in_live_name);
 
-            /* The function returned the name of an object, or of the first of a range of them. */
+            /* The call returned an object name, or the first of a range. */
             void register_returned_name(const uint64_t& in_live_value);
 
             void register_uniform_location(const uint64_t& in_dumped_program,
@@ -113,15 +104,13 @@ namespace Replay
             void set_pixel_pack_buffer_bound(const bool&     in_is_bound);
 
         private:
-            /* The kind of the index, the dumped program, the scope and the dumped index. */
+            /* Kind, dumped program, scope, dumped index. */
             typedef std::tuple<ObjectKind, uint64_t, uint32_t, uint32_t> IndexKey;
 
-            /* The program an index of this call belongs to: the one the call names (its first parameter), or the current one. */
+            /* The program named by the call's first parameter, else the current one. */
             uint64_t get_index_program() const;
 
-            /* The number of components of a pixel of the format, and the bytes of one of them (or of the whole pixel, for a packed type): a number that is
-             * never less than the true one, for a format or a type that is not known.
-             */
+            /* Components per pixel of the format, and bytes per component (per pixel for packed types); never below the true value for unknown formats/types. */
             static uint64_t get_pixel_n_components(const uint32_t& in_format);
             static uint64_t get_pixel_type_n_bytes(const uint32_t& in_type);
 

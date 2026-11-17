@@ -30,9 +30,7 @@ public:
 
 private:
     /* Private types */
-    /* mutex is held while a segment is being cut, and taken before RecordedState::mutex. writer_thread must only be
-     * accessed with it held (bar the destructor).
-     */
+    /* mutex is held while a segment is cut and taken before RecordedState::mutex; writer_thread needs it (except in the destructor). */
     struct CutState
     {
         std::mutex  mutex;
@@ -58,20 +56,18 @@ private:
         std::unique_ptr<std::vector<uint8_t> > u8_vec_ptr;
     };
 
-    /* What has been recorded and not handed over to the writer yet. Everything but n_frames_dumped, which is also read
-     * without the lock, must only be accessed with mutex held.
-     */
+    /* Recorded and not yet handed to the writer. All but n_frames_dumped (also read unlocked) need mutex held. */
     struct RecordedState
     {
-        std::deque<DumpedAPICall>  api_call_deque;                  /* no big reallocations on the render thread                 */
-        uint32_t                   chunk_scan_cursor     = 0;       /* first data chunk not yet counted in n_chunk_bytes_counted */
+        std::deque<DumpedAPICall>  api_call_deque;                  /* no big reallocations on the render thread */
+        uint32_t                   chunk_scan_cursor     = 0;       /* first chunk not yet in n_chunk_bytes_counted */
         FILE*                      file_handle           = nullptr;
         bool                       is_workload_written   = false;
         std::mutex                 mutex;
-        uint64_t                   n_chunk_bytes_counted = 0;       /* of the data chunks which are not handed over yet           */
-        uint32_t                   n_data_chunks_written = 0;       /* handed over, to be precise                                 */
+        uint64_t                   n_chunk_bytes_counted = 0;       /* of the chunks not handed over yet   */
+        uint32_t                   n_data_chunks_written = 0;       /* handed over                         */
         std::atomic<uint32_t>      n_frames_dumped;
-        uint64_t                   n_surface_bytes       = 0;       /* of the surfaces which are not handed over yet              */
+        uint64_t                   n_surface_bytes       = 0;       /* of the surfaces not handed over yet */
         std::vector<DumpedSurface> surface_vec;
 
         RecordedState()
@@ -81,7 +77,7 @@ private:
         }
     };
 
-    /* A segment of the workload, handed over to the writer thread. Follows the types it is made of. */
+    /* A workload segment handed to the writer thread. */
     struct SegmentJob
     {
         std::deque<DumpedAPICall>          api_call_deque;
@@ -105,37 +101,32 @@ private:
     /* Private funcs */
     APIDumper();
 
-    /* Cuts the workload at a frame boundary: hands over what has been recorded, if enough has piled up (or if the dump
-     * is complete, in which case the last segment is written). Must be called without the dumper's mutex held, from
-     * within an intercepted API call. Other threads are held back from entering intercepted calls for the time of the
-     * cut, so that no call ends up split between two segments.
+    /* Cuts at a frame boundary: hands over the recording if enough has piled up, or the last segment if the dump is complete. Call
+     * without the dumper's mutex, from within an intercepted call. Other threads are held out of intercepted calls meanwhile, so no
+     * call is split between segments.
      */
     void cut_segment(const bool& in_is_last);
 
-    /* What the store of the data chunks runs when it is full (see APIInterceptor::set_data_chunk_drain()). Any thread. Once the dump is complete nothing
-     * reads the chunks, so it releases them all. While the dump is in progress the chunks belong to calls that are not written yet, and a segment is cut
-     * only between frames (the tools that seek by frame rely on it), so it frees nothing: the cut that on_frame_presented() makes does, and a frame that
-     * holds more than the store may makes the store end the process, saying so.
+    /* Run when the data chunk store is full (see APIInterceptor::set_data_chunk_drain()). Any thread. Releases all chunks once the dump
+     * is complete; during the dump it frees nothing (segments are cut only between frames), so a frame larger than the store ends the process.
      */
     void drain_data_chunks();
 
-    /* Bytes held in memory by what has not been handed over to the writer yet. */
+    /* Bytes held by what has not been handed to the writer. */
     uint64_t get_n_unwritten_bytes();
 
     bool init();
 
-    /* Called once a frame has been presented. Decides whether to cut the workload. */
+    /* After a frame is presented; decides whether to cut. */
     void on_frame_presented();
 
     /* Does the work of cut_segment(), with m_cut.mutex held. */
     void perform_cut(const bool& in_is_last);
 
-    /* Keeps a surface which was read, so that it is written with the segment it belongs to. Takes the mutex of the recorded state. */
+    /* Keeps a read surface for its segment. Takes the recorded state's mutex. */
     void store_surface(DumpedSurface in_surface);
 
-    /* Hands over what has been recorded to the writer thread, which writes it out as a segment. Blocks only until the
-     * previous segment is on disk. Must be called with the dumper's mutex held.
-     */
+    /* Hands the recording to the writer thread as a segment; blocks only until the previous segment is on disk. Needs the dumper's mutex. */
     void submit_segment(const bool& in_is_last);
 
     void wait_for_writer();
@@ -154,9 +145,7 @@ private:
                                    bool*                                      out_should_pass_through_ptr);
     static void on_process_exiting(void*                                      in_user_arg_ptr);
 
-    /* Reads the frame which a call is about to present, if the call is one which presents a frame of an API the dumper can
-     * read. Every reader is of one API; this is the only place which tells which is which. False if there is nothing to store.
-     */
+    /* Reads the frame a presenting call is about to show, for APIs the dumper can read (the only place that tells which). False if nothing to store. */
     static bool read_frame_surface(const APIInterceptor::APIFunction&         in_api_func,
                                    const uint32_t&                            in_n_arguments_in,
                                    const APIInterceptor::APIFunctionArgument* in_arguments_in_ptr,
@@ -167,7 +156,7 @@ private:
     /* Private vars */
     CutState                                    m_cut;
     Capture::APIDumperDLL::FrameRateLimiterUniquePtr m_frame_rate_limiter_ptr; /* null: the app is not held */
-    std::atomic<bool> m_is_dump_complete = {false}; /* the last segment was handed over; read without the mutex by drain_data_chunks() */
+    std::atomic<bool> m_is_dump_complete = {false}; /* last segment handed over; read unlocked by drain_data_chunks() */
     RecordedState     m_recorded;
     Settings          m_settings;
 };

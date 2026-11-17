@@ -192,7 +192,7 @@ end:
                         static_cast<__int64>(in_start.state_offset_n_bytes),
                         SEEK_SET) == 0)
         {
-            out_frame_byte_vec_ptr->resize(in_start.state_n_bytes);
+            out_frame_byte_vec_ptr->resize(static_cast<size_t>(in_start.state_n_bytes) );
 
             result = (::fread(out_frame_byte_vec_ptr->data(),
                               1,

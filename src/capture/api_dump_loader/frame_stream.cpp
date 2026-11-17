@@ -89,11 +89,6 @@ const uint8_t* Capture::APIDumpLoader::FrameStream::get_buffered_ptr() const
     return m_buffer_u8_vec.data() + m_buffer_start;
 }
 
-bool Capture::APIDumpLoader::FrameStream::is_broken() const
-{
-    return m_is_broken;
-}
-
 size_t Capture::APIDumpLoader::FrameStream::peek(const size_t& in_n_bytes)
 {
     if (m_buffer_end - m_buffer_start < in_n_bytes)

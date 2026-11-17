@@ -2,12 +2,8 @@
  *
  * This code is licensed under MIT license (see LICENSE.txt for details)
  *
- * Reads a workload file one segment at a time (see common/workload_format.h for the file layout), so that a dump needs not fit
- * in memory. A file which is still being written, or which ends abruptly, can be read as far as it goes.
- *
- * Each segment is a Zstandard frame of its own, so the segments can be decompressed and read at the same time: with threads (see Options),
- * the reader works on the next segments while the caller works on the one it has, and hands them out in the order of the file all the same.
- * What a caller sees is the same with and without them.
+ * Reads a workload file one segment at a time (layout: common/workload_format.h); a file still being written or cut off is read as far
+ * as it goes. With threads (see Options) segments are decompressed ahead but handed out in file order; results are the same.
  */
 #if !defined(APIDUMPLOADER_WORKLOAD_READER_H)
 #define APIDUMPLOADER_WORKLOAD_READER_H
@@ -33,8 +29,7 @@ namespace Capture
         class WorkloadReader
         {
         public:
-            /* How a reader goes about it. */
-            /* Where a segment is in the file and what it numbers from, as the index of the workload has it (see WorkloadIndex). */
+            /* Where a segment is in the file and what it numbers from, as in the workload index (see WorkloadIndex). */
             struct SegmentStart
             {
                 uint64_t file_offset_n_bytes  = 0;
@@ -48,64 +43,50 @@ namespace Capture
 
             struct Options
             {
-                /* Makes the function that says which calls of a segment are kept, for each segment (see CallKeptFunc). The calls it does not keep never reach the
-                 * caller, which is what makes a replay that leaves out what some frames make cheap: they are not made into calls. Only for the segments that
-                 * segment_start_vec has. Empty: all calls are kept.
+                /* Makes, per segment, the function that says which calls are kept (see CallKeptFunc); others never reach the caller.
+                 * Only for segments in segment_start_vec. Empty: all calls are kept.
                  */
                 CallKeptFuncFactory call_kept_func_factory;
 
-                /* Asked of each call, with the number of its frame: the data chunks that calls refer to and none of them wants come as empty chunks (the
-                 * chunks after them keep their numbers). For a replay that leaves out what some frames make. It is asked by the threads of the reader, as
-                 * a segment is decoded, and only of the segments that segment_start_vec has. Empty: all chunks are wanted.
+                /* Asked per call (with its frame number); chunks that no call wants come as empty chunks (numbering is kept). Called on
+                 * reader threads while decoding, only for segments in segment_start_vec. Empty: all chunks are wanted.
                  */
                 ChunkWantedFunc chunk_wanted_func;
 
-                /* The checksums which the dumper writes with each compressed frame are not checked: a quarter of the time of reading a workload goes to them. For the
-                 * replay of a workload which was checked when it was made or read before; the tools which say what is in a workload check them. false: they are.
-                 */
+                /* true: the dumper's per-frame checksums are not checked, for workloads already verified. */
                 bool ignores_checksums = false;
 
-                /* The segments which are being read or are waiting for the caller, at most; each is held in memory in full (a segment is as
-                 * large as the dumper's memory was when it spilled). 0 is n_threads + 2.
-                 */
+                /* Maximum segments being read or waiting for the caller; each is held in memory in full. 0: n_threads + 2. */
                 uint32_t n_segments_in_flight = 0;
 
-                /* The number of data chunks in the segments before the one that the reader starts at (see start_offset_n_bytes): the chunks of the segments it
-                 * reads are numbered as they are in the dump. The index of a workload has it (see WorkloadIndex).
-                 */
+                /* Data chunks in the segments before start_offset_n_bytes, so chunk numbers match the dump (the index has it, see WorkloadIndex). */
                 uint32_t n_data_chunks_before = 0;
 
-                /* The threads which read segments ahead of the caller. 0: the caller reads a segment itself when it asks for it. */
+                /* Threads reading ahead. 0: the caller reads a segment itself when it asks for it. */
                 uint32_t n_threads = 0;
 
-                /* The segments (by file offset, ascending) whose chunks chunk_wanted_func is asked about: the segments of the workload, from its index. */
+                /* Segments (file offset, ascending) that chunk_wanted_func applies to; taken from the index. */
                 std::vector<SegmentStart> segment_start_vec;
 
-                /* A data chunk of more bytes than this comes as an empty one (the chunks after it keep their numbers), and is not copied
-                 * anywhere: for tools which look at the calls and not at the vertices and pixels, which are most of a workload. 0: none is left out.
-                 */
+                /* Data chunks above this size come as empty chunks (numbering is kept) and are not copied. 0: none is left out. */
                 uint32_t skip_data_chunks_above_n_bytes = 0;
 
-                /* The index file, and which segments come from its state frames: those of segment_start_vec with one that the function wants as state only. */
+                /* The index file; segments of segment_start_vec with a state frame that state_only_func wants as state only come from it. */
                 std::string state_filename;
                 StateOnlyFunc state_only_func;
 
-                /* The images of the swap chains in the file come as empty ones (their sizes are kept, so they are counted): for tools which have no use for them, as
-                 * a replay makes its own. */
+                /* Swap chain images come as empty ones (sizes are kept and counted). */
                 bool skip_surfaces = false;
 
-                /* Where in the file the reader starts: at the start of a segment (a frame of the file, see Workload::file_offset_n_bytes). 0: after the header,
-                 * which is the start of the file. The calls of the segments before it are not read, so what a tool follows from call to call is not
-                 * what it would be if it read them (the names of objects, for one).
+                /* Start of the segment to begin at (see Workload::file_offset_n_bytes). 0: the start of the file. Earlier calls are not read,
+                 * so state a tool follows across calls (object names) is incomplete.
                  */
                 uint64_t start_offset_n_bytes = 0;
             };
 
             ~WorkloadReader();
 
-            /* Returns nullptr if the file cannot be opened, or is not a workload this version can read. In that case,
-             * *out_error_ptr (if not null) says why.
-             */
+            /* Returns nullptr (and sets *out_error_ptr if not null) if the file cannot be opened or is not a readable workload. */
             static WorkloadReaderUniquePtr create(const char*    in_filename_ptr,
                                                   std::string*   out_error_ptr = nullptr);
             static WorkloadReaderUniquePtr create(const char*    in_filename_ptr,
@@ -113,20 +94,17 @@ namespace Capture
                                                   std::string*   out_error_ptr = nullptr);
 
 
-            /* Reads on until it meets a call of the group. The segments which were read are gone, so this is for a reader
-             * which has not been used for anything else. Returns false if the file has no such call.
-             */
+            /* Reads until a call of the group; the segments read are consumed, so use only on an unused reader. False if there is none. */
             bool contains_api_group(const APIGroup& in_group);
 
-            /* Of the process which was dumped. */
+            /* Pointer size of the dumped process. */
             uint32_t get_pointer_n_bytes() const;
 
             /* True if the file ended in the middle of a segment. */
             bool is_truncated() const;
 
-            /* Reads the next segment, replacing the contents of *out_workload_ptr. Returns false once there is no segment
-             * left. If the file ends in the middle of a segment, the part which is complete is returned, and
-             * is_truncated() starts to return true; the next call returns false.
+            /* Replaces *out_workload_ptr with the next segment; false when none is left. A cut-off segment is returned as far as it is
+             * complete and is_truncated() turns true; the next call returns false.
              */
             bool read_next_segment(Workload* out_workload_ptr);
 
@@ -134,36 +112,36 @@ namespace Capture
             struct FrameSource;
             struct Pipeline;
 
-            /* A segment, as a frame of the file made it. */
+            /* A segment decoded from a file frame. */
             struct DecodedSegment
             {
-                uint64_t                  file_offset_n_bytes = 0; /* of the frame, in the file                                        */
-                bool                      has_segment  = false; /* the frame held at least the counts of a segment */
-                bool                      is_truncated = false; /* the frame was cut or damaged, or the segment is short of what its counts say */
-                uint64_t                  n_compressed_bytes  = 0; /* of the frame                                                      */
+                uint64_t                  file_offset_n_bytes = 0; /* of the frame */
+                bool                      has_segment  = false; /* the frame held at least a segment's counts */
+                bool                      is_truncated = false; /* frame cut or damaged, or segment short of its counts */
+                uint64_t                  n_compressed_bytes  = 0; /* of the frame */
                 std::unique_ptr<Workload> workload_ptr;
             };
 
             WorkloadReader();
 
-            /* Makes a segment of the bytes of a frame. A frame which is cut is decompressed as far as it goes. */
+            /* Decodes a frame's bytes; a cut frame is decompressed as far as it goes. */
             static void decode_frame(ZSTD_DCtx*                  in_decompressor_ptr,
                                      const std::vector<uint8_t>& in_frame_byte_vec,
                                      const uint64_t&             in_file_offset_n_bytes,
                                      const Options&              in_options,
                                      DecodedSegment*             out_segment_ptr);
 
-            /* The next segment of the file, in order. */
+            /* Next segment in file order. */
             FrameFetch fetch_next_segment(DecodedSegment* out_segment_ptr);
 
-            ZSTD_DCtx*                     m_decompressor_ptr;    /* for the caller's own reading, without threads */
+            ZSTD_DCtx*                     m_decompressor_ptr;    /* for reading without threads */
             FILE*                          m_file_handle;
             std::unique_ptr<FrameSource>   m_frame_source_ptr;
             bool                           m_is_finished;
             bool                           m_is_truncated;
             uint32_t                       m_n_data_chunks_read;
             Options                        m_options;
-            std::unique_ptr<Pipeline>      m_pipeline_ptr;        /* the threads, if there are any */
+            std::unique_ptr<Pipeline>      m_pipeline_ptr;        /* null without threads */
             uint32_t                       m_pointer_n_bytes;
             uint64_t                       m_qpc_frequency;
         };
