@@ -664,47 +664,19 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_indexed_primitive(std::stri
     constexpr size_t TYPE_ARGUMENT       = 1;
     constexpr size_t VERTICES_ARGUMENT   = 9;
 
-    void*    device_ptr = nullptr;
-    uint32_t flags      = 0;
-    uint32_t fvf        = 0;
-    uint32_t n_indices  = 0;
-    uint32_t n_vertices = 0;
-    uint32_t type       = 0;
-    bool     result     = false;
+    D3D7DrawLayout layout;
+    bool           result = false;
+    D3D7DrawValues values;
 
-    if (get_live_object(0,
-                       &device_ptr,
-                        out_error_ptr) == false)
-    {
-        goto end;
-    }
+    layout.flags      = FLAGS_ARGUMENT;
+    layout.fvf        = FVF_ARGUMENT;
+    layout.n_indices  = N_INDICES_ARGUMENT;
+    layout.n_vertices = N_VERTICES_ARGUMENT;
+    layout.type       = TYPE_ARGUMENT;
 
-    if (get_u32(FLAGS_ARGUMENT,
-               &flags) == false)
-    {
-        goto end;
-    }
-
-    if (get_u32(FVF_ARGUMENT,
-               &fvf) == false)
-    {
-        goto end;
-    }
-
-    if (get_u32(N_INDICES_ARGUMENT,
-               &n_indices) == false)
-    {
-        goto end;
-    }
-
-    if (get_u32(N_VERTICES_ARGUMENT,
-               &n_vertices) == false)
-    {
-        goto end;
-    }
-
-    if (get_u32(TYPE_ARGUMENT,
-               &type) == false)
+    if (read_draw_arguments(layout,
+                           &values,
+                            out_error_ptr) == false)
     {
         goto end;
     }
@@ -715,15 +687,15 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_indexed_primitive(std::stri
         WORD* const    indices_ptr  = reinterpret_cast<WORD*>(const_cast<uint8_t*>(get_chunk_ptr(INDICES_ARGUMENT)));
         uint8_t* const vertices_ptr = const_cast<uint8_t*>   (get_chunk_ptr                     (VERTICES_ARGUMENT));
 
-        call_method<HRESULT>(device_ptr,
+        call_method<HRESULT>(values.device_ptr,
                              Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_DRAWINDEXEDPRIMITIVE,
-                             static_cast<Interception::Hooks::D3D7::D3DPRIMITIVETYPE>(type),
-                             static_cast<DWORD>                                      (fvf),
+                             static_cast<Interception::Hooks::D3D7::D3DPRIMITIVETYPE>(values.type),
+                             static_cast<DWORD>                                      (values.fvf),
                              vertices_ptr,
-                             static_cast<DWORD>                                      (n_vertices),
+                             static_cast<DWORD>                                      (values.n_vertices),
                              indices_ptr,
-                             static_cast<DWORD>                                      (n_indices),
-                             static_cast<DWORD>                                      (flags) );
+                             static_cast<DWORD>                                      (values.n_indices),
+                             static_cast<DWORD>                                      (values.flags) );
     }
 
 end:
@@ -741,48 +713,20 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_indexed_primitive_strided(s
     constexpr size_t STRIDED_ARGUMENT      = 3;
     constexpr size_t TYPE_ARGUMENT         = 1;
 
-    void*                                                   device_ptr = nullptr;
-    uint32_t                                                flags      = 0;
-    uint32_t                                                fvf        = 0;
-    uint32_t                                                n_indices  = 0;
-    uint32_t                                                n_vertices = 0;
-    bool                                                    result     = false;
-    Interception::Hooks::D3D7::D3DDRAWPRIMITIVESTRIDEDDATA  strided    = {};
-    uint32_t                                                type       = 0;
+    D3D7DrawLayout                                          layout;
+    bool                                                    result  = false;
+    Interception::Hooks::D3D7::D3DDRAWPRIMITIVESTRIDEDDATA  strided = {};
+    D3D7DrawValues                                          values;
 
-    if (get_live_object(0,
-                       &device_ptr,
-                        out_error_ptr) == false)
-    {
-        goto end;
-    }
+    layout.flags      = FLAGS_ARGUMENT;
+    layout.fvf        = FVF_ARGUMENT;
+    layout.n_indices  = N_INDICES_ARGUMENT;
+    layout.n_vertices = N_VERTICES_ARGUMENT;
+    layout.type       = TYPE_ARGUMENT;
 
-    if (get_u32(FLAGS_ARGUMENT,
-               &flags) == false)
-    {
-        goto end;
-    }
-
-    if (get_u32(FVF_ARGUMENT,
-               &fvf) == false)
-    {
-        goto end;
-    }
-
-    if (get_u32(N_INDICES_ARGUMENT,
-               &n_indices) == false)
-    {
-        goto end;
-    }
-
-    if (get_u32(N_VERTICES_ARGUMENT,
-               &n_vertices) == false)
-    {
-        goto end;
-    }
-
-    if (get_u32(TYPE_ARGUMENT,
-               &type) == false)
+    if (read_draw_arguments(layout,
+                           &values,
+                            out_error_ptr) == false)
     {
         goto end;
     }
@@ -801,15 +745,15 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_indexed_primitive_strided(s
     {
         WORD* const indices_ptr = reinterpret_cast<WORD*>(const_cast<uint8_t*>(get_chunk_ptr(INDICES_ARGUMENT)));
 
-        call_method<HRESULT>(device_ptr,
+        call_method<HRESULT>(values.device_ptr,
                              Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_DRAWINDEXEDPRIMITIVESTRIDED,
-                             static_cast<Interception::Hooks::D3D7::D3DPRIMITIVETYPE>(type),
-                             static_cast<DWORD>                                      (fvf),
+                             static_cast<Interception::Hooks::D3D7::D3DPRIMITIVETYPE>(values.type),
+                             static_cast<DWORD>                                      (values.fvf),
                             &strided,
-                             static_cast<DWORD>                                      (n_vertices),
+                             static_cast<DWORD>                                      (values.n_vertices),
                              indices_ptr,
-                             static_cast<DWORD>                                      (n_indices),
-                             static_cast<DWORD>                                      (flags) );
+                             static_cast<DWORD>                                      (values.n_indices),
+                             static_cast<DWORD>                                      (values.flags) );
     }
 
 end:
@@ -826,55 +770,20 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_indexed_primitive_vb(std::s
     constexpr size_t TYPE_ARGUMENT          = 1;
     constexpr size_t VERTEX_BUFFER_ARGUMENT = 2;
 
-    void*    device_ptr        = nullptr;
-    uint32_t flags             = 0;
-    uint32_t n_indices         = 0;
-    uint32_t n_vertices        = 0;
-    bool     result            = false;
-    uint32_t start_vertex      = 0;
-    uint32_t type              = 0;
-    void*    vertex_buffer_ptr = nullptr;
+    D3D7DrawLayout layout;
+    bool           result = false;
+    D3D7DrawValues values;
 
-    if (get_live_object(0,
-                       &device_ptr,
-                        out_error_ptr) == false)
-    {
-        goto end;
-    }
+    layout.flags         = FLAGS_ARGUMENT;
+    layout.n_indices     = N_INDICES_ARGUMENT;
+    layout.n_vertices    = N_VERTICES_ARGUMENT;
+    layout.start_vertex  = START_VERTEX_ARGUMENT;
+    layout.type          = TYPE_ARGUMENT;
+    layout.vertex_buffer = VERTEX_BUFFER_ARGUMENT;
 
-    if (get_live_object(VERTEX_BUFFER_ARGUMENT,
-                       &vertex_buffer_ptr,
-                        out_error_ptr) == false)
-    {
-        goto end;
-    }
-
-    if (get_u32(FLAGS_ARGUMENT,
-               &flags) == false)
-    {
-        goto end;
-    }
-
-    if (get_u32(N_INDICES_ARGUMENT,
-               &n_indices) == false)
-    {
-        goto end;
-    }
-
-    if (get_u32(N_VERTICES_ARGUMENT,
-               &n_vertices) == false)
-    {
-        goto end;
-    }
-
-    if (get_u32(START_VERTEX_ARGUMENT,
-               &start_vertex) == false)
-    {
-        goto end;
-    }
-
-    if (get_u32(TYPE_ARGUMENT,
-               &type) == false)
+    if (read_draw_arguments(layout,
+                           &values,
+                            out_error_ptr) == false)
     {
         goto end;
     }
@@ -884,15 +793,15 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_indexed_primitive_vb(std::s
     {
         WORD* const indices_ptr = reinterpret_cast<WORD*>(const_cast<uint8_t*>(get_chunk_ptr(INDICES_ARGUMENT)));
 
-        call_method<HRESULT>(device_ptr,
+        call_method<HRESULT>(values.device_ptr,
                              Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_DRAWINDEXEDPRIMITIVEVB,
-                             static_cast<Interception::Hooks::D3D7::D3DPRIMITIVETYPE>(type),
-                             vertex_buffer_ptr,
-                             static_cast<DWORD>                                      (start_vertex),
-                             static_cast<DWORD>                                      (n_vertices),
+                             static_cast<Interception::Hooks::D3D7::D3DPRIMITIVETYPE>(values.type),
+                             values.vertex_buffer_ptr,
+                             static_cast<DWORD>                                      (values.start_vertex),
+                             static_cast<DWORD>                                      (values.n_vertices),
                              indices_ptr,
-                             static_cast<DWORD>                                      (n_indices),
-                             static_cast<DWORD>                                      (flags) );
+                             static_cast<DWORD>                                      (values.n_indices),
+                             static_cast<DWORD>                                      (values.flags) );
     }
 
 end:
@@ -907,40 +816,18 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_primitive(std::string* out_
     constexpr size_t TYPE_ARGUMENT       = 1;
     constexpr size_t VERTICES_ARGUMENT   = 6; /* follow the arguments of the method, in a data chunk */
 
-    void*    device_ptr = nullptr;
-    uint32_t flags      = 0;
-    uint32_t fvf        = 0;
-    uint32_t n_vertices = 0;
-    uint32_t type       = 0;
-    bool     result     = false;
+    D3D7DrawLayout layout;
+    bool           result = false;
+    D3D7DrawValues values;
 
-    if (get_live_object(0,
-                       &device_ptr,
-                        out_error_ptr) == false)
-    {
-        goto end;
-    }
+    layout.flags      = FLAGS_ARGUMENT;
+    layout.fvf        = FVF_ARGUMENT;
+    layout.n_vertices = N_VERTICES_ARGUMENT;
+    layout.type       = TYPE_ARGUMENT;
 
-    if (get_u32(FLAGS_ARGUMENT,
-               &flags) == false)
-    {
-        goto end;
-    }
-
-    if (get_u32(FVF_ARGUMENT,
-               &fvf) == false)
-    {
-        goto end;
-    }
-
-    if (get_u32(N_VERTICES_ARGUMENT,
-               &n_vertices) == false)
-    {
-        goto end;
-    }
-
-    if (get_u32(TYPE_ARGUMENT,
-               &type) == false)
+    if (read_draw_arguments(layout,
+                           &values,
+                            out_error_ptr) == false)
     {
         goto end;
     }
@@ -950,13 +837,13 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_primitive(std::string* out_
     {
         uint8_t* const vertices_ptr = const_cast<uint8_t*>(get_chunk_ptr(VERTICES_ARGUMENT));
 
-        call_method<HRESULT>(device_ptr,
+        call_method<HRESULT>(values.device_ptr,
                              Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_DRAWPRIMITIVE,
-                             static_cast<Interception::Hooks::D3D7::D3DPRIMITIVETYPE>(type),
-                             static_cast<DWORD>                                      (fvf),
+                             static_cast<Interception::Hooks::D3D7::D3DPRIMITIVETYPE>(values.type),
+                             static_cast<DWORD>                                      (values.fvf),
                              vertices_ptr,
-                             static_cast<DWORD>                                      (n_vertices),
-                             static_cast<DWORD>                                      (flags) );
+                             static_cast<DWORD>                                      (values.n_vertices),
+                             static_cast<DWORD>                                      (values.flags) );
     }
 
 end:
@@ -972,41 +859,19 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_primitive_strided(std::stri
     constexpr size_t STRIDED_ARGUMENT      = 3;
     constexpr size_t TYPE_ARGUMENT         = 1;
 
-    void*                                                  device_ptr = nullptr;
-    uint32_t                                               flags      = 0;
-    uint32_t                                               fvf        = 0;
-    uint32_t                                               n_vertices = 0;
-    bool                                                   result     = false;
-    Interception::Hooks::D3D7::D3DDRAWPRIMITIVESTRIDEDDATA strided    = {};
-    uint32_t                                               type       = 0;
+    D3D7DrawLayout                                          layout;
+    bool                                                    result  = false;
+    Interception::Hooks::D3D7::D3DDRAWPRIMITIVESTRIDEDDATA  strided = {};
+    D3D7DrawValues                                          values;
 
-    if (get_live_object(0,
-                       &device_ptr,
-                        out_error_ptr) == false)
-    {
-        goto end;
-    }
+    layout.flags      = FLAGS_ARGUMENT;
+    layout.fvf        = FVF_ARGUMENT;
+    layout.n_vertices = N_VERTICES_ARGUMENT;
+    layout.type       = TYPE_ARGUMENT;
 
-    if (get_u32(FLAGS_ARGUMENT,
-               &flags) == false)
-    {
-        goto end;
-    }
-
-    if (get_u32(FVF_ARGUMENT,
-               &fvf) == false)
-    {
-        goto end;
-    }
-
-    if (get_u32(N_VERTICES_ARGUMENT,
-               &n_vertices) == false)
-    {
-        goto end;
-    }
-
-    if (get_u32(TYPE_ARGUMENT,
-               &type) == false)
+    if (read_draw_arguments(layout,
+                           &values,
+                            out_error_ptr) == false)
     {
         goto end;
     }
@@ -1022,13 +887,13 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_primitive_strided(std::stri
 
     result = true;
 
-    call_method<HRESULT>(device_ptr,
+    call_method<HRESULT>(values.device_ptr,
                          Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_DRAWPRIMITIVESTRIDED,
-                         static_cast<Interception::Hooks::D3D7::D3DPRIMITIVETYPE>(type),
-                         static_cast<DWORD>                                      (fvf),
+                         static_cast<Interception::Hooks::D3D7::D3DPRIMITIVETYPE>(values.type),
+                         static_cast<DWORD>                                      (values.fvf),
                         &strided,
-                         static_cast<DWORD>                                      (n_vertices),
-                         static_cast<DWORD>                                      (flags) );
+                         static_cast<DWORD>                                      (values.n_vertices),
+                         static_cast<DWORD>                                      (values.flags) );
 
 end:
     return result;
@@ -1042,61 +907,32 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::draw_primitive_vb(std::string* o
     constexpr size_t TYPE_ARGUMENT          = 1;
     constexpr size_t VERTEX_BUFFER_ARGUMENT = 2;
 
-    void*    device_ptr        = nullptr;
-    uint32_t flags             = 0;
-    uint32_t n_vertices        = 0;
-    bool     result            = false;
-    uint32_t start_vertex      = 0;
-    uint32_t type              = 0;
-    void*    vertex_buffer_ptr = nullptr;
+    D3D7DrawLayout layout;
+    bool           result = false;
+    D3D7DrawValues values;
 
-    if (get_live_object(0,
-                       &device_ptr,
-                        out_error_ptr) == false)
-    {
-        goto end;
-    }
+    layout.flags         = FLAGS_ARGUMENT;
+    layout.n_vertices    = N_VERTICES_ARGUMENT;
+    layout.start_vertex  = START_VERTEX_ARGUMENT;
+    layout.type          = TYPE_ARGUMENT;
+    layout.vertex_buffer = VERTEX_BUFFER_ARGUMENT;
 
-    if (get_live_object(VERTEX_BUFFER_ARGUMENT,
-                       &vertex_buffer_ptr,
-                        out_error_ptr) == false)
-    {
-        goto end;
-    }
-
-    if (get_u32(FLAGS_ARGUMENT,
-               &flags) == false)
-    {
-        goto end;
-    }
-
-    if (get_u32(N_VERTICES_ARGUMENT,
-               &n_vertices) == false)
-    {
-        goto end;
-    }
-
-    if (get_u32(START_VERTEX_ARGUMENT,
-               &start_vertex) == false)
-    {
-        goto end;
-    }
-
-    if (get_u32(TYPE_ARGUMENT,
-               &type) == false)
+    if (read_draw_arguments(layout,
+                           &values,
+                            out_error_ptr) == false)
     {
         goto end;
     }
 
     result = true;
 
-    call_method<HRESULT>(device_ptr,
+    call_method<HRESULT>(values.device_ptr,
                          Interception::Hooks::D3D7::VTABLE_INDEX_IDIRECT3DDEVICE7_DRAWPRIMITIVEVB,
-                         static_cast<Interception::Hooks::D3D7::D3DPRIMITIVETYPE>(type),
-                         vertex_buffer_ptr,
-                         static_cast<DWORD>                                      (start_vertex),
-                         static_cast<DWORD>                                      (n_vertices),
-                         static_cast<DWORD>                                      (flags) );
+                         static_cast<Interception::Hooks::D3D7::D3DPRIMITIVETYPE>(values.type),
+                         values.vertex_buffer_ptr,
+                         static_cast<DWORD>                                      (values.start_vertex),
+                         static_cast<DWORD>                                      (values.n_vertices),
+                         static_cast<DWORD>                                      (values.flags) );
 
 end:
     return result;
@@ -1979,6 +1815,60 @@ bool Replay::ReplayEngineDLL::D3D7CallExecutor::read_back_buffer(std::vector<uin
 end:
     unlock_frame_image();
 
+    return result;
+}
+
+bool Replay::ReplayEngineDLL::D3D7CallExecutor::read_draw_arguments(const D3D7DrawLayout& in_layout,
+                                                                    D3D7DrawValues*       out_values_ptr,
+                                                                    std::string*          out_error_ptr) const
+{
+    typedef std::pair<size_t, uint32_t*> U32Argument;
+
+    const U32Argument u32_argument_array[] =
+    {
+        {in_layout.flags,        &out_values_ptr->flags},
+        {in_layout.fvf,          &out_values_ptr->fvf},
+        {in_layout.n_indices,    &out_values_ptr->n_indices},
+        {in_layout.n_vertices,   &out_values_ptr->n_vertices},
+        {in_layout.start_vertex, &out_values_ptr->start_vertex},
+        {in_layout.type,         &out_values_ptr->type}
+    };
+
+    bool result = false;
+
+    if (get_live_object(0,
+                       &out_values_ptr->device_ptr,
+                        out_error_ptr) == false)
+    {
+        goto end;
+    }
+
+    if (in_layout.vertex_buffer != D3D7DrawLayout::NO_ARGUMENT)
+    {
+        if (get_live_object(in_layout.vertex_buffer,
+                           &out_values_ptr->vertex_buffer_ptr,
+                            out_error_ptr) == false)
+        {
+            goto end;
+        }
+    }
+
+    for (const auto& u32_argument : u32_argument_array)
+    {
+        if (u32_argument.first == D3D7DrawLayout::NO_ARGUMENT)
+        {
+            continue;
+        }
+
+        if (get_u32(u32_argument.first,
+                    u32_argument.second) == false)
+        {
+            goto end;
+        }
+    }
+
+    result = true;
+end:
     return result;
 }
 

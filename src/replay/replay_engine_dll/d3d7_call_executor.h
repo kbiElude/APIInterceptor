@@ -197,6 +197,11 @@ namespace Replay
                                     Interception::Hooks::D3D7::DDSURFACEDESC2* out_description_ptr);
             void unlock_frame_image();
 
+            /* Reads the device, the vertex buffer if the layout has one, and the numbers of a draw call; false, and the error, if one is missing. */
+            bool read_draw_arguments(const D3D7DrawLayout& in_layout,
+                                     D3D7DrawValues*       out_values_ptr,
+                                     std::string*          out_error_ptr) const;
+
             /* The object is the replay's from now on. */
             void register_object(const size_t& in_n_argument,
                                  void*         in_live_object_ptr);

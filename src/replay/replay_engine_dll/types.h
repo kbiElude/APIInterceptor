@@ -5,6 +5,9 @@
 #ifndef REPLAYENGINEDLL_INTERNAL_TYPES_H
 #define REPLAYENGINEDLL_INTERNAL_TYPES_H
 
+#include <stddef.h>
+#include <stdint.h>
+
 namespace Replay
 {
     namespace ReplayEngineDLL
@@ -15,6 +18,33 @@ namespace Replay
             REPLAYED,   /* the call is made again                                                                              */
             SKIPPED,    /* the replay does without it: it only asks about the API, or the executor leaves it out               */
             UNSUPPORTED /* the replay has no code for it, and fails on it                                                      */
+        };
+
+        /* Where the arguments of a Direct3D 7 draw call are; NO_ARGUMENT for one the call does not have. */
+        struct D3D7DrawLayout
+        {
+            static constexpr size_t NO_ARGUMENT = static_cast<size_t>(-1);
+
+            size_t flags         = NO_ARGUMENT;
+            size_t fvf           = NO_ARGUMENT;
+            size_t n_indices     = NO_ARGUMENT;
+            size_t n_vertices    = NO_ARGUMENT;
+            size_t start_vertex  = NO_ARGUMENT;
+            size_t type          = NO_ARGUMENT;
+            size_t vertex_buffer = NO_ARGUMENT;
+        };
+
+        /* The values read by a D3D7DrawLayout; 0 or nullptr for what the layout does not have. */
+        struct D3D7DrawValues
+        {
+            void*    device_ptr        = nullptr;
+            uint32_t flags             = 0;
+            uint32_t fvf               = 0;
+            uint32_t n_indices         = 0;
+            uint32_t n_vertices        = 0;
+            uint32_t start_vertex      = 0;
+            uint32_t type              = 0;
+            void*    vertex_buffer_ptr = nullptr;
         };
 
         /* When the calls of a frame that is executed more than once are executed. */
