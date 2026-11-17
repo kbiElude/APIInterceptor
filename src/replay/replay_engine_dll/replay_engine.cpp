@@ -79,11 +79,7 @@ void Replay::ReplayEngineDLL::ReplayEngine::add_call_executor(const Capture::API
 
 void Replay::ReplayEngineDLL::ReplayEngine::add_call_interceptor(ICallInterceptor* in_interceptor_ptr)
 {
-    std::lock_guard<std::mutex> lock(m_listeners.mutex);
-
-    m_listeners.interceptor_ptr_vec.push_back(in_interceptor_ptr);
-
-    m_listeners.n_interceptors = m_listeners.interceptor_ptr_vec.size();
+    m_interceptors.add(in_interceptor_ptr);
 }
 
 void Replay::ReplayEngineDLL::ReplayEngine::add_replay_observer(IReplayObserver* in_observer_ptr)
@@ -142,20 +138,15 @@ bool Replay::ReplayEngineDLL::ReplayEngine::execute_call(const Capture::APIDumpL
                                                          const IChunkSource&                          in_chunk_source)
 {
     std::string                    error;
-    std::vector<ICallInterceptor*> interceptor_ptr_vec;
+    const auto                     group          = Capture::APIDumpLoader::get_api_group(in_call.func);
     uint32_t                       n_frame        = 0;
     bool                           result         = false;
     bool                           should_execute = true;
 
+    /* Only the interceptors of the API of the call: no lock is taken and nothing is copied. */
+    const auto& interceptor_ptr_vec = m_interceptors.get_interceptor_ptr_vec(group);
+
     n_frame = m_control.n_frames_presented;
-
-    /* Most replays have no interceptor, and then nothing is locked or copied for the call. */
-    if (m_listeners.n_interceptors != 0)
-    {
-        std::lock_guard<std::mutex> lock(m_listeners.mutex);
-
-        interceptor_ptr_vec = m_listeners.interceptor_ptr_vec;
-    }
 
     /* Every interceptor sees the call, even if another one has skipped it. */
     for (auto interceptor_ptr : interceptor_ptr_vec)
@@ -169,8 +160,6 @@ bool Replay::ReplayEngineDLL::ReplayEngine::execute_call(const Capture::APIDumpL
 
     if (should_execute)
     {
-        const auto group = Capture::APIDumpLoader::get_api_group(in_call.func);
-
         if (m_executors.has_executor(group) == false)
         {
             fail("The workload holds a call of an unknown API.");
@@ -448,16 +437,7 @@ bool Replay::ReplayEngineDLL::ReplayEngine::read_next_call(const Capture::APIDum
 
 void Replay::ReplayEngineDLL::ReplayEngine::remove_call_interceptor(ICallInterceptor* in_interceptor_ptr)
 {
-    std::lock_guard<std::mutex> lock(m_listeners.mutex);
-
-    const auto removed_begin_iterator = std::remove(m_listeners.interceptor_ptr_vec.begin(),
-                                                    m_listeners.interceptor_ptr_vec.end  (),
-                                                    in_interceptor_ptr);
-
-    m_listeners.interceptor_ptr_vec.erase(removed_begin_iterator,
-                                          m_listeners.interceptor_ptr_vec.end() );
-
-    m_listeners.n_interceptors = m_listeners.interceptor_ptr_vec.size();
+    m_interceptors.remove(in_interceptor_ptr);
 }
 
 void Replay::ReplayEngineDLL::ReplayEngine::remove_replay_observer(IReplayObserver* in_observer_ptr)

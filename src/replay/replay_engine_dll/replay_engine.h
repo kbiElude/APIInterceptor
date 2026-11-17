@@ -10,6 +10,7 @@
 #include "executor_registry.h"
 #include "i_frame_executor.h"
 #include "i_frame_host.h"
+#include "interceptor_registry.h"
 #include "listener_list.h"
 #include "object_remapper.h"
 #include "sequential_frame_executor.h"
@@ -83,14 +84,6 @@ namespace Replay
                 uint32_t                stop_frame         = 0;
             };
 
-            /* Lock order: Control::mutex is never held while a listener is called. */
-            struct Listeners
-            {
-                std::vector<ICallInterceptor*> interceptor_ptr_vec;
-                std::mutex                     mutex;
-                std::atomic<size_t>            n_interceptors{0}; /* the number above, to look at without the lock */
-            };
-
             void complete_frame           (bool*                  out_is_done_ptr);
             void notify_error             (const std::string&     in_message);
             void notify_frame_presented   (const uint32_t&        in_n_frame);
@@ -107,8 +100,8 @@ namespace Replay
             ExecutorRegistry              m_executors;
             SequentialFrameExecutor       m_default_frame_executor;
             IFrameExecutor*               m_frame_executor_ptr;
+            InterceptorRegistry           m_interceptors;
             bool                          m_is_loaded;
-            mutable Listeners             m_listeners;
             ListenerList<IReplayObserver> m_observers;
             ObjectRemapper                m_remapper;
             std::thread                   m_thread;

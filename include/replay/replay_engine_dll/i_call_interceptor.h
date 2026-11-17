@@ -6,18 +6,26 @@
 #define REPLAYENGINEDLL_I_CALL_INTERCEPTOR_H
 
 #include "capture/api_dump_loader/api_dump_loader.h"
+#include "capture/api_dump_loader/types.h"
+#include <vector>
 
 namespace Replay
 {
     namespace ReplayEngineDLL
     {
-        /* Sees every call of the workload around its replay: the hook for analysis and for tools built on the replayer.
+        /* Sees the calls of the workload around their replay (every call, or those of the APIs get_api_groups() names): the hook for analysis and for tools built on the replayer.
          * Called from the replay thread. The call is valid for the duration of the function only.
          */
         class ICallInterceptor
         {
         public:
             virtual ~ICallInterceptor() = default;
+
+            /* The APIs whose calls the interceptor wants to see; none named: all of them. Asked when it is added. */
+            virtual std::vector<Capture::APIDumpLoader::APIGroup> get_api_groups() const
+            {
+                return std::vector<Capture::APIDumpLoader::APIGroup>();
+            }
 
             /* Called after the call was replayed, or skipped. */
             virtual void on_call_replayed(const Capture::APIDumpLoader::DumpedAPICall& in_call,
