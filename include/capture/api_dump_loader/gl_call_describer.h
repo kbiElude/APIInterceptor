@@ -21,6 +21,9 @@ namespace Capture
             CallClass describe(const DumpedAPICall& in_call) override;
             APIGroup  get_group() const override;
 
+            /* Whether a display list is being recorded: between glNewList and glEndList. */
+            bool is_recording() const;
+
             /* The class of the function outside a recorded list. */
             static CallClass get_function_class(const APIInterceptor::APIFunction& in_function);
 

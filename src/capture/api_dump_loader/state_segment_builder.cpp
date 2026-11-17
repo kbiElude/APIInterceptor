@@ -3,6 +3,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 #include "capture/api_dump_loader/state_segment_builder.h"
+#include "common/macros.h"
 #include "common/workload_format.h"
 #include "zstd.h"
 #include <string.h>
@@ -67,9 +68,9 @@ void Capture::APIDumpLoader::StateSegmentBuilder::append_u32(const uint32_t&    
              sizeof(uint32_t) );
 }
 
-bool Capture::APIDumpLoader::StateSegmentBuilder::build(const Workload&          in_segment,
-                                                        const std::vector<bool>& in_is_kept_vec,
-                                                        std::vector<uint8_t>*    out_frame_byte_vec_ptr)
+bool Capture::APIDumpLoader::StateSegmentBuilder::build(const Workload&            in_segment,
+                                                        const std::vector<size_t>& in_call_index_vec,
+                                                        std::vector<uint8_t>*      out_frame_byte_vec_ptr)
 {
     const size_t         n_calls          = (in_segment.dumped_api_call_vec_ptr != nullptr) ? in_segment.dumped_api_call_vec_ptr->size()
                                                                                             : 0;
@@ -79,27 +80,15 @@ bool Capture::APIDumpLoader::StateSegmentBuilder::build(const Workload&         
     std::vector<uint8_t> call_byte_vec;
     std::vector<bool>    is_chunk_kept_vec(n_chunks,
                                            false);
-    uint32_t             n_calls_kept     = 0;
     std::vector<uint8_t> raw_byte_vec;
     bool                 result           = false;
 
-    if (in_is_kept_vec.size() != n_calls)
+    for (const auto& call_index : in_call_index_vec)
     {
-        goto end;
-    }
+        AI_ASSERT_ALWAYS(call_index < n_calls,
+                         "A state frame is made of a call that the segment does not have.");
 
-    for (size_t n_call = 0;
-                n_call < n_calls;
-              ++n_call)
-    {
-        if (in_is_kept_vec.at(n_call) == false)
-        {
-            continue;
-        }
-
-        const auto& call = in_segment.dumped_api_call_vec_ptr->at(n_call);
-
-        n_calls_kept++;
+        const auto& call = in_segment.dumped_api_call_vec_ptr->at(call_index);
 
         append_call(call,
                    &call_byte_vec);
@@ -122,7 +111,7 @@ bool Capture::APIDumpLoader::StateSegmentBuilder::build(const Workload&         
         }
     }
 
-    append_u32(n_calls_kept,
+    append_u32(static_cast<uint32_t>(in_call_index_vec.size() ),
               &raw_byte_vec);
     append_u32(static_cast<uint32_t>(n_chunks),
               &raw_byte_vec);
@@ -184,6 +173,5 @@ bool Capture::APIDumpLoader::StateSegmentBuilder::build(const Workload&         
                                                 : 0);
     }
 
-end:
     return result;
 }

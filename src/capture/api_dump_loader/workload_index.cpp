@@ -5,6 +5,8 @@
 #include "capture/api_dump_loader/workload_index.h"
 #include "capture/api_dump_loader/api_info.h"
 #include "capture/api_dump_loader/call_describer_set.h"
+#include "capture/api_dump_loader/state_coalescer.h"
+#include "capture/api_dump_loader/state_effect_describer_set.h"
 #include "capture/api_dump_loader/state_segment_builder.h"
 #include <algorithm>
 #include <stdio.h>
@@ -14,7 +16,7 @@ namespace
 {
     /* What an index file begins with. */
     constexpr char     INDEX_MAGIC[8] = {'A', 'P', 'I', 'D', 'W', 'I', 'D', 'X'};
-    constexpr uint32_t INDEX_VERSION  = 2;
+    constexpr uint32_t INDEX_VERSION  = 3;
 
     struct IndexFileHeader
     {
@@ -97,13 +99,22 @@ bool Capture::APIDumpLoader::WorkloadIndex::build(const char*     in_workload_fi
     /* The state frames need the chunks of the calls they keep, so the segments are read in full (without their images). */
     constexpr uint32_t MAX_N_SEGMENTS_IN_FLIGHT = (sizeof(void*) == sizeof(uint32_t) ) ? 2 : 5; /* a 32-bit process has 2 GB */
 
-    CallDescriberSet          describer_set;
+    CallDescriberSet          call_describer_set;
+    StateEffectDescriberSet   effect_describer_set;
     WorkloadIndex             index;
     bool                      is_in_open_frame = false; /* a call was made after the last one that ended a frame */
     WorkloadReader::Options   options;
     WorkloadReaderUniquePtr   reader_ptr;
     bool                      result = false;
     Workload                  segment;
+
+    /* One walk over all the calls of the workload, so that what a describer follows from call to call (a display list) goes across segments. */
+    const auto describe_func = [&effect_describer_set](const DumpedAPICall& in_call)
+    {
+        return effect_describer_set.describe(in_call);
+    };
+
+    StateCoalescer coalescer(describe_func);
 
     options.n_segments_in_flight = (in_n_threads != 0) ? (std::min)(in_n_threads + 1, MAX_N_SEGMENTS_IN_FLIGHT)
                                                        : 0;
@@ -146,7 +157,7 @@ bool Capture::APIDumpLoader::WorkloadIndex::build(const char*     in_workload_fi
         for (const auto& call : *segment.dumped_api_call_vec_ptr)
         {
             const bool is_boundary = is_frame_boundary(call);
-            const auto call_class  = describer_set.describe(call);
+            const auto call_class  = call_describer_set.describe(call);
 
             is_kept_vec.push_back(call_class != CallClass::CONTENT ||
                                   is_boundary);
@@ -164,10 +175,12 @@ bool Capture::APIDumpLoader::WorkloadIndex::build(const char*     in_workload_fi
         }
 
         {
-            std::vector<uint8_t> state_frame_byte_vec;
+            const std::vector<size_t> call_index_vec = coalescer.coalesce(*segment.dumped_api_call_vec_ptr,
+                                                                          is_kept_vec);
+            std::vector<uint8_t>      state_frame_byte_vec;
 
             if (StateSegmentBuilder::build(segment,
-                                           is_kept_vec,
+                                           call_index_vec,
                                           &state_frame_byte_vec) )
             {
                 entry.state_n_bytes        = state_frame_byte_vec.size();

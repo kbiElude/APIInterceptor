@@ -52,7 +52,7 @@ namespace Tests
                                         const uint32_t&       in_n_calls_per_segment,
                                         const size_t&         in_n_bytes_per_chunk);
 
-        /* n_segments segments of one frame each: a glEnable (state) that refers to chunk 2 * S, a glVertex3fv (content) that refers to chunk 2 * S + 1, a
+        /* n_segments segments of one frame each: a glAccum (kept, a barrier) that refers to chunk 2 * S, a glVertex3fv (content) that refers to chunk 2 * S + 1, a
          * Direct3D 8 draw (content), a Direct3D 7 SetRenderState (state) and a SwapBuffers call. The chunks are 4 bytes of the value 10 * S + their number.
          */
         static void build_mixed_segments(std::vector<uint8_t>* out_u8_vec_ptr,

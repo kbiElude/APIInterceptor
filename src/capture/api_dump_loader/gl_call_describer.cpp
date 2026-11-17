@@ -122,3 +122,8 @@ Capture::APIDumpLoader::APIGroup Capture::APIDumpLoader::GLCallDescriber::get_gr
 {
     return APIGroup::GL;
 }
+
+bool Capture::APIDumpLoader::GLCallDescriber::is_recording() const
+{
+    return m_is_recording;
+}

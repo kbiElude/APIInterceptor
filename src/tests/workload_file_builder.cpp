@@ -382,7 +382,7 @@ void Tests::WorkloadFileBuilder::build_mixed_segments(std::vector<uint8_t>* out_
                       0); /* in_n_surfaces    */
 
         append_call_with_argument(&segment_u8_vec,
-                                  APIInterceptor::APIFUNCTION_GL_GLENABLE,
+                                  APIInterceptor::APIFUNCTION_GL_GLACCUM,
                                   APIInterceptor::APIFunctionArgument::create_data_chunk_id(2 * n_segment),
                                   n_segment);
         append_call_with_argument(&segment_u8_vec,

@@ -117,11 +117,11 @@ TEST(StateFrames, ASegmentWantedAsStateOnlyComesFromItsStateFrameWithTheContentL
             const auto& segment = segment_vec.at(n_segment);
             const auto& entry   = file.index.get_segment_vec().at(n_segment);
 
-            /* The glEnable, the Direct3D 7 call and the end of the frame stay; the vertex and the Direct3D 8 draw go. */
+            /* The glAccum, the Direct3D 7 call and the end of the frame stay; the vertex and the Direct3D 8 draw go. */
             ASSERT_EQ(segment.dumped_api_call_vec_ptr->size(),
                       3u);
             EXPECT_EQ(segment.dumped_api_call_vec_ptr->at(0).func,
-                      APIInterceptor::APIFUNCTION_GL_GLENABLE);
+                      APIInterceptor::APIFUNCTION_GL_GLACCUM);
             EXPECT_EQ(segment.dumped_api_call_vec_ptr->at(1).func,
                       APIInterceptor::APIFUNCTION_D3D7_IDIRECT3DDEVICE7_SETRENDERSTATE);
             EXPECT_EQ(segment.dumped_api_call_vec_ptr->at(2).func,
@@ -135,7 +135,7 @@ TEST(StateFrames, ASegmentWantedAsStateOnlyComesFromItsStateFrameWithTheContentL
             EXPECT_EQ(segment.first_data_chunk_id,
                       entry.first_data_chunk_id);
 
-            /* The chunk of the glEnable is there; the one of the vertex is an empty place. */
+            /* The chunk of the glAccum is there; the one of the vertex is an empty place. */
             ASSERT_EQ(segment.data_chunk_ptr_vec.size(),
                       2u);
             EXPECT_EQ(segment.data_chunk_ptr_vec.at(0)->size(),

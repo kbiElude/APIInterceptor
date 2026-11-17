@@ -19,10 +19,12 @@ namespace Capture
         class StateSegmentBuilder
         {
         public:
-            /* Keeps the calls that in_is_kept_vec says (one per call) and the chunks they use. False if the frame cannot be made. */
-            static bool build(const Workload&          in_segment,
-                              const std::vector<bool>& in_is_kept_vec,
-                              std::vector<uint8_t>*    out_frame_byte_vec_ptr);
+            /* Makes the calls that the indices say (of the calls of the segment, in this order, one may come again) and keeps the chunks they use. False if the
+             * frame cannot be made.
+             */
+            static bool build(const Workload&            in_segment,
+                              const std::vector<size_t>& in_call_index_vec,
+                              std::vector<uint8_t>*      out_frame_byte_vec_ptr);
 
         private:
                         static void append_call(const DumpedAPICall&  in_call,
