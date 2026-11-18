@@ -54,7 +54,14 @@ namespace Capture
                 TEXTURE_ENV,
                 TEXTURE_GEN,
                 TEXTURE_PARAMETER,
-                VIEWPORT
+                VIEWPORT,
+
+                /* Added later: the numbers are part of the keys, so they follow the others. */
+                COLOR_MASK,
+                FRONT_FACE,
+                STENCIL_FUNC,
+                STENCIL_MASK,
+                STENCIL_OP
             };
 
             /* What the function does to state, by the table, when it is not recorded into a list. Ends the process for a function that is not in it. */

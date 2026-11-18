@@ -266,6 +266,79 @@ TEST(GLStateEffectDescriber, AContentCallOutsideAListEndsTheProcess)
                 "outside a display list");
 }
 
+TEST(GLStateEffectDescriber, TheFrontFaceTheColorMaskAndTheStencilCallsEachSetAPieceOfStateOfTheirOwn)
+{
+    Capture::APIDumpLoader::GLStateEffectDescriber describer;
+
+    const APIInterceptor::APIFunction function_array[] =
+    {
+        APIInterceptor::APIFUNCTION_GL_GLCOLORMASK,
+        APIInterceptor::APIFUNCTION_GL_GLFRONTFACE,
+        APIInterceptor::APIFUNCTION_GL_GLSTENCILFUNC,
+        APIInterceptor::APIFUNCTION_GL_GLSTENCILMASK,
+        APIInterceptor::APIFUNCTION_GL_GLSTENCILOP
+    };
+
+    std::vector<StateEffect> effect_vec;
+
+    for (const auto function : function_array)
+    {
+        effect_vec.push_back(describer.describe(make_call(function,
+                                                          {1, 1, 1, 1}) ) );
+
+        EXPECT_EQ(effect_vec.back().kind,
+                  StateEffectKind::ASSIGN) << static_cast<int>(function);
+    }
+
+    /* Two calls that set different state are not coalesced into one. */
+    for (size_t n_first = 0;
+                n_first < effect_vec.size();
+              ++n_first)
+    {
+        for (size_t n_second = n_first + 1;
+                    n_second < effect_vec.size();
+                  ++n_second)
+        {
+            EXPECT_FALSE(effect_vec.at(n_first).key == effect_vec.at(n_second).key) << n_first << " " << n_second;
+        }
+    }
+}
+
+TEST(GLStateEffectDescriber, AQueryOfTheDriverAndAVideoUploadChangeNoTrackedStateExceptThatAnUploadIsABarrier)
+{
+    Capture::APIDumpLoader::GLStateEffectDescriber describer;
+
+    const StateEffect boolean_query = describer.describe(make_call(APIInterceptor::APIFUNCTION_GL_GLGETBOOLEANV) );
+    const StateEffect integer_query = describer.describe(make_call(APIInterceptor::APIFUNCTION_GL_GLGETINTEGERV) );
+    const StateEffect upload        = describer.describe(make_call(APIInterceptor::APIFUNCTION_GL_GLTEXSUBIMAGE2D) );
+
+    EXPECT_EQ(boolean_query.kind,
+              StateEffectKind::ORDERED);
+    EXPECT_EQ(boolean_query.domain_mask,
+              0u);
+    EXPECT_EQ(integer_query.kind,
+              StateEffectKind::ORDERED);
+    EXPECT_EQ(upload.kind,
+              StateEffectKind::BARRIER);
+}
+
+TEST(GLStateEffectDescriber, ADoubleMatrixCallAndAFourComponentTextureCoordinateAreTreatedLikeTheirFloatForms)
+{
+    Capture::APIDumpLoader::GLStateEffectDescriber describer;
+
+    const StateEffect mult_double = describer.describe(make_call(APIInterceptor::APIFUNCTION_GL_GLMULTMATRIXD) );
+    const StateEffect mult_float  = describer.describe(make_call(APIInterceptor::APIFUNCTION_GL_GLMULTMATRIXF) );
+    const StateEffect coord_four  = describer.describe(make_call(APIInterceptor::APIFUNCTION_GL_GLTEXCOORD4F) );
+    const StateEffect coord_two   = describer.describe(make_call(APIInterceptor::APIFUNCTION_GL_GLTEXCOORD2F) );
+
+    EXPECT_EQ(mult_double.kind,
+              mult_float.kind);
+    EXPECT_EQ(mult_double.selector_mask,
+              mult_float.selector_mask);
+    EXPECT_EQ(coord_four.key,
+              coord_two.key);
+}
+
 TEST(GLStateEffectDescriber, AFunctionThatIsNotInTheTableEndsTheProcess)
 {
     set_no_error_dialog();

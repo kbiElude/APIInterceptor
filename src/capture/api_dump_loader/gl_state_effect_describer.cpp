@@ -213,6 +213,17 @@ Capture::APIDumpLoader::StateEffect Capture::APIDumpLoader::GLStateEffectDescrib
             break;
         }
 
+        case APIInterceptor::APIFUNCTION_GL_GLCOLORMASK:
+        {
+            result = make_assign(DOMAIN_RASTER,
+                                 Family::COLOR_MASK,
+                                 0,
+                                 0,
+                                 0);
+
+            break;
+        }
+
         case APIInterceptor::APIFUNCTION_GL_GLCULLFACE:
         {
             result = make_assign(DOMAIN_RASTER,
@@ -325,6 +336,17 @@ Capture::APIDumpLoader::StateEffect Capture::APIDumpLoader::GLStateEffectDescrib
             result = make_assign(DOMAIN_FOG,
                                  Family::FOG,
                                  fog_parameter,
+                                 0,
+                                 0);
+
+            break;
+        }
+
+        case APIInterceptor::APIFUNCTION_GL_GLFRONTFACE:
+        {
+            result = make_assign(DOMAIN_RASTER,
+                                 Family::FRONT_FACE,
+                                 0,
                                  0,
                                  0);
 
@@ -483,7 +505,41 @@ Capture::APIDumpLoader::StateEffect Capture::APIDumpLoader::GLStateEffectDescrib
             break;
         }
 
+        case APIInterceptor::APIFUNCTION_GL_GLSTENCILFUNC:
+        {
+            result = make_assign(DOMAIN_RASTER,
+                                 Family::STENCIL_FUNC,
+                                 0,
+                                 0,
+                                 0);
+
+            break;
+        }
+
+        case APIInterceptor::APIFUNCTION_GL_GLSTENCILMASK:
+        {
+            result = make_assign(DOMAIN_RASTER,
+                                 Family::STENCIL_MASK,
+                                 0,
+                                 0,
+                                 0);
+
+            break;
+        }
+
+        case APIInterceptor::APIFUNCTION_GL_GLSTENCILOP:
+        {
+            result = make_assign(DOMAIN_RASTER,
+                                 Family::STENCIL_OP,
+                                 0,
+                                 0,
+                                 0);
+
+            break;
+        }
+
         case APIInterceptor::APIFUNCTION_GL_GLTEXCOORD2F:
+        case APIInterceptor::APIFUNCTION_GL_GLTEXCOORD4F:
         {
             result = make_assign(DOMAIN_CURRENT,
                                  Family::TEXCOORD,
@@ -613,6 +669,7 @@ Capture::APIDumpLoader::StateEffect Capture::APIDumpLoader::GLStateEffectDescrib
         /* Calls that are made in place: the matrices, which depend on the matrix mode and on each other. */
         case APIInterceptor::APIFUNCTION_GL_GLFRUSTUM:
         case APIInterceptor::APIFUNCTION_GL_GLLOADIDENTITY:
+        case APIInterceptor::APIFUNCTION_GL_GLMULTMATRIXD:
         case APIInterceptor::APIFUNCTION_GL_GLMULTMATRIXF:
         case APIInterceptor::APIFUNCTION_GL_GLORTHO:
         case APIInterceptor::APIFUNCTION_GL_GLPOPMATRIX:
@@ -640,8 +697,10 @@ Capture::APIDumpLoader::StateEffect Capture::APIDumpLoader::GLStateEffectDescrib
         /* Calls that read and set none of the state above. */
         case APIInterceptor::APIFUNCTION_GL_GLGENLISTS:
         case APIInterceptor::APIFUNCTION_GL_GLGENTEXTURES:
+        case APIInterceptor::APIFUNCTION_GL_GLGETBOOLEANV:
         case APIInterceptor::APIFUNCTION_GL_GLGETERROR:
         case APIInterceptor::APIFUNCTION_GL_GLGETFLOATV:
+        case APIInterceptor::APIFUNCTION_GL_GLGETINTEGERV:
         case APIInterceptor::APIFUNCTION_GL_GLGETSTRING:
         {
             result = make_ordered(0,
@@ -666,6 +725,7 @@ Capture::APIDumpLoader::StateEffect Capture::APIDumpLoader::GLStateEffectDescrib
         case APIInterceptor::APIFUNCTION_GL_GLPOPATTRIB:
         case APIInterceptor::APIFUNCTION_GL_GLPUSHATTRIB:
         case APIInterceptor::APIFUNCTION_GL_GLTEXIMAGE2D:
+        case APIInterceptor::APIFUNCTION_GL_GLTEXSUBIMAGE2D:
         {
             result = make_barrier();
 
