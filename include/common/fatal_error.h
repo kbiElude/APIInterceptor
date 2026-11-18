@@ -5,7 +5,10 @@
 #ifndef COMMON_FATAL_ERROR_H
 #define COMMON_FATAL_ERROR_H
 
+#include <atomic>
+#include <stdexcept>
 #include <stdint.h>
+#include <string>
 
 namespace APIInterceptor
 {
@@ -16,6 +19,20 @@ namespace APIInterceptor
     class FatalError
     {
     public:
+        /* What is thrown in place of ending the process, while set_throws_for_tests() is on. */
+        class Exception : public std::runtime_error
+        {
+        public:
+            Exception(const std::string& in_message,
+                      const bool&        in_is_unsupported_value);
+
+            /* True if it came from unsupported_value(), false if it came from assertion_failed(). */
+            bool is_unsupported_value() const;
+
+        private:
+            bool m_is_unsupported_value;
+        };
+
         /* Says which condition does not hold, where, and what it means (see AI_ASSERT_ALWAYS()), the way unsupported_value() does, then ends the process. */
         [[noreturn]] static void assertion_failed(const char*     in_filename_ptr,
                                                   const uint32_t& in_line,
@@ -25,6 +42,11 @@ namespace APIInterceptor
 
         /* What the process exits with. */
         static uint32_t get_exit_code();
+
+        /* For tests only: with this on, the failures throw an Exception instead of ending the process, so that a test can ask a table about
+         * every function it may be given, in one process. Off by default; never on in a tool or in an injected DLL.
+         */
+        static void set_throws_for_tests(const bool& in_throws);
 
         /* Says what is not supported and where (to the standard error stream, to the debugger, and to the user in a box, unless the
          * process has a console or the environment has APIINTERCEPTOR_NO_ERROR_DIALOG), then ends the process.
@@ -36,9 +58,14 @@ namespace APIInterceptor
                                                    const uint64_t& in_value);
 
     private:
-        /* To the standard error stream, to the debugger and (with no console, unless the environment says otherwise) to the user in a box; then ends the process. */
+        static std::atomic<bool>& get_throws_flag();
+
+        /* To the standard error stream, to the debugger and (with no console, unless the environment says otherwise) to the user in a box; then ends the process
+         * (or throws, see set_throws_for_tests()).
+         */
         [[noreturn]] static void report_and_end_process(const char* in_message_ptr,
-                                                        const char* in_title_ptr);
+                                                        const char* in_title_ptr,
+                                                        const bool& in_is_unsupported_value);
     };
 }
 

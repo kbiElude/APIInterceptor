@@ -36,6 +36,43 @@ TEST(FatalError, AnAssertionThatHoldsDoesNothing)
     SUCCEED();
 }
 
+TEST(FatalError, ForTestsAFailureThrowsAndSaysWhichKindItWasInsteadOfEndingTheProcess)
+{
+    const bool     is_supported      = false;
+    const uint32_t unsupported_value = 5;
+
+    APIInterceptor::FatalError::set_throws_for_tests(true);
+
+    bool is_assertion_thrown   = false;
+    bool is_unsupported_thrown = false;
+
+    try
+    {
+        AI_ASSERT_ALWAYS(is_supported,
+                         "The use is not implemented");
+    }
+    catch (const APIInterceptor::FatalError::Exception& in_exception)
+    {
+        is_assertion_thrown = (in_exception.is_unsupported_value() == false &&
+                               std::string(in_exception.what() ).find("The use is not implemented") != std::string::npos);
+    }
+
+    try
+    {
+        AI_FAIL_UNSUPPORTED(unsupported_value);
+    }
+    catch (const APIInterceptor::FatalError::Exception& in_exception)
+    {
+        is_unsupported_thrown = (in_exception.is_unsupported_value() &&
+                                 std::string(in_exception.what() ).find("unsupported_value") != std::string::npos);
+    }
+
+    APIInterceptor::FatalError::set_throws_for_tests(false);
+
+    EXPECT_TRUE(is_assertion_thrown);
+    EXPECT_TRUE(is_unsupported_thrown);
+}
+
 TEST(FatalError, AnUnsupportedValueEndsTheProcessAndSaysWhatItWas)
 {
     const uint32_t unsupported_value = 77;

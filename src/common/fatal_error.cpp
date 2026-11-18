@@ -7,6 +7,19 @@
 #include <stdlib.h>
 #include <Windows.h>
 
+APIInterceptor::FatalError::Exception::Exception(const std::string& in_message,
+                                                 const bool&        in_is_unsupported_value)
+    : std::runtime_error    (in_message),
+      m_is_unsupported_value(in_is_unsupported_value)
+{
+    /* Stub */
+}
+
+bool APIInterceptor::FatalError::Exception::is_unsupported_value() const
+{
+    return m_is_unsupported_value;
+}
+
 void APIInterceptor::FatalError::assertion_failed(const char*     in_filename_ptr,
                                                   const uint32_t& in_line,
                                                   const char*     in_function_ptr,
@@ -29,7 +42,8 @@ void APIInterceptor::FatalError::assertion_failed(const char*     in_filename_pt
                in_message_ptr);
 
     report_and_end_process(message_i8vec1024,
-                           "API Interceptor: not implemented");
+                           "API Interceptor: not implemented",
+                           false); /* in_is_unsupported_value */
 }
 
 uint32_t APIInterceptor::FatalError::get_exit_code()
@@ -39,9 +53,23 @@ uint32_t APIInterceptor::FatalError::get_exit_code()
     return EXIT_CODE;
 }
 
-void APIInterceptor::FatalError::report_and_end_process(const char* in_message_ptr,
-                                                        const char* in_title_ptr)
+std::atomic<bool>& APIInterceptor::FatalError::get_throws_flag()
 {
+    static std::atomic<bool> flag(false);
+
+    return flag;
+}
+
+void APIInterceptor::FatalError::report_and_end_process(const char* in_message_ptr,
+                                                        const char* in_title_ptr,
+                                                        const bool& in_is_unsupported_value)
+{
+    if (get_throws_flag().load() )
+    {
+        throw Exception(in_message_ptr,
+                        in_is_unsupported_value);
+    }
+
     ::fprintf           (stderr,
                          "%s\n",
                          in_message_ptr);
@@ -73,6 +101,11 @@ void APIInterceptor::FatalError::report_and_end_process(const char* in_message_p
     ::abort();
 }
 
+void APIInterceptor::FatalError::set_throws_for_tests(const bool& in_throws)
+{
+    get_throws_flag().store(in_throws);
+}
+
 void APIInterceptor::FatalError::unsupported_value(const char*     in_filename_ptr,
                                                    const uint32_t& in_line,
                                                    const char*     in_function_ptr,
@@ -95,5 +128,6 @@ void APIInterceptor::FatalError::unsupported_value(const char*     in_filename_p
                in_line);
 
     report_and_end_process(message_i8vec1024,
-                           "API Interceptor: unsupported value");
+                           "API Interceptor: unsupported value",
+                           true); /* in_is_unsupported_value */
 }
