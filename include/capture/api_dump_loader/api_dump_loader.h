@@ -48,7 +48,7 @@ namespace Capture
          */
         typedef std::function<CallKeptFunc()> CallKeptFuncFactory;
 
-        /* Whether only the state calls of the frames first..last are wanted (see WorkloadIndex). */
+        /* Whether only the state calls of the frames first..last are wanted (the host that keeps an index of the file knows). */
         typedef std::function<bool(const uint64_t& in_first_frame_index,
                                    const uint64_t& in_last_frame_index)> StateOnlyFunc;
 

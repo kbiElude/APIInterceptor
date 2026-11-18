@@ -9,7 +9,7 @@
 *.workload
 !src/tests/data/*.workload
 
-# The index of a workload which a tool makes next to it (see WorkloadIndex)
+# The index of a workload which a tool of a project that builds on this one makes next to it
 *.workload.index
 
 # Visual Studio

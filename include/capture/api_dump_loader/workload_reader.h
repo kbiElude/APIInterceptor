@@ -29,7 +29,7 @@ namespace Capture
         class WorkloadReader
         {
         public:
-            /* Where a segment is in the file and what it numbers from, as in the workload index (see WorkloadIndex). */
+            /* Where a segment is in the file and what it numbers from, as an index of the workload kept by the host says. */
             struct SegmentStart
             {
                 uint64_t file_offset_n_bytes  = 0;
@@ -59,7 +59,7 @@ namespace Capture
                 /* Maximum segments being read or waiting for the caller; each is held in memory in full. 0: n_threads + 2. */
                 uint32_t n_segments_in_flight = 0;
 
-                /* Data chunks in the segments before start_offset_n_bytes, so chunk numbers match the dump (the index has it, see WorkloadIndex). */
+                /* Data chunks in the segments before start_offset_n_bytes, so chunk numbers match the dump (an index of the workload kept by the host has it). */
                 uint32_t n_data_chunks_before = 0;
 
                 /* Threads reading ahead. 0: the caller reads a segment itself when it asks for it. */
