@@ -64,6 +64,10 @@ namespace Replay
             void                                    set_call_kept_func_factory (const Capture::APIDumpLoader::CallKeptFuncFactory& in_factory);
             void                                    set_chunk_wanted_func      (const Capture::APIDumpLoader::ChunkWantedFunc&     in_func);
             void                                    set_frame_executor         (IFrameExecutor*                                    in_executor_ptr);
+
+            /* Where the segments of the workload start, and the file with their state frames, as the host's index of it says: the filters below need it (see CallWalker). */
+            void                                    set_segment_starts         (const CallWalker::SegmentStartVector&              in_start_vec,
+                                                                                const std::string&                                 in_state_filename);
             void                                    set_state_only_func        (const Capture::APIDumpLoader::StateOnlyFunc&       in_func);
             void                                    set_windows_visible        (const bool&                                        in_are_visible);
 

@@ -521,6 +521,13 @@ void Replay::ReplayEngineDLL::ReplayEngine::set_frame_executor(IFrameExecutor* i
                                                         : &m_default_frame_executor;
 }
 
+void Replay::ReplayEngineDLL::ReplayEngine::set_segment_starts(const CallWalker::SegmentStartVector& in_start_vec,
+                                                               const std::string&                   in_state_filename)
+{
+    m_walker.set_segment_starts(in_start_vec,
+                                in_state_filename);
+}
+
 void Replay::ReplayEngineDLL::ReplayEngine::set_state(const PlaybackState& in_state)
 {
     PlaybackState old_state;

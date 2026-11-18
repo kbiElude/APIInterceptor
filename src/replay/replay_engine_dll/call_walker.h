@@ -23,6 +23,8 @@ namespace Replay
         class CallWalker : public IChunkSource
         {
         public:
+            typedef std::vector<Capture::APIDumpLoader::WorkloadReader::SegmentStart> SegmentStartVector;
+
              CallWalker();
             ~CallWalker();
 
@@ -53,6 +55,13 @@ namespace Replay
              */
             void set_chunk_wanted_func(const Capture::APIDumpLoader::ChunkWantedFunc& in_func);
 
+            /* Where each segment of the file starts, and the file with the state frames of those that have them, as the host knows them (it keeps the index of
+             * the file; see WorkloadReader::Options::segment_start_vec and state_filename). The filters above are used only if this says where the segments
+             * are: without it the whole file is read, with every chunk. Applies when the file is opened (again). Any thread.
+             */
+            void set_segment_starts(const SegmentStartVector& in_start_vec,
+                                    const std::string&        in_state_filename);
+
             /* Segments whose frames the function says are wanted as state calls only are read from the state frames of the index when the file is opened
              * (again), as far as the index has them (see WorkloadReader::Options::state_only_func). Empty: all segments are read in full. Any thread.
              */
@@ -66,6 +75,8 @@ namespace Replay
                 Capture::APIDumpLoader::ChunkWantedFunc     func;
                 bool                                        is_pending = false; /* set after the reader was started, so the segments yet to be read are to be read with it */
                 std::mutex                                  mutex;
+                SegmentStartVector                          segment_start_vec;
+                std::string                                 state_filename;
                 Capture::APIDumpLoader::StateOnlyFunc       state_only_func;
             };
 
@@ -95,10 +106,6 @@ namespace Replay
 
             /* Whether a filter was set since the reader was started; clears that. */
             bool takes_pending_chunk_filter();
-
-            /* The start of each segment of the file by its index; false if the file has no index (of the file as it is). */
-            static bool read_segment_starts(const char*                                                        in_filename_ptr,
-                                            std::vector<Capture::APIDumpLoader::WorkloadReader::SegmentStart>* out_start_vec_ptr);
 
             ChunkFilter                                     m_chunk_filter;
             std::string                                     m_filename;
