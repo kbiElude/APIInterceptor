@@ -4,13 +4,31 @@
  */
 #include "common/callback_registry.h"
 
-AI_THREADLOCAL bool APIInterceptor::CallbackRegistry::m_are_callbacks_enabled = true;
+AI_THREADLOCAL bool                            APIInterceptor::CallbackRegistry::m_are_callbacks_enabled = true;
+std::atomic<APIInterceptor::CallbackRegistry*> APIInterceptor::CallbackRegistry::m_instance_ptr      = {nullptr};
 
 APIInterceptor::CallbackRegistry::CallbackRegistry()
     :m_post_callback_vec(APIInterceptor::APIFUNCTION_COUNT),
      m_pre_callback_vec (APIInterceptor::APIFUNCTION_COUNT)
 {
     /* Stub */
+}
+
+APIInterceptor::CallbackRegistry* APIInterceptor::CallbackRegistry::create_instance_ptr()
+{
+    CallbackRegistry* expected_ptr = nullptr;
+    CallbackRegistry* new_ptr      = new CallbackRegistry();
+
+    /* Never destroyed: hooks can still run during shutdown. */
+    if (m_instance_ptr.compare_exchange_strong(expected_ptr,
+                                               new_ptr) == false)
+    {
+        delete new_ptr;
+
+        new_ptr = expected_ptr;
+    }
+
+    return new_ptr;
 }
 
 void APIInterceptor::CallbackRegistry::disable_for_this_thread()
@@ -54,14 +72,6 @@ bool APIInterceptor::CallbackRegistry::get_pre_callback(const APIFunction&      
     }
 
     return result;
-}
-
-APIInterceptor::CallbackRegistry* APIInterceptor::CallbackRegistry::get_ptr()
-{
-    /* Never destroyed: hooks can still run during shutdown. */
-    static CallbackRegistry* instance_ptr = new CallbackRegistry();
-
-    return instance_ptr;
 }
 
 void APIInterceptor::CallbackRegistry::register_post_callback(const APIFunction&      in_function,

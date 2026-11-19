@@ -46,7 +46,20 @@ namespace APIInterceptor
          */
         bool try_quiesce(const uint32_t& in_timeout_ms);
 
-        static APICallGate* get_ptr();
+        /* Every hooked call starts and finishes through the gate, so this is a load of a pointer and a test, not a function-local static,
+         * whose guard costs a thread-local read each time.
+         */
+        static APICallGate* get_ptr()
+        {
+            APICallGate* result_ptr = m_instance_ptr.load(std::memory_order_acquire);
+
+            if (result_ptr == nullptr)
+            {
+                result_ptr = create_instance_ptr();
+            }
+
+            return result_ptr;
+        }
 
     private:
         void enter();
@@ -57,8 +70,12 @@ namespace APIInterceptor
         std::mutex              m_mutex;
         std::atomic<uint32_t>   m_n_threads_inside;
 
-        static AI_THREADLOCAL uint32_t m_n_api_calls_intercepted;
-        static AI_THREADLOCAL uint32_t m_scope_depth;
+        /* Makes the gate the first time it is asked for. Two threads can race to it; one gate wins and is never destroyed. */
+        static APICallGate* create_instance_ptr();
+
+        static std::atomic<APICallGate*> m_instance_ptr;
+        static AI_THREADLOCAL uint32_t   m_n_api_calls_intercepted;
+        static AI_THREADLOCAL uint32_t   m_scope_depth;
     };
 }
 

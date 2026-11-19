@@ -7,6 +7,7 @@
 
 #include "common/callbacks.h"
 #include "common/globals.h"
+#include <atomic>
 #include <utility>
 #include <vector>
 
@@ -38,7 +39,20 @@ namespace APIInterceptor
                                     PFNPRECALLBACKFUNCPROC  in_callback_func_ptr,
                                     void*                   in_func_user_arg);
 
-        static CallbackRegistry* get_ptr();
+        /* Every hooked call asks for the registry (twice, with the post callback), so this is a load of a pointer and a test, not a function-local
+         * static, whose guard costs a thread-local read each time.
+         */
+        static CallbackRegistry* get_ptr()
+        {
+            CallbackRegistry* result_ptr = m_instance_ptr.load(std::memory_order_acquire);
+
+            if (result_ptr == nullptr)
+            {
+                result_ptr = create_instance_ptr();
+            }
+
+            return result_ptr;
+        }
 
     private:
         typedef std::pair<PFNPOSTCALLBACKFUNCPROC, void*> PostCallback;
@@ -47,7 +61,11 @@ namespace APIInterceptor
         std::vector<PostCallback> m_post_callback_vec;
         std::vector<PreCallback>  m_pre_callback_vec;
 
-        static AI_THREADLOCAL bool m_are_callbacks_enabled;
+        /* Makes the registry the first time it is asked for. Two threads can race to it; one registry wins and is never destroyed. */
+        static CallbackRegistry* create_instance_ptr();
+
+        static AI_THREADLOCAL bool            m_are_callbacks_enabled;
+        static std::atomic<CallbackRegistry*> m_instance_ptr;
     };
 }
 

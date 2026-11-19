@@ -6,14 +6,32 @@
 #include <assert.h>
 #include <chrono>
 
-AI_THREADLOCAL uint32_t APIInterceptor::APICallGate::m_n_api_calls_intercepted = 0;
-AI_THREADLOCAL uint32_t APIInterceptor::APICallGate::m_scope_depth             = 0;
+std::atomic<APIInterceptor::APICallGate*> APIInterceptor::APICallGate::m_instance_ptr            = {nullptr};
+AI_THREADLOCAL uint32_t                   APIInterceptor::APICallGate::m_n_api_calls_intercepted = 0;
+AI_THREADLOCAL uint32_t                   APIInterceptor::APICallGate::m_scope_depth             = 0;
 
 APIInterceptor::APICallGate::APICallGate()
     :m_is_closed       (false),
      m_n_threads_inside(0)
 {
     /* Stub */
+}
+
+APIInterceptor::APICallGate* APIInterceptor::APICallGate::create_instance_ptr()
+{
+    APICallGate* expected_ptr = nullptr;
+    APICallGate* new_ptr      = new APICallGate();
+
+    /* Never destroyed: hooks can still run during shutdown. */
+    if (m_instance_ptr.compare_exchange_strong(expected_ptr,
+                                               new_ptr) == false)
+    {
+        delete new_ptr;
+
+        new_ptr = expected_ptr;
+    }
+
+    return new_ptr;
 }
 
 void APIInterceptor::APICallGate::enter()
@@ -41,14 +59,6 @@ void APIInterceptor::APICallGate::enter()
                       is_open_func);
         }
     }
-}
-
-APIInterceptor::APICallGate* APIInterceptor::APICallGate::get_ptr()
-{
-    /* Never destroyed: hooks can still run during shutdown. */
-    static APICallGate* instance_ptr = new APICallGate();
-
-    return instance_ptr;
 }
 
 void APIInterceptor::APICallGate::leave()
