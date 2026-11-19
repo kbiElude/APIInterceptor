@@ -26,12 +26,6 @@ namespace APIInterceptor
                                             const APIFunctionArgument* out_returned_value_ptr);
 
     void disable_callbacks_for_this_thread();
-    bool get_post_callback_for_function   (const APIFunction&                      in_api_func,
-                                           PFNPOSTCALLBACKFUNCPROC*                out_callback_func_ptr,
-                                           void**                                  out_user_arg_ptr);
-    bool get_pre_callback_for_function    (const APIFunction&                      in_api_func,
-                                           PFNPRECALLBACKFUNCPROC*                 out_callback_func_ptr,
-                                           void**                                  out_user_arg_ptr);
     void register_for_pre_callback        (APIFunction                             in_function,
                                            APIInterceptor::PFNPRECALLBACKFUNCPROC  in_callback_func_ptr,
                                            void*                                   in_func_user_arg);
@@ -103,5 +97,8 @@ namespace APIInterceptor
     void on_gate_scope_entered();
     void on_gate_scope_left   ();
 }
+
+/* The lookup of the callbacks of a function (get_pre_callback_for_function(), get_post_callback_for_function()) is inline: it is in the table header, which needs what is above. */
+#include "common/callback_table.h"
 
 #endif /* COMMON_CALLBACKS_H */

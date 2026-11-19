@@ -31,24 +31,6 @@ uint32_t APIInterceptor::get_n_held_data_chunks()
     return DataChunkStore::get_ptr()->get_n_held_chunks();
 }
 
-bool APIInterceptor::get_post_callback_for_function(const APIFunction&       in_api_func,
-                                                    PFNPOSTCALLBACKFUNCPROC* out_callback_func_ptr,
-                                                    void**                   out_user_arg_ptr)
-{
-    return CallbackRegistry::get_ptr()->get_post_callback(in_api_func,
-                                                          out_callback_func_ptr,
-                                                          out_user_arg_ptr);
-}
-
-bool APIInterceptor::get_pre_callback_for_function(const APIFunction&                      in_api_func,
-                                                   APIInterceptor::PFNPRECALLBACKFUNCPROC* out_callback_func_ptr,
-                                                   void**                                  out_user_arg_ptr)
-{
-    return CallbackRegistry::get_ptr()->get_pre_callback(in_api_func,
-                                                         out_callback_func_ptr,
-                                                         out_user_arg_ptr);
-}
-
 void APIInterceptor::on_api_call_interception_finished()
 {
     APICallGate::get_ptr()->on_api_call_interception_finished();
