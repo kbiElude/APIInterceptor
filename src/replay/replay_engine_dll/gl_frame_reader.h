@@ -33,6 +33,18 @@ namespace Replay
             bool read(std::vector<uint8_t>* out_pixel_u8_vec_ptr,
                       FrameImage*           out_image_ptr);
 
+            /* Puts pixels that read() gave (rows from the top, four bytes each) into the back buffer of the window of the current context, over what is there, without
+             * changing any state the program has set. An empty array stands for the content that a new back buffer has (see make_default_pixels()). False if there is
+             * no current context, or the window has no size, or the pixels are not the size of the window.
+             */
+            bool write(const std::vector<uint8_t>& in_pixel_u8_vec);
+
+            /* The content that a new back buffer has: the specification of OpenGL leaves it undefined, so it is opaque black (blue, green, red 0 and alpha 255), four bytes
+             * a pixel, rows from the top.
+             */
+            static std::vector<uint8_t> make_default_pixels(const uint32_t& in_width,
+                                                            const uint32_t& in_height);
+
             /* The rows of what GL read (from the bottom, four bytes a pixel) put from the top, and an alpha of 255 in every pixel. */
             static void make_top_down_and_opaque(const uint32_t&       in_width,
                                                  const uint32_t&       in_height,

@@ -93,7 +93,8 @@ namespace Replay
             /* The replay is over: release everything. Unless the executor keeps something for reset(), that is the same. */
             virtual void shutdown();
 
-            /* Puts pixels that read_back_buffer() gave into the back buffer. Returns false if that cannot be done. */
+            /* Puts pixels that read_back_buffer() gave into the back buffer. An empty array stands for the content that a new back buffer has (opaque black, where the API
+             * leaves it open). Returns false if that cannot be done. */
             virtual bool write_back_buffer(const std::vector<uint8_t>& in_pixel_u8_vec)
             {
                 (void) in_pixel_u8_vec;

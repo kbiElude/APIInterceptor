@@ -43,6 +43,7 @@ namespace Replay
             void           reset              ()                                                                 override;
             void           restore_state      ()                                                                 override;
             void           save_state         ()                                                                 override;
+            bool           write_back_buffer  (const std::vector<uint8_t>&                  in_pixel_u8_vec)       override;
 
         protected:
             /* The function of GL by name (those of opengl32.dll and of the driver); null if there is none. */

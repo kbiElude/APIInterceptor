@@ -107,3 +107,32 @@ TEST(GLFrameReader, ThereIsNoImageWithoutAContext)
     EXPECT_FALSE(reader.read(&pixel_u8vec,
                              &image) );
 }
+
+TEST(GLFrameReader, TheContentOfANewBackBufferIsOpaqueBlackAndHasTheSizeOfTheWindow)
+{
+    const auto pixel_u8vec = Replay::ReplayEngineDLL::GLFrameReader::make_default_pixels(3,
+                                                                                         2);
+
+    ASSERT_EQ(pixel_u8vec.size(),
+              3u * 2u * 4u);
+
+    for (size_t n_pixel = 0;
+                n_pixel < 3 * 2;
+              ++n_pixel)
+    {
+        EXPECT_EQ(pixel_u8vec.at(n_pixel * 4 + 0),
+                  0u);
+        EXPECT_EQ(pixel_u8vec.at(n_pixel * 4 + 1),
+                  0u);
+        EXPECT_EQ(pixel_u8vec.at(n_pixel * 4 + 2),
+                  0u);
+        EXPECT_EQ(pixel_u8vec.at(n_pixel * 4 + 3),
+                  255u);
+    }
+}
+
+TEST(GLFrameReader, ABackBufferOfNoSizeHasNoDefaultContent)
+{
+    EXPECT_TRUE(Replay::ReplayEngineDLL::GLFrameReader::make_default_pixels(0,
+                                                                             5).empty() );
+}

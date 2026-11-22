@@ -548,3 +548,8 @@ void Replay::ReplayEngineDLL::GLCallExecutor::save_state()
 {
     m_state_saver.save();
 }
+
+bool Replay::ReplayEngineDLL::GLCallExecutor::write_back_buffer(const std::vector<uint8_t>& in_pixel_u8_vec)
+{
+    return m_frame_reader.write(in_pixel_u8_vec);
+}
