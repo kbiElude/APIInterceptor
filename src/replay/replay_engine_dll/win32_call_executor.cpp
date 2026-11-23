@@ -45,7 +45,9 @@ Replay::ReplayEngineDLL::Win32CallExecutor::Win32CallExecutor(ObjectRemapper*   
         {APIInterceptor::APIFUNCTION_USER32_CREATEWINDOWEXA,                   &Win32CallExecutor::on_create_window_ex_a},
         {APIInterceptor::APIFUNCTION_USER32_CREATEWINDOWEXW,                   &Win32CallExecutor::on_create_window_ex_w},
         {APIInterceptor::APIFUNCTION_USER32_GETDC,                             &Win32CallExecutor::on_get_dc},
+        {APIInterceptor::APIFUNCTION_USER32_MOVEWINDOW,                        &Win32CallExecutor::on_move_window},
         {APIInterceptor::APIFUNCTION_USER32_RELEASEDC,                         &Win32CallExecutor::on_release_dc},
+        {APIInterceptor::APIFUNCTION_USER32_SETWINDOWPOS,                      &Win32CallExecutor::on_set_window_pos},
         {APIInterceptor::APIFUNCTION_WGL_WGLCOPYCONTEXT,                       &Win32CallExecutor::on_copy_context},
         {APIInterceptor::APIFUNCTION_WGL_WGLCREATECONTEXT,                     &Win32CallExecutor::on_create_context},
         {APIInterceptor::APIFUNCTION_WGL_WGLCREATECONTEXTATTRIBSARB,           &Win32CallExecutor::on_create_context_attribs_arb},
@@ -293,6 +295,53 @@ Replay::ReplayEngineDLL::ExecutionClass Replay::ReplayEngineDLL::Win32CallExecut
                                                                           : ExecutionClass::FIRST_TIME_ONLY;
 }
 
+void Replay::ReplayEngineDLL::Win32CallExecutor::get_frame_growth(const DWORD& in_ex_style,
+                                                                  const DWORD& in_app_style,
+                                                                  const DWORD& in_replay_style,
+                                                                  int*         out_height_ptr,
+                                                                  int*         out_width_ptr)
+{
+    RECT new_frame = {};
+    RECT old_frame = {};
+
+    *out_height_ptr = 0;
+    *out_width_ptr  = 0;
+
+    if (has_own_frame(in_app_style) )
+    {
+        ::AdjustWindowRectEx(&old_frame,
+                             in_app_style,
+                             FALSE,
+                             in_ex_style);
+        ::AdjustWindowRectEx(&new_frame,
+                             in_replay_style,
+                             FALSE,
+                             in_ex_style);
+
+        /* The thin border takes less room: the window grows by the difference, and the area for drawing stays as big. */
+        *out_height_ptr = (new_frame.bottom - new_frame.top) - (old_frame.bottom - old_frame.top);
+        *out_width_ptr  = (new_frame.right  - new_frame.left) - (old_frame.right  - old_frame.left);
+    }
+}
+
+void Replay::ReplayEngineDLL::Win32CallExecutor::get_frame_size(const DWORD& in_ex_style,
+                                                                const DWORD& in_style,
+                                                                const UINT&  in_dpi,
+                                                                int*         out_height_ptr,
+                                                                int*         out_width_ptr)
+{
+    RECT frame = {};
+
+    ::AdjustWindowRectExForDpi(&frame,
+                               in_style,
+                               FALSE,
+                               in_ex_style,
+                               in_dpi);
+
+    *out_height_ptr = frame.bottom - frame.top;
+    *out_width_ptr  = frame.right  - frame.left;
+}
+
 bool Replay::ReplayEngineDLL::Win32CallExecutor::get_live_handle(const ObjectKind&                          in_kind,
                                                                  const APIInterceptor::APIFunctionArgument& in_argument,
                                                                  void**                                     out_live_handle_ptr,
@@ -313,6 +362,12 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::get_live_handle(const ObjectKin
     }
 
     return result;
+}
+
+bool Replay::ReplayEngineDLL::Win32CallExecutor::has_own_frame(const DWORD& in_style)
+{
+    return ((in_style & WS_CAPTION) != 0 &&
+            (in_style & WS_CHILD)   == 0);
 }
 
 void* Replay::ReplayEngineDLL::Win32CallExecutor::get_wgl_function_ptr(const HDC&  in_hdc,
@@ -392,29 +447,24 @@ void Replay::ReplayEngineDLL::Win32CallExecutor::make_non_scalable(const DWORD& 
                                                                    int*         inout_width_ptr,
                                                                    int*         inout_height_ptr)
 {
-    RECT        new_frame = {};
-    const DWORD new_style = *inout_style_ptr & ~(WS_MAXIMIZEBOX | WS_THICKFRAME);
-    RECT        old_frame = {};
+    int         growth_height = 0;
+    int         growth_width  = 0;
+    const DWORD new_style     = *inout_style_ptr & ~(WS_MAXIMIZEBOX | WS_THICKFRAME);
 
     /* The size of a window the user can pull is not the app's to keep: only a window with a title bar is made so. */
-    if ((*inout_style_ptr & WS_CAPTION) != 0             &&
-        (*inout_style_ptr & WS_CHILD)   == 0             &&
-        *inout_width_ptr                != CW_USEDEFAULT &&
-        *inout_height_ptr               != CW_USEDEFAULT)
+    if (has_own_frame(*inout_style_ptr) &&
+        *inout_width_ptr  != CW_USEDEFAULT &&
+        *inout_height_ptr != CW_USEDEFAULT)
     {
-        ::AdjustWindowRectEx(&old_frame,
-                             *inout_style_ptr,
-                             FALSE,
-                             in_ex_style);
-        ::AdjustWindowRectEx(&new_frame,
-                             new_style,
-                             FALSE,
-                             in_ex_style);
+        get_frame_growth(in_ex_style,
+                         *inout_style_ptr,
+                         new_style,
+                        &growth_height,
+                        &growth_width);
 
-        /* The thin border takes less room: the window grows by the difference, and the area for drawing stays as big. */
-        *inout_height_ptr += (new_frame.bottom - new_frame.top) - (old_frame.bottom - old_frame.top);
-        *inout_width_ptr  += (new_frame.right  - new_frame.left) - (old_frame.right  - old_frame.left);
-        *inout_style_ptr   =  new_style;
+        *inout_height_ptr += growth_height;
+        *inout_width_ptr  += growth_width;
+        *inout_style_ptr   = new_style;
     }
 }
 
@@ -823,6 +873,64 @@ end:
     return result;
 }
 
+bool Replay::ReplayEngineDLL::Win32CallExecutor::on_move_window(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                                const IChunkSource&                          in_chunk_source,
+                                                                std::string*                                 out_error_ptr)
+{
+    constexpr size_t N_ARGUMENTS                  = 6;
+    constexpr size_t N_ARGUMENT_WINDOW            = 0;
+    constexpr size_t N_OUT_ARGUMENT_CLIENT_HEIGHT = 7;
+    constexpr size_t N_OUT_ARGUMENT_CLIENT_WIDTH  = 6;
+    constexpr size_t N_OUT_ARGUMENTS              = 8;
+
+    int  client_height = 0;
+    int  client_width  = 0;
+    HWND live_window   = nullptr;
+    bool result        = false;
+
+    (void) in_chunk_source;
+
+    if (in_call.arg_in_vec.size() < N_ARGUMENTS)
+    {
+        *out_error_ptr = "MoveWindow: too few arguments.";
+
+        goto end;
+    }
+
+    /* A window which the replay does not have (e.g. one of the system's libraries) is not the app's. */
+    if (get_live_handle(ObjectKind::HWND,
+                        in_call.arg_in_vec.at   (N_ARGUMENT_WINDOW),
+                        reinterpret_cast<void**>(&live_window),
+                        out_error_ptr)                               == false)
+    {
+        out_error_ptr->clear();
+
+        result = true;
+
+        goto end;
+    }
+
+    /* The area for drawing the window has after the call is the two arguments that follow the call's own. A dump that has not got them cannot be sized. */
+    if (in_call.arg_out_vec.size() >= N_OUT_ARGUMENTS)
+    {
+        client_height = in_call.arg_out_vec.at(N_OUT_ARGUMENT_CLIENT_HEIGHT).get_i32();
+        client_width  = in_call.arg_out_vec.at(N_OUT_ARGUMENT_CLIENT_WIDTH).get_i32();
+    }
+
+    if (client_height > 0 &&
+        client_width  > 0)
+    {
+        resize_window(live_window,
+                      client_width,
+                      client_height);
+    }
+
+    result = true;
+
+end:
+    return result;
+}
+
 bool Replay::ReplayEngineDLL::Win32CallExecutor::on_release_dc(const Capture::APIDumpLoader::DumpedAPICall& in_call,
                                                                const IChunkSource&                          in_chunk_source,
                                                                std::string*                                 out_error_ptr)
@@ -921,6 +1029,71 @@ bool Replay::ReplayEngineDLL::Win32CallExecutor::on_set_pixel_format(const Captu
     ::SetPixelFormat(live_hdc,
                      live_format,
                     &pixel_format_descriptor);
+
+    result = true;
+
+end:
+    return result;
+}
+
+bool Replay::ReplayEngineDLL::Win32CallExecutor::on_set_window_pos(const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                                   const IChunkSource&                          in_chunk_source,
+                                                                   std::string*                                 out_error_ptr)
+{
+    constexpr size_t N_ARGUMENTS                  = 7;
+    constexpr size_t N_ARGUMENT_FLAGS             = 6;
+    constexpr size_t N_ARGUMENT_WINDOW            = 0;
+    constexpr size_t N_OUT_ARGUMENT_CLIENT_HEIGHT = 8;
+    constexpr size_t N_OUT_ARGUMENT_CLIENT_WIDTH  = 7;
+    constexpr size_t N_OUT_ARGUMENTS              = 9;
+
+    int      client_height = 0;
+    int      client_width  = 0;
+    uint32_t flags         = 0;
+    HWND     live_window   = nullptr;
+    bool     result        = false;
+
+    (void) in_chunk_source;
+
+    if (in_call.arg_in_vec.size() < N_ARGUMENTS)
+    {
+        *out_error_ptr = "SetWindowPos: too few arguments.";
+
+        goto end;
+    }
+
+    /* A window which the replay does not have (e.g. one of the system's libraries) is not the app's. */
+    if (get_live_handle(ObjectKind::HWND,
+                        in_call.arg_in_vec.at   (N_ARGUMENT_WINDOW),
+                        reinterpret_cast<void**>(&live_window),
+                        out_error_ptr)                               == false)
+    {
+        out_error_ptr->clear();
+
+        result = true;
+
+        goto end;
+    }
+
+    flags = in_call.arg_in_vec.at(N_ARGUMENT_FLAGS).get_u32();
+
+    /* The place of a window is the replay's, so only the size is taken from the call. The area for drawing the window has after the call is the two arguments
+     * that follow the call's own. A dump that has not got them cannot be sized.
+     */
+    if ( (flags & SWP_NOSIZE)            == 0 &&
+        in_call.arg_out_vec.size()       >= N_OUT_ARGUMENTS)
+    {
+        client_height = in_call.arg_out_vec.at(N_OUT_ARGUMENT_CLIENT_HEIGHT).get_i32();
+        client_width  = in_call.arg_out_vec.at(N_OUT_ARGUMENT_CLIENT_WIDTH).get_i32();
+    }
+
+    if (client_height > 0 &&
+        client_width  > 0)
+    {
+        resize_window(live_window,
+                      client_width,
+                      client_height);
+    }
 
     result = true;
 
@@ -1217,6 +1390,49 @@ void Replay::ReplayEngineDLL::Win32CallExecutor::reset()
 
     m_context_set.clear         ();
     m_window_signature_map.clear();
+}
+
+void Replay::ReplayEngineDLL::Win32CallExecutor::resize_window(const HWND& in_live_window,
+                                                               const int&  in_client_width,
+                                                               const int&  in_client_height)
+{
+    const UINT  dpi           = ::GetDpiForWindow(in_live_window);
+    const DWORD ex_style      = static_cast<DWORD>(::GetWindowLongW(in_live_window,
+                                                                    GWL_EXSTYLE) );
+    int         frame_height  = 0;
+    int         frame_width   = 0;
+    const bool  is_top_level  = (::GetParent(in_live_window) == nullptr);
+    const DWORD style         = static_cast<DWORD>(::GetWindowLongW(in_live_window,
+                                                                    GWL_STYLE) );
+
+    /* A child has no frame of its own. */
+    if ((style & WS_CHILD) == 0)
+    {
+        get_frame_size(ex_style,
+                       style,
+                       dpi,
+                      &frame_height,
+                      &frame_width);
+    }
+
+    ::SetWindowPos(in_live_window,
+                   nullptr,
+                   0,
+                   0,
+                   in_client_width  + frame_width,
+                   in_client_height + frame_height,
+                   SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOZORDER);
+
+    if (m_are_windows_visible &&
+        is_top_level)
+    {
+        const BOOL is_visible = ::IsWindowVisible(in_live_window);
+
+        if (is_visible != FALSE)
+        {
+            place_window(in_live_window);
+        }
+    }
 }
 
 void Replay::ReplayEngineDLL::Win32CallExecutor::set_windows_visible(const bool& in_are_visible)

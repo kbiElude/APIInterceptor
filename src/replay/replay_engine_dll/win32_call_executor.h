@@ -75,12 +75,28 @@ namespace Replay
                                                 const bool&                                  in_is_wide,
                                                 std::string*                                 out_error_ptr);
             void  destroy_parked_windows       ();
+            /* How much larger the outer size of a window must be so that its area for drawing is as large as the app's frame gave it: the replay makes
+             * its windows with a thinner frame (see make_non_scalable()). in_app_style is the style the app made the window with.
+             */
+            static void get_frame_growth       (const DWORD&                                 in_ex_style,
+                                                const DWORD&                                 in_app_style,
+                                                const DWORD&                                 in_replay_style,
+                                                int*                                         out_height_ptr,
+                                                int*                                         out_width_ptr);
+            /* How large the frame of a window with this style is at this DPI: what its outer size has more than the area for drawing. */
+            static void get_frame_size         (const DWORD&                                 in_ex_style,
+                                                const DWORD&                                 in_style,
+                                                const UINT&                                  in_dpi,
+                                                int*                                         out_height_ptr,
+                                                int*                                         out_width_ptr);
             bool  get_live_handle              (const ObjectKind&                            in_kind,
                                                 const APIInterceptor::APIFunctionArgument&   in_argument,
                                                 void**                                       out_live_handle_ptr,
                                                 std::string*                                 out_error_ptr) const;
             void* get_wgl_function_ptr         (const HDC&                                   in_hdc,
                                                 const char*                                  in_name_ptr) const;
+            /* True for a window that has a title bar and is not a child: the one whose size takes its frame into account. */
+            static bool has_own_frame          (const DWORD&                                 in_style);
             void  make_non_scalable            (const DWORD&                                 in_ex_style,
                                                 DWORD*                                       inout_style_ptr,
                                                 int*                                         inout_width_ptr,
@@ -115,10 +131,16 @@ namespace Replay
             bool  on_make_current              (const Capture::APIDumpLoader::DumpedAPICall& in_call,
                                                 const IChunkSource&                          in_chunk_source,
                                                 std::string*                                 out_error_ptr);
+            bool  on_move_window               (const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                const IChunkSource&                          in_chunk_source,
+                                                std::string*                                 out_error_ptr);
             bool  on_release_dc                (const Capture::APIDumpLoader::DumpedAPICall& in_call,
                                                 const IChunkSource&                          in_chunk_source,
                                                 std::string*                                 out_error_ptr);
             bool  on_set_pixel_format          (const Capture::APIDumpLoader::DumpedAPICall& in_call,
+                                                const IChunkSource&                          in_chunk_source,
+                                                std::string*                                 out_error_ptr);
+            bool  on_set_window_pos            (const Capture::APIDumpLoader::DumpedAPICall& in_call,
                                                 const IChunkSource&                          in_chunk_source,
                                                 std::string*                                 out_error_ptr);
             bool  on_share_lists               (const Capture::APIDumpLoader::DumpedAPICall& in_call,
@@ -138,6 +160,13 @@ namespace Replay
             void  place_window                 (const HWND&                                  in_window);
             void  pump_messages                ();
             bool  register_window_class        (const std::wstring&                          in_name);
+            /* Gives the window the area for drawing that the dump says the program's window had after the call: the outer size is that area plus the frame the
+             * replay's window has (the frame of the program depends on the system and on its DPI-awareness, so it is not worked out from the outer size). The
+             * window is put in view again.
+             */
+            void  resize_window                (const HWND&                                  in_live_window,
+                                                const int&                                   in_client_width,
+                                                const int&                                   in_client_height);
             bool  take_parked_window           (const WindowSignature&                       in_signature,
                                                 HWND*                                        out_window_ptr);
 

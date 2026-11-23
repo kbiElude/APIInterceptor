@@ -30,8 +30,10 @@ Capture::APIDumpLoader::APIGroup Capture::APIDumpLoader::get_api_group(const API
         result = APIGroup::WGL;
     }
     else
-    if (in_function >= APIInterceptor::APIFUNCTION_USER32_FIRST &&
-        in_function <= APIInterceptor::APIFUNCTION_USER32_LAST)
+    if ( (in_function >= APIInterceptor::APIFUNCTION_USER32_FIRST        &&
+          in_function <= APIInterceptor::APIFUNCTION_USER32_LAST)         ||
+         (in_function >= APIInterceptor::APIFUNCTION_USER32_WINDOW_FIRST &&
+          in_function <= APIInterceptor::APIFUNCTION_USER32_WINDOW_LAST) )
     {
         result = APIGroup::USER32;
     }

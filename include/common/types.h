@@ -1115,6 +1115,15 @@ namespace APIInterceptor
         APIFUNCTION_D3D7_METHODS_FIRST = APIFUNCTION_D3D7_METHODS_BEGIN + 1,
         APIFUNCTION_D3D7_METHODS_LAST  = APIFUNCTION_D3D7_METHODS_END   - 1,
 
+        /* Window placement (User32): appended after D3D7, so that the IDs of the dumps made before it stay valid. They are in the group of User32
+         * (see get_api_group()).
+         */
+        APIFUNCTION_USER32_MOVEWINDOW,
+        APIFUNCTION_USER32_SETWINDOWPOS,
+
+        APIFUNCTION_USER32_WINDOW_FIRST = APIFUNCTION_USER32_MOVEWINDOW,
+        APIFUNCTION_USER32_WINDOW_LAST  = APIFUNCTION_USER32_SETWINDOWPOS,
+
         /* Always last */
         APIFUNCTION_COUNT,
         APIFUNCTION_UNKNOWN = APIFUNCTION_COUNT

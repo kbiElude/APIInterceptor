@@ -11,4 +11,6 @@ void* Interception::Hooks::User32::g_cached_create_dc_w_func_ptr           = Cre
 void* Interception::Hooks::User32::g_cached_create_window_ex_a_func_ptr    = CreateWindowExA;
 void* Interception::Hooks::User32::g_cached_create_window_ex_w_func_ptr    = CreateWindowExW;
 void* Interception::Hooks::User32::g_cached_get_dc_func_ptr                = GetDC;
+void* Interception::Hooks::User32::g_cached_move_window_func_ptr           = MoveWindow;
 void* Interception::Hooks::User32::g_cached_release_dc_func_ptr            = ReleaseDC;
+void* Interception::Hooks::User32::g_cached_set_window_pos_func_ptr        = SetWindowPos;

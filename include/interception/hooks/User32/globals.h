@@ -19,7 +19,9 @@ namespace Interception
             typedef HWND (WINAPI *PFNCREATEWINDOWEXAPROC)   (DWORD,   LPCSTR,  LPCSTR,  DWORD,            int, int, int, int, HWND, HMENU, HINSTANCE, LPVOID);
             typedef HWND (WINAPI *PFNCREATEWINDOWEXWPROC)   (DWORD,   LPCWSTR, LPCWSTR, DWORD,            int, int, int, int, HWND, HMENU, HINSTANCE, LPVOID);
             typedef HDC  (WINAPI *PFNGETDCPROC)             (HWND);
+            typedef BOOL (WINAPI *PFNMOVEWINDOWPROC)        (HWND, int, int, int, int, BOOL);
             typedef int  (WINAPI *PFNRELEASEDCPROC)         (HWND, HDC);
+            typedef BOOL (WINAPI *PFNSETWINDOWPOSPROC)      (HWND, HWND, int, int, int, int, UINT);
 
             extern void* g_cached_adjust_window_rect_ex_func_ptr;
             extern void* g_cached_create_dc_a_func_ptr;
@@ -27,7 +29,9 @@ namespace Interception
             extern void* g_cached_create_window_ex_a_func_ptr;
             extern void* g_cached_create_window_ex_w_func_ptr;
             extern void* g_cached_get_dc_func_ptr;
+            extern void* g_cached_move_window_func_ptr;
             extern void* g_cached_release_dc_func_ptr;
+            extern void* g_cached_set_window_pos_func_ptr;
         }
     }
 }

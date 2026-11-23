@@ -41,7 +41,7 @@
   <li><code>HooksCommon</code> (<code>interception/hooks/common</code>) is what the hooks of the APIs made of COM objects have in common: the hook of a function exported by a DLL, found once the DLL is loaded; the registry of the patched tables of methods, and the table of hooks that fills them; the hook of one method, which an API tunes with its traits (how its arguments are stored, the extra data and bookkeeping of a method, which call ends a frame); the capture of arguments by category; and the tracker of locks, so that the data a program writes into a buffer or a surface is known when it is unlocked.</li>
   <li><code>OpenGL</code> hooks the functions of each version and extension, a directory for each. It keeps the state that is per context in a registry of contexts.</li>
   <li><code>WGL</code> hooks the creation and the use of OpenGL contexts on Windows.</li>
-  <li><code>GDI32</code> hooks the choice of the pixel format and the swap of buffers; <code>User32</code> hooks the creation of windows and device contexts. Together with <code>WGL</code> they are what a workload needs to put the window and the context back at replay. They do not draw.</li>
+  <li><code>GDI32</code> hooks the choice of the pixel format and the swap of buffers; <code>User32</code> hooks the creation of windows, their size (<code>SetWindowPos</code>, <code>MoveWindow</code>) and device contexts. Together with <code>WGL</code> they are what a workload needs to put the window and the context back at replay. They do not draw.</li>
   <li><code>Kernel32</code> hooks <code>LoadLibrary</code> and <code>ExitProcess</code>: the first to notice an API that is loaded after the program starts, the second to know when the process ends.</li>
 </ul>
 

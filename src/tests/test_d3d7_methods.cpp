@@ -29,6 +29,8 @@ TEST(D3D7Methods, FunctionsComeAfterThoseOfD3D8)
     EXPECT_GT(static_cast<uint32_t>(APIInterceptor::APIFUNCTION_D3D7_FIRST),
               static_cast<uint32_t>(APIInterceptor::APIFUNCTION_D3D8_LAST) );
     EXPECT_EQ(static_cast<uint32_t>(APIInterceptor::APIFUNCTION_D3D7_LAST) + 1,
+              static_cast<uint32_t>(APIInterceptor::APIFUNCTION_USER32_WINDOW_FIRST) );
+    EXPECT_EQ(static_cast<uint32_t>(APIInterceptor::APIFUNCTION_USER32_WINDOW_LAST) + 1,
               static_cast<uint32_t>(APIInterceptor::APIFUNCTION_COUNT) );
 }
 

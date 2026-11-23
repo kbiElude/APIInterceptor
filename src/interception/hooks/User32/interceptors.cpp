@@ -8,7 +8,9 @@
 #include "interception/hooks/User32/entrypoints/create_window_ex_a.h"
 #include "interception/hooks/User32/entrypoints/create_window_ex_w.h"
 #include "interception/hooks/User32/entrypoints/get_dc.h"
+#include "interception/hooks/User32/entrypoints/move_window.h"
 #include "interception/hooks/User32/entrypoints/release_dc.h"
+#include "interception/hooks/User32/entrypoints/set_window_pos.h"
 #include "interception/hooks/User32/globals.h"
 #include "interception/hooks/User32/interceptors.h"
 
@@ -22,6 +24,8 @@ std::vector<APIInterceptor::FunctionHookTarget> Interception::Hooks::User32::get
         APIInterceptor::FunctionHookTarget(&(PVOID&)Interception::Hooks::User32::g_cached_create_window_ex_a_func_ptr,     Interception::Hooks::User32::create_window_ex_a),
         APIInterceptor::FunctionHookTarget(&(PVOID&)Interception::Hooks::User32::g_cached_create_window_ex_w_func_ptr,     Interception::Hooks::User32::create_window_ex_w),
         APIInterceptor::FunctionHookTarget(&(PVOID&)Interception::Hooks::User32::g_cached_get_dc_func_ptr,                 Interception::Hooks::User32::get_dc),
+        APIInterceptor::FunctionHookTarget(&(PVOID&)Interception::Hooks::User32::g_cached_move_window_func_ptr,            Interception::Hooks::User32::move_window),
         APIInterceptor::FunctionHookTarget(&(PVOID&)Interception::Hooks::User32::g_cached_release_dc_func_ptr,             Interception::Hooks::User32::release_dc),
+        APIInterceptor::FunctionHookTarget(&(PVOID&)Interception::Hooks::User32::g_cached_set_window_pos_func_ptr,         Interception::Hooks::User32::set_window_pos),
     };
 }
