@@ -6,6 +6,7 @@
 #include "interception/hooks/OpenGL/client_vertex_array_tracker.h"
 #include "interception/hooks/OpenGL/types.h"
 #include <string.h>
+#include <windows.h>
 
 /* gl/gl.h provides the compatibility-profile tokens which are absent from glcorearb.h. */
 #include "gl/gl.h"
@@ -134,6 +135,59 @@ bool Interception::Hooks::OpenGL::ClientVertexArrayTracker::get_kind_for_array_e
         }
     }
 
+    return result;
+}
+
+uint64_t Interception::Hooks::OpenGL::ClientVertexArrayTracker::get_n_readable_bytes(const void*     in_pointer_ptr,
+                                                                                     const uint64_t& in_n_bytes)
+{
+    constexpr DWORD READABLE_PROTECTION_MASK = PAGE_EXECUTE_READ      |
+                                               PAGE_EXECUTE_READWRITE |
+                                               PAGE_EXECUTE_WRITECOPY |
+                                               PAGE_READONLY          |
+                                               PAGE_READWRITE         |
+                                               PAGE_WRITECOPY;
+
+    const uintptr_t start_address = reinterpret_cast<uintptr_t>(in_pointer_ptr);
+    uint64_t        result        = 0;
+
+    while (result < in_n_bytes)
+    {
+        const uintptr_t          address            = start_address + static_cast<uintptr_t>(result);
+        uint64_t                 n_region_bytes     = 0;
+        MEMORY_BASIC_INFORMATION region             = {};
+        uintptr_t                region_end_address = 0;
+
+        if (::VirtualQuery(reinterpret_cast<LPCVOID>(address),
+                          &region,
+                           sizeof(region) ) == 0)
+        {
+            goto end;
+        }
+
+        if (region.State != MEM_COMMIT)
+        {
+            goto end;
+        }
+
+        if ((region.Protect & PAGE_GUARD) != 0)
+        {
+            goto end;
+        }
+
+        if ((region.Protect & READABLE_PROTECTION_MASK) == 0)
+        {
+            goto end;
+        }
+
+        region_end_address = reinterpret_cast<uintptr_t>(region.BaseAddress) + region.RegionSize;
+        n_region_bytes     = region_end_address - address;
+
+        result += (n_region_bytes < in_n_bytes - result) ? n_region_bytes
+                                                         : in_n_bytes - result;
+    }
+
+end:
     return result;
 }
 
@@ -448,6 +502,12 @@ std::vector<uint8_t> Interception::Hooks::OpenGL::ClientVertexArrayTracker::take
                 const uint32_t n_bytes_32    = static_cast<uint32_t>(n_bytes);
                 const auto     data_ptr      = static_cast<const uint8_t*>(array.pointer_ptr) + static_cast<uint64_t>(first_element) * stride_n_bytes;
 
+                /* An app may leave an array enabled with a pointer that is too short for this draw (a driver skips an array the draw does not
+                 * use, such as the normals while lighting is off). Only the memory which can be read is copied; the rest is zeros.
+                 */
+                const uint64_t n_readable_bytes = get_n_readable_bytes(data_ptr,
+                                                                       n_bytes_32);
+
                 append_value_func(kind);
                 append_value_func(index);
                 append_value_func(size);
@@ -460,7 +520,10 @@ std::vector<uint8_t> Interception::Hooks::OpenGL::ClientVertexArrayTracker::take
                 append_value_func(n_elements_32);
                 append_value_func(n_bytes_32);
                 append_bytes_func(data_ptr,
-                                  n_bytes_32);
+                                  static_cast<size_t>(n_readable_bytes) );
+
+                result_u8_vec.resize(result_u8_vec.size() + static_cast<size_t>(n_bytes_32 - n_readable_bytes),
+                                     0);
 
                 n_arrays++;
             }

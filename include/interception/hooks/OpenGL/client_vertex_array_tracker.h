@@ -39,7 +39,7 @@ namespace Interception
              *       uint32_t first_element index of the first element which was copied
              *       uint32_t n_elements    number of elements which were copied
              *       uint32_t n_bytes       size of the copy, from the start of first_element to the end of the last element
-             *       uint8_t  data[n_bytes]
+             *       uint8_t  data[n_bytes] zeros where the app's memory could not be read (an array that is too short for the draw)
              *   }
              */
             class ClientVertexArrayTracker
@@ -130,6 +130,10 @@ namespace Interception
 
                 /* Returns null if the format is not one of the interleaved formats. */
                 static const InterleavedFormat* get_interleaved_format_ptr(const uint32_t& in_format);
+
+                /* Returns how many bytes, from the start of the range, can be read: the range ends where memory stops being readable. */
+                static uint64_t get_n_readable_bytes(const void*     in_pointer_ptr,
+                                                     const uint64_t& in_n_bytes);
 
                 static uint32_t get_n_type_bytes(const uint32_t& in_type);
 

@@ -9,6 +9,7 @@
 #include "interception/hooks/OpenGL/types.h"
 #include "gl/gl.h"
 #include <string.h>
+#include <windows.h>
 #include <vector>
 
 /* One array of a snapshot, as stored. */
@@ -308,6 +309,78 @@ TEST(ClientVertexArrayTracker, InterleavedArraysSetUpEveryArrayOfTheFormat)
               reinterpret_cast<uint64_t>(data_u8vec48 + 12) );
     EXPECT_EQ(array_vec[2].stride,
               24u);
+}
+
+TEST(ClientVertexArrayTracker, AnArrayWhichIsTooShortForTheDrawIsPaddedWithZerosInsteadOfBeingReadPastItsEnd)
+{
+    /* Two pages, the second of which cannot be read. Two elements of 3 floats fit in the first page, the draw reads four. */
+    constexpr uint32_t N_ELEMENT_BYTES      = 3 * sizeof(float);
+    constexpr uint32_t N_READABLE_ELEMENTS  = 2;
+    constexpr uint32_t N_REQUESTED_ELEMENTS = 4;
+
+    DWORD       old_protection = 0;
+    SYSTEM_INFO system_info    = {};
+
+    ::GetSystemInfo(&system_info);
+
+    const uint32_t page_n_bytes = system_info.dwPageSize;
+    auto           region_ptr   = static_cast<uint8_t*>(::VirtualAlloc(nullptr,
+                                                                      2 * page_n_bytes,
+                                                                      MEM_COMMIT | MEM_RESERVE,
+                                                                      PAGE_READWRITE) );
+
+    ASSERT_NE(region_ptr,
+              nullptr);
+    ASSERT_NE(::VirtualProtect(region_ptr + page_n_bytes,
+                               page_n_bytes,
+                               PAGE_NOACCESS,
+                              &old_protection),
+              0);
+
+    const uint8_t* array_ptr = region_ptr + page_n_bytes - N_READABLE_ELEMENTS * N_ELEMENT_BYTES;
+
+    ::memset(region_ptr,
+             0xAB,
+             page_n_bytes);
+
+    Interception::Hooks::OpenGL::ClientVertexArrayTracker state;
+
+    state.set_pointer(Interception::Hooks::OpenGL::ClientArrayKind::NORMAL,
+                      0,
+                      3,
+                      GL_FLOAT,
+                      0,
+                      array_ptr,
+                      0,
+                      false,  /* in_is_integer    */
+                      false,  /* in_is_long       */
+                      false); /* in_is_normalized */
+    state.set_enabled(Interception::Hooks::OpenGL::ClientArrayKind::NORMAL,
+                      0,
+                      true);  /* in_is_enabled */
+
+    const auto array_vec = parse_snapshot(state.take_snapshot(0,
+                                                              N_REQUESTED_ELEMENTS,
+                                                              1,
+                                                              0) );
+
+    ASSERT_EQ(array_vec.size(),
+              1u);
+    ASSERT_EQ(array_vec[0].data_u8_vec.size(),
+              N_REQUESTED_ELEMENTS * N_ELEMENT_BYTES);
+
+    for (uint32_t n_byte = 0;
+                  n_byte < N_REQUESTED_ELEMENTS * N_ELEMENT_BYTES;
+                ++n_byte)
+    {
+        EXPECT_EQ(array_vec[0].data_u8_vec[n_byte],
+                  (n_byte < N_READABLE_ELEMENTS * N_ELEMENT_BYTES) ? 0xAB
+                                                                   : 0x00) << "byte " << n_byte;
+    }
+
+    ::VirtualFree(region_ptr,
+                  0,
+                  MEM_RELEASE);
 }
 
 TEST(ClientVertexArrayTracker, MapsArrayTokensToKinds)
